@@ -1,0 +1,44 @@
+// This is a generated file. Do not modify directly.
+#![allow(non_camel_case_types)]
+#![allow(unused)]
+
+use crate::magic::*;
+use regex::bytes::Regex;
+use phf::phf_map;
+
+<% for t in &types { %>
+pub(super) struct <%- t.short_name %>;
+impl MimeTypeChecker for <%- t.short_name %> {
+ fn get_mime(&self) -> &'static str {
+        "<%- t.mime_string %>"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &[<%- t.globs.iter()
+               .map(|e| format!("\"{}\"", e))
+               .collect::<Vec<_>>()
+               .join(",")
+          %>]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        <%- t.match_rules_string %>
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[<%- t.children.join(",") %>]
+    }
+}
+<% } %>
+
+pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
+<% for t in &types { %>&<%- t.short_name %>,
+<% } %>
+];
+
+pub static MIME_MAP: phf::Map<&'static str,  &[&'static dyn MimeTypeChecker]> = phf_map! {
+<% for t in &type_map { %>"<%- t.0 %>" => &[<%- t.1.join(",") %>],
+<% } %>
+};
+
+pub static EXT_MAP: phf::Map<&'static str,  &[&'static dyn MimeTypeChecker]> = phf_map! {
+<% for t in &ext_map { %>"<%- t.0 %>" => &[<%- t.1.join(",") %>],
+<% } %>
+};

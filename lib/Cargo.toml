@@ -1,0 +1,34 @@
+[package]
+name = "tika-magic"
+version = "0.1.0"
+edition = "2024"
+authors = [
+    "Ryan Stortz <ryan@withzombies.com>",
+]
+description = "Determines the MIME type of a file using the Apache Tika mime database."
+repository = "https://github.com/withzombies/tika-magic/"
+documentation = "https://docs.rs/tika-magic/"
+license = "Apache-2.0"
+readme = "../README.md"
+categories = ["parser-implementations", "filesystem"]
+keywords = ["mime", "filesystem", "media-types"]
+exclude = ["tests/*", "benches/*"]
+
+[dependencies]
+phf = { version = "0.11.3", features = ["macros", "phf_macros"] }
+regex = "1.11.1"
+
+[dev-dependencies]
+bencher = "0.1.5"
+rstest = "0.25.0"
+
+[package.metadata]
+exclude = ["tools/*", "file/*", "benches/*"]
+
+[[bench]]
+name = "from_u8"
+harness = false
+
+[[bench]]
+name = "match_u8"
+harness = false

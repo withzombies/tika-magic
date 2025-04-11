@@ -1,0 +1,13 @@
+[package]
+name = "parse_definitions"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hex = "0.4.3"
+itertools = "0.14.0"
+num-traits = "0.2.19"
+quick-xml = { version = "0.37.4", features = ["serde", "serde-types", "serialize"] }
+regex = "1.11.1"
+sailfish = "0.9.0"
+serde = "1.0.219"
