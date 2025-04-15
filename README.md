@@ -132,7 +132,7 @@ faster. Something for `tika-magic` to improve on!
 
 [test-action-image]: https://github.com/withzombies/tika-magic/workflows/CI/badge.svg
 
-[test-action-link]: https://github.com/withzombies/tika-magic/actions?query=workflow:Test
+[test-action-link]: https://github.com/withzombies/tika-magic/actions?query=workflow:CI
 
 [license-apache-image]: https://img.shields.io/badge/license-Apache2.0-blue.svg
 
