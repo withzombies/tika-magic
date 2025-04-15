@@ -1,5 +1,5 @@
 use quick_xml::de::from_str;
-use serde::{Deserialize, Deserializer, de};
+use serde::{de, Deserialize, Deserializer};
 use std::fmt;
 use std::fs::File;
 use std::io::{BufReader, Read};

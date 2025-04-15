@@ -10,7 +10,7 @@
 
 mod magic;
 
-use crate::magic::{MIME_MAP, MIME_TYPES};
+use crate::magic::{MIME_MAP, MIME_TYPES, PRIORITY_MIME_TYPES};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -75,6 +75,12 @@ fn check_recursive(checker: &'static dyn magic::MimeTypeChecker, bytes: &[u8]) -
 /// assert_eq!(result, "image/gif");
 /// ```
 pub fn from_u8(bytes: &[u8]) -> Mime {
+    for m in PRIORITY_MIME_TYPES {
+        if let Some(mime) = check_recursive(*m, bytes) {
+            return mime;
+        }
+    }
+
     for m in MIME_TYPES {
         if let Some(mime) = check_recursive(*m, bytes) {
             return mime;

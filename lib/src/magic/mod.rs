@@ -9,6 +9,15 @@ pub use generated::{EXT_MAP, MIME_MAP, MIME_TYPES};
 
 use generated::*;
 
+pub static PRIORITY_MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
+    &T_png_image,
+    &T_gif_image,
+    &T_jpeg_image,
+    &T_zip_application,
+    &T_pdf_application,
+    &T_x_dosexec_application,
+];
+
 struct MimeType {
     mime: String,
     ext: String,

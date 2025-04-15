@@ -1,7 +1,7 @@
 mod parse_xml;
 
+use crate::parse_xml::{parse_mime_type_xml, Match, MimeType, Offset};
 use crate::MatchRule::And;
-use crate::parse_xml::{Match, MimeType, Offset, parse_mime_type_xml};
 use num_traits::Num;
 use regex::bytes::Regex;
 use sailfish::TemplateSimple;
