@@ -75,7 +75,7 @@ The library has minimal dependencies and doesn't require any system libraries or
 ## License
 tika-magic is licensed under the Apache License, Version 2.0. See the LICENSE file for the full license text.
 ``` 
-Copyright 2023 [Your Name or Organization]
+Copyright 2025 Ryan Stortz
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
