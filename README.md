@@ -1,3 +1,8 @@
+[![Crate][crate-image]][crate-link]
+[![Docs][docs-image]][docs-link]
+[![Status][test-action-image]][test-action-link]
+[![Apache 2.0 Licensed][license-apache-image]][license-apache-link]
+
 # tika-magic
 
 tika-magic is a Rust library that determines the MIME type of a file or byte array. tika-magic is meant to be an API 
@@ -114,3 +119,21 @@ test tree_magic_mini::match_u8::text_plain          ... bench:          16 ns/it
 
 If you can afford to use the system magic database or to distribute GPL software, `tree_magic_mini` is significantly 
 faster. Something for `tika-magic` to improve on!
+
+[//]: # (links)
+
+[crate-image]: https://img.shields.io/crates/v/tika-magic.svg
+
+[crate-link]: https://crates.io/crates/tika-magic
+
+[docs-image]: https://docs.rs/tika-magic/badge.svg
+
+[docs-link]: https://docs.rs/tika-magic/
+
+[test-action-image]: https://github.com/withzombies/tika-magic/workflows/CI/badge.svg
+
+[test-action-link]: https://github.com/withzombies/tika-magic/actions?query=workflow:Test
+
+[license-apache-image]: https://img.shields.io/badge/license-Apache2.0-blue.svg
+
+[license-apache-link]: http://www.apache.org/licenses/LICENSE-2.0
