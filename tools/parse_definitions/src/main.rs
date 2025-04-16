@@ -1,7 +1,7 @@
 mod parse_xml;
 
 use crate::parse_xml::{parse_mime_type_xml, Match, MimeType, Offset};
-use crate::MatchRule::And;
+use crate::MatchRule::{And, RootXML};
 use num_traits::Num;
 use regex::bytes::Regex;
 use sailfish::TemplateSimple;
@@ -70,6 +70,7 @@ enum MatchRule {
     ValueU16(u32, Vec<u8>),
     UnicodeLE(u32, Vec<u8>),
     UnicodeLERange(u32, u32, Vec<u8>),
+    RootXML(Option<String>, Option<String>),
     And(Vec<MatchRule>),
     Or(Vec<MatchRule>),
     Empty,
@@ -347,9 +348,21 @@ fn match_to_rule(mat: &Match) -> MatchRule {
     rule
 }
 
+fn xml_actions_to_rules(mime: &MimeType) -> Vec<MatchRule> {
+    if mime.root_xml.is_empty() {
+        return vec![];
+    }
+
+    mime.root_xml
+        .iter()
+        .map(|e| RootXML(e.local_name.clone(), e.namespace_uri.clone()))
+        .collect()
+}
+
 fn actions_to_rules(mime: &MimeType) -> MatchRule {
     // Any magics work
-    let mut or_rules: Vec<MatchRule> = Vec::new();
+    let mut or_rules: Vec<MatchRule> = xml_actions_to_rules(mime);
+
     for magic in &mime.magics {
         if magic.matches.len() == 1 {
             let first = magic.matches.first().unwrap();
@@ -447,6 +460,18 @@ fn rules_to_string(match_rule: &MatchRule) -> String {
         MatchRule::UnicodeLERange(start, end, bytes) => {
             format!("unicode_le_range(bytes, {}, {}, &{:?})", start, end, bytes)
         }
+        MatchRule::RootXML(Some(local), Some(namespace)) => {
+            format!("rootxml(bytes, \"{}\", \"{}\")", local, namespace)
+        }
+        MatchRule::RootXML(Some(local), None) => {
+            format!("rootxml_local(bytes, \"{}\")", local)
+        }
+        MatchRule::RootXML(None, Some(namespace)) => {
+            format!("rootxml_namespace(bytes, \"{}\")", namespace)
+        }
+        _ => {
+            panic!("Unsupported rule {:?}", match_rule);
+        }
     }
 }
 
@@ -515,13 +540,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut seen = HashSet::new();
     let mut error_out = false;
     for mime in &output_mime_types {
-        if seen.contains(mime.mime_string.as_str()) {
-            eprintln!(
-                "Error: Duplicate mime type ({}) please consolidate the definitions or delete one",
-                mime.mime_string
-            );
-            error_out = true;
-        } else if seen.contains(mime.short_name.as_str()) {
+        if seen.contains(mime.mime_string.as_str()) || seen.contains(mime.short_name.as_str()) {
             eprintln!(
                 "Error: Duplicate mime type ({}) please consolidate the definitions or delete one",
                 mime.mime_string
@@ -780,6 +799,27 @@ mod tests {
         assert_eq!(
             string_rules,
             "(offset(bytes, 0, &[60, 63, 120, 109, 108]) || offset(bytes, 0, &[60, 63, 88, 77, 76]) || offset(bytes, 0, &[239, 187, 191, 60, 63, 120, 109, 108]) || offset(bytes, 0, &[255, 254, 60, 0, 63, 0, 120, 0, 109, 0, 108, 0]) || offset(bytes, 0, &[254, 255, 0, 60, 0, 63, 0, 120, 0, 109, 0, 108]) || offset(bytes, 0, &[60, 33, 45, 45]))"
+        );
+    }
+
+    #[test]
+    fn we_generate_xml_tests() {
+        let def = r#"
+            <mime-type type="application/xhtml+xml">
+                <root-XML namespaceURI="http://www.w3.org/1999/xhtml" localName="html"/>
+                <root-XML localName="html"/>
+                <root-XML namespaceURI="http://www.w3.org/1991/xhtml"/>
+            </mime-type>"#;
+
+        let mime: MimeType = from_str(def).unwrap();
+
+        let rule = actions_to_rules(&mime);
+        dbg!(&rule);
+
+        let string_rules = rules_to_string(&rule);
+        assert_eq!(
+            string_rules,
+            r#"(rootxml(bytes, "html", "http://www.w3.org/1999/xhtml") || rootxml_local(bytes, "html") || rootxml_namespace(bytes, "http://www.w3.org/1991/xhtml"))"#
         );
     }
 }

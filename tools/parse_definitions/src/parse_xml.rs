@@ -25,6 +25,7 @@ pub struct MimeType {
     pub magics: Vec<Magic>,
     pub aliases: Vec<Alias>,
     pub sub_classes: Vec<SubClass>,
+    pub root_xml: Vec<RootXml>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -80,6 +81,15 @@ pub struct SubClass {
     pub class_type: Option<String>,
 }
 
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct RootXml {
+    #[serde(rename = "@localName")]
+    pub local_name: Option<String>,
+    #[serde(rename = "@namespaceURI")]
+    pub namespace_uri: Option<String>,
+}
+
 // Define custom deserialization for MimeType that can handle interleaved fields
 impl<'de> Deserialize<'de> for MimeType {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -104,6 +114,7 @@ impl<'de> Deserialize<'de> for MimeType {
                 let mut magics = Vec::new();
                 let mut aliases = Vec::new();
                 let mut sub_classes = Vec::new();
+                let mut root_xml = Vec::new();
 
                 while let Some(key) = map.next_key::<String>()? {
                     match key.as_str() {
@@ -122,6 +133,9 @@ impl<'de> Deserialize<'de> for MimeType {
                         "sub-class-of" => {
                             sub_classes.push(map.next_value()?);
                         }
+                        "root-XML" => {
+                            root_xml.push(map.next_value()?);
+                        }
                         _ => {
                             // just eat the rest
                             let _: String = map.next_value()?;
@@ -135,6 +149,7 @@ impl<'de> Deserialize<'de> for MimeType {
                     magics,
                     aliases,
                     sub_classes,
+                    root_xml,
                 })
             }
         }
@@ -345,6 +360,11 @@ mod tests {
         assert_eq!(magic.len(), 3);
 
         dbg!(&mime);
+
+        let rootxmls = mime.root_xml;
+        assert_eq!(rootxmls.len(), 14);
+
+        dbg!(&rootxmls[0]);
     }
 
     #[test]

@@ -46,6 +46,11 @@ pub(crate) fn offset(bytes: &[u8], start: usize, needle: &[u8]) -> bool {
 }
 
 pub(crate) fn offset_range(bytes: &[u8], start: usize, end: usize, needle: &[u8]) -> bool {
+    let end = std::cmp::min(end, bytes.len().saturating_sub(1));
+    if end < start || start >= bytes.len() {
+        return false;
+    }
+
     let Some(slice) = &bytes.get(start..=end) else {
         return false;
     };
@@ -71,6 +76,10 @@ pub(crate) fn offset_mask_range(
     needle: &[u8],
     mask: &[u8],
 ) -> bool {
+    let end = std::cmp::min(end, bytes.len().saturating_sub(1));
+    if end < start || start >= bytes.len() {
+        return false;
+    }
     let Some(slice) = &bytes.get(start..=end) else {
         return false;
     };
@@ -118,6 +127,10 @@ pub(crate) fn offset_range_case_insensitive(
     end: usize,
     needle: &[u8],
 ) -> bool {
+    let end = std::cmp::min(end, bytes.len().saturating_sub(1));
+    if end < start || start >= bytes.len() {
+        return false;
+    }
     let Some(slice) = &bytes.get(start..=end) else {
         return false;
     };
@@ -201,6 +214,20 @@ pub(crate) fn unicode_le_range(bytes: &[u8], start: usize, end: usize, needle: &
     };
 
     offset_range(bytes, start, end, needle)
+}
+
+pub(crate) fn rootxml(bytes: &[u8], local_name: &str, namespace_uri: &str) -> bool {
+    rootxml_local(bytes, local_name) && rootxml_namespace(bytes, namespace_uri)
+}
+
+pub(crate) fn rootxml_local(bytes: &[u8], local_name: &str) -> bool {
+    let local_name_tag = format!("<{}", local_name);
+    let local_name_bytes = local_name_tag.as_bytes();
+    offset_range(bytes, 0, 512, local_name_bytes)
+}
+
+pub(crate) fn rootxml_namespace(bytes: &[u8], namespace_uri: &str) -> bool {
+    offset_range(bytes, 0, 512, namespace_uri.as_bytes())
 }
 
 #[cfg(test)]

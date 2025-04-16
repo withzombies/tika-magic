@@ -154,7 +154,7 @@ pub fn match_file(mimetype: &str, file: &File) -> bool {
 /// ```
 pub fn match_filepath(mimetype: &str, path: &Path) -> bool {
     match File::open(path) {
-        Ok(mut file) => match_file(mimetype, &mut file),
+        Ok(file) => match_file(mimetype, &file),
         Err(_) => false,
     }
 }
