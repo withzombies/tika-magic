@@ -15,10 +15,13 @@ impl MimeTypeChecker for T_x_tga_image {
         &["*.tga", "*.icb", "*.vda"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 1, &[0, 0, 1, 1]) && regex(bytes, 8, &Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap())) || (offset(bytes, 1, &[0, 0, 2, 0]) && regex(bytes, 8, &Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap())) || (offset(bytes, 1, &[0, 0, 3, 0]) && regex(bytes, 8, &Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap())))
+        ((offset(bytes, 1, &[1, 1, 0, 0]) && regex(bytes, 8, &Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap())) || (offset(bytes, 1, &[0, 2, 0, 0]) && regex(bytes, 8, &Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap())) || (offset(bytes, 1, &[0, 3, 0, 0]) && regex(bytes, 8, &Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap())))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -35,6 +38,9 @@ impl MimeTypeChecker for T_x_tmx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -54,6 +60,9 @@ impl MimeTypeChecker for T_x_endnote_refer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_dvd_ifo_application;
@@ -71,6 +80,9 @@ impl MimeTypeChecker for T_x_dvd_ifo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ebu_stl_application;
@@ -86,6 +98,9 @@ impl MimeTypeChecker for T_x_ebu_stl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -201,6 +216,9 @@ impl MimeTypeChecker for T_mbox_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_emlx_message;
@@ -247,6 +265,9 @@ impl MimeTypeChecker for T_x_emlx_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_nls_application;
@@ -267,6 +288,28 @@ impl MimeTypeChecker for T_x_ms_nls_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_x_mswrite_application;
+impl MimeTypeChecker for T_x_mswrite_application {
+    fn get_mime(&self) -> &'static str {
+        "application/x-mswrite"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.wri"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[49, 190, 0, 0]) || offset(bytes, 0, &[50, 190, 0, 0]))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pdf_application;
@@ -280,15 +323,20 @@ impl MimeTypeChecker for T_pdf_application {
     fn check(&self, bytes: &[u8]) -> bool {
         (offset(bytes, 0, &[37, 80, 68, 70, 45])
             || offset(bytes, 0, &[239, 187, 191, 37, 80, 68, 70, 45])
-            || (offset_range(bytes, 0, 128, &[37, 37])
-                && offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 49, 46]))
-            || (offset_range(bytes, 0, 128, &[37, 37])
-                && offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 50, 46]))
-            || offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 49, 46])
-            || offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 50, 46]))
+            || (regex_range(bytes, 0, 128, &Regex::new("^[ -~]*%%").unwrap())
+                && ((offset_range(bytes, 0, 128, &[37, 37])
+                    && offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 49, 46]))
+                    || (offset_range(bytes, 0, 128, &[37, 37])
+                        && offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 50, 46]))))
+            || (regex_range(bytes, 0, 128, &Regex::new("^[ -~]*%%").unwrap())
+                && (offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 49, 46])
+                    || offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 50, 46]))))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_illustrator_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -318,6 +366,9 @@ impl MimeTypeChecker for T_x_bplist_application {
             &T_x_webarchive_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_cbor_application;
@@ -333,6 +384,9 @@ impl MimeTypeChecker for T_cbor_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -354,6 +408,9 @@ impl MimeTypeChecker for T_coreldraw_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_illustrator_ps_application;
@@ -374,6 +431,28 @@ impl MimeTypeChecker for T_illustrator_ps_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_apple_mpegurl_application;
+impl MimeTypeChecker for T_vnd_apple_mpegurl_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.apple.mpegurl"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.m3u8"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        offset(bytes, 0, &[35, 69, 88, 84, 77, 51, 85])
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -400,6 +479,9 @@ impl MimeTypeChecker for T_vnd_etsi_asic_e_zip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_asic_s_zip_application;
@@ -425,6 +507,9 @@ impl MimeTypeChecker for T_vnd_etsi_asic_s_zip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_excel_sheet_4_application;
@@ -444,6 +529,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_4_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_excel_workspace_4_application;
@@ -459,6 +547,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_workspace_4_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -479,6 +570,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_3_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_excel_workspace_3_application;
@@ -494,6 +588,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_workspace_3_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -514,6 +611,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_tcpdump_pcap_application;
@@ -525,10 +625,13 @@ impl MimeTypeChecker for T_vnd_tcpdump_pcap_application {
         &["*.pcap", "*.cap", "*.dmp"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[212, 195, 178, 161]) || offset(bytes, 0, &[161, 178, 195, 212]))
+        (offset(bytes, 0, &[161, 178, 195, 212]) || offset(bytes, 0, &[212, 195, 178, 161]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -542,10 +645,13 @@ impl MimeTypeChecker for T_vnd_tcpdump_pcapng_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         (offset(bytes, 0, &[10, 13, 13, 10])
-            && (offset(bytes, 8, &[212, 195, 178, 161]) || offset(bytes, 8, &[77, 60, 43, 26])))
+            && (offset(bytes, 8, &[161, 178, 195, 212]) || offset(bytes, 8, &[77, 60, 43, 26])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -562,6 +668,9 @@ impl MimeTypeChecker for T_warc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -583,6 +692,9 @@ impl MimeTypeChecker for T_x_activemime_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_axcrypt_application;
@@ -600,10 +712,13 @@ impl MimeTypeChecker for T_x_axcrypt_application {
             &[
                 192, 185, 7, 46, 79, 147, 241, 70, 160, 21, 121, 44, 161, 217, 232, 33,
             ],
-        ) && offset(bytes, 17, &[2, 0, 0, 0]))
+        ) && offset(bytes, 17, &[0, 0, 0, 2]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -617,11 +732,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_2_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[5, 0, 0, 0]))
-            || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[5, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 6, 21, 97]) && offset(bytes, 16, &[0, 0, 0, 5]))
             || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[5, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -635,11 +753,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_3_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[7, 0, 0, 0]))
-            || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[7, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 6, 21, 97]) && offset(bytes, 16, &[0, 0, 0, 7]))
             || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[7, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -653,11 +774,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_4_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[8, 0, 0, 0]))
-            || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[8, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 6, 21, 97]) && offset(bytes, 16, &[0, 0, 0, 8]))
             || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[8, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -671,11 +795,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_5_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[9, 0, 0, 0]))
-            || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[9, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 6, 21, 97]) && offset(bytes, 16, &[0, 0, 0, 9]))
             || (offset(bytes, 12, &[97, 21, 6, 0]) && offset(bytes, 16, &[9, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -689,11 +816,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_version_2_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[6, 0, 0, 0]))
-            || (offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[6, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 5, 49, 98]) && offset(bytes, 16, &[0, 0, 0, 6]))
             || (offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[6, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -707,11 +837,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_version_3_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[8, 0, 0, 0]))
-            || (offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[8, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 5, 49, 98]) && offset(bytes, 16, &[0, 0, 0, 8]))
             || (offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[8, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -725,11 +858,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_version_4_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[9, 0, 0, 0]))
-            || (offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[9, 0, 0, 0]))
+            || (offset(bytes, 12, &[0, 5, 49, 98]) && offset(bytes, 16, &[0, 0, 0, 9]))
             || (offset(bytes, 12, &[98, 49, 5, 0]) && offset(bytes, 16, &[9, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -760,6 +896,9 @@ impl MimeTypeChecker for T_x_debian_package_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -794,6 +933,32 @@ impl MimeTypeChecker for T_x_font_type1_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_x_foxmail_application;
+impl MimeTypeChecker for T_x_foxmail_application {
+    fn get_mime(&self) -> &'static str {
+        "application/x-foxmail"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &[]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        offset(
+            bytes,
+            0,
+            &[16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 17, 17, 83],
+        )
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_internet_archive_application;
@@ -814,6 +979,9 @@ impl MimeTypeChecker for T_x_internet_archive_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_lz4_application;
@@ -830,6 +998,9 @@ impl MimeTypeChecker for T_x_lz4_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mobipocket_ebook_application;
@@ -845,6 +1016,9 @@ impl MimeTypeChecker for T_x_mobipocket_ebook_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -876,6 +1050,9 @@ impl MimeTypeChecker for T_x_msaccess_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msdownload_format_pe32_application;
@@ -892,6 +1069,9 @@ impl MimeTypeChecker for T_x_msdownload_format_pe32_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -910,6 +1090,9 @@ impl MimeTypeChecker for T_x_msdownload_format_pe64_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msdownload_format_pe_itanium_application;
@@ -926,6 +1109,9 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_itanium_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -944,6 +1130,9 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_armLE_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msdownload_format_pe_arm7_application;
@@ -960,6 +1149,9 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_arm7_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -983,6 +1175,9 @@ impl MimeTypeChecker for T_x_msmoney_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_rar_compressed_version_4_application;
@@ -998,6 +1193,9 @@ impl MimeTypeChecker for T_x_rar_compressed_version_4_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1015,6 +1213,9 @@ impl MimeTypeChecker for T_x_rar_compressed_version_5_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_shapefile_application;
@@ -1026,10 +1227,13 @@ impl MimeTypeChecker for T_x_shapefile_application {
         &["*.shp"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        offset(bytes, 0, &[10, 39, 0, 0])
+        offset(bytes, 0, &[0, 0, 39, 10])
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1053,6 +1257,9 @@ impl MimeTypeChecker for T_x_geopackage_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_geopackage__version_1_1Or1_0_application;
@@ -1074,6 +1281,9 @@ impl MimeTypeChecker for T_x_geopackage__version_1_1Or1_0_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1097,6 +1307,9 @@ impl MimeTypeChecker for T_x_fossil_checkout_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_fossil_global_conf_application;
@@ -1118,6 +1331,9 @@ impl MimeTypeChecker for T_x_fossil_global_conf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1141,6 +1357,9 @@ impl MimeTypeChecker for T_x_fossil_repository_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_bentley_besqlite_application;
@@ -1162,6 +1381,9 @@ impl MimeTypeChecker for T_x_bentley_besqlite_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1185,6 +1407,9 @@ impl MimeTypeChecker for T_x_bentley_localization_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_monotone_source_repo_application;
@@ -1206,6 +1431,9 @@ impl MimeTypeChecker for T_x_monotone_source_repo_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1229,6 +1457,9 @@ impl MimeTypeChecker for T_x_esri_spatially_enabled_db_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mbtiles_application;
@@ -1251,6 +1482,9 @@ impl MimeTypeChecker for T_x_mbtiles_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_texnicard_application;
@@ -1272,6 +1506,9 @@ impl MimeTypeChecker for T_x_texnicard_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1297,6 +1534,9 @@ impl MimeTypeChecker for T_x_stata_dta_version_14_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_stata_dta_version_13_application;
@@ -1320,6 +1560,9 @@ impl MimeTypeChecker for T_x_stata_dta_version_13_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1345,6 +1588,9 @@ impl MimeTypeChecker for T_x_stata_dta_version_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_stata_dta_version_10_application;
@@ -1368,6 +1614,9 @@ impl MimeTypeChecker for T_x_stata_dta_version_10_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1393,30 +1642,8 @@ impl MimeTypeChecker for T_x_stata_dta_version_8_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_x_tika_msworks_spreadsheet_application;
-impl MimeTypeChecker for T_x_tika_msworks_spreadsheet_application {
-    fn get_mime(&self) -> &'static str {
-        "application/x-tika-msworks-spreadsheet"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.xlr"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset_range(bytes, 0, 8, &[208, 207, 17, 224, 161, 177, 26, 225])
-            && offset_range(
-                bytes,
-                1152,
-                4096,
-                &[
-                    87, 0, 107, 0, 115, 0, 83, 0, 83, 0, 87, 0, 111, 0, 114, 0, 107, 0, 66, 0, 111,
-                    0, 111, 0, 107,
-                ],
-            ))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1440,6 +1667,9 @@ impl MimeTypeChecker for T_mp4_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vorbis_audio;
@@ -1456,6 +1686,9 @@ impl MimeTypeChecker for T_vorbis_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1484,6 +1717,9 @@ impl MimeTypeChecker for T_x_oggflac_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_oggpcm_audio;
@@ -1511,6 +1747,9 @@ impl MimeTypeChecker for T_x_oggpcm_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_opus_audio;
@@ -1528,6 +1767,9 @@ impl MimeTypeChecker for T_opus_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_speex_audio;
@@ -1544,6 +1786,9 @@ impl MimeTypeChecker for T_speex_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1565,6 +1810,9 @@ impl MimeTypeChecker for T_x_caf_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_avif_image;
@@ -1581,6 +1829,9 @@ impl MimeTypeChecker for T_avif_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1599,6 +1850,9 @@ impl MimeTypeChecker for T_heic_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_heic_sequence_image;
@@ -1615,6 +1869,9 @@ impl MimeTypeChecker for T_heic_sequence_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1634,6 +1891,9 @@ impl MimeTypeChecker for T_x_canon_cr2_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_canon_cr3_image;
@@ -1649,6 +1909,9 @@ impl MimeTypeChecker for T_x_canon_cr3_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1667,6 +1930,9 @@ impl MimeTypeChecker for T_news_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1715,6 +1981,9 @@ impl MimeTypeChecker for T_x_httpresponse_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_related_multipart;
@@ -1761,6 +2030,9 @@ impl MimeTypeChecker for T_related_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_e57_model;
@@ -1776,6 +2048,9 @@ impl MimeTypeChecker for T_e57_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1794,6 +2069,9 @@ impl MimeTypeChecker for T_x_stl_ascii_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dwf_version_6_model;
@@ -1811,6 +2089,9 @@ impl MimeTypeChecker for T_vnd_dwf_version_6_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dwf_version_5_model;
@@ -1826,6 +2107,9 @@ impl MimeTypeChecker for T_vnd_dwf_version_5_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1843,73 +2127,8 @@ impl MimeTypeChecker for T_vnd_dwf_version_2_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_html_text;
-impl MimeTypeChecker for T_html_text {
-    fn get_mime(&self) -> &'static str {
-        "text/html"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.html", "*.htm"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (rootxml_local(bytes, "html")
-            || rootxml_local(bytes, "HTML")
-            || rootxml_local(bytes, "link")
-            || rootxml_local(bytes, "LINK")
-            || rootxml_local(bytes, "body")
-            || rootxml_local(bytes, "BODY")
-            || rootxml_local(bytes, "p")
-            || rootxml_local(bytes, "P")
-            || rootxml_local(bytes, "script")
-            || rootxml_local(bytes, "SCRIPT")
-            || rootxml_local(bytes, "frameset")
-            || rootxml_local(bytes, "FRAMESET")
-            || rootxml_local(bytes, "iframe")
-            || rootxml_local(bytes, "IFRAME")
-            || regex(
-                bytes,
-                0,
-                &Regex::new("(?i)<(html|head|body|title|div)[ >]").unwrap(),
-            )
-            || regex(bytes, 0, &Regex::new("(?i)<h[123][ >]").unwrap())
-            || offset_range(
-                bytes,
-                0,
-                64,
-                &[60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 72, 84, 77, 76],
-            )
-            || offset_range(
-                bytes,
-                0,
-                64,
-                &[60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 104, 116, 109, 108],
-            )
-            || offset_range(
-                bytes,
-                0,
-                64,
-                &[60, 33, 100, 111, 99, 116, 121, 112, 101, 32, 72, 84, 77, 76],
-            )
-            || offset_range(
-                bytes,
-                0,
-                64,
-                &[
-                    60, 33, 100, 111, 99, 116, 121, 112, 101, 32, 104, 116, 109, 108,
-                ],
-            )
-            || offset_range(bytes, 0, 64, &[60, 72, 69, 65, 68])
-            || offset_range(bytes, 0, 64, &[60, 104, 101, 97, 100])
-            || offset_range(bytes, 0, 64, &[60, 84, 73, 84, 76, 69])
-            || offset_range(bytes, 0, 64, &[60, 116, 105, 116, 108, 101])
-            || offset_range(bytes, 0, 64, &[60, 72, 84, 77, 76])
-            || offset_range(bytes, 0, 128, &[60, 104, 116, 109, 108])
-            || offset_range(bytes, 128, 8192, &[60, 104, 116, 109, 108]))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -1942,6 +2161,9 @@ impl MimeTypeChecker for T_x_php_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_3gpp_video;
@@ -1968,6 +2190,9 @@ impl MimeTypeChecker for T_3gpp_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_3gpp2_video;
@@ -1989,6 +2214,9 @@ impl MimeTypeChecker for T_3gpp2_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2017,6 +2245,9 @@ impl MimeTypeChecker for T_daala_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_theora_video;
@@ -2043,6 +2274,9 @@ impl MimeTypeChecker for T_theora_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2071,6 +2305,9 @@ impl MimeTypeChecker for T_x_dirac_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ogm_video;
@@ -2097,6 +2334,9 @@ impl MimeTypeChecker for T_x_ogm_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2125,6 +2365,9 @@ impl MimeTypeChecker for T_x_ogguvs_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_oggyuv_video;
@@ -2151,6 +2394,9 @@ impl MimeTypeChecker for T_x_oggyuv_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2179,6 +2425,9 @@ impl MimeTypeChecker for T_x_oggrgb_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_m4v_video;
@@ -2196,6 +2445,9 @@ impl MimeTypeChecker for T_x_m4v_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2229,6 +2481,9 @@ impl MimeTypeChecker for T_x_ms_wmv_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mach_o_universal_application;
@@ -2241,25 +2496,25 @@ impl MimeTypeChecker for T_x_mach_o_universal_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 0, &[202, 254, 186, 190])
-            && (offset(bytes, 4, &[1, 0, 0, 0])
-                || offset(bytes, 4, &[2, 0, 0, 0])
-                || offset(bytes, 4, &[3, 0, 0, 0])
-                || offset(bytes, 4, &[4, 0, 0, 0])
-                || offset(bytes, 4, &[5, 0, 0, 0])
-                || offset(bytes, 4, &[6, 0, 0, 0])
-                || offset(bytes, 4, &[7, 0, 0, 0])
-                || offset(bytes, 4, &[8, 0, 0, 0])
-                || offset(bytes, 4, &[9, 0, 0, 0])
-                || offset(bytes, 4, &[10, 0, 0, 0])
-                || offset(bytes, 4, &[11, 0, 0, 0])
-                || offset(bytes, 4, &[12, 0, 0, 0])
-                || offset(bytes, 4, &[13, 0, 0, 0])
-                || offset(bytes, 4, &[14, 0, 0, 0])
-                || offset(bytes, 4, &[15, 0, 0, 0])
-                || offset(bytes, 4, &[16, 0, 0, 0])
-                || offset(bytes, 4, &[17, 0, 0, 0])
-                || offset(bytes, 4, &[18, 0, 0, 0])
-                || offset(bytes, 4, &[19, 0, 0, 0])))
+            && (offset(bytes, 4, &[0, 0, 0, 1])
+                || offset(bytes, 4, &[0, 0, 0, 2])
+                || offset(bytes, 4, &[0, 0, 0, 3])
+                || offset(bytes, 4, &[0, 0, 0, 4])
+                || offset(bytes, 4, &[0, 0, 0, 5])
+                || offset(bytes, 4, &[0, 0, 0, 6])
+                || offset(bytes, 4, &[0, 0, 0, 7])
+                || offset(bytes, 4, &[0, 0, 0, 8])
+                || offset(bytes, 4, &[0, 0, 0, 9])
+                || offset(bytes, 4, &[0, 0, 0, 10])
+                || offset(bytes, 4, &[0, 0, 0, 11])
+                || offset(bytes, 4, &[0, 0, 0, 12])
+                || offset(bytes, 4, &[0, 0, 0, 13])
+                || offset(bytes, 4, &[0, 0, 0, 14])
+                || offset(bytes, 4, &[0, 0, 0, 15])
+                || offset(bytes, 4, &[0, 0, 0, 16])
+                || offset(bytes, 4, &[0, 0, 0, 17])
+                || offset(bytes, 4, &[0, 0, 0, 18])
+                || offset(bytes, 4, &[0, 0, 0, 19])))
             || (offset(bytes, 0, &[190, 186, 254, 202])
                 && (offset(bytes, 4, &[1, 0, 0, 0])
                     || offset(bytes, 4, &[2, 0, 0, 0])
@@ -2281,25 +2536,25 @@ impl MimeTypeChecker for T_x_mach_o_universal_application {
                     || offset(bytes, 4, &[18, 0, 0, 0])
                     || offset(bytes, 4, &[19, 0, 0, 0])))
             || (offset(bytes, 0, &[202, 254, 186, 191])
-                && (offset(bytes, 4, &[1, 0, 0, 0])
-                    || offset(bytes, 4, &[2, 0, 0, 0])
-                    || offset(bytes, 4, &[3, 0, 0, 0])
-                    || offset(bytes, 4, &[4, 0, 0, 0])
-                    || offset(bytes, 4, &[5, 0, 0, 0])
-                    || offset(bytes, 4, &[6, 0, 0, 0])
-                    || offset(bytes, 4, &[7, 0, 0, 0])
-                    || offset(bytes, 4, &[8, 0, 0, 0])
-                    || offset(bytes, 4, &[9, 0, 0, 0])
-                    || offset(bytes, 4, &[10, 0, 0, 0])
-                    || offset(bytes, 4, &[11, 0, 0, 0])
-                    || offset(bytes, 4, &[12, 0, 0, 0])
-                    || offset(bytes, 4, &[13, 0, 0, 0])
-                    || offset(bytes, 4, &[14, 0, 0, 0])
-                    || offset(bytes, 4, &[15, 0, 0, 0])
-                    || offset(bytes, 4, &[16, 0, 0, 0])
-                    || offset(bytes, 4, &[17, 0, 0, 0])
-                    || offset(bytes, 4, &[18, 0, 0, 0])
-                    || offset(bytes, 4, &[19, 0, 0, 0])))
+                && (offset(bytes, 4, &[0, 0, 0, 1])
+                    || offset(bytes, 4, &[0, 0, 0, 2])
+                    || offset(bytes, 4, &[0, 0, 0, 3])
+                    || offset(bytes, 4, &[0, 0, 0, 4])
+                    || offset(bytes, 4, &[0, 0, 0, 5])
+                    || offset(bytes, 4, &[0, 0, 0, 6])
+                    || offset(bytes, 4, &[0, 0, 0, 7])
+                    || offset(bytes, 4, &[0, 0, 0, 8])
+                    || offset(bytes, 4, &[0, 0, 0, 9])
+                    || offset(bytes, 4, &[0, 0, 0, 10])
+                    || offset(bytes, 4, &[0, 0, 0, 11])
+                    || offset(bytes, 4, &[0, 0, 0, 12])
+                    || offset(bytes, 4, &[0, 0, 0, 13])
+                    || offset(bytes, 4, &[0, 0, 0, 14])
+                    || offset(bytes, 4, &[0, 0, 0, 15])
+                    || offset(bytes, 4, &[0, 0, 0, 16])
+                    || offset(bytes, 4, &[0, 0, 0, 17])
+                    || offset(bytes, 4, &[0, 0, 0, 18])
+                    || offset(bytes, 4, &[0, 0, 0, 19])))
             || (offset(bytes, 0, &[191, 186, 254, 202])
                 && (offset(bytes, 4, &[1, 0, 0, 0])
                     || offset(bytes, 4, &[2, 0, 0, 0])
@@ -2324,6 +2579,9 @@ impl MimeTypeChecker for T_x_mach_o_universal_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_java_jnilib_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_heif_image;
@@ -2343,6 +2601,9 @@ impl MimeTypeChecker for T_heif_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_heic_image]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_heif_sequence_image;
@@ -2361,6 +2622,9 @@ impl MimeTypeChecker for T_heif_sequence_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_heic_sequence_image]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -2387,6 +2651,9 @@ impl MimeTypeChecker for T_mp4_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_m4v_video]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -2435,6 +2702,9 @@ impl MimeTypeChecker for T_x_robots_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mach_o_object_application;
@@ -2446,13 +2716,16 @@ impl MimeTypeChecker for T_x_mach_o_object_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[1, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 1]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[1, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[1, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 1]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[1, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2465,13 +2738,16 @@ impl MimeTypeChecker for T_x_mach_o_executable_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[2, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 2]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[2, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[2, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 2]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[2, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2484,13 +2760,16 @@ impl MimeTypeChecker for T_x_mach_o_fvmlib_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[3, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 3]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[3, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[3, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 3]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[3, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2503,13 +2782,16 @@ impl MimeTypeChecker for T_x_mach_o_core_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[4, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 4]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[4, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[4, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 4]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[4, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2522,13 +2804,16 @@ impl MimeTypeChecker for T_x_mach_o_preload_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[5, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 5]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[5, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[5, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 5]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[5, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2541,13 +2826,16 @@ impl MimeTypeChecker for T_x_mach_o_dylib_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[6, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 6]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[6, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[6, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 6]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[6, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2560,13 +2848,16 @@ impl MimeTypeChecker for T_x_mach_o_dylinker_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[7, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 7]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[7, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[7, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 7]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[7, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2579,13 +2870,16 @@ impl MimeTypeChecker for T_x_mach_o_bundle_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[8, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 8]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[8, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[8, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 8]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[8, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2598,13 +2892,16 @@ impl MimeTypeChecker for T_x_mach_o_dylib_stub_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[9, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 9]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[9, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[9, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 9]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[9, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2617,13 +2914,16 @@ impl MimeTypeChecker for T_x_mach_o_dsym_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[10, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 10]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[10, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[10, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 10]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[10, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2636,13 +2936,16 @@ impl MimeTypeChecker for T_x_mach_o_kext_bundle_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[11, 0, 0, 0]))
+        ((offset(bytes, 0, &[254, 237, 250, 206]) && offset(bytes, 12, &[0, 0, 0, 11]))
             || (offset(bytes, 0, &[206, 250, 237, 254]) && offset(bytes, 12, &[11, 0, 0, 0]))
-            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[11, 0, 0, 0]))
+            || (offset(bytes, 0, &[254, 237, 250, 207]) && offset(bytes, 12, &[0, 0, 0, 11]))
             || (offset(bytes, 0, &[207, 250, 237, 254]) && offset(bytes, 12, &[11, 0, 0, 0])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2670,6 +2973,9 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_application {
             &T_x_msdownload_format_pe_arm7_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_applefile_application;
@@ -2685,6 +2991,9 @@ impl MimeTypeChecker for T_applefile_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2703,6 +3012,9 @@ impl MimeTypeChecker for T_x_bat_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dicom_application;
@@ -2719,6 +3031,9 @@ impl MimeTypeChecker for T_dicom_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_java_vm_application;
@@ -2734,6 +3049,9 @@ impl MimeTypeChecker for T_java_vm_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2755,6 +3073,9 @@ impl MimeTypeChecker for T_vnd_java_hprof__application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_java_hprof_text_application;
@@ -2774,6 +3095,9 @@ impl MimeTypeChecker for T_vnd_java_hprof_text_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2797,6 +3121,9 @@ impl MimeTypeChecker for T_mac_binhex40_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2823,6 +3150,9 @@ impl MimeTypeChecker for T_marc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wolfram_wl_application;
@@ -2845,6 +3175,9 @@ impl MimeTypeChecker for T_vnd_wolfram_wl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2872,7 +3205,7 @@ impl MimeTypeChecker for T_msword_application {
                 102, 116, 32, 87, 111, 114, 100, 32, 54,
             ],
         ) || offset(bytes, 2112, &[77, 83, 87, 111, 114, 100, 68, 111, 99])
-            || offset(bytes, 0, &[0, 0, 190, 49])
+            || offset(bytes, 0, &[49, 190, 0, 0])
             || offset(bytes, 0, &[80, 79, 94, 81, 96])
             || offset(bytes, 0, &[254, 55, 0, 35])
             || offset(bytes, 0, &[219, 165, 45, 0, 0, 0])
@@ -2894,6 +3227,9 @@ impl MimeTypeChecker for T_msword_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_msword2_application;
@@ -2910,6 +3246,9 @@ impl MimeTypeChecker for T_msword2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_msword5_application;
@@ -2925,6 +3264,9 @@ impl MimeTypeChecker for T_msword5_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -2958,6 +3300,9 @@ impl MimeTypeChecker for T_octet_stream_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_onenote_format_one_application;
@@ -2977,6 +3322,9 @@ impl MimeTypeChecker for T_onenote_format_one_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_onenote_format_onetoc2_application;
@@ -2995,6 +3343,9 @@ impl MimeTypeChecker for T_onenote_format_onetoc2_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3052,6 +3403,9 @@ impl MimeTypeChecker for T_pkcs7_signature_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_timestamped_data_application;
@@ -3067,6 +3421,9 @@ impl MimeTypeChecker for T_timestamped_data_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3084,6 +3441,9 @@ impl MimeTypeChecker for T_rtf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sereal_version_1_application;
@@ -3099,6 +3459,9 @@ impl MimeTypeChecker for T_sereal_version_1_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3116,6 +3479,9 @@ impl MimeTypeChecker for T_sereal_version_2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sereal_version_3_application;
@@ -3131,6 +3497,9 @@ impl MimeTypeChecker for T_sereal_version_3_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3148,6 +3517,9 @@ impl MimeTypeChecker for T_vnd_digilite_prolights_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fdf_application;
@@ -3163,6 +3535,9 @@ impl MimeTypeChecker for T_vnd_fdf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3180,6 +3555,9 @@ impl MimeTypeChecker for T_vnd_iccprofile_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lotus_1_2_3_version_1_application;
@@ -3195,6 +3573,9 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_1_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3212,6 +3593,9 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lotus_1_2_3_version_3_application;
@@ -3227,6 +3611,9 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_3_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3244,6 +3631,9 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_4_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lotus_1_2_3_version_97_9_x_application;
@@ -3259,6 +3649,9 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_97_9_x_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3276,6 +3669,9 @@ impl MimeTypeChecker for T_vnd_lotus_wordpro_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3311,6 +3707,52 @@ impl MimeTypeChecker for T_vnd_mif_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_ms_excel_application;
+impl MimeTypeChecker for T_vnd_ms_excel_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.ms-excel"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &[
+            "*.xls", "*.xlm", "*.xla", "*.xlc", "*.xlt", "*.xlw", "*.xll", "*.xld",
+        ]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(
+            bytes,
+            2080,
+            &[
+                77, 105, 99, 114, 111, 115, 111, 102, 116, 32, 69, 120, 99, 101, 108, 32, 53, 46,
+                48, 32, 87, 111, 114, 107, 115, 104, 101, 101, 116,
+            ],
+        ) || offset(
+            bytes,
+            2080,
+            &[
+                70, 111, 103, 108, 105, 111, 32, 100, 105, 32, 108, 97, 118, 111, 114, 111, 32, 77,
+                105, 99, 114, 111, 115, 111, 102, 116, 32, 69, 120, 99, 101,
+            ],
+        ) || offset(bytes, 2114, &[66, 105, 102, 102, 53])
+            || offset(bytes, 2121, &[66, 105, 102, 102, 53])
+            || (offset_range(bytes, 0, 8, &[208, 207, 17, 224, 161, 177, 26, 225])
+                && offset_range(
+                    bytes,
+                    1152,
+                    4096,
+                    &[87, 0, 111, 0, 114, 0, 107, 0, 98, 0, 111, 0, 111, 0, 107],
+                )))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_fontobject_application;
@@ -3327,6 +3769,9 @@ impl MimeTypeChecker for T_vnd_ms_fontobject_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_htmlhelp_application;
@@ -3342,6 +3787,9 @@ impl MimeTypeChecker for T_vnd_ms_htmlhelp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3363,6 +3811,9 @@ impl MimeTypeChecker for T_vnd_ms_outlook_pst_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3389,6 +3840,9 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_project_application;
@@ -3412,6 +3866,9 @@ impl MimeTypeChecker for T_x_project_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_tnef_application;
@@ -3427,6 +3884,9 @@ impl MimeTypeChecker for T_vnd_ms_tnef_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3444,6 +3904,209 @@ impl MimeTypeChecker for T_vnd_ms_works_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_chart_template_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_chart_template_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.chart-template"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.otc"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[80, 75])
+            && offset(
+                bytes,
+                30,
+                &[
+                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
+                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
+                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 99, 104, 97, 114, 116, 45,
+                    116, 101, 109, 112, 108, 97, 116, 101,
+                ],
+            ))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_base_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_base_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.base"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.odb"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[80, 75])
+            && offset(
+                bytes,
+                30,
+                &[
+                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
+                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
+                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 98, 97, 115, 101,
+                ],
+            ))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_formula_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_formula_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.formula"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.odf"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[80, 75])
+            && offset(
+                bytes,
+                30,
+                &[
+                    97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 47, 118, 110, 100, 46, 111,
+                    97, 115, 105, 115, 46, 111, 112, 101, 110, 100, 111, 99, 117, 109, 101, 110,
+                    116, 46, 102, 111, 114, 109, 117, 108, 97,
+                ],
+            ))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_flat_text_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_text_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.flat.text"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.fodt"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        offset_range(
+            bytes,
+            0,
+            2048,
+            &[
+                109, 105, 109, 101, 116, 121, 112, 101, 61, 34, 97, 112, 112, 108, 105, 99, 97,
+                116, 105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
+                101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 116, 101, 120, 116, 34,
+            ],
+        )
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_flat_presentation_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_presentation_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.flat.presentation"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.fodp"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        offset_range(
+            bytes,
+            0,
+            2048,
+            &[
+                109, 105, 109, 101, 116, 121, 112, 101, 61, 34, 97, 112, 112, 108, 105, 99, 97,
+                116, 105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
+                101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 112, 114, 101, 115, 101, 110,
+                116, 97, 116, 105, 111, 110, 34,
+            ],
+        )
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_flat_spreadsheet_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_spreadsheet_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.flat.spreadsheet"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.fods"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        offset_range(
+            bytes,
+            0,
+            2048,
+            &[
+                109, 105, 109, 101, 116, 121, 112, 101, 61, 34, 97, 112, 112, 108, 105, 99, 97,
+                116, 105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
+                101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 115, 112, 114, 101, 97, 100,
+                115, 104, 101, 101, 116, 34,
+            ],
+        )
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_oasis_opendocument_text_master_application;
+impl MimeTypeChecker for T_vnd_oasis_opendocument_text_master_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.oasis.opendocument.text-master"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.otm"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[80, 75])
+            && offset(
+                bytes,
+                30,
+                &[
+                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
+                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
+                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 116, 101, 120, 116, 45,
+                    109, 97, 115, 116, 101, 114,
+                ],
+            ))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3477,6 +4140,9 @@ impl MimeTypeChecker
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application;
@@ -3506,6 +4172,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_spreadsheetml_sheet
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3537,6 +4206,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_wordprocessingml_do
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_rn_realmedia_application;
@@ -3552,6 +4224,9 @@ impl MimeTypeChecker for T_vnd_rn_realmedia_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3570,6 +4245,9 @@ impl MimeTypeChecker for T_vnd_stardivision_calc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_stardivision_draw_application;
@@ -3586,6 +4264,9 @@ impl MimeTypeChecker for T_vnd_stardivision_draw_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3609,6 +4290,9 @@ impl MimeTypeChecker for T_vnd_stardivision_impress_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_stardivision_writer_application;
@@ -3631,6 +4315,9 @@ impl MimeTypeChecker for T_vnd_stardivision_writer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_subrip_application;
@@ -3652,6 +4339,9 @@ impl MimeTypeChecker for T_x_subrip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_symbian_install_application;
@@ -3667,6 +4357,9 @@ impl MimeTypeChecker for T_vnd_symbian_install_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3684,6 +4377,9 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_4_2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wordperfect_version_5_0_application;
@@ -3695,10 +4391,13 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_5_0_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[67, 80, 87, 255]) && offset(bytes, 10, &[0, 0]))
+        (offset(bytes, 0, &[255, 87, 80, 67]) && offset(bytes, 10, &[0, 0]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3711,10 +4410,13 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_5_1_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[67, 80, 87, 255]) && offset(bytes, 10, &[0, 1]))
+        (offset(bytes, 0, &[255, 87, 80, 67]) && offset(bytes, 10, &[0, 1]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3727,10 +4429,13 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_6_x_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[67, 80, 87, 255]) && offset(bytes, 10, &[2, 1]))
+        (offset(bytes, 0, &[255, 87, 80, 67]) && offset(bytes, 10, &[2, 1]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3748,6 +4453,9 @@ impl MimeTypeChecker for T_vnd_xara_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_wasm_application;
@@ -3759,10 +4467,13 @@ impl MimeTypeChecker for T_wasm_application {
         &["*.wasm"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[0, 97, 115, 109]) || offset(bytes, 0, &[0, 97, 115, 109]))
+        (offset(bytes, 0, &[0, 97, 115, 109]) || offset(bytes, 0, &[109, 115, 97, 0]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3781,6 +4492,9 @@ impl MimeTypeChecker for T_x_atari_floppy_disk_image_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3804,6 +4518,9 @@ impl MimeTypeChecker for T_x_adobe_indesign_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_isac_fcs_application;
@@ -3819,6 +4536,38 @@ impl MimeTypeChecker for T_vnd_isac_fcs_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_vnd_adobe_indesign_idml_package_application;
+impl MimeTypeChecker for T_vnd_adobe_indesign_idml_package_application {
+    fn get_mime(&self) -> &'static str {
+        "application/vnd.adobe.indesign-idml-package"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.idml"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[80, 75, 3, 4])
+            && offset(
+                bytes,
+                30,
+                &[
+                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
+                    105, 111, 110, 47, 118, 110, 100, 46, 97, 100, 111, 98, 101, 46, 105, 110, 100,
+                    101, 115, 105, 103, 110, 45, 105, 100, 109, 108, 45, 112, 97, 99, 107, 97, 103,
+                    101,
+                ],
+            ))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3836,6 +4585,9 @@ impl MimeTypeChecker for T_x_adobe_indesign_interchange_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_arj_application;
@@ -3851,6 +4603,9 @@ impl MimeTypeChecker for T_x_arj_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3869,6 +4624,9 @@ impl MimeTypeChecker for T_x_asprs_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_berkeley_db_format_queue_application;
@@ -3881,11 +4639,14 @@ impl MimeTypeChecker for T_x_berkeley_db_format_queue_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         (offset(bytes, 12, &[83, 34, 4, 0])
-            || offset(bytes, 12, &[83, 34, 4, 0])
+            || offset(bytes, 12, &[0, 4, 34, 83])
             || offset(bytes, 12, &[83, 34, 4, 0]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -3900,10 +4661,13 @@ impl MimeTypeChecker for T_x_berkeley_db_format_log_application {
     fn check(&self, bytes: &[u8]) -> bool {
         (offset(bytes, 12, &[136, 9, 4, 0])
             || offset(bytes, 12, &[136, 9, 4, 0])
-            || offset(bytes, 12, &[136, 9, 4, 0]))
+            || offset(bytes, 12, &[0, 4, 9, 136]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4044,6 +4808,9 @@ impl MimeTypeChecker for T_x_bibtex_text_file_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_bittorrent_application;
@@ -4063,6 +4830,9 @@ impl MimeTypeChecker for T_x_bittorrent_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4086,6 +4856,9 @@ impl MimeTypeChecker for T_x_cdf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_gtar_application;
@@ -4101,6 +4874,9 @@ impl MimeTypeChecker for T_x_gtar_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4130,6 +4906,9 @@ impl MimeTypeChecker for T_x_guitar_pro_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_amiga_disk_format_application;
@@ -4154,6 +4933,9 @@ impl MimeTypeChecker for T_x_amiga_disk_format_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_chrome_package_application;
@@ -4170,6 +4952,9 @@ impl MimeTypeChecker for T_x_chrome_package_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_compress_application;
@@ -4185,6 +4970,9 @@ impl MimeTypeChecker for T_x_compress_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4206,6 +4994,9 @@ impl MimeTypeChecker for T_x_cpio_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_dex_application;
@@ -4221,6 +5012,9 @@ impl MimeTypeChecker for T_x_dex_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4244,6 +5038,9 @@ impl MimeTypeChecker for T_x_dvi_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_elc_application;
@@ -4259,6 +5056,9 @@ impl MimeTypeChecker for T_x_elc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4278,6 +5078,9 @@ impl MimeTypeChecker for T_x_endnote_style_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4301,6 +5104,9 @@ impl MimeTypeChecker for T_x_fat_diskimage_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_object_application;
@@ -4317,6 +5123,9 @@ impl MimeTypeChecker for T_x_object_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4335,6 +5144,9 @@ impl MimeTypeChecker for T_x_executable_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sharedlib_application;
@@ -4351,6 +5163,9 @@ impl MimeTypeChecker for T_x_sharedlib_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4369,6 +5184,9 @@ impl MimeTypeChecker for T_x_coredump_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mmm_digisonde_application;
@@ -4384,6 +5202,9 @@ impl MimeTypeChecker for T_x_mmm_digisonde_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4404,6 +5225,9 @@ impl MimeTypeChecker for T_x_erdas_hfa_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4429,6 +5253,9 @@ impl MimeTypeChecker for T_x_filemaker_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_gnumeric_application;
@@ -4451,6 +5278,9 @@ impl MimeTypeChecker for T_x_gnumeric_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_grib_application;
@@ -4466,6 +5296,9 @@ impl MimeTypeChecker for T_x_grib_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4505,6 +5338,9 @@ impl MimeTypeChecker for T_zstd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_hdf_application;
@@ -4516,10 +5352,13 @@ impl MimeTypeChecker for T_x_hdf_application {
         &["*.hdf", "*.he5", "*.h5"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[1, 19, 3, 14]) || offset(bytes, 0, &[137, 72, 68, 70, 13, 10, 26]))
+        (offset(bytes, 0, &[14, 3, 19, 1]) || offset(bytes, 0, &[137, 72, 68, 70, 13, 10, 26]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4542,6 +5381,9 @@ impl MimeTypeChecker for T_x_hwp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4567,6 +5409,9 @@ impl MimeTypeChecker for T_x_ibooks_zip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_idl_save_file_application;
@@ -4582,6 +5427,9 @@ impl MimeTypeChecker for T_x_idl_save_file_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4606,6 +5454,9 @@ impl MimeTypeChecker for T_x_isatab_investigation_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_isatab_application;
@@ -4625,6 +5476,9 @@ impl MimeTypeChecker for T_x_isatab_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4646,6 +5500,9 @@ impl MimeTypeChecker for T_x_isatab_assay_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_jeol_jdf_application;
@@ -4662,6 +5519,9 @@ impl MimeTypeChecker for T_x_jeol_jdf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4685,6 +5545,9 @@ impl MimeTypeChecker for T_x_jigdo_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4715,6 +5578,9 @@ impl MimeTypeChecker for T_x_kdelnk_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_latex_application;
@@ -4734,6 +5600,9 @@ impl MimeTypeChecker for T_x_latex_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4759,6 +5628,9 @@ impl MimeTypeChecker for T_x_lha_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_lharc_application;
@@ -4778,6 +5650,9 @@ impl MimeTypeChecker for T_x_lharc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_lzip_application;
@@ -4793,6 +5668,9 @@ impl MimeTypeChecker for T_x_lzip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4813,6 +5691,9 @@ impl MimeTypeChecker for T_x_mach_o_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_compress_szdd_application;
@@ -4829,21 +5710,8 @@ impl MimeTypeChecker for T_x_ms_compress_szdd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_x_mswrite_application;
-impl MimeTypeChecker for T_x_mswrite_application {
-    fn get_mime(&self) -> &'static str {
-        "application/x-mswrite"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.wri"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[0, 0, 190, 49]) || offset(bytes, 0, &[0, 0, 190, 50]))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4860,6 +5728,9 @@ impl MimeTypeChecker for T_x_nesrom_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4879,6 +5750,9 @@ impl MimeTypeChecker for T_x_netcdf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_parquet_application;
@@ -4894,6 +5768,9 @@ impl MimeTypeChecker for T_x_parquet_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4911,6 +5788,9 @@ impl MimeTypeChecker for T_x_prt_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_quattro_pro_version_1_4_application;
@@ -4926,6 +5806,9 @@ impl MimeTypeChecker for T_x_quattro_pro_version_1_4_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4943,6 +5826,9 @@ impl MimeTypeChecker for T_x_quattro_pro_version_5_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_quattro_pro_version_1_5_application;
@@ -4958,6 +5844,9 @@ impl MimeTypeChecker for T_x_quattro_pro_version_1_5_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -4975,6 +5864,9 @@ impl MimeTypeChecker for T_x_quattro_pro_version_6_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_rpm_application;
@@ -4991,6 +5883,9 @@ impl MimeTypeChecker for T_x_rpm_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_spss_sav_application;
@@ -5006,6 +5901,9 @@ impl MimeTypeChecker for T_x_spss_sav_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5027,6 +5925,9 @@ impl MimeTypeChecker for T_x_sc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_shockwave_flash_application;
@@ -5045,6 +5946,9 @@ impl MimeTypeChecker for T_x_shockwave_flash_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sibelius_application;
@@ -5061,6 +5965,9 @@ impl MimeTypeChecker for T_x_sibelius_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_snappy_framed_application;
@@ -5072,10 +5979,13 @@ impl MimeTypeChecker for T_x_snappy_framed_application {
         &["*.sz"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        offset(bytes, 0, &[115, 78, 97, 80, 112, 89])
+        offset_range(bytes, 0, 16, &[115, 78, 97, 80, 112, 89])
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5093,6 +6003,9 @@ impl MimeTypeChecker for T_x_spectrum_tzx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_stuffit_application;
@@ -5108,6 +6021,9 @@ impl MimeTypeChecker for T_x_stuffit_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5131,6 +6047,9 @@ impl MimeTypeChecker for T_x_texinfo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tex_virtual_font_application;
@@ -5148,6 +6067,9 @@ impl MimeTypeChecker for T_x_tex_virtual_font_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5167,6 +6089,9 @@ impl MimeTypeChecker for T_x_touhou_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_uc2_compressed_application;
@@ -5183,6 +6108,9 @@ impl MimeTypeChecker for T_x_uc2_compressed_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vhd_application;
@@ -5198,6 +6126,9 @@ impl MimeTypeChecker for T_x_vhd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5221,6 +6152,9 @@ impl MimeTypeChecker for T_x_x509_cert_format_pem_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5260,6 +6194,9 @@ impl MimeTypeChecker for T_x_x509_cert_format_der_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5325,6 +6262,9 @@ impl MimeTypeChecker for T_x_x509_key_format_pem_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_x509_dsa_parameters_application;
@@ -5347,6 +6287,9 @@ impl MimeTypeChecker for T_x_x509_dsa_parameters_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5371,6 +6314,9 @@ impl MimeTypeChecker for T_x_x509_ec_parameters_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_java_keystore_application;
@@ -5386,6 +6332,9 @@ impl MimeTypeChecker for T_x_java_keystore_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5403,6 +6352,9 @@ impl MimeTypeChecker for T_x_xz_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_zim_application;
@@ -5418,6 +6370,9 @@ impl MimeTypeChecker for T_x_zim_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5435,6 +6390,9 @@ impl MimeTypeChecker for T_x_zoo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_7z_compressed_application;
@@ -5450,6 +6408,9 @@ impl MimeTypeChecker for T_x_7z_compressed_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5473,6 +6434,9 @@ impl MimeTypeChecker for T_eac3_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_amr_wb_audio;
@@ -5488,6 +6452,9 @@ impl MimeTypeChecker for T_amr_wb_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5521,6 +6488,9 @@ impl MimeTypeChecker for T_x_psf_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sap_audio;
@@ -5536,6 +6506,9 @@ impl MimeTypeChecker for T_x_sap_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5553,6 +6526,9 @@ impl MimeTypeChecker for T_prs_sid_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_qcelp_audio;
@@ -5569,6 +6545,9 @@ impl MimeTypeChecker for T_qcelp_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_flac_audio;
@@ -5584,6 +6563,9 @@ impl MimeTypeChecker for T_x_flac_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5619,6 +6601,9 @@ impl MimeTypeChecker for T_x_mod_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mpegurl_audio;
@@ -5634,6 +6619,9 @@ impl MimeTypeChecker for T_x_mpegurl_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5659,6 +6647,9 @@ impl MimeTypeChecker for T_x_ms_wma_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_pn_realaudio_audio;
@@ -5670,10 +6661,13 @@ impl MimeTypeChecker for T_x_pn_realaudio_audio {
         &["*.ram", "*.ra"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        offset(bytes, 0, &[253, 97, 114, 46])
+        offset(bytes, 0, &[46, 114, 97, 253])
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5690,6 +6684,9 @@ impl MimeTypeChecker for T_x_cdx_chemical {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5709,6 +6706,9 @@ impl MimeTypeChecker for T_x_3ds_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_aces_image;
@@ -5725,6 +6725,9 @@ impl MimeTypeChecker for T_aces_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5746,6 +6749,9 @@ impl MimeTypeChecker for T_x_os2_graphics__charset_binary_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5771,6 +6777,9 @@ impl MimeTypeChecker for T_bmp_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_bpg_image;
@@ -5786,6 +6795,9 @@ impl MimeTypeChecker for T_x_bpg_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5808,6 +6820,9 @@ impl MimeTypeChecker for T_cgm_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_dpx_image;
@@ -5823,6 +6838,9 @@ impl MimeTypeChecker for T_x_dpx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5840,6 +6858,9 @@ impl MimeTypeChecker for T_emf_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_fits_image;
@@ -5855,6 +6876,9 @@ impl MimeTypeChecker for T_fits_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5872,6 +6896,9 @@ impl MimeTypeChecker for T_gif_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_icns_image;
@@ -5887,6 +6914,9 @@ impl MimeTypeChecker for T_icns_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5905,6 +6935,9 @@ impl MimeTypeChecker for T_jp2_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_jpeg_image;
@@ -5920,6 +6953,9 @@ impl MimeTypeChecker for T_jpeg_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5938,6 +6974,9 @@ impl MimeTypeChecker for T_jpm_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_jpx_image;
@@ -5954,6 +6993,9 @@ impl MimeTypeChecker for T_jpx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -5972,6 +7014,9 @@ impl MimeTypeChecker for T_nitf_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6000,6 +7045,9 @@ impl MimeTypeChecker for T_svg_xml_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_adobe_photoshop_image;
@@ -6016,6 +7064,9 @@ impl MimeTypeChecker for T_vnd_adobe_photoshop_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dgn_version_7_image;
@@ -6031,6 +7082,9 @@ impl MimeTypeChecker for T_vnd_dgn_version_7_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6051,6 +7105,9 @@ impl MimeTypeChecker for T_vnd_djvu_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6080,6 +7137,9 @@ impl MimeTypeChecker for T_vnd_dwg_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dxb_image;
@@ -6103,6 +7163,9 @@ impl MimeTypeChecker for T_vnd_dxb_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dxf_format_binary_image;
@@ -6125,6 +7188,9 @@ impl MimeTypeChecker for T_vnd_dxf_format_binary_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6152,6 +7218,9 @@ impl MimeTypeChecker for T_vnd_dxf_format_ascii_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_microsoft_icon_image;
@@ -6170,6 +7239,9 @@ impl MimeTypeChecker for T_vnd_microsoft_icon_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_modi_image;
@@ -6185,6 +7257,9 @@ impl MimeTypeChecker for T_vnd_ms_modi_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6202,6 +7277,9 @@ impl MimeTypeChecker for T_vnd_radiance_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_zbrush_dcx_image;
@@ -6217,6 +7295,9 @@ impl MimeTypeChecker for T_vnd_zbrush_dcx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6239,6 +7320,9 @@ impl MimeTypeChecker for T_webp_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_wmf_image;
@@ -6254,6 +7338,9 @@ impl MimeTypeChecker for T_wmf_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6279,6 +7366,9 @@ impl MimeTypeChecker for T_x_freehand_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_jbig2_image;
@@ -6294,6 +7384,9 @@ impl MimeTypeChecker for T_x_jbig2_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6312,6 +7405,9 @@ impl MimeTypeChecker for T_jxl_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_niff_image;
@@ -6328,6 +7424,9 @@ impl MimeTypeChecker for T_x_niff_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_pict_image;
@@ -6343,6 +7442,9 @@ impl MimeTypeChecker for T_x_pict_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6363,6 +7465,9 @@ impl MimeTypeChecker for T_x_portable_bitmap_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_portable_graymap_image;
@@ -6381,6 +7486,9 @@ impl MimeTypeChecker for T_x_portable_graymap_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6401,6 +7509,9 @@ impl MimeTypeChecker for T_x_portable_pixmap_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_portable_arbitrarymap_image;
@@ -6417,6 +7528,9 @@ impl MimeTypeChecker for T_x_portable_arbitrarymap_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6438,6 +7552,9 @@ impl MimeTypeChecker for T_x_raw_canon_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_olympus_image;
@@ -6453,6 +7570,9 @@ impl MimeTypeChecker for T_x_raw_olympus_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6470,6 +7590,9 @@ impl MimeTypeChecker for T_x_rgb_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_xcf_image;
@@ -6485,6 +7608,9 @@ impl MimeTypeChecker for T_x_xcf_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6502,6 +7628,9 @@ impl MimeTypeChecker for T_x_xpixmap_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_appledouble_multipart;
@@ -6517,6 +7646,9 @@ impl MimeTypeChecker for T_appledouble_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6543,6 +7675,9 @@ impl MimeTypeChecker for T_calendar_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_troff_text;
@@ -6562,6 +7697,9 @@ impl MimeTypeChecker for T_troff_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6592,6 +7730,9 @@ impl MimeTypeChecker for T_vnd_graphviz_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptc_anpa_text;
@@ -6607,6 +7748,9 @@ impl MimeTypeChecker for T_vnd_iptc_anpa_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6675,6 +7819,9 @@ impl MimeTypeChecker for T_x_awk_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_diff_text;
@@ -6702,6 +7849,9 @@ impl MimeTypeChecker for T_x_diff_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_jsp_text;
@@ -6717,6 +7867,9 @@ impl MimeTypeChecker for T_x_jsp_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6751,6 +7904,9 @@ impl MimeTypeChecker for T_x_lua_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_matlab_text;
@@ -6781,6 +7937,9 @@ impl MimeTypeChecker for T_x_matlab_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_matlab_data_application;
@@ -6796,6 +7955,9 @@ impl MimeTypeChecker for T_x_matlab_data_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6842,6 +8004,9 @@ impl MimeTypeChecker for T_x_perl_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -6922,6 +8087,9 @@ impl MimeTypeChecker for T_x_python_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tcl_text;
@@ -6950,6 +8118,9 @@ impl MimeTypeChecker for T_x_tcl_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vcalendar_text;
@@ -6970,6 +8141,9 @@ impl MimeTypeChecker for T_x_vcalendar_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vcard_text;
@@ -6985,6 +8159,9 @@ impl MimeTypeChecker for T_x_vcard_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7003,6 +8180,9 @@ impl MimeTypeChecker for T_mj2_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mpeg_video;
@@ -7018,6 +8198,9 @@ impl MimeTypeChecker for T_mpeg_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7035,6 +8218,9 @@ impl MimeTypeChecker for T_x_flv_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_jng_video;
@@ -7051,6 +8237,9 @@ impl MimeTypeChecker for T_x_jng_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mng_video;
@@ -7066,6 +8255,9 @@ impl MimeTypeChecker for T_x_mng_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7088,6 +8280,9 @@ impl MimeTypeChecker for T_x_msvideo_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sgi_movie_video;
@@ -7107,6 +8302,9 @@ impl MimeTypeChecker for T_x_sgi_movie_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7130,6 +8328,9 @@ impl MimeTypeChecker for T_x_matroska_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_webm_video;
@@ -7148,6 +8349,9 @@ impl MimeTypeChecker for T_webm_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ole_storage_application;
@@ -7163,6 +8367,9 @@ impl MimeTypeChecker for T_x_ole_storage_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7184,6 +8391,9 @@ impl MimeTypeChecker for T_webm_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_woff_font;
@@ -7199,6 +8409,9 @@ impl MimeTypeChecker for T_woff_font {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7216,6 +8429,9 @@ impl MimeTypeChecker for T_woff2_font {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_xar_application;
@@ -7232,6 +8448,9 @@ impl MimeTypeChecker for T_x_xar_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_lzip_application;
@@ -7247,6 +8466,9 @@ impl MimeTypeChecker for T_lzip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7266,6 +8488,9 @@ impl MimeTypeChecker for T_x_installshield_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_chrome_extension_application;
@@ -7281,6 +8506,9 @@ impl MimeTypeChecker for T_x_chrome_extension_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7304,6 +8532,9 @@ impl MimeTypeChecker for T_ape_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_musepack_audio;
@@ -7319,6 +8550,9 @@ impl MimeTypeChecker for T_musepack_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7343,6 +8577,9 @@ impl MimeTypeChecker for T_x_unknown_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_shortcut_application;
@@ -7358,6 +8595,9 @@ impl MimeTypeChecker for T_x_ms_shortcut_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7376,6 +8616,9 @@ impl MimeTypeChecker for T_gltf_binary_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_tzif_application;
@@ -7393,6 +8636,9 @@ impl MimeTypeChecker for T_tzif_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_collection_font;
@@ -7409,6 +8655,9 @@ impl MimeTypeChecker for T_collection_font {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7444,6 +8693,9 @@ impl MimeTypeChecker for T_vnd_dvb_file_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mozilla_apng_image;
@@ -7461,6 +8713,9 @@ impl MimeTypeChecker for T_vnd_mozilla_apng_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_bpg_image;
@@ -7476,6 +8731,9 @@ impl MimeTypeChecker for T_bpg_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7493,6 +8751,9 @@ impl MimeTypeChecker for T_jxs_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_jxr_image;
@@ -7509,6 +8770,9 @@ impl MimeTypeChecker for T_jxr_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_reader_application;
@@ -7524,6 +8788,9 @@ impl MimeTypeChecker for T_x_ms_reader_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -7548,6 +8815,9 @@ impl MimeTypeChecker for T_epub_zip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_ibooks_zip_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -7578,6 +8848,9 @@ impl MimeTypeChecker for T_fits_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_fits_image]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -7673,6 +8946,9 @@ impl MimeTypeChecker for T_javascript_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_json_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_mathematica_application;
@@ -7688,6 +8964,9 @@ impl MimeTypeChecker for T_mathematica_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_wolfram_wl_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -7708,6 +8987,9 @@ impl MimeTypeChecker for T_postscript_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_illustrator_ps_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_ms_cab_compressed_application;
@@ -7724,45 +9006,8 @@ impl MimeTypeChecker for T_vnd_ms_cab_compressed_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_onenote__format_package_application]
     }
-}
-
-pub(super) struct T_vnd_ms_excel_application;
-impl MimeTypeChecker for T_vnd_ms_excel_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.ms-excel"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &[
-            "*.xls", "*.xlm", "*.xla", "*.xlc", "*.xlt", "*.xlw", "*.xll", "*.xld",
-        ]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset(
-            bytes,
-            2080,
-            &[
-                77, 105, 99, 114, 111, 115, 111, 102, 116, 32, 69, 120, 99, 101, 108, 32, 53, 46,
-                48, 32, 87, 111, 114, 107, 115, 104, 101, 101, 116,
-            ],
-        ) || offset(
-            bytes,
-            2080,
-            &[
-                70, 111, 103, 108, 105, 111, 32, 100, 105, 32, 108, 97, 118, 111, 114, 111, 32, 77,
-                105, 99, 114, 111, 115, 111, 102, 116, 32, 69, 120, 99, 101,
-            ],
-        ) || offset(bytes, 2114, &[66, 105, 102, 102, 53])
-            || offset(bytes, 2121, &[66, 105, 102, 102, 53])
-            || (offset_range(bytes, 0, 8, &[208, 207, 17, 224, 161, 177, 26, 225])
-                && offset_range(
-                    bytes,
-                    1152,
-                    4096,
-                    &[87, 0, 111, 0, 114, 0, 107, 0, 98, 0, 111, 0, 111, 0, 107],
-                )))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[&T_x_tika_msworks_spreadsheet_application]
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -7781,6 +9026,9 @@ impl MimeTypeChecker for T_x_archive_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_debian_package_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_iso9660_image_application;
@@ -7798,6 +9046,9 @@ impl MimeTypeChecker for T_x_iso9660_image_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_roxio_toast_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -7840,6 +9091,9 @@ impl MimeTypeChecker for T_x_tex_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_latex_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_ac3_audio;
@@ -7866,6 +9120,9 @@ impl MimeTypeChecker for T_ac3_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_eac3_audio]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_png_image;
@@ -7881,6 +9138,9 @@ impl MimeTypeChecker for T_png_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_mozilla_apng_image]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -7900,6 +9160,9 @@ impl MimeTypeChecker for T_tiff_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_canon_cr2_image]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_xbitmap_image;
@@ -7915,6 +9178,9 @@ impl MimeTypeChecker for T_x_xbitmap_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_xpixmap_image]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8298,6 +9564,9 @@ impl MimeTypeChecker for T_rfc822_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_related_multipart]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_dwf_model;
@@ -8315,6 +9584,9 @@ impl MimeTypeChecker for T_vnd_dwf_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_dwf_version_6_model]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8335,6 +9607,9 @@ impl MimeTypeChecker for T_x_msdownload_application {
             &T_x_msdownload_format_pe_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_rar_compressed_application;
@@ -8354,6 +9629,9 @@ impl MimeTypeChecker for T_x_rar_compressed_application {
             &T_x_rar_compressed_version_5_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_ogg_application;
@@ -8370,6 +9648,9 @@ impl MimeTypeChecker for T_ogg_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_kate_application, &T_ogg_audio, &T_ogg_video]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_berkeley_db_format_btree_application;
@@ -8382,10 +9663,10 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         (offset(bytes, 0, &[98, 49, 5, 0])
-            || offset(bytes, 0, &[98, 49, 5, 0])
+            || offset(bytes, 0, &[0, 5, 49, 98])
             || offset(bytes, 0, &[98, 49, 5, 0])
             || offset(bytes, 12, &[98, 49, 5, 0])
-            || offset(bytes, 12, &[98, 49, 5, 0])
+            || offset(bytes, 12, &[0, 5, 49, 98])
             || offset(bytes, 12, &[98, 49, 5, 0]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
@@ -8394,6 +9675,9 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_application {
             &T_x_berkeley_db_format_btree_version_3_application,
             &T_x_berkeley_db_format_btree_version_4_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8413,6 +9697,9 @@ impl MimeTypeChecker for T_x_sh_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_javascript_text, &T_x_lua_text, &T_x_tcl_text]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8434,7 +9721,7 @@ impl MimeTypeChecker for T_vnd_wordperfect_application {
                 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 47, 118, 110, 100, 46, 119,
                 111, 114, 100, 112, 101, 114, 102, 101, 99, 116, 59,
             ],
-        ) || offset(bytes, 0, &[67, 80, 87, 255]))
+        ) || offset(bytes, 0, &[255, 87, 80, 67]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[
@@ -8443,6 +9730,9 @@ impl MimeTypeChecker for T_vnd_wordperfect_application {
             &T_vnd_wordperfect_version_5_1_application,
             &T_vnd_wordperfect_version_6_x_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8456,10 +9746,10 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_application {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         (offset(bytes, 0, &[97, 21, 6, 0])
-            || offset(bytes, 0, &[97, 21, 6, 0])
+            || offset(bytes, 0, &[0, 6, 21, 97])
             || offset(bytes, 0, &[97, 21, 6, 0])
             || offset(bytes, 12, &[97, 21, 6, 0])
-            || offset(bytes, 12, &[97, 21, 6, 0])
+            || offset(bytes, 12, &[0, 6, 21, 97])
             || offset(bytes, 12, &[97, 21, 6, 0]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
@@ -8469,6 +9759,9 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_application {
             &T_x_berkeley_db_format_hash_version_4_application,
             &T_x_berkeley_db_format_hash_version_5_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8491,6 +9784,9 @@ impl MimeTypeChecker for T_x_elf_application {
             &T_x_coredump_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_jp2_container_image;
@@ -8506,6 +9802,9 @@ impl MimeTypeChecker for T_x_jp2_container_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_jp2_image, &T_jpm_image, &T_jpx_image, &T_mj2_video]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8538,6 +9837,9 @@ impl MimeTypeChecker for T_x_stata_dta_application {
             &T_x_stata_dta_version_8_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_quicktime_video;
@@ -8568,6 +9870,9 @@ impl MimeTypeChecker for T_quicktime_video {
             &T_mp4_video,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_ogg_video;
@@ -8594,6 +9899,9 @@ impl MimeTypeChecker for T_ogg_video {
             &T_x_oggyuv_video,
             &T_x_oggrgb_video,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8628,6 +9936,9 @@ impl MimeTypeChecker for T_x_sqlite3_application {
             &T_x_mbtiles_application,
             &T_x_texnicard_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -8681,6 +9992,9 @@ impl MimeTypeChecker for T_x_tika_ooxml_application {
             &T_vnd_dwfx_xps_model,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_zip_application;
@@ -8699,6 +10013,7 @@ impl MimeTypeChecker for T_zip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[
             &T_bizagi_modeler_application,
+            &T_epub_zip_application,
             &T_java_archive_application,
             &T_vnd_apple_unknown_13_application,
             &T_vnd_apple_iwork_application,
@@ -8709,6 +10024,7 @@ impl MimeTypeChecker for T_zip_application {
             &T_vnd_mindjet_mindmanager_application,
             &T_vnd_oasis_opendocument_chart_application,
             &T_vnd_oasis_opendocument_chart_template_application,
+            &T_vnd_oasis_opendocument_base_application,
             &T_vnd_oasis_opendocument_formula_application,
             &T_vnd_oasis_opendocument_formula_template_application,
             &T_vnd_oasis_opendocument_graphics_application,
@@ -8729,6 +10045,9 @@ impl MimeTypeChecker for T_zip_application {
             &T_x_xliff_zip_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_xml_application;
@@ -8746,6 +10065,14 @@ impl MimeTypeChecker for T_xml_application {
             || offset(bytes, 0, &[13, 10, 60, 63, 120, 109, 108])
             || offset(bytes, 0, &[255, 254, 60, 0, 63, 0, 120, 0, 109, 0, 108, 0])
             || offset(bytes, 0, &[254, 255, 0, 60, 0, 63, 0, 120, 0, 109, 0, 108])
+            || (offset_range_case_insensitive(bytes, 0, 256, &[60, 63, 120, 109, 108])
+                && (offset_range_case_insensitive(bytes, 0, 256, &[120, 109, 108, 110, 115, 61])
+                    || offset_range_case_insensitive(
+                        bytes,
+                        0,
+                        256,
+                        &[120, 109, 108, 110, 115, 58],
+                    )))
             || offset(bytes, 0, &[60, 33, 45, 45]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
@@ -8771,6 +10098,7 @@ impl MimeTypeChecker for T_xml_application {
             &T_x_amf_application,
             &T_x_adobe_indesign_interchange_application,
             &T_x_plist_application,
+            &T_x_internet_archive_application,
             &T_svg_xml_image,
             &T_svg_xml_image,
             &T_vnd_adobe_premiere_image,
@@ -8787,6 +10115,80 @@ impl MimeTypeChecker for T_xml_application {
             &T_vnd_garmin_tcx_xml_application,
             &T_x3d_xml_model,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
+    }
+}
+
+pub(super) struct T_html_text;
+impl MimeTypeChecker for T_html_text {
+    fn get_mime(&self) -> &'static str {
+        "text/html"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.html", "*.htm"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (rootxml_local(bytes, "html")
+            || rootxml_local(bytes, "HTML")
+            || rootxml_local(bytes, "link")
+            || rootxml_local(bytes, "LINK")
+            || rootxml_local(bytes, "body")
+            || rootxml_local(bytes, "BODY")
+            || rootxml_local(bytes, "p")
+            || rootxml_local(bytes, "P")
+            || rootxml_local(bytes, "script")
+            || rootxml_local(bytes, "SCRIPT")
+            || rootxml_local(bytes, "frameset")
+            || rootxml_local(bytes, "FRAMESET")
+            || rootxml_local(bytes, "iframe")
+            || rootxml_local(bytes, "IFRAME")
+            || regex(
+                bytes,
+                0,
+                &Regex::new("(?i)<(html|head|body|title|div)[ >]").unwrap(),
+            )
+            || regex(bytes, 0, &Regex::new("(?i)<h[123][ >]").unwrap())
+            || offset_range(
+                bytes,
+                0,
+                64,
+                &[60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 72, 84, 77, 76],
+            )
+            || offset_range(
+                bytes,
+                0,
+                64,
+                &[60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 104, 116, 109, 108],
+            )
+            || offset_range(
+                bytes,
+                0,
+                64,
+                &[60, 33, 100, 111, 99, 116, 121, 112, 101, 32, 72, 84, 77, 76],
+            )
+            || offset_range(
+                bytes,
+                0,
+                64,
+                &[
+                    60, 33, 100, 111, 99, 116, 121, 112, 101, 32, 104, 116, 109, 108,
+                ],
+            )
+            || offset_range(bytes, 0, 64, &[60, 72, 69, 65, 68])
+            || offset_range(bytes, 0, 64, &[60, 104, 101, 97, 100])
+            || offset_range(bytes, 0, 64, &[60, 84, 73, 84, 76, 69])
+            || offset_range(bytes, 0, 64, &[60, 116, 105, 116, 108, 101])
+            || offset_range(bytes, 0, 64, &[60, 72, 84, 77, 76])
+            || offset_range(bytes, 0, 128, &[60, 104, 116, 109, 108])
+            || offset_range(bytes, 128, 8192, &[60, 104, 116, 109, 108]))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -8806,6 +10208,9 @@ impl MimeTypeChecker for T_zlib_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -8827,6 +10232,9 @@ impl MimeTypeChecker for T_gzip_application {
             &T_x_emf_compressed_image,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_dbf_application;
@@ -8842,6 +10250,9 @@ impl MimeTypeChecker for T_x_dbf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -8859,6 +10270,9 @@ impl MimeTypeChecker for T_x_bzip2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_otf_application;
@@ -8875,6 +10289,9 @@ impl MimeTypeChecker for T_x_font_otf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_ttf_application;
@@ -8890,6 +10307,9 @@ impl MimeTypeChecker for T_x_font_ttf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -8913,6 +10333,9 @@ impl MimeTypeChecker for T_x_font_adobe_metric_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_printer_metric_application;
@@ -8933,6 +10356,9 @@ impl MimeTypeChecker for T_x_font_printer_metric_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -8955,6 +10381,9 @@ impl MimeTypeChecker for T_x_mysql_table_definition_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mysql_misam_index_application;
@@ -8971,6 +10400,9 @@ impl MimeTypeChecker for T_x_mysql_misam_index_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mysql_misam_compressed_index_application;
@@ -8986,6 +10418,9 @@ impl MimeTypeChecker for T_x_mysql_misam_compressed_index_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9006,6 +10441,9 @@ impl MimeTypeChecker for T_x_sas_data_v6_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_data_application;
@@ -9021,6 +10459,9 @@ impl MimeTypeChecker for T_x_sas_data_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9045,6 +10486,9 @@ impl MimeTypeChecker for T_x_sas_xport_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9074,6 +10518,9 @@ impl MimeTypeChecker for T_x_x509_key_format_der_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xhtml_xml_application;
@@ -9096,6 +10543,9 @@ impl MimeTypeChecker for T_xhtml_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_aac_audio;
@@ -9107,10 +10557,13 @@ impl MimeTypeChecker for T_x_aac_audio {
         &["*.aac"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[255, 249]) || offset(bytes, 0, &[255, 241]) || regex(bytes, 0, &Regex::new("\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)").unwrap()) || (offset(bytes, 0, &[73, 68, 51]) && regex_range(bytes, 512, 2048, &Regex::new("\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)").unwrap())))
+        (offset(bytes, 0, &[255, 249]) || offset(bytes, 0, &[255, 241]) || regex(bytes, 0, &Regex::new("\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)").unwrap()) || (offset(bytes, 0, &[73, 68, 51]) && regex_range(bytes, 256, 2048, &Regex::new("\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)").unwrap())))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9132,6 +10585,9 @@ impl MimeTypeChecker for T_vnd_zbrush_pcx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9167,6 +10623,9 @@ impl MimeTypeChecker for T_vtt_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_bzip_application;
@@ -9182,6 +10641,9 @@ impl MimeTypeChecker for T_x_bzip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_bzip2_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -9199,6 +10661,9 @@ impl MimeTypeChecker for T_x_tar_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_gtar_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_amr_audio;
@@ -9214,6 +10679,9 @@ impl MimeTypeChecker for T_amr_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_amr_wb_audio, &T_amr_wb__audio]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -9235,6 +10703,9 @@ impl MimeTypeChecker for T_x_matroska_application {
             &T_webm_video,
             &T_webm_audio,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -9272,6 +10743,9 @@ impl MimeTypeChecker for T_x_tika_msoffice_application {
             &T_x_ole_storage_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_inf_application;
@@ -9289,6 +10763,9 @@ impl MimeTypeChecker for T_inf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_chdr_text;
@@ -9304,6 +10781,9 @@ impl MimeTypeChecker for T_x_chdr_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9321,6 +10801,9 @@ impl MimeTypeChecker for T_x_gimp_pat_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_gimp_gbr_image;
@@ -9336,6 +10819,9 @@ impl MimeTypeChecker for T_x_gimp_gbr_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9353,6 +10839,9 @@ impl MimeTypeChecker for T_x_c_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_xbitmap_image]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_jp2_codestream_image;
@@ -9368,6 +10857,9 @@ impl MimeTypeChecker for T_x_jp2_codestream_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9385,6 +10877,9 @@ impl MimeTypeChecker for T_vnd_msa_disk_image_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_basic_audio;
@@ -9397,17 +10892,20 @@ impl MimeTypeChecker for T_basic_audio {
     }
     fn check(&self, bytes: &[u8]) -> bool {
         ((offset(bytes, 0, &[46, 115, 110, 100])
-            && (offset(bytes, 12, &[1, 0, 0, 0])
-                || offset(bytes, 12, &[2, 0, 0, 0])
-                || offset(bytes, 12, &[3, 0, 0, 0])
-                || offset(bytes, 12, &[4, 0, 0, 0])
-                || offset(bytes, 12, &[5, 0, 0, 0])
-                || offset(bytes, 12, &[6, 0, 0, 0])
-                || offset(bytes, 12, &[7, 0, 0, 0])))
+            && (offset(bytes, 12, &[0, 0, 0, 1])
+                || offset(bytes, 12, &[0, 0, 0, 2])
+                || offset(bytes, 12, &[0, 0, 0, 3])
+                || offset(bytes, 12, &[0, 0, 0, 4])
+                || offset(bytes, 12, &[0, 0, 0, 5])
+                || offset(bytes, 12, &[0, 0, 0, 6])
+                || offset(bytes, 12, &[0, 0, 0, 7])))
             || offset(bytes, 0, &[46, 115, 110, 100, 0, 0, 0]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9425,21 +10923,8 @@ impl MimeTypeChecker for T_midi_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_mpeg_audio;
-impl MimeTypeChecker for T_mpeg_audio {
-    fn get_mime(&self) -> &'static str {
-        "audio/mpeg"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.mpga", "*.mp2", "*.mp2a", "*.mp3", "*.m2a", "*.m3a"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[255, 242]) || offset(bytes, 0, &[255, 243]) || offset(bytes, 0, &[255, 244]) || offset(bytes, 0, &[255, 245]) || offset(bytes, 0, &[255, 246]) || offset(bytes, 0, &[255, 247]) || offset(bytes, 0, &[255, 250]) || offset(bytes, 0, &[255, 251]) || offset(bytes, 0, &[255, 252]) || offset(bytes, 0, &[255, 253]) || offset(bytes, 0, &[255, 227]) || offset(bytes, 0, &[255, 255]) || offset(bytes, 0, &[73, 68, 51]) || regex(bytes, 0, &Regex::new("(?:\\x0D\\x0A|\\x00{1,1024})(?:\\xff[\\xe3\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff]|ID3)").unwrap()))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9452,10 +10937,13 @@ impl MimeTypeChecker for T_x_adpcm_audio {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[46, 115, 110, 100]) && offset(bytes, 12, &[23, 0, 0, 0]))
+        (offset(bytes, 0, &[46, 115, 110, 100]) && offset(bytes, 12, &[0, 0, 0, 23]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9488,6 +10976,9 @@ impl MimeTypeChecker for T_x_aiff_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_dec_basic_audio;
@@ -9499,17 +10990,20 @@ impl MimeTypeChecker for T_x_dec_basic_audio {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[46, 115, 100, 0])
-            && (offset(bytes, 12, &[1, 0, 0, 0])
-                || offset(bytes, 12, &[2, 0, 0, 0])
-                || offset(bytes, 12, &[3, 0, 0, 0])
-                || offset(bytes, 12, &[4, 0, 0, 0])
-                || offset(bytes, 12, &[5, 0, 0, 0])
-                || offset(bytes, 12, &[6, 0, 0, 0])
-                || offset(bytes, 12, &[7, 0, 0, 0])))
+        (offset(bytes, 0, &[0, 100, 115, 46])
+            && (offset(bytes, 12, &[0, 0, 0, 1])
+                || offset(bytes, 12, &[0, 0, 0, 2])
+                || offset(bytes, 12, &[0, 0, 0, 3])
+                || offset(bytes, 12, &[0, 0, 0, 4])
+                || offset(bytes, 12, &[0, 0, 0, 5])
+                || offset(bytes, 12, &[0, 0, 0, 6])
+                || offset(bytes, 12, &[0, 0, 0, 7])))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9522,10 +11016,13 @@ impl MimeTypeChecker for T_x_dec_adpcm_audio {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[46, 115, 100, 0]) && offset(bytes, 12, &[23, 0, 0, 0]))
+        (offset(bytes, 0, &[0, 100, 115, 46]) && offset(bytes, 12, &[0, 0, 0, 23]))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9547,6 +11044,9 @@ impl MimeTypeChecker for T_vnd_wave_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9593,6 +11093,28 @@ impl MimeTypeChecker for T_x_makefile_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
+    }
+}
+
+pub(super) struct T_mpeg_audio;
+impl MimeTypeChecker for T_mpeg_audio {
+    fn get_mime(&self) -> &'static str {
+        "audio/mpeg"
+    }
+    fn get_ext(&self) -> &[&'static str] {
+        &["*.mpga", "*.mp2", "*.mp2a", "*.mp3", "*.m2a", "*.m3a"]
+    }
+    fn check(&self, bytes: &[u8]) -> bool {
+        (offset(bytes, 0, &[255, 242]) || offset(bytes, 0, &[255, 243]) || offset(bytes, 0, &[255, 244]) || offset(bytes, 0, &[255, 245]) || offset(bytes, 0, &[255, 246]) || offset(bytes, 0, &[255, 247]) || offset(bytes, 0, &[255, 250]) || offset(bytes, 0, &[255, 251]) || offset(bytes, 0, &[255, 252]) || offset(bytes, 0, &[255, 253]) || offset(bytes, 0, &[255, 227]) || offset(bytes, 0, &[255, 255]) || offset(bytes, 0, &[73, 68, 51]) || regex(bytes, 0, &Regex::new("(?:\\x0D\\x0A|\\x00{1,1024})(?:\\xff[\\xe3\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff]|ID3)").unwrap()))
+    }
+    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
+        &[&T_x_aac_audio]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -9692,7 +11214,8 @@ impl MimeTypeChecker for T_plain_text {
             || offset(bytes, 0, &[59, 59])
             || offset(bytes, 0, &[254, 255])
             || offset(bytes, 0, &[255, 254])
-            || offset(bytes, 0, &[239, 187, 191]))
+            || offset(bytes, 0, &[239, 187, 191])
+            || regex(bytes, 0, &Regex::new("^[ -~]{6}[ -~]+").unwrap()))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[
@@ -9795,6 +11318,9 @@ impl MimeTypeChecker for T_plain_text {
             &T_x_sass_text,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_activemessage_application;
@@ -9810,6 +11336,9 @@ impl MimeTypeChecker for T_activemessage_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9827,6 +11356,9 @@ impl MimeTypeChecker for T_andrew_inset_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_applixware_application;
@@ -9842,6 +11374,9 @@ impl MimeTypeChecker for T_applixware_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9860,6 +11395,9 @@ impl MimeTypeChecker for T_iso19139_xml_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_atom_xml_application;
@@ -9877,6 +11415,9 @@ impl MimeTypeChecker for T_atom_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_atomcat_xml_application;
@@ -9892,6 +11433,9 @@ impl MimeTypeChecker for T_atomcat_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9909,6 +11453,9 @@ impl MimeTypeChecker for T_atomicmail_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_atomsvc_xml_application;
@@ -9924,6 +11471,9 @@ impl MimeTypeChecker for T_atomsvc_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9941,6 +11491,9 @@ impl MimeTypeChecker for T_auth_policy_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_batch_smtp_application;
@@ -9956,6 +11509,9 @@ impl MimeTypeChecker for T_batch_smtp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -9973,6 +11529,9 @@ impl MimeTypeChecker for T_beep_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_bizagi_modeler_application;
@@ -9988,6 +11547,9 @@ impl MimeTypeChecker for T_bizagi_modeler_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10005,6 +11567,9 @@ impl MimeTypeChecker for T_cals_1840_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ccxml_xml_application;
@@ -10020,6 +11585,9 @@ impl MimeTypeChecker for T_ccxml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10037,6 +11605,9 @@ impl MimeTypeChecker for T_cea_2018_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_cellml_xml_application;
@@ -10052,6 +11623,9 @@ impl MimeTypeChecker for T_cellml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10069,6 +11643,9 @@ impl MimeTypeChecker for T_cnrp_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_commonground_application;
@@ -10084,6 +11661,9 @@ impl MimeTypeChecker for T_commonground_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10101,6 +11681,9 @@ impl MimeTypeChecker for T_conference_info_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_cpl_xml_application;
@@ -10116,6 +11699,9 @@ impl MimeTypeChecker for T_cpl_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10133,6 +11719,9 @@ impl MimeTypeChecker for T_csta_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_cstadata_xml_application;
@@ -10148,6 +11737,9 @@ impl MimeTypeChecker for T_cstadata_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10165,6 +11757,9 @@ impl MimeTypeChecker for T_cu_seeme_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_cybercash_application;
@@ -10180,6 +11775,9 @@ impl MimeTypeChecker for T_cybercash_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10197,6 +11795,9 @@ impl MimeTypeChecker for T_dash_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_davmount_xml_application;
@@ -10212,6 +11813,9 @@ impl MimeTypeChecker for T_davmount_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10229,6 +11833,9 @@ impl MimeTypeChecker for T_dca_rft_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dec_dx_application;
@@ -10245,6 +11852,9 @@ impl MimeTypeChecker for T_dec_dx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dialog_info_xml_application;
@@ -10260,6 +11870,9 @@ impl MimeTypeChecker for T_dialog_info_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10278,6 +11891,9 @@ impl MimeTypeChecker for T_dita_xml_format_map_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dita_xml_format_task_application;
@@ -10294,6 +11910,9 @@ impl MimeTypeChecker for T_dita_xml_format_task_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10312,6 +11931,9 @@ impl MimeTypeChecker for T_dita_xml_format_concept_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dita_xml_format_val_application;
@@ -10329,6 +11951,9 @@ impl MimeTypeChecker for T_dita_xml_format_val_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dns_application;
@@ -10344,6 +11969,9 @@ impl MimeTypeChecker for T_dns_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10361,6 +11989,9 @@ impl MimeTypeChecker for T_dvcs_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ecmascript_application;
@@ -10376,6 +12007,9 @@ impl MimeTypeChecker for T_ecmascript_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10393,6 +12027,9 @@ impl MimeTypeChecker for T_edi_consent_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_edi_x12_application;
@@ -10408,6 +12045,9 @@ impl MimeTypeChecker for T_edi_x12_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10425,6 +12065,9 @@ impl MimeTypeChecker for T_edifact_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_emma_xml_application;
@@ -10440,6 +12083,9 @@ impl MimeTypeChecker for T_emma_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10457,6 +12103,9 @@ impl MimeTypeChecker for T_envi_hdr_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_epp_xml_application;
@@ -10472,6 +12121,9 @@ impl MimeTypeChecker for T_epp_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10489,6 +12141,9 @@ impl MimeTypeChecker for T_eshop_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_example_application;
@@ -10504,6 +12159,9 @@ impl MimeTypeChecker for T_example_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10521,6 +12179,9 @@ impl MimeTypeChecker for T_fastinfoset_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_fastsoap_application;
@@ -10536,6 +12197,9 @@ impl MimeTypeChecker for T_fastsoap_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10553,6 +12217,9 @@ impl MimeTypeChecker for T_font_tdpfr_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_h224_application;
@@ -10568,6 +12235,9 @@ impl MimeTypeChecker for T_h224_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10585,6 +12255,9 @@ impl MimeTypeChecker for T_http_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_hyperstudio_application;
@@ -10600,6 +12273,9 @@ impl MimeTypeChecker for T_hyperstudio_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10617,6 +12293,9 @@ impl MimeTypeChecker for T_ibe_key_request_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ibe_pkg_reply_xml_application;
@@ -10632,6 +12311,9 @@ impl MimeTypeChecker for T_ibe_pkg_reply_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10649,6 +12331,9 @@ impl MimeTypeChecker for T_ibe_pp_data_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_iges_application;
@@ -10664,6 +12349,9 @@ impl MimeTypeChecker for T_iges_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10681,6 +12369,9 @@ impl MimeTypeChecker for T_illustrator_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_im_iscomposing_xml_application;
@@ -10696,6 +12387,9 @@ impl MimeTypeChecker for T_im_iscomposing_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10713,6 +12407,9 @@ impl MimeTypeChecker for T_index_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_index_cmd_application;
@@ -10728,6 +12425,9 @@ impl MimeTypeChecker for T_index_cmd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10745,6 +12445,9 @@ impl MimeTypeChecker for T_index_obj_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_index_response_application;
@@ -10760,6 +12463,9 @@ impl MimeTypeChecker for T_index_response_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10777,6 +12483,9 @@ impl MimeTypeChecker for T_index_vnd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_iotp_application;
@@ -10792,6 +12501,9 @@ impl MimeTypeChecker for T_iotp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10809,6 +12521,9 @@ impl MimeTypeChecker for T_ipp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_isup_application;
@@ -10824,6 +12539,9 @@ impl MimeTypeChecker for T_isup_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10841,6 +12559,9 @@ impl MimeTypeChecker for T_vnd_android_package_archive_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tika_java_enterprise_archive_application;
@@ -10856,6 +12577,9 @@ impl MimeTypeChecker for T_x_tika_java_enterprise_archive_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10873,6 +12597,9 @@ impl MimeTypeChecker for T_x_tika_java_web_archive_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tika_unix_dump_application;
@@ -10888,6 +12615,9 @@ impl MimeTypeChecker for T_x_tika_unix_dump_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10905,6 +12635,9 @@ impl MimeTypeChecker for T_java_serialized_object_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_manifest_json_application;
@@ -10920,6 +12653,9 @@ impl MimeTypeChecker for T_manifest_json_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10937,6 +12673,9 @@ impl MimeTypeChecker for T_x_java_jnilib_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_kpml_request_xml_application;
@@ -10952,6 +12691,9 @@ impl MimeTypeChecker for T_kpml_request_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -10969,6 +12711,9 @@ impl MimeTypeChecker for T_kpml_response_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_lost_xml_application;
@@ -10984,6 +12729,9 @@ impl MimeTypeChecker for T_lost_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11001,6 +12749,9 @@ impl MimeTypeChecker for T_mac_compactpro_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_macwriteii_application;
@@ -11016,6 +12767,9 @@ impl MimeTypeChecker for T_macwriteii_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11033,6 +12787,9 @@ impl MimeTypeChecker for T_mathml_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mbms_associated_procedure_description_xml_application;
@@ -11048,6 +12805,9 @@ impl MimeTypeChecker for T_mbms_associated_procedure_description_xml_application
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11065,6 +12825,9 @@ impl MimeTypeChecker for T_mbms_deregister_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mbms_envelope_xml_application;
@@ -11080,6 +12843,9 @@ impl MimeTypeChecker for T_mbms_envelope_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11097,6 +12863,9 @@ impl MimeTypeChecker for T_mbms_msk_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mbms_msk_response_xml_application;
@@ -11112,6 +12881,9 @@ impl MimeTypeChecker for T_mbms_msk_response_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11129,6 +12901,9 @@ impl MimeTypeChecker for T_mbms_protection_description_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mbms_reception_report_xml_application;
@@ -11144,6 +12919,9 @@ impl MimeTypeChecker for T_mbms_reception_report_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11161,6 +12939,9 @@ impl MimeTypeChecker for T_mbms_register_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mbms_register_response_xml_application;
@@ -11176,6 +12957,9 @@ impl MimeTypeChecker for T_mbms_register_response_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11193,6 +12977,9 @@ impl MimeTypeChecker for T_mbms_user_service_description_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_media_control_xml_application;
@@ -11208,6 +12995,9 @@ impl MimeTypeChecker for T_media_control_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11225,6 +13015,9 @@ impl MimeTypeChecker for T_mediaservercontrol_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mikey_application;
@@ -11240,6 +13033,9 @@ impl MimeTypeChecker for T_mikey_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11257,6 +13053,9 @@ impl MimeTypeChecker for T_moss_keys_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_moss_signature_application;
@@ -11272,6 +13071,9 @@ impl MimeTypeChecker for T_moss_signature_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11289,6 +13091,9 @@ impl MimeTypeChecker for T_mosskey_data_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mosskey_request_application;
@@ -11304,6 +13109,9 @@ impl MimeTypeChecker for T_mosskey_request_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11321,6 +13129,9 @@ impl MimeTypeChecker for T_mp4_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mpeg4_generic_application;
@@ -11336,6 +13147,9 @@ impl MimeTypeChecker for T_mpeg4_generic_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11353,6 +13167,9 @@ impl MimeTypeChecker for T_mpeg4_iod_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mpeg4_iod_xmt_application;
@@ -11368,6 +13185,9 @@ impl MimeTypeChecker for T_mpeg4_iod_xmt_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11385,6 +13205,9 @@ impl MimeTypeChecker for T_mxf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_nasdata_application;
@@ -11400,6 +13223,9 @@ impl MimeTypeChecker for T_nasdata_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11417,6 +13243,9 @@ impl MimeTypeChecker for T_news_checkgroups_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_news_groupinfo_application;
@@ -11432,6 +13261,9 @@ impl MimeTypeChecker for T_news_groupinfo_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11449,6 +13281,9 @@ impl MimeTypeChecker for T_news_transmission_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_nss_application;
@@ -11464,6 +13299,9 @@ impl MimeTypeChecker for T_nss_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11481,6 +13319,9 @@ impl MimeTypeChecker for T_ocsp_request_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ocsp_response_application;
@@ -11496,6 +13337,9 @@ impl MimeTypeChecker for T_ocsp_response_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11513,6 +13357,9 @@ impl MimeTypeChecker for T_oda_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_oebps_package_xml_application;
@@ -11528,6 +13375,9 @@ impl MimeTypeChecker for T_oebps_package_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11545,6 +13395,9 @@ impl MimeTypeChecker for T_kate_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_onenote__format_package_application;
@@ -11560,6 +13413,9 @@ impl MimeTypeChecker for T_onenote__format_package_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11577,6 +13433,9 @@ impl MimeTypeChecker for T_parityfec_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_patch_ops_error_xml_application;
@@ -11592,6 +13451,9 @@ impl MimeTypeChecker for T_patch_ops_error_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11609,6 +13471,9 @@ impl MimeTypeChecker for T_pgp_encrypted_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pgp_keys_application;
@@ -11624,6 +13489,9 @@ impl MimeTypeChecker for T_pgp_keys_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11641,6 +13509,9 @@ impl MimeTypeChecker for T_pgp_signature_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pics_rules_application;
@@ -11656,6 +13527,9 @@ impl MimeTypeChecker for T_pics_rules_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11673,6 +13547,9 @@ impl MimeTypeChecker for T_pidf_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pidf_diff_xml_application;
@@ -11688,6 +13565,9 @@ impl MimeTypeChecker for T_pidf_diff_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11705,6 +13585,9 @@ impl MimeTypeChecker for T_pkcs10_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pkcs7_mime_application;
@@ -11720,6 +13603,9 @@ impl MimeTypeChecker for T_pkcs7_mime_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11737,6 +13623,9 @@ impl MimeTypeChecker for T_pkix_cert_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pkix_crl_application;
@@ -11752,6 +13641,9 @@ impl MimeTypeChecker for T_pkix_crl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11769,6 +13661,9 @@ impl MimeTypeChecker for T_pkix_pkipath_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pkixcmp_application;
@@ -11784,6 +13679,9 @@ impl MimeTypeChecker for T_pkixcmp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11801,6 +13699,9 @@ impl MimeTypeChecker for T_pls_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_poc_settings_xml_application;
@@ -11816,6 +13717,9 @@ impl MimeTypeChecker for T_poc_settings_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11833,6 +13737,9 @@ impl MimeTypeChecker for T_prs_alvestrand_titrax_sheet_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_prs_cww_application;
@@ -11848,6 +13755,9 @@ impl MimeTypeChecker for T_prs_cww_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11865,6 +13775,9 @@ impl MimeTypeChecker for T_prs_nprend_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_prs_plucker_application;
@@ -11881,6 +13794,9 @@ impl MimeTypeChecker for T_prs_plucker_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_qsig_application;
@@ -11896,6 +13812,9 @@ impl MimeTypeChecker for T_qsig_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11917,6 +13836,9 @@ impl MimeTypeChecker for T_vnd_ms_spreadsheetml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_wordml_application;
@@ -11936,6 +13858,9 @@ impl MimeTypeChecker for T_vnd_ms_wordml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -11957,6 +13882,9 @@ impl MimeTypeChecker for T_vnd_ms_word2006ml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rdf_xml_application;
@@ -11974,6 +13902,9 @@ impl MimeTypeChecker for T_rdf_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_reginfo_xml_application;
@@ -11989,6 +13920,9 @@ impl MimeTypeChecker for T_reginfo_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12006,6 +13940,9 @@ impl MimeTypeChecker for T_relax_ng_compact_syntax_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_remote_printing_application;
@@ -12021,6 +13958,9 @@ impl MimeTypeChecker for T_remote_printing_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12038,6 +13978,9 @@ impl MimeTypeChecker for T_resource_lists_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_resource_lists_diff_xml_application;
@@ -12053,6 +13996,9 @@ impl MimeTypeChecker for T_resource_lists_diff_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12070,6 +14016,9 @@ impl MimeTypeChecker for T_riscos_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rlmi_xml_application;
@@ -12085,6 +14034,9 @@ impl MimeTypeChecker for T_rlmi_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12102,6 +14054,9 @@ impl MimeTypeChecker for T_rls_services_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rsd_xml_application;
@@ -12117,6 +14072,9 @@ impl MimeTypeChecker for T_rsd_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12134,6 +14092,9 @@ impl MimeTypeChecker for T_rss_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rtx_application;
@@ -12149,6 +14110,9 @@ impl MimeTypeChecker for T_rtx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12166,6 +14130,9 @@ impl MimeTypeChecker for T_samlassertion_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_samlmetadata_xml_application;
@@ -12181,6 +14148,9 @@ impl MimeTypeChecker for T_samlmetadata_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12198,6 +14168,9 @@ impl MimeTypeChecker for T_sbml_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_scvp_cv_request_application;
@@ -12213,6 +14186,9 @@ impl MimeTypeChecker for T_scvp_cv_request_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12230,6 +14206,9 @@ impl MimeTypeChecker for T_scvp_cv_response_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_scvp_vp_request_application;
@@ -12245,6 +14224,9 @@ impl MimeTypeChecker for T_scvp_vp_request_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12262,6 +14244,9 @@ impl MimeTypeChecker for T_scvp_vp_response_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sdp_application;
@@ -12277,6 +14262,9 @@ impl MimeTypeChecker for T_sdp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12294,6 +14282,9 @@ impl MimeTypeChecker for T_set_payment_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_set_payment_initiation_application;
@@ -12309,6 +14300,9 @@ impl MimeTypeChecker for T_set_payment_initiation_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12326,6 +14320,9 @@ impl MimeTypeChecker for T_set_registration_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_set_registration_initiation_application;
@@ -12341,6 +14338,9 @@ impl MimeTypeChecker for T_set_registration_initiation_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12358,6 +14358,9 @@ impl MimeTypeChecker for T_sgml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sgml_open_catalog_application;
@@ -12373,6 +14376,9 @@ impl MimeTypeChecker for T_sgml_open_catalog_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12390,6 +14396,9 @@ impl MimeTypeChecker for T_shf_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sieve_application;
@@ -12405,6 +14414,9 @@ impl MimeTypeChecker for T_sieve_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12422,6 +14434,9 @@ impl MimeTypeChecker for T_simple_filter_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_simple_message_summary_application;
@@ -12437,6 +14452,9 @@ impl MimeTypeChecker for T_simple_message_summary_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12454,6 +14472,9 @@ impl MimeTypeChecker for T_simplesymbolcontainer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_slate_application;
@@ -12469,6 +14490,9 @@ impl MimeTypeChecker for T_slate_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12486,6 +14510,9 @@ impl MimeTypeChecker for T_smil_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_soap_fastinfoset_application;
@@ -12501,6 +14528,9 @@ impl MimeTypeChecker for T_soap_fastinfoset_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12518,6 +14548,9 @@ impl MimeTypeChecker for T_soap_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sldworks_application;
@@ -12533,6 +14566,9 @@ impl MimeTypeChecker for T_sldworks_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12550,6 +14586,9 @@ impl MimeTypeChecker for T_sparql_query_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sparql_results_xml_application;
@@ -12565,6 +14604,9 @@ impl MimeTypeChecker for T_sparql_results_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12582,6 +14624,9 @@ impl MimeTypeChecker for T_spirits_event_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_srgs_application;
@@ -12597,6 +14642,9 @@ impl MimeTypeChecker for T_srgs_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12614,6 +14662,9 @@ impl MimeTypeChecker for T_srgs_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ssml_xml_application;
@@ -12629,6 +14680,9 @@ impl MimeTypeChecker for T_ssml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12646,6 +14700,9 @@ impl MimeTypeChecker for T_timestamp_query_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_timestamp_reply_application;
@@ -12661,6 +14718,9 @@ impl MimeTypeChecker for T_timestamp_reply_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12678,6 +14738,9 @@ impl MimeTypeChecker for T_tve_trigger_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ulpfec_application;
@@ -12693,6 +14756,9 @@ impl MimeTypeChecker for T_ulpfec_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12710,6 +14776,9 @@ impl MimeTypeChecker for T_vemmi_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vividence_scriptfile_application;
@@ -12725,6 +14794,9 @@ impl MimeTypeChecker for T_vividence_scriptfile_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12742,6 +14814,9 @@ impl MimeTypeChecker for T_vnd_3gpp_bsf_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_3gpp_pic_bw_large_application;
@@ -12757,6 +14832,9 @@ impl MimeTypeChecker for T_vnd_3gpp_pic_bw_large_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12774,6 +14852,9 @@ impl MimeTypeChecker for T_vnd_3gpp_pic_bw_small_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_3gpp_pic_bw_var_application;
@@ -12789,6 +14870,9 @@ impl MimeTypeChecker for T_vnd_3gpp_pic_bw_var_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12806,6 +14890,9 @@ impl MimeTypeChecker for T_vnd_3gpp_sms_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_3gpp2_bcmcsinfo_xml_application;
@@ -12821,6 +14908,9 @@ impl MimeTypeChecker for T_vnd_3gpp2_bcmcsinfo_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12838,6 +14928,9 @@ impl MimeTypeChecker for T_vnd_3gpp2_sms_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_3gpp2_tcap_application;
@@ -12853,6 +14946,9 @@ impl MimeTypeChecker for T_vnd_3gpp2_tcap_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12870,6 +14966,9 @@ impl MimeTypeChecker for T_vnd_3m_post_it_notes_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_accpac_simply_aso_application;
@@ -12885,6 +14984,9 @@ impl MimeTypeChecker for T_vnd_accpac_simply_aso_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12902,6 +15004,9 @@ impl MimeTypeChecker for T_vnd_accpac_simply_imp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_acucobol_application;
@@ -12917,6 +15022,9 @@ impl MimeTypeChecker for T_vnd_acucobol_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12934,6 +15042,9 @@ impl MimeTypeChecker for T_vnd_acucorp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_adobe_air_application_installer_package_zip_application;
@@ -12949,6 +15060,9 @@ impl MimeTypeChecker for T_vnd_adobe_air_application_installer_package_zip_appli
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12966,6 +15080,9 @@ impl MimeTypeChecker for T_vnd_adobe_aftereffects_project_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_adobe_aftereffects_template_application;
@@ -12981,6 +15098,9 @@ impl MimeTypeChecker for T_vnd_adobe_aftereffects_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -12998,6 +15118,9 @@ impl MimeTypeChecker for T_vnd_adobe_xdp_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_adobe_xfdf_application;
@@ -13013,6 +15136,9 @@ impl MimeTypeChecker for T_vnd_adobe_xfdf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13030,6 +15156,9 @@ impl MimeTypeChecker for T_vnd_aether_imp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_airzip_filesecure_azf_application;
@@ -13045,6 +15174,9 @@ impl MimeTypeChecker for T_vnd_airzip_filesecure_azf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13062,6 +15194,9 @@ impl MimeTypeChecker for T_vnd_airzip_filesecure_azs_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_amazon_ebook_application;
@@ -13077,6 +15212,9 @@ impl MimeTypeChecker for T_vnd_amazon_ebook_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13094,6 +15232,9 @@ impl MimeTypeChecker for T_vnd_americandynamics_acc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_amiga_ami_application;
@@ -13109,6 +15250,9 @@ impl MimeTypeChecker for T_vnd_amiga_ami_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13126,6 +15270,9 @@ impl MimeTypeChecker for T_vnd_anser_web_certificate_issue_initiation_applicatio
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_anser_web_funds_transfer_initiation_application;
@@ -13141,6 +15288,9 @@ impl MimeTypeChecker for T_vnd_anser_web_funds_transfer_initiation_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13158,6 +15308,9 @@ impl MimeTypeChecker for T_vnd_antix_game_component_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_apple_installer_xml_application;
@@ -13174,6 +15327,9 @@ impl MimeTypeChecker for T_vnd_apple_installer_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_apple_unknown_13_application;
@@ -13189,6 +15345,9 @@ impl MimeTypeChecker for T_vnd_apple_unknown_13_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13210,21 +15369,8 @@ impl MimeTypeChecker for T_vnd_apple_keynote_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_vnd_apple_mpegurl_application;
-impl MimeTypeChecker for T_vnd_apple_mpegurl_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.apple.mpegurl"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.m3u8"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        offset(bytes, 0, &[35, 69, 88, 84, 77, 51, 85])
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13246,6 +15392,9 @@ impl MimeTypeChecker for T_vnd_apple_pages_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_apple_numbers_application;
@@ -13266,6 +15415,9 @@ impl MimeTypeChecker for T_vnd_apple_numbers_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tika_iworks_protected_application;
@@ -13281,6 +15433,9 @@ impl MimeTypeChecker for T_x_tika_iworks_protected_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13298,6 +15453,9 @@ impl MimeTypeChecker for T_vnd_arastra_swi_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_audiograph_application;
@@ -13313,6 +15471,9 @@ impl MimeTypeChecker for T_vnd_audiograph_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13330,6 +15491,9 @@ impl MimeTypeChecker for T_vnd_autopackage_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_avistar_xml_application;
@@ -13345,6 +15509,9 @@ impl MimeTypeChecker for T_vnd_avistar_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13362,6 +15529,9 @@ impl MimeTypeChecker for T_vnd_blueice_multipass_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_bluetooth_ep_oob_application;
@@ -13377,6 +15547,9 @@ impl MimeTypeChecker for T_vnd_bluetooth_ep_oob_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13394,6 +15567,9 @@ impl MimeTypeChecker for T_vnd_bmi_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_businessobjects_application;
@@ -13409,6 +15585,9 @@ impl MimeTypeChecker for T_vnd_businessobjects_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13426,6 +15605,9 @@ impl MimeTypeChecker for T_vnd_cab_jscript_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_canon_cpdl_application;
@@ -13441,6 +15623,9 @@ impl MimeTypeChecker for T_vnd_canon_cpdl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13458,6 +15643,9 @@ impl MimeTypeChecker for T_vnd_canon_lips_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cendio_thinlinc_clientconf_application;
@@ -13473,6 +15661,9 @@ impl MimeTypeChecker for T_vnd_cendio_thinlinc_clientconf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13490,6 +15681,9 @@ impl MimeTypeChecker for T_vnd_chemdraw_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_chipnuts_karaoke_mmd_application;
@@ -13505,6 +15699,9 @@ impl MimeTypeChecker for T_vnd_chipnuts_karaoke_mmd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13522,6 +15719,9 @@ impl MimeTypeChecker for T_vnd_cinderella_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cirpack_isdn_ext_application;
@@ -13537,6 +15737,9 @@ impl MimeTypeChecker for T_vnd_cirpack_isdn_ext_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13554,6 +15757,9 @@ impl MimeTypeChecker for T_vnd_claymore_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_clonk_c4group_application;
@@ -13569,6 +15775,9 @@ impl MimeTypeChecker for T_vnd_clonk_c4group_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13586,6 +15795,9 @@ impl MimeTypeChecker for T_vnd_commerce_battelle_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_commonspace_application;
@@ -13601,6 +15813,9 @@ impl MimeTypeChecker for T_vnd_commonspace_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13618,6 +15833,9 @@ impl MimeTypeChecker for T_vnd_contact_cmsg_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cosmocaller_application;
@@ -13633,6 +15851,9 @@ impl MimeTypeChecker for T_vnd_cosmocaller_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13650,6 +15871,9 @@ impl MimeTypeChecker for T_vnd_crick_clicker_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_crick_clicker_keyboard_application;
@@ -13665,6 +15889,9 @@ impl MimeTypeChecker for T_vnd_crick_clicker_keyboard_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13682,6 +15909,9 @@ impl MimeTypeChecker for T_vnd_crick_clicker_palette_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_crick_clicker_template_application;
@@ -13697,6 +15927,9 @@ impl MimeTypeChecker for T_vnd_crick_clicker_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13714,6 +15947,9 @@ impl MimeTypeChecker for T_vnd_crick_clicker_wordbank_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_criticaltools_wbs_xml_application;
@@ -13729,6 +15965,9 @@ impl MimeTypeChecker for T_vnd_criticaltools_wbs_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13746,6 +15985,9 @@ impl MimeTypeChecker for T_vnd_ctc_posml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ctct_ws_xml_application;
@@ -13761,6 +16003,9 @@ impl MimeTypeChecker for T_vnd_ctct_ws_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13778,6 +16023,9 @@ impl MimeTypeChecker for T_vnd_cups_pdf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cups_postscript_application;
@@ -13793,6 +16041,9 @@ impl MimeTypeChecker for T_vnd_cups_postscript_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13810,6 +16061,9 @@ impl MimeTypeChecker for T_vnd_cups_ppd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cups_raster_application;
@@ -13825,6 +16079,9 @@ impl MimeTypeChecker for T_vnd_cups_raster_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13842,6 +16099,9 @@ impl MimeTypeChecker for T_vnd_cups_raw_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_curl_car_application;
@@ -13857,6 +16117,9 @@ impl MimeTypeChecker for T_vnd_curl_car_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13874,6 +16137,9 @@ impl MimeTypeChecker for T_vnd_curl_pcurl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cybank_application;
@@ -13889,6 +16155,9 @@ impl MimeTypeChecker for T_vnd_cybank_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13906,6 +16175,9 @@ impl MimeTypeChecker for T_x_wacz_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vnd_datapackage_json_application;
@@ -13921,6 +16193,9 @@ impl MimeTypeChecker for T_x_vnd_datapackage_json_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13938,6 +16213,9 @@ impl MimeTypeChecker for T_x_vnd_datapackage_gz_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_data_vision_rdz_application;
@@ -13953,6 +16231,9 @@ impl MimeTypeChecker for T_vnd_data_vision_rdz_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -13970,6 +16251,9 @@ impl MimeTypeChecker for T_vnd_denovo_fcselayout_link_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dir_bi_plate_dl_nosuffix_application;
@@ -13985,6 +16269,9 @@ impl MimeTypeChecker for T_vnd_dir_bi_plate_dl_nosuffix_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14002,6 +16289,9 @@ impl MimeTypeChecker for T_vnd_dna_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dolby_mlp_application;
@@ -14017,6 +16307,9 @@ impl MimeTypeChecker for T_vnd_dolby_mlp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14034,6 +16327,9 @@ impl MimeTypeChecker for T_vnd_dolby_mobile_1_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dolby_mobile_2_application;
@@ -14049,6 +16345,9 @@ impl MimeTypeChecker for T_vnd_dolby_mobile_2_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14066,6 +16365,9 @@ impl MimeTypeChecker for T_vnd_dpgraph_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dreamfactory_application;
@@ -14081,6 +16383,9 @@ impl MimeTypeChecker for T_vnd_dreamfactory_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14098,6 +16403,9 @@ impl MimeTypeChecker for T_vnd_dvb_esgcontainer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dvb_ipdcdftnotifaccess_application;
@@ -14113,6 +16421,9 @@ impl MimeTypeChecker for T_vnd_dvb_ipdcdftnotifaccess_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14130,6 +16441,9 @@ impl MimeTypeChecker for T_vnd_dvb_ipdcesgaccess_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dvb_ipdcroaming_application;
@@ -14145,6 +16459,9 @@ impl MimeTypeChecker for T_vnd_dvb_ipdcroaming_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14162,6 +16479,9 @@ impl MimeTypeChecker for T_vnd_dvb_iptv_alfec_base_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dvb_iptv_alfec_enhancement_application;
@@ -14177,6 +16497,9 @@ impl MimeTypeChecker for T_vnd_dvb_iptv_alfec_enhancement_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14194,6 +16517,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_aggregate_root_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dvb_notif_container_xml_application;
@@ -14209,6 +16535,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_container_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14226,6 +16555,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_generic_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dvb_notif_ia_msglist_xml_application;
@@ -14241,6 +16573,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_ia_msglist_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14258,6 +16593,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_ia_registration_request_xml_application
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dvb_notif_ia_registration_response_xml_application;
@@ -14273,6 +16611,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_ia_registration_response_xml_applicatio
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14290,6 +16631,9 @@ impl MimeTypeChecker for T_vnd_dvb_notif_init_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dxr_application;
@@ -14305,6 +16649,9 @@ impl MimeTypeChecker for T_vnd_dxr_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14322,6 +16669,9 @@ impl MimeTypeChecker for T_vnd_dynageo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ecdis_update_application;
@@ -14337,6 +16687,9 @@ impl MimeTypeChecker for T_vnd_ecdis_update_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14354,6 +16707,9 @@ impl MimeTypeChecker for T_vnd_ecowin_chart_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ecowin_filerequest_application;
@@ -14369,6 +16725,9 @@ impl MimeTypeChecker for T_vnd_ecowin_filerequest_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14386,6 +16745,9 @@ impl MimeTypeChecker for T_vnd_ecowin_fileupdate_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ecowin_series_application;
@@ -14401,6 +16763,9 @@ impl MimeTypeChecker for T_vnd_ecowin_series_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14418,6 +16783,9 @@ impl MimeTypeChecker for T_vnd_ecowin_seriesrequest_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ecowin_seriesupdate_application;
@@ -14433,6 +16801,9 @@ impl MimeTypeChecker for T_vnd_ecowin_seriesupdate_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14450,6 +16821,9 @@ impl MimeTypeChecker for T_vnd_emclient_accessrequest_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_enliven_application;
@@ -14465,6 +16839,9 @@ impl MimeTypeChecker for T_vnd_enliven_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14482,6 +16859,9 @@ impl MimeTypeChecker for T_vnd_epson_esf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_epson_msf_application;
@@ -14497,6 +16877,9 @@ impl MimeTypeChecker for T_vnd_epson_msf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14514,6 +16897,9 @@ impl MimeTypeChecker for T_vnd_epson_quickanime_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_epson_salt_application;
@@ -14529,6 +16915,9 @@ impl MimeTypeChecker for T_vnd_epson_salt_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14546,6 +16935,9 @@ impl MimeTypeChecker for T_vnd_epson_ssf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ericsson_quickcall_application;
@@ -14561,6 +16953,9 @@ impl MimeTypeChecker for T_vnd_ericsson_quickcall_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14578,6 +16973,9 @@ impl MimeTypeChecker for T_vnd_eszigno3_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_aoc_xml_application;
@@ -14593,6 +16991,9 @@ impl MimeTypeChecker for T_vnd_etsi_aoc_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14610,6 +17011,9 @@ impl MimeTypeChecker for T_vnd_etsi_cug_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_iptvcommand_xml_application;
@@ -14625,6 +17029,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvcommand_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14642,6 +17049,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvdiscovery_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_iptvprofile_xml_application;
@@ -14657,6 +17067,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvprofile_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14674,6 +17087,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvsad_bc_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_iptvsad_cod_xml_application;
@@ -14689,6 +17105,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvsad_cod_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14706,6 +17125,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvsad_npvr_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_iptvueprofile_xml_application;
@@ -14721,6 +17143,9 @@ impl MimeTypeChecker for T_vnd_etsi_iptvueprofile_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14738,6 +17163,9 @@ impl MimeTypeChecker for T_vnd_etsi_mcid_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_etsi_sci_xml_application;
@@ -14753,6 +17181,9 @@ impl MimeTypeChecker for T_vnd_etsi_sci_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14770,6 +17201,9 @@ impl MimeTypeChecker for T_vnd_etsi_simservs_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_eudora_data_application;
@@ -14785,6 +17219,9 @@ impl MimeTypeChecker for T_vnd_eudora_data_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14802,6 +17239,9 @@ impl MimeTypeChecker for T_vnd_ezpix_album_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ezpix_package_application;
@@ -14817,6 +17257,9 @@ impl MimeTypeChecker for T_vnd_ezpix_package_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14834,6 +17277,9 @@ impl MimeTypeChecker for T_vnd_f_secure_mobile_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fdsn_mseed_application;
@@ -14849,6 +17295,9 @@ impl MimeTypeChecker for T_vnd_fdsn_mseed_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14866,6 +17315,9 @@ impl MimeTypeChecker for T_vnd_fdsn_seed_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ffsns_application;
@@ -14881,6 +17333,9 @@ impl MimeTypeChecker for T_vnd_ffsns_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14898,6 +17353,9 @@ impl MimeTypeChecker for T_vnd_fints_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_flographit_application;
@@ -14913,6 +17371,9 @@ impl MimeTypeChecker for T_vnd_flographit_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14930,6 +17391,9 @@ impl MimeTypeChecker for T_vnd_fluxtime_clip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_font_fontforge_sfd_application;
@@ -14945,6 +17409,9 @@ impl MimeTypeChecker for T_vnd_font_fontforge_sfd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14962,6 +17429,9 @@ impl MimeTypeChecker for T_vnd_framemaker_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_frogans_fnc_application;
@@ -14977,6 +17447,9 @@ impl MimeTypeChecker for T_vnd_frogans_fnc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -14994,6 +17467,9 @@ impl MimeTypeChecker for T_vnd_frogans_ltf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fsc_weblaunch_application;
@@ -15009,6 +17485,9 @@ impl MimeTypeChecker for T_vnd_fsc_weblaunch_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15026,6 +17505,9 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasys_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fujitsu_oasys2_application;
@@ -15041,6 +17523,9 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasys2_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15058,6 +17543,9 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasys3_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fujitsu_oasysgp_application;
@@ -15073,6 +17561,9 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasysgp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15090,6 +17581,9 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasysprs_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fujixerox_art_ex_application;
@@ -15105,6 +17599,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_art_ex_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15122,6 +17619,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_art4_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fujixerox_hbpl_application;
@@ -15137,6 +17637,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_hbpl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15154,6 +17657,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_ddd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fujixerox_docuworks_application;
@@ -15169,6 +17675,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_docuworks_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15186,6 +17695,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_docuworks_binder_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fut_misnet_application;
@@ -15201,6 +17713,9 @@ impl MimeTypeChecker for T_vnd_fut_misnet_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15218,6 +17733,9 @@ impl MimeTypeChecker for T_vnd_fuzzysheet_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_genomatix_tuxedo_application;
@@ -15233,6 +17751,9 @@ impl MimeTypeChecker for T_vnd_genomatix_tuxedo_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15250,6 +17771,9 @@ impl MimeTypeChecker for T_vnd_geogebra_file_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_geogebra_tool_application;
@@ -15265,6 +17789,9 @@ impl MimeTypeChecker for T_vnd_geogebra_tool_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15282,6 +17809,9 @@ impl MimeTypeChecker for T_vnd_geometry_explorer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_gmx_application;
@@ -15297,6 +17827,9 @@ impl MimeTypeChecker for T_vnd_gmx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15318,6 +17851,9 @@ impl MimeTypeChecker for T_vnd_google_earth_kml_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_google_earth_kmz_application;
@@ -15333,6 +17869,9 @@ impl MimeTypeChecker for T_vnd_google_earth_kmz_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15350,6 +17889,9 @@ impl MimeTypeChecker for T_vnd_grafeq_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_gridmp_application;
@@ -15365,6 +17907,9 @@ impl MimeTypeChecker for T_vnd_gridmp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15382,6 +17927,9 @@ impl MimeTypeChecker for T_vnd_groove_account_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_groove_help_application;
@@ -15397,6 +17945,9 @@ impl MimeTypeChecker for T_vnd_groove_help_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15414,6 +17965,9 @@ impl MimeTypeChecker for T_vnd_groove_identity_message_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_groove_injector_application;
@@ -15429,6 +17983,9 @@ impl MimeTypeChecker for T_vnd_groove_injector_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15446,6 +18003,9 @@ impl MimeTypeChecker for T_vnd_groove_tool_message_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_groove_tool_template_application;
@@ -15461,6 +18021,9 @@ impl MimeTypeChecker for T_vnd_groove_tool_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15478,6 +18041,9 @@ impl MimeTypeChecker for T_vnd_groove_vcard_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_handheld_entertainment_xml_application;
@@ -15493,6 +18059,9 @@ impl MimeTypeChecker for T_vnd_handheld_entertainment_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15510,6 +18079,9 @@ impl MimeTypeChecker for T_vnd_hbci_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_hcl_bireports_application;
@@ -15525,6 +18097,9 @@ impl MimeTypeChecker for T_vnd_hcl_bireports_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15542,6 +18117,9 @@ impl MimeTypeChecker for T_vnd_hhe_lesson_player_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_hp_hpgl_application;
@@ -15557,6 +18135,9 @@ impl MimeTypeChecker for T_vnd_hp_hpgl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15574,6 +18155,9 @@ impl MimeTypeChecker for T_vnd_hp_hpid_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_hp_hps_application;
@@ -15589,6 +18173,9 @@ impl MimeTypeChecker for T_vnd_hp_hps_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15606,6 +18193,9 @@ impl MimeTypeChecker for T_vnd_hp_jlyt_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_hp_pcl_application;
@@ -15621,6 +18211,9 @@ impl MimeTypeChecker for T_vnd_hp_pcl_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15638,6 +18231,9 @@ impl MimeTypeChecker for T_vnd_hp_pclxl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_httphone_application;
@@ -15653,6 +18249,9 @@ impl MimeTypeChecker for T_vnd_httphone_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15670,6 +18269,9 @@ impl MimeTypeChecker for T_vnd_hydrostatix_sof_data_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_hzn_3d_crossword_application;
@@ -15685,6 +18287,9 @@ impl MimeTypeChecker for T_vnd_hzn_3d_crossword_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15702,6 +18307,9 @@ impl MimeTypeChecker for T_vnd_ibm_afplinedata_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ibm_electronic_media_application;
@@ -15717,6 +18325,9 @@ impl MimeTypeChecker for T_vnd_ibm_electronic_media_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15734,6 +18345,9 @@ impl MimeTypeChecker for T_vnd_ibm_minipay_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ibm_modcap_application;
@@ -15749,6 +18363,9 @@ impl MimeTypeChecker for T_vnd_ibm_modcap_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15766,6 +18383,9 @@ impl MimeTypeChecker for T_vnd_ibm_rights_management_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ibm_secure_container_application;
@@ -15781,6 +18401,9 @@ impl MimeTypeChecker for T_vnd_ibm_secure_container_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15798,6 +18421,9 @@ impl MimeTypeChecker for T_vnd_igloader_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_immervision_ivp_application;
@@ -15813,6 +18439,9 @@ impl MimeTypeChecker for T_vnd_immervision_ivp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15830,6 +18459,9 @@ impl MimeTypeChecker for T_vnd_immervision_ivu_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_informedcontrol_rms_xml_application;
@@ -15845,6 +18477,9 @@ impl MimeTypeChecker for T_vnd_informedcontrol_rms_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15862,6 +18497,9 @@ impl MimeTypeChecker for T_vnd_informix_visionary_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_intercon_formnet_application;
@@ -15877,6 +18515,9 @@ impl MimeTypeChecker for T_vnd_intercon_formnet_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15894,6 +18535,9 @@ impl MimeTypeChecker for T_vnd_intertrust_digibox_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_intertrust_nncp_application;
@@ -15909,6 +18553,9 @@ impl MimeTypeChecker for T_vnd_intertrust_nncp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15926,6 +18573,9 @@ impl MimeTypeChecker for T_vnd_intu_qbo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_intu_qfx_application;
@@ -15941,6 +18591,9 @@ impl MimeTypeChecker for T_vnd_intu_qfx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15958,6 +18611,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_catalogitem_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptc_g2_conceptitem_xml_application;
@@ -15973,6 +18629,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_conceptitem_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -15990,6 +18649,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_knowledgeitem_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptc_g2_newsitem_xml_application;
@@ -16005,6 +18667,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_newsitem_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16023,6 +18688,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_newsmessage_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptc_g2_packageitem_xml_application;
@@ -16038,6 +18706,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_packageitem_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16055,6 +18726,9 @@ impl MimeTypeChecker for T_vnd_iptc_g2_planningitem_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ipunplugged_rcprofile_application;
@@ -16070,6 +18744,9 @@ impl MimeTypeChecker for T_vnd_ipunplugged_rcprofile_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16087,6 +18764,9 @@ impl MimeTypeChecker for T_vnd_irepository_package_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_is_xpr_application;
@@ -16102,6 +18782,9 @@ impl MimeTypeChecker for T_vnd_is_xpr_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16119,6 +18802,9 @@ impl MimeTypeChecker for T_vnd_jam_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_japannet_directory_service_application;
@@ -16134,6 +18820,9 @@ impl MimeTypeChecker for T_vnd_japannet_directory_service_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16151,6 +18840,9 @@ impl MimeTypeChecker for T_vnd_japannet_jpnstore_wakeup_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_japannet_payment_wakeup_application;
@@ -16166,6 +18858,9 @@ impl MimeTypeChecker for T_vnd_japannet_payment_wakeup_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16183,6 +18878,9 @@ impl MimeTypeChecker for T_vnd_japannet_registration_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_japannet_registration_wakeup_application;
@@ -16198,6 +18896,9 @@ impl MimeTypeChecker for T_vnd_japannet_registration_wakeup_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16215,6 +18916,9 @@ impl MimeTypeChecker for T_vnd_japannet_setstore_wakeup_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_japannet_verification_application;
@@ -16230,6 +18934,9 @@ impl MimeTypeChecker for T_vnd_japannet_verification_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16247,6 +18954,9 @@ impl MimeTypeChecker for T_vnd_japannet_verification_wakeup_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_jcp_javame_midlet_rms_application;
@@ -16262,6 +18972,9 @@ impl MimeTypeChecker for T_vnd_jcp_javame_midlet_rms_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16279,6 +18992,9 @@ impl MimeTypeChecker for T_vnd_jisp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_joost_joda_archive_application;
@@ -16294,6 +19010,9 @@ impl MimeTypeChecker for T_vnd_joost_joda_archive_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16311,6 +19030,9 @@ impl MimeTypeChecker for T_vnd_kahootz_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kde_karbon_application;
@@ -16326,6 +19048,9 @@ impl MimeTypeChecker for T_vnd_kde_karbon_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16343,6 +19068,9 @@ impl MimeTypeChecker for T_vnd_kde_kchart_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kde_kformula_application;
@@ -16358,6 +19086,9 @@ impl MimeTypeChecker for T_vnd_kde_kformula_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16375,6 +19106,9 @@ impl MimeTypeChecker for T_vnd_kde_kivio_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kde_kontour_application;
@@ -16390,6 +19124,9 @@ impl MimeTypeChecker for T_vnd_kde_kontour_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16407,6 +19144,9 @@ impl MimeTypeChecker for T_vnd_kde_kpresenter_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kde_kspread_application;
@@ -16422,6 +19162,9 @@ impl MimeTypeChecker for T_vnd_kde_kspread_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16439,6 +19182,9 @@ impl MimeTypeChecker for T_vnd_kde_kword_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kenameaapp_application;
@@ -16454,6 +19200,9 @@ impl MimeTypeChecker for T_vnd_kenameaapp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16471,6 +19220,9 @@ impl MimeTypeChecker for T_vnd_kidspiration_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kinar_application;
@@ -16486,6 +19238,9 @@ impl MimeTypeChecker for T_vnd_kinar_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16503,6 +19258,9 @@ impl MimeTypeChecker for T_vnd_koan_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_kodak_descriptor_application;
@@ -16518,6 +19276,9 @@ impl MimeTypeChecker for T_vnd_kodak_descriptor_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16535,6 +19296,9 @@ impl MimeTypeChecker for T_vnd_liberty_request_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_llamagraphics_life_balance_desktop_application;
@@ -16550,6 +19314,9 @@ impl MimeTypeChecker for T_vnd_llamagraphics_life_balance_desktop_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16567,6 +19334,9 @@ impl MimeTypeChecker for T_vnd_llamagraphics_life_balance_exchange_xml_applicati
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lotus_approach_application;
@@ -16582,6 +19352,9 @@ impl MimeTypeChecker for T_vnd_lotus_approach_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16599,6 +19372,9 @@ impl MimeTypeChecker for T_vnd_lotus_freelance_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lotus_notes_application;
@@ -16614,6 +19390,9 @@ impl MimeTypeChecker for T_vnd_lotus_notes_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16631,6 +19410,9 @@ impl MimeTypeChecker for T_vnd_lotus_organizer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lotus_screencam_application;
@@ -16646,6 +19428,9 @@ impl MimeTypeChecker for T_vnd_lotus_screencam_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16663,6 +19448,9 @@ impl MimeTypeChecker for T_vnd_macports_portpkg_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_marlin_drm_actiontoken_xml_application;
@@ -16678,6 +19466,9 @@ impl MimeTypeChecker for T_vnd_marlin_drm_actiontoken_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16695,6 +19486,9 @@ impl MimeTypeChecker for T_vnd_marlin_drm_conftoken_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_marlin_drm_license_xml_application;
@@ -16710,6 +19504,9 @@ impl MimeTypeChecker for T_vnd_marlin_drm_license_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16727,6 +19524,9 @@ impl MimeTypeChecker for T_vnd_marlin_drm_mdcf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mcd_application;
@@ -16742,6 +19542,9 @@ impl MimeTypeChecker for T_vnd_mcd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16759,6 +19562,9 @@ impl MimeTypeChecker for T_vnd_medcalcdata_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mediastation_cdkey_application;
@@ -16774,6 +19580,9 @@ impl MimeTypeChecker for T_vnd_mediastation_cdkey_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16791,6 +19600,9 @@ impl MimeTypeChecker for T_vnd_meridian_slingshot_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mfer_application;
@@ -16806,6 +19618,9 @@ impl MimeTypeChecker for T_vnd_mfer_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16823,6 +19638,9 @@ impl MimeTypeChecker for T_vnd_mfmp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_micrografx_flo_application;
@@ -16838,6 +19656,9 @@ impl MimeTypeChecker for T_vnd_micrografx_flo_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16855,6 +19676,9 @@ impl MimeTypeChecker for T_vnd_micrografx_igx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mindjet_mindmanager_application;
@@ -16870,6 +19694,9 @@ impl MimeTypeChecker for T_vnd_mindjet_mindmanager_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16887,6 +19714,9 @@ impl MimeTypeChecker for T_vnd_minisoft_hp3000_save_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mitsubishi_misty_guard_trustweb_application;
@@ -16902,6 +19732,9 @@ impl MimeTypeChecker for T_vnd_mitsubishi_misty_guard_trustweb_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16919,6 +19752,9 @@ impl MimeTypeChecker for T_vnd_mobius_daf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mobius_dis_application;
@@ -16934,6 +19770,9 @@ impl MimeTypeChecker for T_vnd_mobius_dis_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16951,6 +19790,9 @@ impl MimeTypeChecker for T_vnd_mobius_mbk_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mobius_mqy_application;
@@ -16966,6 +19808,9 @@ impl MimeTypeChecker for T_vnd_mobius_mqy_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -16983,6 +19828,9 @@ impl MimeTypeChecker for T_vnd_mobius_msl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mobius_plc_application;
@@ -16998,6 +19846,9 @@ impl MimeTypeChecker for T_vnd_mobius_plc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17015,6 +19866,9 @@ impl MimeTypeChecker for T_vnd_mobius_txf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mophun_application_application;
@@ -17030,6 +19884,9 @@ impl MimeTypeChecker for T_vnd_mophun_application_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17047,6 +19904,9 @@ impl MimeTypeChecker for T_vnd_mophun_certificate_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_motorola_flexsuite_application;
@@ -17062,6 +19922,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17079,6 +19942,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_adsi_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_motorola_flexsuite_fis_application;
@@ -17094,6 +19960,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_fis_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17111,6 +19980,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_gotap_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_motorola_flexsuite_kmr_application;
@@ -17126,6 +19998,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_kmr_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17143,6 +20018,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_ttc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_motorola_flexsuite_wem_application;
@@ -17158,6 +20036,9 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_wem_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17175,6 +20056,9 @@ impl MimeTypeChecker for T_vnd_motorola_iprm_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mozilla_xul_xml_application;
@@ -17190,6 +20074,9 @@ impl MimeTypeChecker for T_vnd_mozilla_xul_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17207,6 +20094,9 @@ impl MimeTypeChecker for T_vnd_ms_artgalry_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_asf_application;
@@ -17222,6 +20112,9 @@ impl MimeTypeChecker for T_vnd_ms_asf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17239,6 +20132,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_addin_macroenabled_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_excel_sheet_macroenabled_12_application;
@@ -17254,6 +20150,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_macroenabled_12_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17271,6 +20170,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_binary_macroenabled_12_application
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_ims_application;
@@ -17286,6 +20188,9 @@ impl MimeTypeChecker for T_vnd_ms_ims_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17303,6 +20208,9 @@ impl MimeTypeChecker for T_vnd_ms_lrm_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_outlook_application;
@@ -17318,6 +20226,9 @@ impl MimeTypeChecker for T_vnd_ms_outlook_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17339,6 +20250,9 @@ impl MimeTypeChecker for T_vnd_ms_package_3dmanufacturing_3dmodel_xml_applicatio
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_pki_seccat_application;
@@ -17354,6 +20268,9 @@ impl MimeTypeChecker for T_vnd_ms_pki_seccat_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17371,6 +20288,9 @@ impl MimeTypeChecker for T_vnd_ms_pki_stl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_playready_initiator_xml_application;
@@ -17386,6 +20306,9 @@ impl MimeTypeChecker for T_vnd_ms_playready_initiator_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17403,6 +20326,9 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_addin_macroenabled_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_powerpoint_presentation_macroenabled_12_application;
@@ -17418,6 +20344,9 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_presentation_macroenabled_12_applic
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17435,6 +20364,9 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_slide_macroenabled_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_powerpoint_slideshow_macroenabled_12_application;
@@ -17450,6 +20382,9 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_slideshow_macroenabled_12_applicati
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17467,6 +20402,9 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_template_macroenabled_12_applicatio
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_project_application;
@@ -17482,6 +20420,9 @@ impl MimeTypeChecker for T_vnd_ms_project_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17499,6 +20440,9 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_lic_chlg_req_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_wmdrm_lic_resp_application;
@@ -17514,6 +20458,9 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_lic_resp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17531,6 +20478,9 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_meter_chlg_req_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_wmdrm_meter_resp_application;
@@ -17546,6 +20496,9 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_meter_resp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17563,6 +20516,9 @@ impl MimeTypeChecker for T_vnd_ms_word_document_macroenabled_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_word_template_macroenabled_12_application;
@@ -17578,6 +20534,9 @@ impl MimeTypeChecker for T_vnd_ms_word_template_macroenabled_12_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17595,6 +20554,9 @@ impl MimeTypeChecker for T_vnd_ms_wpl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_xpsdocument_application;
@@ -17610,6 +20572,9 @@ impl MimeTypeChecker for T_vnd_ms_xpsdocument_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17627,6 +20592,9 @@ impl MimeTypeChecker for T_vnd_mseq_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_msign_application;
@@ -17642,6 +20610,9 @@ impl MimeTypeChecker for T_vnd_msign_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17659,6 +20630,9 @@ impl MimeTypeChecker for T_vnd_multiad_creator_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_multiad_creator_cif_application;
@@ -17674,6 +20648,9 @@ impl MimeTypeChecker for T_vnd_multiad_creator_cif_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17691,6 +20668,9 @@ impl MimeTypeChecker for T_vnd_music_niff_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_musician_application;
@@ -17706,6 +20686,9 @@ impl MimeTypeChecker for T_vnd_musician_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17723,6 +20706,9 @@ impl MimeTypeChecker for T_vnd_muvee_style_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ncd_control_application;
@@ -17738,6 +20724,9 @@ impl MimeTypeChecker for T_vnd_ncd_control_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17755,6 +20744,9 @@ impl MimeTypeChecker for T_vnd_ncd_reference_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nervana_application;
@@ -17770,6 +20762,9 @@ impl MimeTypeChecker for T_vnd_nervana_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17787,6 +20782,9 @@ impl MimeTypeChecker for T_vnd_netfpx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_neurolanguage_nlu_application;
@@ -17802,6 +20800,9 @@ impl MimeTypeChecker for T_vnd_neurolanguage_nlu_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17819,6 +20820,9 @@ impl MimeTypeChecker for T_vnd_noblenet_directory_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_noblenet_sealer_application;
@@ -17834,6 +20838,9 @@ impl MimeTypeChecker for T_vnd_noblenet_sealer_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17851,6 +20858,9 @@ impl MimeTypeChecker for T_vnd_noblenet_web_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_catalogs_application;
@@ -17866,6 +20876,9 @@ impl MimeTypeChecker for T_vnd_nokia_catalogs_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17883,6 +20896,9 @@ impl MimeTypeChecker for T_vnd_nokia_conml_wbxml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_conml_xml_application;
@@ -17898,6 +20914,9 @@ impl MimeTypeChecker for T_vnd_nokia_conml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17915,6 +20934,9 @@ impl MimeTypeChecker for T_vnd_nokia_isds_radio_presets_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_iptv_config_xml_application;
@@ -17930,6 +20952,9 @@ impl MimeTypeChecker for T_vnd_nokia_iptv_config_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17947,6 +20972,9 @@ impl MimeTypeChecker for T_vnd_nokia_landmark_wbxml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_landmark_xml_application;
@@ -17962,6 +20990,9 @@ impl MimeTypeChecker for T_vnd_nokia_landmark_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -17979,6 +21010,9 @@ impl MimeTypeChecker for T_vnd_nokia_landmarkcollection_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_n_gage_ac_xml_application;
@@ -17994,6 +21028,9 @@ impl MimeTypeChecker for T_vnd_nokia_n_gage_ac_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18011,6 +21048,9 @@ impl MimeTypeChecker for T_vnd_nokia_n_gage_data_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_n_gage_symbian_install_application;
@@ -18026,6 +21066,9 @@ impl MimeTypeChecker for T_vnd_nokia_n_gage_symbian_install_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18043,6 +21086,9 @@ impl MimeTypeChecker for T_vnd_nokia_ncd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_pcd_wbxml_application;
@@ -18058,6 +21104,9 @@ impl MimeTypeChecker for T_vnd_nokia_pcd_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18075,6 +21124,9 @@ impl MimeTypeChecker for T_vnd_nokia_pcd_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_radio_preset_application;
@@ -18090,6 +21142,9 @@ impl MimeTypeChecker for T_vnd_nokia_radio_preset_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18107,6 +21162,9 @@ impl MimeTypeChecker for T_vnd_nokia_radio_presets_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_novadigm_edm_application;
@@ -18122,6 +21180,9 @@ impl MimeTypeChecker for T_vnd_novadigm_edm_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18139,6 +21200,9 @@ impl MimeTypeChecker for T_vnd_novadigm_edx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_novadigm_ext_application;
@@ -18154,6 +21218,9 @@ impl MimeTypeChecker for T_vnd_novadigm_ext_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18180,73 +21247,8 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_chart_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_chart_template_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_chart_template_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.chart-template"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.otc"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[80, 75])
-            && offset(
-                bytes,
-                30,
-                &[
-                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
-                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
-                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 99, 104, 97, 114, 116, 45,
-                    116, 101, 109, 112, 108, 97, 116, 101,
-                ],
-            ))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
-    }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_base_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_base_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.base"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.odb"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
+    fn is_virtual(&self) -> bool {
         false
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
-    }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_formula_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_formula_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.formula"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.odf"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[80, 75])
-            && offset(
-                bytes,
-                30,
-                &[
-                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
-                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
-                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 102, 111, 114, 109, 117,
-                    108, 97,
-                ],
-            ))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
     }
 }
 
@@ -18264,15 +21266,18 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_formula_template_application {
                 bytes,
                 30,
                 &[
-                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
-                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
-                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 102, 111, 114, 109, 117,
-                    108, 97, 45, 116, 101, 109, 112, 108, 97, 116, 101,
+                    97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 47, 118, 110, 100, 46, 111,
+                    97, 115, 105, 115, 46, 111, 112, 101, 110, 100, 111, 99, 117, 109, 101, 110,
+                    116, 46, 102, 111, 114, 109, 117, 108, 97, 45, 116, 101, 109, 112, 108, 97,
+                    116, 101,
                 ],
             ))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18300,6 +21305,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_graphics_template_application 
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oasis_opendocument_image_template_application;
@@ -18325,6 +21333,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_image_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18352,6 +21363,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_presentation_template_applicat
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oasis_opendocument_spreadsheet_template_application;
@@ -18378,79 +21392,8 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_spreadsheet_template_applicati
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_flat_text_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_text_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.flat.text"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.fodt"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
+    fn is_virtual(&self) -> bool {
         false
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
-    }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_flat_presentation_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_presentation_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.flat.presentation"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.fodp"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        false
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
-    }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_flat_spreadsheet_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_spreadsheet_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.flat.spreadsheet"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.fods"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        false
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
-    }
-}
-
-pub(super) struct T_vnd_oasis_opendocument_text_master_application;
-impl MimeTypeChecker for T_vnd_oasis_opendocument_text_master_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.oasis.opendocument.text-master"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.otm"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        (offset(bytes, 0, &[80, 75])
-            && offset(
-                bytes,
-                30,
-                &[
-                    109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116,
-                    105, 111, 110, 47, 118, 110, 100, 46, 111, 97, 115, 105, 115, 46, 111, 112,
-                    101, 110, 100, 111, 99, 117, 109, 101, 110, 116, 46, 116, 101, 120, 116, 45,
-                    109, 97, 115, 116, 101, 114,
-                ],
-            ))
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
     }
 }
 
@@ -18478,6 +21421,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_template_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oasis_opendocument_text_web_application;
@@ -18504,6 +21450,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_web_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_obn_application;
@@ -18519,6 +21468,9 @@ impl MimeTypeChecker for T_vnd_obn_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18536,6 +21488,9 @@ impl MimeTypeChecker for T_vnd_olpc_sugar_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_scws_config_application;
@@ -18551,6 +21506,9 @@ impl MimeTypeChecker for T_vnd_oma_scws_config_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18568,6 +21526,9 @@ impl MimeTypeChecker for T_vnd_oma_scws_http_request_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_scws_http_response_application;
@@ -18583,6 +21544,9 @@ impl MimeTypeChecker for T_vnd_oma_scws_http_response_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18600,6 +21564,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_associated_procedure_parameter_xml_appl
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_bcast_drm_trigger_xml_application;
@@ -18615,6 +21582,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_drm_trigger_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18632,6 +21602,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_imd_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_bcast_ltkm_application;
@@ -18647,6 +21620,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_ltkm_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18664,6 +21640,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_notification_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_bcast_provisioningtrigger_application;
@@ -18679,6 +21658,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_provisioningtrigger_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18696,6 +21678,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sgboot_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_bcast_sgdd_xml_application;
@@ -18711,6 +21696,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sgdd_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18728,6 +21716,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sgdu_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_bcast_simple_symbol_container_application;
@@ -18743,6 +21734,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_simple_symbol_container_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18760,6 +21754,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_smartcard_trigger_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_bcast_sprov_xml_application;
@@ -18775,6 +21772,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sprov_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18792,6 +21792,9 @@ impl MimeTypeChecker for T_vnd_oma_bcast_stkm_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_dcd_application;
@@ -18807,6 +21810,9 @@ impl MimeTypeChecker for T_vnd_oma_dcd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18824,6 +21830,9 @@ impl MimeTypeChecker for T_vnd_oma_dcdc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_dd2_xml_application;
@@ -18839,6 +21848,9 @@ impl MimeTypeChecker for T_vnd_oma_dd2_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18856,6 +21868,9 @@ impl MimeTypeChecker for T_vnd_oma_drm_risd_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_group_usage_list_xml_application;
@@ -18871,6 +21886,9 @@ impl MimeTypeChecker for T_vnd_oma_group_usage_list_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18888,6 +21906,9 @@ impl MimeTypeChecker for T_vnd_oma_poc_detailed_progress_report_xml_application 
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_poc_final_report_xml_application;
@@ -18903,6 +21924,9 @@ impl MimeTypeChecker for T_vnd_oma_poc_final_report_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18920,6 +21944,9 @@ impl MimeTypeChecker for T_vnd_oma_poc_groups_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_poc_invocation_descriptor_xml_application;
@@ -18935,6 +21962,9 @@ impl MimeTypeChecker for T_vnd_oma_poc_invocation_descriptor_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18952,6 +21982,9 @@ impl MimeTypeChecker for T_vnd_oma_poc_optimized_progress_report_xml_application
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_oma_xcap_directory_xml_application;
@@ -18967,6 +22000,9 @@ impl MimeTypeChecker for T_vnd_oma_xcap_directory_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -18984,6 +22020,9 @@ impl MimeTypeChecker for T_vnd_omads_email_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_omads_file_xml_application;
@@ -18999,6 +22038,9 @@ impl MimeTypeChecker for T_vnd_omads_file_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19016,6 +22058,9 @@ impl MimeTypeChecker for T_vnd_omads_folder_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_omaloc_supl_init_application;
@@ -19031,6 +22076,9 @@ impl MimeTypeChecker for T_vnd_omaloc_supl_init_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19048,6 +22096,9 @@ impl MimeTypeChecker for T_vnd_openofficeorg_extension_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_openofficeorg_autotext_application;
@@ -19063,6 +22114,9 @@ impl MimeTypeChecker for T_vnd_openofficeorg_autotext_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19080,6 +22134,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_slid
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_openxmlformats_officedocument_presentationml_template_application;
@@ -19095,6 +22152,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_temp
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19112,6 +22172,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_slid
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_openxmlformats_officedocument_spreadsheetml_template_application;
@@ -19127,6 +22190,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_spreadsheetml_templ
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19144,6 +22210,9 @@ impl MimeTypeChecker for T_vnd_ms_excel_template_macroenabled_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_openxmlformats_officedocument_wordprocessingml_template_application;
@@ -19159,6 +22228,9 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_wordprocessingml_te
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19176,6 +22248,9 @@ impl MimeTypeChecker for T_vnd_osa_netdeploy_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_osgi_bundle_application;
@@ -19191,6 +22266,9 @@ impl MimeTypeChecker for T_vnd_osgi_bundle_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19208,6 +22286,9 @@ impl MimeTypeChecker for T_vnd_osgi_dp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_otps_ct_kip_xml_application;
@@ -19223,6 +22304,9 @@ impl MimeTypeChecker for T_vnd_otps_ct_kip_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19240,6 +22324,9 @@ impl MimeTypeChecker for T_vnd_palm_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_paos_xml_application;
@@ -19255,6 +22342,9 @@ impl MimeTypeChecker for T_vnd_paos_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19272,6 +22362,9 @@ impl MimeTypeChecker for T_vnd_pg_format_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_pg_osasli_application;
@@ -19287,6 +22380,9 @@ impl MimeTypeChecker for T_vnd_pg_osasli_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19304,6 +22400,9 @@ impl MimeTypeChecker for T_vnd_piaccess_application_licence_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_picsel_application;
@@ -19319,6 +22418,9 @@ impl MimeTypeChecker for T_vnd_picsel_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19336,6 +22438,9 @@ impl MimeTypeChecker for T_vnd_poc_group_advertisement_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_pocketlearn_application;
@@ -19351,6 +22456,9 @@ impl MimeTypeChecker for T_vnd_pocketlearn_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19368,6 +22476,9 @@ impl MimeTypeChecker for T_vnd_powerbuilder6_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_powerbuilder6_s_application;
@@ -19383,6 +22494,9 @@ impl MimeTypeChecker for T_vnd_powerbuilder6_s_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19400,6 +22514,9 @@ impl MimeTypeChecker for T_vnd_powerbuilder7_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_powerbuilder7_s_application;
@@ -19415,6 +22532,9 @@ impl MimeTypeChecker for T_vnd_powerbuilder7_s_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19432,6 +22552,9 @@ impl MimeTypeChecker for T_vnd_powerbuilder75_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_powerbuilder75_s_application;
@@ -19447,6 +22570,9 @@ impl MimeTypeChecker for T_vnd_powerbuilder75_s_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19464,6 +22590,9 @@ impl MimeTypeChecker for T_vnd_preminet_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_previewsystems_box_application;
@@ -19479,6 +22608,9 @@ impl MimeTypeChecker for T_vnd_previewsystems_box_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19496,6 +22628,9 @@ impl MimeTypeChecker for T_vnd_proteus_magazine_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_publishare_delta_tree_application;
@@ -19511,6 +22646,9 @@ impl MimeTypeChecker for T_vnd_publishare_delta_tree_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19528,6 +22666,9 @@ impl MimeTypeChecker for T_vnd_pvi_ptid1_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_pwg_multiplexed_application;
@@ -19543,6 +22684,9 @@ impl MimeTypeChecker for T_vnd_pwg_multiplexed_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19560,6 +22704,9 @@ impl MimeTypeChecker for T_vnd_pwg_xhtml_print_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_qualcomm_brew_app_res_application;
@@ -19575,6 +22722,9 @@ impl MimeTypeChecker for T_vnd_qualcomm_brew_app_res_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19592,6 +22742,9 @@ impl MimeTypeChecker for T_vnd_quark_quarkxpress_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_rapid_application;
@@ -19607,6 +22760,9 @@ impl MimeTypeChecker for T_vnd_rapid_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19624,6 +22780,9 @@ impl MimeTypeChecker for T_vnd_recordare_musicxml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_recordare_musicxml_xml_application;
@@ -19639,6 +22798,9 @@ impl MimeTypeChecker for T_vnd_recordare_musicxml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19656,6 +22818,9 @@ impl MimeTypeChecker for T_vnd_renlearn_rlprint_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_rim_cod_application;
@@ -19671,6 +22836,9 @@ impl MimeTypeChecker for T_vnd_rim_cod_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19688,6 +22856,9 @@ impl MimeTypeChecker for T_vnd_route66_link66_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ruckus_download_application;
@@ -19703,6 +22874,9 @@ impl MimeTypeChecker for T_vnd_ruckus_download_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19720,6 +22894,9 @@ impl MimeTypeChecker for T_vnd_s3sms_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sbm_cid_application;
@@ -19735,6 +22912,9 @@ impl MimeTypeChecker for T_vnd_sbm_cid_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19752,6 +22932,9 @@ impl MimeTypeChecker for T_vnd_sbm_mid2_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_scribus_application;
@@ -19767,6 +22950,9 @@ impl MimeTypeChecker for T_vnd_scribus_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19784,6 +22970,9 @@ impl MimeTypeChecker for T_vnd_sealed_3df_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealed_csf_application;
@@ -19799,6 +22988,9 @@ impl MimeTypeChecker for T_vnd_sealed_csf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19816,6 +23008,9 @@ impl MimeTypeChecker for T_vnd_sealed_doc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealed_eml_application;
@@ -19831,6 +23026,9 @@ impl MimeTypeChecker for T_vnd_sealed_eml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19848,6 +23046,9 @@ impl MimeTypeChecker for T_vnd_sealed_mht_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealed_net_application;
@@ -19863,6 +23064,9 @@ impl MimeTypeChecker for T_vnd_sealed_net_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19880,6 +23084,9 @@ impl MimeTypeChecker for T_vnd_sealed_ppt_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealed_tiff_application;
@@ -19895,6 +23102,9 @@ impl MimeTypeChecker for T_vnd_sealed_tiff_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19912,6 +23122,9 @@ impl MimeTypeChecker for T_vnd_sealed_xls_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealedmedia_softseal_html_application;
@@ -19927,6 +23140,9 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_html_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19944,6 +23160,9 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_pdf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_seemail_application;
@@ -19959,6 +23178,9 @@ impl MimeTypeChecker for T_vnd_seemail_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -19976,6 +23198,9 @@ impl MimeTypeChecker for T_vnd_sema_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_semd_application;
@@ -19991,6 +23216,9 @@ impl MimeTypeChecker for T_vnd_semd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20008,6 +23236,9 @@ impl MimeTypeChecker for T_vnd_semf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_shana_informed_formdata_application;
@@ -20023,6 +23254,9 @@ impl MimeTypeChecker for T_vnd_shana_informed_formdata_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20040,6 +23274,9 @@ impl MimeTypeChecker for T_vnd_shana_informed_formtemplate_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_shana_informed_interchange_application;
@@ -20055,6 +23292,9 @@ impl MimeTypeChecker for T_vnd_shana_informed_interchange_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20072,6 +23312,9 @@ impl MimeTypeChecker for T_vnd_shana_informed_package_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_simtech_mindmapper_application;
@@ -20087,6 +23330,9 @@ impl MimeTypeChecker for T_vnd_simtech_mindmapper_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20104,6 +23350,9 @@ impl MimeTypeChecker for T_vnd_smaf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_smart_teacher_application;
@@ -20119,6 +23368,9 @@ impl MimeTypeChecker for T_vnd_smart_teacher_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20136,6 +23388,9 @@ impl MimeTypeChecker for T_vnd_software602_filler_form_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_software602_filler_form_xml_zip_application;
@@ -20151,6 +23406,9 @@ impl MimeTypeChecker for T_vnd_software602_filler_form_xml_zip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20168,6 +23426,9 @@ impl MimeTypeChecker for T_vnd_solent_sdkm_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_spotfire_dxp_application;
@@ -20183,6 +23444,9 @@ impl MimeTypeChecker for T_vnd_spotfire_dxp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20200,6 +23464,9 @@ impl MimeTypeChecker for T_vnd_spotfire_sfs_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sss_cod_application;
@@ -20215,6 +23482,9 @@ impl MimeTypeChecker for T_vnd_sss_cod_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20232,6 +23502,9 @@ impl MimeTypeChecker for T_vnd_sss_dtf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sss_ntf_application;
@@ -20247,6 +23520,9 @@ impl MimeTypeChecker for T_vnd_sss_ntf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20264,6 +23540,9 @@ impl MimeTypeChecker for T_vnd_stardivision_math_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_staroffice_template_application;
@@ -20279,6 +23558,9 @@ impl MimeTypeChecker for T_x_staroffice_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20296,6 +23578,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_writer_template_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_stardivision_writer_global_application;
@@ -20312,6 +23597,9 @@ impl MimeTypeChecker for T_vnd_stardivision_writer_global_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_street_stream_application;
@@ -20327,6 +23615,9 @@ impl MimeTypeChecker for T_vnd_street_stream_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20353,6 +23644,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_calc_template_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sun_xml_draw_template_application;
@@ -20377,6 +23671,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_draw_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20403,6 +23700,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_impress_template_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sun_xml_math_application;
@@ -20418,6 +23718,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_math_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20435,6 +23738,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_writer_global_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sun_wadl_xml_application;
@@ -20450,6 +23756,9 @@ impl MimeTypeChecker for T_vnd_sun_wadl_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20467,6 +23776,9 @@ impl MimeTypeChecker for T_vnd_sus_calendar_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_svd_application;
@@ -20482,6 +23794,9 @@ impl MimeTypeChecker for T_vnd_svd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20499,6 +23814,9 @@ impl MimeTypeChecker for T_vnd_swiftview_ics_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_syncml_xml_application;
@@ -20514,6 +23832,9 @@ impl MimeTypeChecker for T_vnd_syncml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20531,6 +23852,9 @@ impl MimeTypeChecker for T_vnd_syncml_dm_wbxml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_syncml_dm_xml_application;
@@ -20546,6 +23870,9 @@ impl MimeTypeChecker for T_vnd_syncml_dm_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20563,6 +23890,9 @@ impl MimeTypeChecker for T_vnd_syncml_dm_notification_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_syncml_ds_notification_application;
@@ -20578,6 +23908,9 @@ impl MimeTypeChecker for T_vnd_syncml_ds_notification_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20595,6 +23928,9 @@ impl MimeTypeChecker for T_vnd_tao_intent_module_archive_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_tmobile_livetv_application;
@@ -20610,6 +23946,9 @@ impl MimeTypeChecker for T_vnd_tmobile_livetv_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20627,6 +23966,9 @@ impl MimeTypeChecker for T_vnd_trid_tpt_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_triscape_mxs_application;
@@ -20642,6 +23984,9 @@ impl MimeTypeChecker for T_vnd_triscape_mxs_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20659,6 +24004,9 @@ impl MimeTypeChecker for T_vnd_trueapp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_truedoc_application;
@@ -20674,6 +24022,9 @@ impl MimeTypeChecker for T_vnd_truedoc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20691,6 +24042,9 @@ impl MimeTypeChecker for T_vnd_ufdl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ttml_xml_application;
@@ -20706,6 +24060,9 @@ impl MimeTypeChecker for T_ttml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20723,6 +24080,9 @@ impl MimeTypeChecker for T_vnd_uiq_theme_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_umajin_application;
@@ -20738,6 +24098,9 @@ impl MimeTypeChecker for T_vnd_umajin_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20755,6 +24118,9 @@ impl MimeTypeChecker for T_vnd_unity_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uoml_xml_application;
@@ -20770,6 +24136,9 @@ impl MimeTypeChecker for T_vnd_uoml_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20787,6 +24156,9 @@ impl MimeTypeChecker for T_vnd_uplanet_alert_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uplanet_alert_wbxml_application;
@@ -20802,6 +24174,9 @@ impl MimeTypeChecker for T_vnd_uplanet_alert_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20819,6 +24194,9 @@ impl MimeTypeChecker for T_vnd_uplanet_bearer_choice_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uplanet_bearer_choice_wbxml_application;
@@ -20834,6 +24212,9 @@ impl MimeTypeChecker for T_vnd_uplanet_bearer_choice_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20851,6 +24232,9 @@ impl MimeTypeChecker for T_vnd_uplanet_cacheop_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uplanet_cacheop_wbxml_application;
@@ -20866,6 +24250,9 @@ impl MimeTypeChecker for T_vnd_uplanet_cacheop_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20883,6 +24270,9 @@ impl MimeTypeChecker for T_vnd_uplanet_channel_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uplanet_channel_wbxml_application;
@@ -20898,6 +24288,9 @@ impl MimeTypeChecker for T_vnd_uplanet_channel_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20915,6 +24308,9 @@ impl MimeTypeChecker for T_vnd_uplanet_list_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uplanet_list_wbxml_application;
@@ -20930,6 +24326,9 @@ impl MimeTypeChecker for T_vnd_uplanet_list_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20947,6 +24346,9 @@ impl MimeTypeChecker for T_vnd_uplanet_listcmd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_uplanet_listcmd_wbxml_application;
@@ -20962,6 +24364,9 @@ impl MimeTypeChecker for T_vnd_uplanet_listcmd_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -20979,6 +24384,9 @@ impl MimeTypeChecker for T_vnd_uplanet_signal_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_vcx_application;
@@ -20994,6 +24402,9 @@ impl MimeTypeChecker for T_vnd_vcx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21011,6 +24422,9 @@ impl MimeTypeChecker for T_vnd_vd_study_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_vectorworks_application;
@@ -21026,6 +24440,9 @@ impl MimeTypeChecker for T_vnd_vectorworks_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21043,6 +24460,9 @@ impl MimeTypeChecker for T_vnd_vidsoft_vidconference_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_visio_application;
@@ -21058,6 +24478,9 @@ impl MimeTypeChecker for T_vnd_visio_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21075,6 +24498,9 @@ impl MimeTypeChecker for T_vnd_ms_visio_drawing_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_visio_template_application;
@@ -21090,6 +24516,9 @@ impl MimeTypeChecker for T_vnd_ms_visio_template_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21107,6 +24536,9 @@ impl MimeTypeChecker for T_vnd_ms_visio_stencil_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_visio_drawing_macroEnabled_12_application;
@@ -21122,6 +24554,9 @@ impl MimeTypeChecker for T_vnd_ms_visio_drawing_macroEnabled_12_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21139,6 +24574,9 @@ impl MimeTypeChecker for T_vnd_ms_visio_template_macroEnabled_12_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_visio_stencil_macroEnabled_12_application;
@@ -21154,6 +24592,9 @@ impl MimeTypeChecker for T_vnd_ms_visio_stencil_macroEnabled_12_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21171,6 +24612,9 @@ impl MimeTypeChecker for T_vnd_visionary_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_vividence_scriptfile_application;
@@ -21186,6 +24630,9 @@ impl MimeTypeChecker for T_vnd_vividence_scriptfile_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21203,6 +24650,9 @@ impl MimeTypeChecker for T_vnd_vsf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wap_sic_application;
@@ -21218,6 +24668,9 @@ impl MimeTypeChecker for T_vnd_wap_sic_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21235,6 +24688,9 @@ impl MimeTypeChecker for T_vnd_wap_slc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wap_wbxml_application;
@@ -21250,6 +24706,9 @@ impl MimeTypeChecker for T_vnd_wap_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21267,6 +24726,9 @@ impl MimeTypeChecker for T_vnd_wap_wmlc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wap_wmlscriptc_application;
@@ -21282,6 +24744,9 @@ impl MimeTypeChecker for T_vnd_wap_wmlscriptc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21299,6 +24764,9 @@ impl MimeTypeChecker for T_vnd_webturbo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wfa_wsc_application;
@@ -21314,6 +24782,9 @@ impl MimeTypeChecker for T_vnd_wfa_wsc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21331,6 +24802,9 @@ impl MimeTypeChecker for T_vnd_wmc_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wmf_bootstrap_application;
@@ -21346,6 +24820,9 @@ impl MimeTypeChecker for T_vnd_wmf_bootstrap_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21363,6 +24840,9 @@ impl MimeTypeChecker for T_vnd_wqd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wrq_hp3000_labelled_application;
@@ -21378,6 +24858,9 @@ impl MimeTypeChecker for T_vnd_wrq_hp3000_labelled_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21395,6 +24878,9 @@ impl MimeTypeChecker for T_vnd_wt_stf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wv_csp_wbxml_application;
@@ -21410,6 +24896,9 @@ impl MimeTypeChecker for T_vnd_wv_csp_wbxml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21427,6 +24916,9 @@ impl MimeTypeChecker for T_vnd_wv_csp_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wv_ssp_xml_application;
@@ -21442,6 +24934,9 @@ impl MimeTypeChecker for T_vnd_wv_ssp_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21459,6 +24954,9 @@ impl MimeTypeChecker for T_vnd_xfdl_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_xfdl_webform_application;
@@ -21474,6 +24972,9 @@ impl MimeTypeChecker for T_vnd_xfdl_webform_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21491,6 +24992,9 @@ impl MimeTypeChecker for T_vnd_xmi_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_xmpie_cpkg_application;
@@ -21506,6 +25010,9 @@ impl MimeTypeChecker for T_vnd_xmpie_cpkg_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21523,6 +25030,9 @@ impl MimeTypeChecker for T_vnd_xmpie_dpkg_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_xmpie_plan_application;
@@ -21538,6 +25048,9 @@ impl MimeTypeChecker for T_vnd_xmpie_plan_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21555,6 +25068,9 @@ impl MimeTypeChecker for T_vnd_xmpie_ppkg_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_xmpie_xlim_application;
@@ -21570,6 +25086,9 @@ impl MimeTypeChecker for T_vnd_xmpie_xlim_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21587,6 +25106,9 @@ impl MimeTypeChecker for T_vnd_yamaha_hv_dic_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_yamaha_hv_script_application;
@@ -21602,6 +25124,9 @@ impl MimeTypeChecker for T_vnd_yamaha_hv_script_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21619,6 +25144,9 @@ impl MimeTypeChecker for T_vnd_yamaha_hv_voice_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_yamaha_openscoreformat_application;
@@ -21634,6 +25162,9 @@ impl MimeTypeChecker for T_vnd_yamaha_openscoreformat_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21651,6 +25182,9 @@ impl MimeTypeChecker for T_vnd_yamaha_openscoreformat_osfpvg_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_yamaha_smaf_audio_application;
@@ -21666,6 +25200,9 @@ impl MimeTypeChecker for T_vnd_yamaha_smaf_audio_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21683,6 +25220,9 @@ impl MimeTypeChecker for T_vnd_yamaha_smaf_phrase_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_yellowriver_custom_menu_application;
@@ -21698,6 +25238,9 @@ impl MimeTypeChecker for T_vnd_yellowriver_custom_menu_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21715,6 +25258,9 @@ impl MimeTypeChecker for T_vnd_zul_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_zzazz_deck_xml_application;
@@ -21730,6 +25276,9 @@ impl MimeTypeChecker for T_vnd_zzazz_deck_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21747,6 +25296,9 @@ impl MimeTypeChecker for T_voicexml_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_warc_gz_application;
@@ -21762,6 +25314,9 @@ impl MimeTypeChecker for T_warc_gz_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21779,6 +25334,9 @@ impl MimeTypeChecker for T_watcherinfo_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_whoispp_query_application;
@@ -21794,6 +25352,9 @@ impl MimeTypeChecker for T_whoispp_query_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21811,6 +25372,9 @@ impl MimeTypeChecker for T_whoispp_response_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_winhlp_application;
@@ -21826,6 +25390,9 @@ impl MimeTypeChecker for T_winhlp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21843,6 +25410,9 @@ impl MimeTypeChecker for T_wita_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_wordperfect5_1_application;
@@ -21858,6 +25428,9 @@ impl MimeTypeChecker for T_wordperfect5_1_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21875,6 +25448,9 @@ impl MimeTypeChecker for T_wsdl_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_wspolicy_xml_application;
@@ -21890,6 +25466,9 @@ impl MimeTypeChecker for T_wspolicy_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21907,6 +25486,9 @@ impl MimeTypeChecker for T_x_abiword_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ace_compressed_application;
@@ -21922,6 +25504,9 @@ impl MimeTypeChecker for T_x_ace_compressed_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -21939,21 +25524,8 @@ impl MimeTypeChecker for T_x_amf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_vnd_adobe_indesign_idml_package_application;
-impl MimeTypeChecker for T_vnd_adobe_indesign_idml_package_application {
-    fn get_mime(&self) -> &'static str {
-        "application/vnd.adobe.indesign-idml-package"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &["*.idml"]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
+    fn is_virtual(&self) -> bool {
         false
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
     }
 }
 
@@ -21971,6 +25543,9 @@ impl MimeTypeChecker for T_x_apple_diskimage_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_appleworks_application;
@@ -21986,6 +25561,9 @@ impl MimeTypeChecker for T_x_appleworks_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22003,6 +25581,9 @@ impl MimeTypeChecker for T_x_authorware_bin_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_authorware_map_application;
@@ -22018,6 +25599,9 @@ impl MimeTypeChecker for T_x_authorware_map_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22035,6 +25619,9 @@ impl MimeTypeChecker for T_x_authorware_seg_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_bcpio_application;
@@ -22050,6 +25637,9 @@ impl MimeTypeChecker for T_x_bcpio_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22067,6 +25657,9 @@ impl MimeTypeChecker for T_x_plist_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_brotli_application;
@@ -22082,6 +25675,9 @@ impl MimeTypeChecker for T_x_brotli_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22099,6 +25695,9 @@ impl MimeTypeChecker for T_x_cdlink_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_chat_application;
@@ -22114,6 +25713,9 @@ impl MimeTypeChecker for T_x_chat_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22131,6 +25733,9 @@ impl MimeTypeChecker for T_x_chess_pgn_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_corelpresentations_application;
@@ -22147,6 +25752,9 @@ impl MimeTypeChecker for T_x_corelpresentations_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_csh_application;
@@ -22162,6 +25770,9 @@ impl MimeTypeChecker for T_x_csh_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22181,6 +25792,9 @@ impl MimeTypeChecker for T_x_director_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_doom_application;
@@ -22196,6 +25810,9 @@ impl MimeTypeChecker for T_x_doom_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22213,6 +25830,9 @@ impl MimeTypeChecker for T_x_dtbncx_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_dtbook_xml_application;
@@ -22228,6 +25848,9 @@ impl MimeTypeChecker for T_x_dtbook_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22245,6 +25868,9 @@ impl MimeTypeChecker for T_x_dtbresource_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_killustrator_application;
@@ -22260,6 +25886,9 @@ impl MimeTypeChecker for T_x_killustrator_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22277,6 +25906,9 @@ impl MimeTypeChecker for T_x_openscad_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_dosexec_application;
@@ -22292,6 +25924,9 @@ impl MimeTypeChecker for T_x_dosexec_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22309,6 +25944,9 @@ impl MimeTypeChecker for T_x_font_bdf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_dos_application;
@@ -22324,6 +25962,9 @@ impl MimeTypeChecker for T_x_font_dos_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22341,6 +25982,9 @@ impl MimeTypeChecker for T_x_font_framemaker_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_ghostscript_application;
@@ -22356,6 +26000,9 @@ impl MimeTypeChecker for T_x_font_ghostscript_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22373,6 +26020,9 @@ impl MimeTypeChecker for T_x_font_libgrx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_linux_psf_application;
@@ -22388,6 +26038,9 @@ impl MimeTypeChecker for T_x_font_linux_psf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22405,6 +26058,9 @@ impl MimeTypeChecker for T_x_font_pcf_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_snf_application;
@@ -22420,6 +26076,9 @@ impl MimeTypeChecker for T_x_font_snf_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22437,6 +26096,9 @@ impl MimeTypeChecker for T_x_font_speedo_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_font_sunos_news_application;
@@ -22452,6 +26114,9 @@ impl MimeTypeChecker for T_x_font_sunos_news_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22469,25 +26134,8 @@ impl MimeTypeChecker for T_x_font_vfont_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
-}
-
-pub(super) struct T_x_foxmail_application;
-impl MimeTypeChecker for T_x_foxmail_application {
-    fn get_mime(&self) -> &'static str {
-        "application/x-foxmail"
-    }
-    fn get_ext(&self) -> &[&'static str] {
-        &[]
-    }
-    fn check(&self, bytes: &[u8]) -> bool {
-        offset(
-            bytes,
-            0,
-            &[16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 17, 17, 83],
-        )
-    }
-    fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
-        &[]
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22505,6 +26153,9 @@ impl MimeTypeChecker for T_x_futuresplash_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_gnucash_application;
@@ -22520,6 +26171,9 @@ impl MimeTypeChecker for T_x_gnucash_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22537,6 +26191,9 @@ impl MimeTypeChecker for T_x_esri_layer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_hwp_v5_application;
@@ -22552,6 +26209,9 @@ impl MimeTypeChecker for T_x_hwp_v5_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22569,6 +26229,9 @@ impl MimeTypeChecker for T_hwp_zip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_itunes_bplist_application;
@@ -22584,6 +26247,9 @@ impl MimeTypeChecker for T_x_itunes_bplist_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22601,6 +26267,9 @@ impl MimeTypeChecker for T_x_itunes_ipa_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_java_jnlp_file_application;
@@ -22616,6 +26285,9 @@ impl MimeTypeChecker for T_x_java_jnlp_file_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22633,6 +26305,9 @@ impl MimeTypeChecker for T_x_java_pack200_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_lzma_application;
@@ -22648,6 +26323,9 @@ impl MimeTypeChecker for T_x_lzma_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22665,6 +26343,9 @@ impl MimeTypeChecker for T_x_memgraph_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_application_application;
@@ -22680,6 +26361,9 @@ impl MimeTypeChecker for T_x_ms_application_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22697,6 +26381,9 @@ impl MimeTypeChecker for T_x_ms_wmd_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_wmz_application;
@@ -22712,6 +26399,9 @@ impl MimeTypeChecker for T_x_ms_wmz_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22729,6 +26419,9 @@ impl MimeTypeChecker for T_x_ms_xbap_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msbinder_application;
@@ -22744,6 +26437,9 @@ impl MimeTypeChecker for T_x_msbinder_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22761,6 +26457,9 @@ impl MimeTypeChecker for T_x_mscardfile_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msclip_application;
@@ -22776,6 +26475,9 @@ impl MimeTypeChecker for T_x_msclip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22793,6 +26495,9 @@ impl MimeTypeChecker for T_x_ms_installer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msmediaview_application;
@@ -22808,6 +26513,9 @@ impl MimeTypeChecker for T_x_msmediaview_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22825,6 +26533,9 @@ impl MimeTypeChecker for T_x_mspublisher_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_msschedule_application;
@@ -22840,6 +26551,9 @@ impl MimeTypeChecker for T_x_msschedule_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22857,6 +26571,9 @@ impl MimeTypeChecker for T_x_msterminal_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_mysql_misam_data_application;
@@ -22872,6 +26589,9 @@ impl MimeTypeChecker for T_x_mysql_misam_data_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22893,6 +26613,9 @@ impl MimeTypeChecker for T_x_pds_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_pkcs12_application;
@@ -22908,6 +26631,9 @@ impl MimeTypeChecker for T_x_pkcs12_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22925,6 +26651,9 @@ impl MimeTypeChecker for T_x_pkcs7_certificates_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_pkcs7_certreqresp_application;
@@ -22940,6 +26669,9 @@ impl MimeTypeChecker for T_x_pkcs7_certreqresp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22957,6 +26689,9 @@ impl MimeTypeChecker for T_xquery_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_roxio_toast_application;
@@ -22972,6 +26707,9 @@ impl MimeTypeChecker for T_x_roxio_toast_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -22989,6 +26727,9 @@ impl MimeTypeChecker for T_x_sas_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_program_data_application;
@@ -23004,6 +26745,9 @@ impl MimeTypeChecker for T_x_sas_program_data_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23021,6 +26765,9 @@ impl MimeTypeChecker for T_x_sas_audit_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_view_application;
@@ -23036,6 +26783,9 @@ impl MimeTypeChecker for T_x_sas_view_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23053,6 +26803,9 @@ impl MimeTypeChecker for T_x_sas_data_index_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_catalog_application;
@@ -23068,6 +26821,9 @@ impl MimeTypeChecker for T_x_sas_catalog_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23085,6 +26841,9 @@ impl MimeTypeChecker for T_x_sas_access_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_fdb_application;
@@ -23100,6 +26859,9 @@ impl MimeTypeChecker for T_x_sas_fdb_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23117,6 +26879,9 @@ impl MimeTypeChecker for T_x_sas_mddb_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_dmdb_application;
@@ -23132,6 +26897,9 @@ impl MimeTypeChecker for T_x_sas_dmdb_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23149,6 +26917,9 @@ impl MimeTypeChecker for T_x_sas_itemstor_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_utility_application;
@@ -23164,6 +26935,9 @@ impl MimeTypeChecker for T_x_sas_utility_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23181,6 +26955,9 @@ impl MimeTypeChecker for T_x_sas_putility_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sas_transport_application;
@@ -23196,6 +26973,9 @@ impl MimeTypeChecker for T_x_sas_transport_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23213,6 +26993,9 @@ impl MimeTypeChecker for T_x_sas_backup_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_shar_application;
@@ -23228,6 +27011,9 @@ impl MimeTypeChecker for T_x_shar_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23245,6 +27031,9 @@ impl MimeTypeChecker for T_x_silverlight_app_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sfdu_application;
@@ -23260,6 +27049,9 @@ impl MimeTypeChecker for T_x_sfdu_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23277,6 +27069,9 @@ impl MimeTypeChecker for T_x_stata_do_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_stuffitx_application;
@@ -23292,6 +27087,9 @@ impl MimeTypeChecker for T_x_stuffitx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23309,6 +27107,9 @@ impl MimeTypeChecker for T_x_sv4cpio_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sv4crc_application;
@@ -23324,6 +27125,9 @@ impl MimeTypeChecker for T_x_sv4crc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23341,6 +27145,9 @@ impl MimeTypeChecker for T_x_tex_tfm_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tika_msoffice_embedded_format_ole10_native_application;
@@ -23356,6 +27163,9 @@ impl MimeTypeChecker for T_x_tika_msoffice_embedded_format_ole10_native_applicat
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23373,6 +27183,9 @@ impl MimeTypeChecker for T_x_tika_msoffice_embedded_format_comp_obj_application 
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_tika_ooxml_protected_application;
@@ -23388,6 +27201,9 @@ impl MimeTypeChecker for T_x_tika_ooxml_protected_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23405,6 +27221,9 @@ impl MimeTypeChecker for T_x_ustar_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vmdk_application;
@@ -23420,6 +27239,9 @@ impl MimeTypeChecker for T_x_vmdk_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23437,6 +27259,9 @@ impl MimeTypeChecker for T_x_wais_source_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_webarchive_application;
@@ -23452,6 +27277,9 @@ impl MimeTypeChecker for T_x_webarchive_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23469,6 +27297,9 @@ impl MimeTypeChecker for T_x_xfig_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_xpinstall_application;
@@ -23484,6 +27315,9 @@ impl MimeTypeChecker for T_x_xpinstall_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23501,6 +27335,9 @@ impl MimeTypeChecker for T_x_xmind_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x400_bp_application;
@@ -23516,6 +27353,9 @@ impl MimeTypeChecker for T_x400_bp_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23533,6 +27373,9 @@ impl MimeTypeChecker for T_xcap_att_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xcap_caps_xml_application;
@@ -23548,6 +27391,9 @@ impl MimeTypeChecker for T_xcap_caps_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23565,6 +27411,9 @@ impl MimeTypeChecker for T_xcap_el_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xcap_error_xml_application;
@@ -23580,6 +27429,9 @@ impl MimeTypeChecker for T_xcap_error_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23597,6 +27449,9 @@ impl MimeTypeChecker for T_xcap_ns_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xcon_conference_info_diff_xml_application;
@@ -23612,6 +27467,9 @@ impl MimeTypeChecker for T_xcon_conference_info_diff_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23629,6 +27487,9 @@ impl MimeTypeChecker for T_xcon_conference_info_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xenc_xml_application;
@@ -23644,6 +27505,9 @@ impl MimeTypeChecker for T_xenc_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23661,6 +27525,9 @@ impl MimeTypeChecker for T_xhtml_voice_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xml_dtd_application;
@@ -23676,6 +27543,9 @@ impl MimeTypeChecker for T_xml_dtd_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23693,6 +27563,9 @@ impl MimeTypeChecker for T_xml_external_parsed_entity_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xmpp_xml_application;
@@ -23708,6 +27581,9 @@ impl MimeTypeChecker for T_xmpp_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23725,6 +27601,9 @@ impl MimeTypeChecker for T_xop_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xslfo_xml_application;
@@ -23740,6 +27619,9 @@ impl MimeTypeChecker for T_xslfo_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23757,6 +27639,9 @@ impl MimeTypeChecker for T_xslt_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_xspf_xml_application;
@@ -23772,6 +27657,9 @@ impl MimeTypeChecker for T_xspf_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23789,6 +27677,9 @@ impl MimeTypeChecker for T_xv_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_32kadpcm_audio;
@@ -23804,6 +27695,9 @@ impl MimeTypeChecker for T_32kadpcm_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23821,6 +27715,9 @@ impl MimeTypeChecker for T_adpcm_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_amr_wb__audio;
@@ -23836,6 +27733,9 @@ impl MimeTypeChecker for T_amr_wb__audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23853,6 +27753,9 @@ impl MimeTypeChecker for T_asc_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_bv16_audio;
@@ -23868,6 +27771,9 @@ impl MimeTypeChecker for T_bv16_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23885,6 +27791,9 @@ impl MimeTypeChecker for T_bv32_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_clearmode_audio;
@@ -23900,6 +27809,9 @@ impl MimeTypeChecker for T_clearmode_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23917,6 +27829,9 @@ impl MimeTypeChecker for T_cn_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dat12_audio;
@@ -23932,6 +27847,9 @@ impl MimeTypeChecker for T_dat12_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23949,6 +27867,9 @@ impl MimeTypeChecker for T_dls_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dsr_es201108_audio;
@@ -23964,6 +27885,9 @@ impl MimeTypeChecker for T_dsr_es201108_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -23981,6 +27905,9 @@ impl MimeTypeChecker for T_dsr_es202050_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dsr_es202211_audio;
@@ -23996,6 +27923,9 @@ impl MimeTypeChecker for T_dsr_es202211_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24013,6 +27943,9 @@ impl MimeTypeChecker for T_dsr_es202212_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dvi4_audio;
@@ -24028,6 +27961,9 @@ impl MimeTypeChecker for T_dvi4_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24045,6 +27981,9 @@ impl MimeTypeChecker for T_evrc_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_evrc_qcp_audio;
@@ -24060,6 +27999,9 @@ impl MimeTypeChecker for T_evrc_qcp_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24077,6 +28019,9 @@ impl MimeTypeChecker for T_evrc0_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_evrc1_audio;
@@ -24092,6 +28037,9 @@ impl MimeTypeChecker for T_evrc1_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24109,6 +28057,9 @@ impl MimeTypeChecker for T_evrcb_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_evrcb0_audio;
@@ -24124,6 +28075,9 @@ impl MimeTypeChecker for T_evrcb0_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24141,6 +28095,9 @@ impl MimeTypeChecker for T_evrcb1_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_evrcwb_audio;
@@ -24156,6 +28113,9 @@ impl MimeTypeChecker for T_evrcwb_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24173,6 +28133,9 @@ impl MimeTypeChecker for T_evrcwb0_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_evrcwb1_audio;
@@ -24188,6 +28151,9 @@ impl MimeTypeChecker for T_evrcwb1_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24205,6 +28171,9 @@ impl MimeTypeChecker for T_example_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g719_audio;
@@ -24220,6 +28189,9 @@ impl MimeTypeChecker for T_g719_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24237,6 +28209,9 @@ impl MimeTypeChecker for T_g722_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g7221_audio;
@@ -24252,6 +28227,9 @@ impl MimeTypeChecker for T_g7221_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24269,6 +28247,9 @@ impl MimeTypeChecker for T_g723_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g726_16_audio;
@@ -24284,6 +28265,9 @@ impl MimeTypeChecker for T_g726_16_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24301,6 +28285,9 @@ impl MimeTypeChecker for T_g726_24_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g726_32_audio;
@@ -24316,6 +28303,9 @@ impl MimeTypeChecker for T_g726_32_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24333,6 +28323,9 @@ impl MimeTypeChecker for T_g726_40_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g728_audio;
@@ -24348,6 +28341,9 @@ impl MimeTypeChecker for T_g728_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24365,6 +28361,9 @@ impl MimeTypeChecker for T_g729_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g7291_audio;
@@ -24380,6 +28379,9 @@ impl MimeTypeChecker for T_g7291_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24397,6 +28399,9 @@ impl MimeTypeChecker for T_g729d_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_g729e_audio;
@@ -24412,6 +28417,9 @@ impl MimeTypeChecker for T_g729e_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24429,6 +28437,9 @@ impl MimeTypeChecker for T_gsm_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_gsm_efr_audio;
@@ -24444,6 +28455,9 @@ impl MimeTypeChecker for T_gsm_efr_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24461,6 +28475,9 @@ impl MimeTypeChecker for T_ilbc_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_l16_audio;
@@ -24476,6 +28493,9 @@ impl MimeTypeChecker for T_l16_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24493,6 +28513,9 @@ impl MimeTypeChecker for T_l20_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_l24_audio;
@@ -24508,6 +28531,9 @@ impl MimeTypeChecker for T_l24_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24525,6 +28551,9 @@ impl MimeTypeChecker for T_l8_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_lpc_audio;
@@ -24540,6 +28569,9 @@ impl MimeTypeChecker for T_lpc_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24557,6 +28589,9 @@ impl MimeTypeChecker for T_mobile_xmf_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mp4a_latm_audio;
@@ -24572,6 +28607,9 @@ impl MimeTypeChecker for T_mp4a_latm_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24589,6 +28627,9 @@ impl MimeTypeChecker for T_mpa_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mpa_robust_audio;
@@ -24604,6 +28645,9 @@ impl MimeTypeChecker for T_mpa_robust_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24621,6 +28665,9 @@ impl MimeTypeChecker for T_mpeg4_generic_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_parityfec_audio;
@@ -24636,6 +28683,9 @@ impl MimeTypeChecker for T_parityfec_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24653,6 +28703,9 @@ impl MimeTypeChecker for T_pcma_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pcma_wb_audio;
@@ -24668,6 +28721,9 @@ impl MimeTypeChecker for T_pcma_wb_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24685,6 +28741,9 @@ impl MimeTypeChecker for T_pcmu_wb_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pcmu_audio;
@@ -24700,6 +28759,9 @@ impl MimeTypeChecker for T_pcmu_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24717,6 +28779,9 @@ impl MimeTypeChecker for T_red_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rtp_enc_aescm128_audio;
@@ -24732,6 +28797,9 @@ impl MimeTypeChecker for T_rtp_enc_aescm128_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24749,6 +28817,9 @@ impl MimeTypeChecker for T_rtp_midi_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rtx_audio;
@@ -24764,6 +28835,9 @@ impl MimeTypeChecker for T_rtx_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24781,6 +28855,9 @@ impl MimeTypeChecker for T_smv_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_smv0_audio;
@@ -24796,6 +28873,9 @@ impl MimeTypeChecker for T_smv0_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24813,6 +28893,9 @@ impl MimeTypeChecker for T_smv_qcp_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sp_midi_audio;
@@ -24828,6 +28911,9 @@ impl MimeTypeChecker for T_sp_midi_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24845,6 +28931,9 @@ impl MimeTypeChecker for T_t140c_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_t38_audio;
@@ -24860,6 +28949,9 @@ impl MimeTypeChecker for T_t38_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24877,6 +28969,9 @@ impl MimeTypeChecker for T_telephone_event_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_tone_audio;
@@ -24892,6 +28987,9 @@ impl MimeTypeChecker for T_tone_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24909,6 +29007,9 @@ impl MimeTypeChecker for T_ulpfec_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vdvi_audio;
@@ -24924,6 +29025,9 @@ impl MimeTypeChecker for T_vdvi_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24941,6 +29045,9 @@ impl MimeTypeChecker for T_vmr_wb_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_3gpp_iufp_audio;
@@ -24956,6 +29063,9 @@ impl MimeTypeChecker for T_vnd_3gpp_iufp_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -24973,6 +29083,9 @@ impl MimeTypeChecker for T_vnd_4sb_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_audiokoz_audio;
@@ -24988,6 +29101,9 @@ impl MimeTypeChecker for T_vnd_audiokoz_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25005,6 +29121,9 @@ impl MimeTypeChecker for T_vnd_adobe_soundbooth_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_celp_audio;
@@ -25020,6 +29139,9 @@ impl MimeTypeChecker for T_vnd_celp_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25037,6 +29159,9 @@ impl MimeTypeChecker for T_vnd_cisco_nse_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cmles_radio_events_audio;
@@ -25052,6 +29177,9 @@ impl MimeTypeChecker for T_vnd_cmles_radio_events_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25069,6 +29197,9 @@ impl MimeTypeChecker for T_vnd_cns_anp1_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_cns_inf1_audio;
@@ -25084,6 +29215,9 @@ impl MimeTypeChecker for T_vnd_cns_inf1_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25101,6 +29235,9 @@ impl MimeTypeChecker for T_vnd_digital_winds_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dlna_adts_audio;
@@ -25116,6 +29253,9 @@ impl MimeTypeChecker for T_vnd_dlna_adts_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25133,6 +29273,9 @@ impl MimeTypeChecker for T_vnd_dolby_heaac_1_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dolby_heaac_2_audio;
@@ -25148,6 +29291,9 @@ impl MimeTypeChecker for T_vnd_dolby_heaac_2_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25165,6 +29311,9 @@ impl MimeTypeChecker for T_vnd_dolby_mlp_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dolby_mps_audio;
@@ -25180,6 +29329,9 @@ impl MimeTypeChecker for T_vnd_dolby_mps_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25197,6 +29349,9 @@ impl MimeTypeChecker for T_vnd_dolby_pl2_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dolby_pl2x_audio;
@@ -25212,6 +29367,9 @@ impl MimeTypeChecker for T_vnd_dolby_pl2x_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25229,6 +29387,9 @@ impl MimeTypeChecker for T_vnd_dolby_pl2z_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dts_audio;
@@ -25244,6 +29405,9 @@ impl MimeTypeChecker for T_vnd_dts_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25261,6 +29425,9 @@ impl MimeTypeChecker for T_vnd_dts_hd_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_everad_plj_audio;
@@ -25276,6 +29443,9 @@ impl MimeTypeChecker for T_vnd_everad_plj_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25293,6 +29463,9 @@ impl MimeTypeChecker for T_vnd_hns_audio_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_lucent_voice_audio;
@@ -25308,6 +29481,9 @@ impl MimeTypeChecker for T_vnd_lucent_voice_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25325,6 +29501,9 @@ impl MimeTypeChecker for T_vnd_ms_playready_media_pya_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_mobile_xmf_audio;
@@ -25340,6 +29519,9 @@ impl MimeTypeChecker for T_vnd_nokia_mobile_xmf_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25357,6 +29539,9 @@ impl MimeTypeChecker for T_vnd_nortel_vbk_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nuera_ecelp4800_audio;
@@ -25372,6 +29557,9 @@ impl MimeTypeChecker for T_vnd_nuera_ecelp4800_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25389,6 +29577,9 @@ impl MimeTypeChecker for T_vnd_nuera_ecelp7470_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nuera_ecelp9600_audio;
@@ -25404,6 +29595,9 @@ impl MimeTypeChecker for T_vnd_nuera_ecelp9600_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25421,6 +29615,9 @@ impl MimeTypeChecker for T_vnd_octel_sbc_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_qcelp_audio;
@@ -25436,6 +29633,9 @@ impl MimeTypeChecker for T_vnd_qcelp_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25453,6 +29653,9 @@ impl MimeTypeChecker for T_vnd_rhetorex_32kadpcm_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealedmedia_softseal_mpeg_audio;
@@ -25468,6 +29671,9 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_mpeg_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25485,6 +29691,9 @@ impl MimeTypeChecker for T_vnd_vmx_cvsd_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vorbis_config_audio;
@@ -25500,6 +29709,9 @@ impl MimeTypeChecker for T_vorbis_config_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25517,6 +29729,9 @@ impl MimeTypeChecker for T_x_ms_wax_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_pn_realaudio_plugin_audio;
@@ -25532,6 +29747,9 @@ impl MimeTypeChecker for T_x_pn_realaudio_plugin_audio {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25549,6 +29767,9 @@ impl MimeTypeChecker for T_x_cif_chemical {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_cmdf_chemical;
@@ -25564,6 +29785,9 @@ impl MimeTypeChecker for T_x_cmdf_chemical {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25581,6 +29805,9 @@ impl MimeTypeChecker for T_x_cml_chemical {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_csml_chemical;
@@ -25596,6 +29823,9 @@ impl MimeTypeChecker for T_x_csml_chemical {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25613,6 +29843,9 @@ impl MimeTypeChecker for T_x_pdb_chemical {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_xyz_chemical;
@@ -25628,6 +29861,9 @@ impl MimeTypeChecker for T_x_xyz_chemical {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25645,6 +29881,9 @@ impl MimeTypeChecker for T_x_emf_compressed_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_example_image;
@@ -25660,6 +29899,9 @@ impl MimeTypeChecker for T_example_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25677,6 +29919,9 @@ impl MimeTypeChecker for T_g3fax_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ief_image;
@@ -25692,6 +29937,9 @@ impl MimeTypeChecker for T_ief_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25709,6 +29957,9 @@ impl MimeTypeChecker for T_naplps_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_prs_btif_image;
@@ -25724,6 +29975,9 @@ impl MimeTypeChecker for T_prs_btif_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25741,6 +29995,9 @@ impl MimeTypeChecker for T_prs_pti_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_t38_image;
@@ -25756,6 +30013,9 @@ impl MimeTypeChecker for T_t38_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25773,6 +30033,9 @@ impl MimeTypeChecker for T_tiff_fx_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_adobe_premiere_image;
@@ -25788,6 +30051,9 @@ impl MimeTypeChecker for T_vnd_adobe_premiere_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25805,6 +30071,9 @@ impl MimeTypeChecker for T_vnd_cns_inf2_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dgn_version_8_image;
@@ -25820,6 +30089,9 @@ impl MimeTypeChecker for T_vnd_dgn_version_8_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25837,6 +30109,9 @@ impl MimeTypeChecker for T_vnd_fastbidsheet_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fpx_image;
@@ -25852,6 +30127,9 @@ impl MimeTypeChecker for T_vnd_fpx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25869,6 +30147,9 @@ impl MimeTypeChecker for T_vnd_fst_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fujixerox_edmics_mmr_image;
@@ -25884,6 +30165,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_edmics_mmr_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25901,6 +30185,9 @@ impl MimeTypeChecker for T_vnd_fujixerox_edmics_rlc_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_globalgraphics_pgb_image;
@@ -25916,6 +30203,9 @@ impl MimeTypeChecker for T_vnd_globalgraphics_pgb_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25933,6 +30223,9 @@ impl MimeTypeChecker for T_vnd_mix_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_net_fpx_image;
@@ -25948,6 +30241,9 @@ impl MimeTypeChecker for T_vnd_net_fpx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25965,6 +30261,9 @@ impl MimeTypeChecker for T_vnd_sealed_png_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealedmedia_softseal_gif_image;
@@ -25980,6 +30279,9 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_gif_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -25997,6 +30299,9 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_jpg_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_svf_image;
@@ -26012,6 +30317,9 @@ impl MimeTypeChecker for T_vnd_svf_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26029,6 +30337,9 @@ impl MimeTypeChecker for T_vnd_wap_wbmp_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_xiff_image;
@@ -26044,6 +30355,9 @@ impl MimeTypeChecker for T_vnd_xiff_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26061,6 +30375,9 @@ impl MimeTypeChecker for T_x_cmu_raster_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_cmx_image;
@@ -26076,6 +30393,9 @@ impl MimeTypeChecker for T_x_cmx_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26093,6 +30413,9 @@ impl MimeTypeChecker for T_x_raw_adobe_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_hasselblad_image;
@@ -26108,6 +30431,9 @@ impl MimeTypeChecker for T_x_raw_hasselblad_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26125,6 +30451,9 @@ impl MimeTypeChecker for T_x_raw_fuji_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_kodak_image;
@@ -26140,6 +30469,9 @@ impl MimeTypeChecker for T_x_raw_kodak_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26157,6 +30489,9 @@ impl MimeTypeChecker for T_x_raw_minolta_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_nikon_image;
@@ -26172,6 +30507,9 @@ impl MimeTypeChecker for T_x_raw_nikon_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26189,6 +30527,9 @@ impl MimeTypeChecker for T_x_raw_pentax_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_sony_image;
@@ -26204,6 +30545,9 @@ impl MimeTypeChecker for T_x_raw_sony_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26221,6 +30565,9 @@ impl MimeTypeChecker for T_x_raw_sigma_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_epson_image;
@@ -26236,6 +30583,9 @@ impl MimeTypeChecker for T_x_raw_epson_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26253,6 +30603,9 @@ impl MimeTypeChecker for T_x_raw_mamiya_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_leaf_image;
@@ -26268,6 +30621,9 @@ impl MimeTypeChecker for T_x_raw_leaf_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26285,6 +30641,9 @@ impl MimeTypeChecker for T_x_raw_panasonic_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_phaseone_image;
@@ -26300,6 +30659,9 @@ impl MimeTypeChecker for T_x_raw_phaseone_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26317,6 +30679,9 @@ impl MimeTypeChecker for T_x_raw_red_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_imacon_image;
@@ -26332,6 +30697,9 @@ impl MimeTypeChecker for T_x_raw_imacon_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26349,6 +30717,9 @@ impl MimeTypeChecker for T_x_raw_logitech_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_raw_casio_image;
@@ -26364,6 +30735,9 @@ impl MimeTypeChecker for T_x_raw_casio_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26381,6 +30755,9 @@ impl MimeTypeChecker for T_x_raw_rawzor_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_xwindowdump_image;
@@ -26396,6 +30773,9 @@ impl MimeTypeChecker for T_x_xwindowdump_image {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26413,6 +30793,9 @@ impl MimeTypeChecker for T_cpim_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_delivery_status_message;
@@ -26428,6 +30811,9 @@ impl MimeTypeChecker for T_delivery_status_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26445,6 +30831,9 @@ impl MimeTypeChecker for T_disposition_notification_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_example_message;
@@ -26460,6 +30849,9 @@ impl MimeTypeChecker for T_example_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26477,6 +30869,9 @@ impl MimeTypeChecker for T_external_body_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_global_message;
@@ -26492,6 +30887,9 @@ impl MimeTypeChecker for T_global_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26509,6 +30907,9 @@ impl MimeTypeChecker for T_global_delivery_status_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_global_disposition_notification_message;
@@ -26524,6 +30925,9 @@ impl MimeTypeChecker for T_global_disposition_notification_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26541,6 +30945,9 @@ impl MimeTypeChecker for T_global_headers_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_http_message;
@@ -26556,6 +30963,9 @@ impl MimeTypeChecker for T_http_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26573,6 +30983,9 @@ impl MimeTypeChecker for T_imdn_xml_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_partial_message;
@@ -26588,6 +31001,9 @@ impl MimeTypeChecker for T_partial_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26605,6 +31021,9 @@ impl MimeTypeChecker for T_s_http_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_sip_message;
@@ -26620,6 +31039,9 @@ impl MimeTypeChecker for T_sip_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26637,6 +31059,9 @@ impl MimeTypeChecker for T_sipfrag_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_tracking_status_message;
@@ -26652,6 +31077,9 @@ impl MimeTypeChecker for T_tracking_status_message {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26669,6 +31097,9 @@ impl MimeTypeChecker for T_vnd_si_simp_message {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_example_model;
@@ -26684,6 +31115,9 @@ impl MimeTypeChecker for T_example_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26701,6 +31135,9 @@ impl MimeTypeChecker for T_iges_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mesh_model;
@@ -26716,6 +31153,9 @@ impl MimeTypeChecker for T_mesh_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26733,6 +31173,9 @@ impl MimeTypeChecker for T_x_stl_binary_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dwfx_xps_model;
@@ -26748,6 +31191,9 @@ impl MimeTypeChecker for T_vnd_dwfx_xps_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26765,6 +31211,9 @@ impl MimeTypeChecker for T_vnd_flatland_3dml_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_gdl_model;
@@ -26780,6 +31229,9 @@ impl MimeTypeChecker for T_vnd_gdl_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26797,6 +31249,9 @@ impl MimeTypeChecker for T_vnd_gs_gdl_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_gtw_model;
@@ -26812,6 +31267,9 @@ impl MimeTypeChecker for T_vnd_gtw_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26829,6 +31287,9 @@ impl MimeTypeChecker for T_vnd_moml_xml_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_mts_model;
@@ -26844,6 +31305,9 @@ impl MimeTypeChecker for T_vnd_mts_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26861,6 +31325,9 @@ impl MimeTypeChecker for T_vnd_parasolid_transmit_binary_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_parasolid_transmit_text_model;
@@ -26876,6 +31343,9 @@ impl MimeTypeChecker for T_vnd_parasolid_transmit_text_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26893,6 +31363,9 @@ impl MimeTypeChecker for T_vnd_vtu_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vrml_model;
@@ -26908,6 +31381,9 @@ impl MimeTypeChecker for T_vrml_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26925,6 +31401,9 @@ impl MimeTypeChecker for T_alternative_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_byteranges_multipart;
@@ -26940,6 +31419,9 @@ impl MimeTypeChecker for T_byteranges_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26957,6 +31439,9 @@ impl MimeTypeChecker for T_digest_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_encrypted_multipart;
@@ -26972,6 +31457,9 @@ impl MimeTypeChecker for T_encrypted_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -26989,6 +31477,9 @@ impl MimeTypeChecker for T_example_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_form_data_multipart;
@@ -27004,6 +31495,9 @@ impl MimeTypeChecker for T_form_data_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27021,6 +31515,9 @@ impl MimeTypeChecker for T_header_set_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mixed_multipart;
@@ -27036,6 +31533,9 @@ impl MimeTypeChecker for T_mixed_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27053,6 +31553,9 @@ impl MimeTypeChecker for T_parallel_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_report_multipart;
@@ -27068,6 +31571,9 @@ impl MimeTypeChecker for T_report_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27085,6 +31591,9 @@ impl MimeTypeChecker for T_signed_multipart {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_voice_message_multipart;
@@ -27100,6 +31609,9 @@ impl MimeTypeChecker for T_voice_message_multipart {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27117,6 +31629,9 @@ impl MimeTypeChecker for T_dif_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27139,6 +31654,9 @@ impl MimeTypeChecker for T_onix_message_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_onix_message_short_xml_application;
@@ -27159,6 +31677,9 @@ impl MimeTypeChecker for T_onix_message_short_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_actionscript_text;
@@ -27174,6 +31695,9 @@ impl MimeTypeChecker for T_x_actionscript_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27191,6 +31715,9 @@ impl MimeTypeChecker for T_x_ada_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_applescript_text;
@@ -27206,6 +31733,9 @@ impl MimeTypeChecker for T_x_applescript_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27223,6 +31753,9 @@ impl MimeTypeChecker for T_asp_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_aspdotnet_text;
@@ -27238,6 +31771,9 @@ impl MimeTypeChecker for T_aspdotnet_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27255,6 +31791,9 @@ impl MimeTypeChecker for T_x_aspectj_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_assembly_text;
@@ -27270,6 +31809,9 @@ impl MimeTypeChecker for T_x_assembly_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27287,6 +31829,9 @@ impl MimeTypeChecker for T_x_config_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_css_text;
@@ -27302,6 +31847,9 @@ impl MimeTypeChecker for T_css_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27319,6 +31867,9 @@ impl MimeTypeChecker for T_csv_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_directory_text;
@@ -27334,6 +31885,9 @@ impl MimeTypeChecker for T_directory_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27351,6 +31905,9 @@ impl MimeTypeChecker for T_dns_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ecmascript_text;
@@ -27366,6 +31923,9 @@ impl MimeTypeChecker for T_ecmascript_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27383,6 +31943,9 @@ impl MimeTypeChecker for T_enriched_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_example_text;
@@ -27398,6 +31961,9 @@ impl MimeTypeChecker for T_example_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27415,6 +31981,9 @@ impl MimeTypeChecker for T_parityfec_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_prs_fallenstein_rst_text;
@@ -27430,6 +31999,9 @@ impl MimeTypeChecker for T_prs_fallenstein_rst_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27447,6 +32019,9 @@ impl MimeTypeChecker for T_prs_lines_tag_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_red_text;
@@ -27462,6 +32037,9 @@ impl MimeTypeChecker for T_red_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27479,6 +32057,9 @@ impl MimeTypeChecker for T_rfc822_headers_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_richtext_text;
@@ -27494,6 +32075,9 @@ impl MimeTypeChecker for T_richtext_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27511,6 +32095,9 @@ impl MimeTypeChecker for T_rtp_enc_aescm128_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rtx_text;
@@ -27526,6 +32113,9 @@ impl MimeTypeChecker for T_rtx_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27543,6 +32133,9 @@ impl MimeTypeChecker for T_sgml_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_t140_text;
@@ -27558,6 +32151,9 @@ impl MimeTypeChecker for T_t140_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27575,6 +32171,9 @@ impl MimeTypeChecker for T_tab_separated_values_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_ulpfec_text;
@@ -27590,6 +32189,9 @@ impl MimeTypeChecker for T_ulpfec_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27607,6 +32209,9 @@ impl MimeTypeChecker for T_uri_list_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_abc_text;
@@ -27622,6 +32227,9 @@ impl MimeTypeChecker for T_vnd_abc_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27639,6 +32247,9 @@ impl MimeTypeChecker for T_vnd_curl_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_curl_dcurl_text;
@@ -27654,6 +32265,9 @@ impl MimeTypeChecker for T_vnd_curl_dcurl_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27671,6 +32285,9 @@ impl MimeTypeChecker for T_vnd_curl_scurl_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_curl_mcurl_text;
@@ -27686,6 +32303,9 @@ impl MimeTypeChecker for T_vnd_curl_mcurl_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27703,6 +32323,9 @@ impl MimeTypeChecker for T_vnd_dmclientscript_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_esmertec_theme_descriptor_text;
@@ -27718,6 +32341,9 @@ impl MimeTypeChecker for T_vnd_esmertec_theme_descriptor_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27735,6 +32361,9 @@ impl MimeTypeChecker for T_vnd_fly_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_fmi_flexstor_text;
@@ -27750,6 +32379,9 @@ impl MimeTypeChecker for T_vnd_fmi_flexstor_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27767,6 +32399,9 @@ impl MimeTypeChecker for T_vnd_in3d_3dml_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_in3d_spot_text;
@@ -27782,6 +32417,9 @@ impl MimeTypeChecker for T_vnd_in3d_spot_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27799,6 +32437,9 @@ impl MimeTypeChecker for T_vnd_iptc_newsml_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptc_nitf_text;
@@ -27814,6 +32455,9 @@ impl MimeTypeChecker for T_vnd_iptc_nitf_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27831,6 +32475,9 @@ impl MimeTypeChecker for T_vnd_latex_z_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_motorola_reflex_text;
@@ -27846,6 +32493,9 @@ impl MimeTypeChecker for T_vnd_motorola_reflex_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27863,6 +32513,9 @@ impl MimeTypeChecker for T_vnd_ms_mediapackage_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_net2phone_commcenter_command_text;
@@ -27878,6 +32531,9 @@ impl MimeTypeChecker for T_vnd_net2phone_commcenter_command_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27895,6 +32551,9 @@ impl MimeTypeChecker for T_vnd_si_uricatalogue_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sun_j2me_app_descriptor_text;
@@ -27910,6 +32569,9 @@ impl MimeTypeChecker for T_vnd_sun_j2me_app_descriptor_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27927,6 +32589,9 @@ impl MimeTypeChecker for T_vnd_trolltech_linguist_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wap_si_text;
@@ -27942,6 +32607,9 @@ impl MimeTypeChecker for T_vnd_wap_si_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27959,6 +32627,9 @@ impl MimeTypeChecker for T_vnd_wap_sl_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_wap_wml_text;
@@ -27974,6 +32645,9 @@ impl MimeTypeChecker for T_vnd_wap_wml_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -27991,6 +32665,9 @@ impl MimeTypeChecker for T_vnd_wap_wmlscript_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_c__hdr_text;
@@ -28006,6 +32683,9 @@ impl MimeTypeChecker for T_x_c__hdr_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28023,6 +32703,9 @@ impl MimeTypeChecker for T_x_c__src_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_cgi_text;
@@ -28038,6 +32721,9 @@ impl MimeTypeChecker for T_x_cgi_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28055,6 +32741,9 @@ impl MimeTypeChecker for T_x_clojure_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_coffeescript_text;
@@ -28070,6 +32759,9 @@ impl MimeTypeChecker for T_x_coffeescript_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28087,6 +32779,9 @@ impl MimeTypeChecker for T_x_csharp_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_cobol_text;
@@ -28102,6 +32797,9 @@ impl MimeTypeChecker for T_x_cobol_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28119,6 +32817,9 @@ impl MimeTypeChecker for T_x_coldfusion_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_common_lisp_text;
@@ -28134,6 +32835,9 @@ impl MimeTypeChecker for T_x_common_lisp_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28151,6 +32855,9 @@ impl MimeTypeChecker for T_x_eiffel_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_emacs_lisp_text;
@@ -28166,6 +32873,9 @@ impl MimeTypeChecker for T_x_emacs_lisp_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28183,6 +32893,9 @@ impl MimeTypeChecker for T_x_erlang_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_expect_text;
@@ -28198,6 +32911,9 @@ impl MimeTypeChecker for T_x_expect_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28215,6 +32931,9 @@ impl MimeTypeChecker for T_x_forth_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_fortran_text;
@@ -28230,6 +32949,9 @@ impl MimeTypeChecker for T_x_fortran_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28247,6 +32969,9 @@ impl MimeTypeChecker for T_x_go_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_groovy_text;
@@ -28262,6 +32987,9 @@ impl MimeTypeChecker for T_x_groovy_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28279,6 +33007,9 @@ impl MimeTypeChecker for T_x_haskell_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_idl_text;
@@ -28294,6 +33025,9 @@ impl MimeTypeChecker for T_x_idl_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28311,6 +33045,9 @@ impl MimeTypeChecker for T_x_ini_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_java_source_text;
@@ -28326,6 +33063,9 @@ impl MimeTypeChecker for T_x_java_source_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28343,6 +33083,9 @@ impl MimeTypeChecker for T_x_java_properties_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_less_text;
@@ -28358,6 +33101,9 @@ impl MimeTypeChecker for T_x_less_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28375,6 +33121,9 @@ impl MimeTypeChecker for T_x_lex_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_log_text;
@@ -28390,6 +33139,9 @@ impl MimeTypeChecker for T_x_log_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28407,6 +33159,9 @@ impl MimeTypeChecker for T_x_ml_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_modula_text;
@@ -28422,6 +33177,9 @@ impl MimeTypeChecker for T_x_modula_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28439,6 +33197,9 @@ impl MimeTypeChecker for T_x_objcsrc_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ocaml_text;
@@ -28454,6 +33215,9 @@ impl MimeTypeChecker for T_x_ocaml_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28471,6 +33235,9 @@ impl MimeTypeChecker for T_x_pascal_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_prolog_text;
@@ -28486,6 +33253,9 @@ impl MimeTypeChecker for T_x_prolog_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28503,6 +33273,9 @@ impl MimeTypeChecker for T_x_rst_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_rexx_text;
@@ -28518,6 +33291,9 @@ impl MimeTypeChecker for T_x_rexx_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28535,6 +33311,9 @@ impl MimeTypeChecker for T_x_ruby_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_scala_text;
@@ -28550,6 +33329,9 @@ impl MimeTypeChecker for T_x_scala_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28567,6 +33349,9 @@ impl MimeTypeChecker for T_x_scheme_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sed_text;
@@ -28582,6 +33367,9 @@ impl MimeTypeChecker for T_x_sed_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28599,6 +33387,9 @@ impl MimeTypeChecker for T_x_sql_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_setext_text;
@@ -28614,6 +33405,9 @@ impl MimeTypeChecker for T_x_setext_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28631,6 +33425,9 @@ impl MimeTypeChecker for T_x_stsrc_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_uuencode_text;
@@ -28646,6 +33443,9 @@ impl MimeTypeChecker for T_x_uuencode_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28663,6 +33463,9 @@ impl MimeTypeChecker for T_x_vbdotnet_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vbscript_text;
@@ -28678,6 +33481,9 @@ impl MimeTypeChecker for T_x_vbscript_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28695,6 +33501,9 @@ impl MimeTypeChecker for T_x_verilog_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_vhdl_text;
@@ -28710,6 +33519,9 @@ impl MimeTypeChecker for T_x_vhdl_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28727,6 +33539,9 @@ impl MimeTypeChecker for T_x_web_markdown_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_yacc_text;
@@ -28742,6 +33557,9 @@ impl MimeTypeChecker for T_x_yacc_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28759,6 +33577,9 @@ impl MimeTypeChecker for T_x_yaml_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_3gpp_tt_video;
@@ -28774,6 +33595,9 @@ impl MimeTypeChecker for T_3gpp_tt_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28791,6 +33615,9 @@ impl MimeTypeChecker for T_bmpeg_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_bt656_video;
@@ -28806,6 +33633,9 @@ impl MimeTypeChecker for T_bt656_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28823,6 +33653,9 @@ impl MimeTypeChecker for T_celb_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_dv_video;
@@ -28838,6 +33671,9 @@ impl MimeTypeChecker for T_dv_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28855,6 +33691,9 @@ impl MimeTypeChecker for T_example_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_h261_video;
@@ -28870,6 +33709,9 @@ impl MimeTypeChecker for T_h261_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28887,6 +33729,9 @@ impl MimeTypeChecker for T_h263_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_h263_1998_video;
@@ -28902,6 +33747,9 @@ impl MimeTypeChecker for T_h263_1998_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28919,6 +33767,9 @@ impl MimeTypeChecker for T_h263_2000_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_h264_video;
@@ -28934,6 +33785,9 @@ impl MimeTypeChecker for T_h264_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28951,6 +33805,9 @@ impl MimeTypeChecker for T_iso_segment_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_jpeg_video;
@@ -28966,6 +33823,9 @@ impl MimeTypeChecker for T_jpeg_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -28983,6 +33843,9 @@ impl MimeTypeChecker for T_jpeg2000_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mp1s_video;
@@ -28998,6 +33861,9 @@ impl MimeTypeChecker for T_mp1s_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29015,6 +33881,9 @@ impl MimeTypeChecker for T_mp2p_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mp2t_video;
@@ -29030,6 +33899,9 @@ impl MimeTypeChecker for T_mp2t_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29047,6 +33919,9 @@ impl MimeTypeChecker for T_mp4v_es_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_mpeg4_generic_video;
@@ -29062,6 +33937,9 @@ impl MimeTypeChecker for T_mpeg4_generic_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29079,6 +33957,9 @@ impl MimeTypeChecker for T_mpv_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_nv_video;
@@ -29094,6 +33975,9 @@ impl MimeTypeChecker for T_nv_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29111,6 +33995,9 @@ impl MimeTypeChecker for T_parityfec_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_pointer_video;
@@ -29126,6 +34013,9 @@ impl MimeTypeChecker for T_pointer_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29143,6 +34033,9 @@ impl MimeTypeChecker for T_raw_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_rtp_enc_aescm128_video;
@@ -29158,6 +34051,9 @@ impl MimeTypeChecker for T_rtp_enc_aescm128_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29175,6 +34071,9 @@ impl MimeTypeChecker for T_rtx_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_smpte292m_video;
@@ -29190,6 +34089,9 @@ impl MimeTypeChecker for T_smpte292m_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29207,6 +34109,9 @@ impl MimeTypeChecker for T_ulpfec_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vc1_video;
@@ -29222,6 +34127,9 @@ impl MimeTypeChecker for T_vc1_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29239,6 +34147,9 @@ impl MimeTypeChecker for T_vnd_cctv_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_dlna_mpeg_tts_video;
@@ -29254,6 +34165,9 @@ impl MimeTypeChecker for T_vnd_dlna_mpeg_tts_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29271,6 +34185,9 @@ impl MimeTypeChecker for T_vnd_fvt_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_hns_video_video;
@@ -29286,6 +34203,9 @@ impl MimeTypeChecker for T_vnd_hns_video_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29303,6 +34223,9 @@ impl MimeTypeChecker for T_vnd_iptvforum_1dparityfec_1010_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptvforum_1dparityfec_2005_video;
@@ -29318,6 +34241,9 @@ impl MimeTypeChecker for T_vnd_iptvforum_1dparityfec_2005_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29335,6 +34261,9 @@ impl MimeTypeChecker for T_vnd_iptvforum_2dparityfec_1010_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptvforum_2dparityfec_2005_video;
@@ -29350,6 +34279,9 @@ impl MimeTypeChecker for T_vnd_iptvforum_2dparityfec_2005_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29367,6 +34299,9 @@ impl MimeTypeChecker for T_vnd_iptvforum_ttsavc_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_iptvforum_ttsmpeg2_video;
@@ -29382,6 +34317,9 @@ impl MimeTypeChecker for T_vnd_iptvforum_ttsmpeg2_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29399,6 +34337,9 @@ impl MimeTypeChecker for T_vnd_motorola_video_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_motorola_videop_video;
@@ -29414,6 +34355,9 @@ impl MimeTypeChecker for T_vnd_motorola_videop_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29431,6 +34375,9 @@ impl MimeTypeChecker for T_vnd_mpegurl_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_ms_playready_media_pyv_video;
@@ -29446,6 +34393,9 @@ impl MimeTypeChecker for T_vnd_ms_playready_media_pyv_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29463,6 +34413,9 @@ impl MimeTypeChecker for T_vnd_nokia_interleaved_multimedia_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_nokia_videovoip_video;
@@ -29478,6 +34431,9 @@ impl MimeTypeChecker for T_vnd_nokia_videovoip_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29495,6 +34451,9 @@ impl MimeTypeChecker for T_vnd_objectvideo_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealed_mpeg1_video;
@@ -29510,6 +34469,9 @@ impl MimeTypeChecker for T_vnd_sealed_mpeg1_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29527,6 +34489,9 @@ impl MimeTypeChecker for T_vnd_sealed_mpeg4_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_sealed_swf_video;
@@ -29542,6 +34507,9 @@ impl MimeTypeChecker for T_vnd_sealed_swf_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29559,6 +34527,9 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_mov_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_vivo_video;
@@ -29574,6 +34545,9 @@ impl MimeTypeChecker for T_vnd_vivo_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29591,6 +34565,9 @@ impl MimeTypeChecker for T_x_f4v_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_flc_video;
@@ -29606,6 +34583,9 @@ impl MimeTypeChecker for T_x_flc_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29623,6 +34603,9 @@ impl MimeTypeChecker for T_x_fli_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_asx_application;
@@ -29638,6 +34621,9 @@ impl MimeTypeChecker for T_x_ms_asx_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29655,6 +34641,9 @@ impl MimeTypeChecker for T_x_ms_wm_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_ms_wmx_video;
@@ -29670,6 +34659,9 @@ impl MimeTypeChecker for T_x_ms_wmx_video {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29687,6 +34679,9 @@ impl MimeTypeChecker for T_x_ms_wvx_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_matroska_audio;
@@ -29703,6 +34698,9 @@ impl MimeTypeChecker for T_x_matroska_audio {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_cooltalk_x_conference;
@@ -29718,6 +34716,9 @@ impl MimeTypeChecker for T_x_cooltalk_x_conference {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29739,6 +34740,9 @@ impl MimeTypeChecker for T_x_fictionbook_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_asciidoc_text;
@@ -29754,6 +34758,9 @@ impl MimeTypeChecker for T_x_asciidoc_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29771,6 +34778,9 @@ impl MimeTypeChecker for T_x_d_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_haml_text;
@@ -29786,6 +34796,9 @@ impl MimeTypeChecker for T_x_haml_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29803,6 +34816,9 @@ impl MimeTypeChecker for T_x_haxe_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_xliff_xml_application;
@@ -29818,6 +34834,9 @@ impl MimeTypeChecker for T_x_xliff_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29835,6 +34854,9 @@ impl MimeTypeChecker for T_x_xliff_zip_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_rsrc_text;
@@ -29850,6 +34872,9 @@ impl MimeTypeChecker for T_x_rsrc_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29867,6 +34892,9 @@ impl MimeTypeChecker for T_x_scss_text {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x_sass_text;
@@ -29882,6 +34910,9 @@ impl MimeTypeChecker for T_x_sass_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29899,6 +34930,9 @@ impl MimeTypeChecker for T_vnd_shp_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_vnd_shx_application;
@@ -29915,6 +34949,9 @@ impl MimeTypeChecker for T_vnd_shx_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_owl_xml_application;
@@ -29930,6 +34967,9 @@ impl MimeTypeChecker for T_owl_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -29951,6 +34991,9 @@ impl MimeTypeChecker for T_vnd_collada_xml_model {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_gml_xml_application;
@@ -29969,6 +35012,9 @@ impl MimeTypeChecker for T_gml_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_gpx_xml_application;
@@ -29984,6 +35030,9 @@ impl MimeTypeChecker for T_gpx_xml_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -30005,6 +35054,9 @@ impl MimeTypeChecker for T_vnd_garmin_tcx_xml_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
     }
+    fn is_virtual(&self) -> bool {
+        false
+    }
 }
 
 pub(super) struct T_x3d_xml_model;
@@ -30020,6 +35072,9 @@ impl MimeTypeChecker for T_x3d_xml_model {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[]
+    }
+    fn is_virtual(&self) -> bool {
+        false
     }
 }
 
@@ -30038,6 +35093,9 @@ impl MimeTypeChecker for T_dita_xml_format_topic_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_dita_xml_format_concept_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_vnd_datapackage_zip_application;
@@ -30053,6 +35111,9 @@ impl MimeTypeChecker for T_x_vnd_datapackage_zip_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_wacz_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30080,6 +35141,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_graphics_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_oasis_opendocument_graphics_template_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_oasis_opendocument_image_application;
@@ -30104,6 +35168,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_image_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_oasis_opendocument_image_template_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30131,6 +35198,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_presentation_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_oasis_opendocument_presentation_template_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_oasis_opendocument_spreadsheet_application;
@@ -30157,6 +35227,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_spreadsheet_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_oasis_opendocument_spreadsheet_template_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_sun_xml_calc_application;
@@ -30181,6 +35254,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_calc_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_sun_xml_calc_template_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30207,6 +35283,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_draw_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_sun_xml_draw_template_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_sun_xml_impress_application;
@@ -30231,6 +35310,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_impress_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_sun_xml_impress_template_application]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30257,6 +35339,9 @@ impl MimeTypeChecker for T_vnd_sun_xml_writer_application {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_sun_xml_writer_template_application]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_dgn_image;
@@ -30273,6 +35358,9 @@ impl MimeTypeChecker for T_vnd_dgn_image {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_vnd_dgn_version_7_image]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_basic_text;
@@ -30288,6 +35376,9 @@ impl MimeTypeChecker for T_x_basic_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_vbasic_text]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30308,6 +35399,9 @@ impl MimeTypeChecker for T_json_application {
             &T_x_vnd_datapackage_json_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_quicktime_application;
@@ -30323,6 +35417,9 @@ impl MimeTypeChecker for T_quicktime_application {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_mp4_application, &T_quicktime_video]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30343,6 +35440,9 @@ impl MimeTypeChecker for T_onenote_application {
             &T_onenote_format_onetoc2_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_tika_msoffice_embedded_application;
@@ -30361,6 +35461,9 @@ impl MimeTypeChecker for T_x_tika_msoffice_embedded_application {
             &T_x_tika_msoffice_embedded_format_ole10_native_application,
             &T_x_tika_msoffice_embedded_format_comp_obj_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30381,6 +35484,9 @@ impl MimeTypeChecker for T_x_x509_cert_application {
             &T_x_x509_cert_format_der_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_x509_key_application;
@@ -30399,6 +35505,9 @@ impl MimeTypeChecker for T_x_x509_key_application {
             &T_x_x509_key_format_pem_application,
             &T_x_x509_key_format_der_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30419,6 +35528,9 @@ impl MimeTypeChecker for T_vnd_dxf_image {
             &T_vnd_dxf_format_ascii_image,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_vbasic_text;
@@ -30434,6 +35546,9 @@ impl MimeTypeChecker for T_x_vbasic_text {
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_vbdotnet_text, &T_x_vbscript_text]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30457,6 +35572,9 @@ impl MimeTypeChecker for T_x_ms_asf_video {
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[&T_x_ms_wma_audio, &T_x_ms_wmv_video]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_java_archive_application;
@@ -30477,6 +35595,9 @@ impl MimeTypeChecker for T_java_archive_application {
             &T_x_tika_java_web_archive_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_sereal_application;
@@ -30496,6 +35617,9 @@ impl MimeTypeChecker for T_sereal_application {
             &T_sereal_version_2_application,
             &T_sereal_version_3_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30526,6 +35650,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_application {
             &T_vnd_oasis_opendocument_text_web_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_oasis_opendocument_tika_flat_document_application;
@@ -30537,11 +35664,11 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_tika_flat_document_application
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        rootxml(
+        (rootxml(
             bytes,
             "document",
             "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
-        )
+        ) || rootxml(bytes, "document", "http://openoffice.org/2009/office"))
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[
@@ -30549,6 +35676,9 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_tika_flat_document_application
             &T_vnd_oasis_opendocument_flat_presentation_application,
             &T_vnd_oasis_opendocument_flat_spreadsheet_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30571,6 +35701,9 @@ impl MimeTypeChecker for T_dita_xml_application {
             &T_dita_xml_format_val_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_vnd_apple_iwork_application;
@@ -30591,6 +35724,9 @@ impl MimeTypeChecker for T_vnd_apple_iwork_application {
             &T_vnd_apple_numbers_application,
             &T_x_tika_iworks_protected_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30613,6 +35749,9 @@ impl MimeTypeChecker for T_x_berkeley_db_application {
             &T_x_berkeley_db_format_log_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_mysql_db_application;
@@ -30633,6 +35772,9 @@ impl MimeTypeChecker for T_x_mysql_db_application {
             &T_x_mysql_misam_compressed_index_application,
             &T_x_mysql_misam_data_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30657,6 +35799,9 @@ impl MimeTypeChecker for T_x_quattro_pro_application {
             &T_x_quattro_pro_version_6_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_portable_anymap_image;
@@ -30678,6 +35823,9 @@ impl MimeTypeChecker for T_x_portable_anymap_image {
             &T_x_portable_arbitrarymap_image,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_tika_text_based_message_text;
@@ -30698,6 +35846,9 @@ impl MimeTypeChecker for T_x_tika_text_based_message_text {
             &T_news_message,
             &T_rfc822_message,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30721,6 +35872,9 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_application {
             &T_vnd_lotus_1_2_3_version_97_9_x_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_x_tika_old_excel_application;
@@ -30742,6 +35896,9 @@ impl MimeTypeChecker for T_x_tika_old_excel_application {
             &T_vnd_ms_excel_workspace_3_application,
             &T_vnd_ms_excel_sheet_2_application,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30765,6 +35922,9 @@ impl MimeTypeChecker for T_x_tika_staroffice_application {
             &T_x_staroffice_template_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub(super) struct T_ogg_audio;
@@ -30786,6 +35946,9 @@ impl MimeTypeChecker for T_ogg_audio {
             &T_opus_audio,
             &T_speex_audio,
         ]
+    }
+    fn is_virtual(&self) -> bool {
+        true
     }
 }
 
@@ -30810,6 +35973,9 @@ impl MimeTypeChecker for T_x_tika_visio_ooxml_application {
             &T_vnd_ms_visio_stencil_macroEnabled_12_application,
         ]
     }
+    fn is_virtual(&self) -> bool {
+        true
+    }
 }
 
 pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
@@ -30821,11 +35987,13 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_mbox_application,
     &T_x_emlx_message,
     &T_x_ms_nls_application,
+    &T_x_mswrite_application,
     &T_pdf_application,
     &T_x_bplist_application,
     &T_cbor_application,
     &T_coreldraw_application,
     &T_illustrator_ps_application,
+    &T_vnd_apple_mpegurl_application,
     &T_vnd_etsi_asic_e_zip_application,
     &T_vnd_etsi_asic_s_zip_application,
     &T_vnd_ms_excel_sheet_4_application,
@@ -30847,6 +36015,7 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_berkeley_db_format_btree_version_4_application,
     &T_x_debian_package_application,
     &T_x_font_type1_application,
+    &T_x_foxmail_application,
     &T_x_internet_archive_application,
     &T_x_lz4_application,
     &T_x_mobipocket_ebook_application,
@@ -30876,7 +36045,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_stata_dta_version_12_application,
     &T_x_stata_dta_version_10_application,
     &T_x_stata_dta_version_8_application,
-    &T_x_tika_msworks_spreadsheet_application,
     &T_mp4_audio,
     &T_vorbis_audio,
     &T_x_oggflac_audio,
@@ -30897,7 +36065,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_vnd_dwf_version_6_model,
     &T_vnd_dwf_version_5_model,
     &T_vnd_dwf_version_2_model,
-    &T_html_text,
     &T_x_php_text,
     &T_3gpp_video,
     &T_3gpp2_video,
@@ -30958,6 +36125,7 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_vnd_lotus_1_2_3_version_97_9_x_application,
     &T_vnd_lotus_wordpro_application,
     &T_vnd_mif_application,
+    &T_vnd_ms_excel_application,
     &T_vnd_ms_fontobject_application,
     &T_vnd_ms_htmlhelp_application,
     &T_vnd_ms_outlook_pst_application,
@@ -30965,6 +36133,13 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_project_application,
     &T_vnd_ms_tnef_application,
     &T_vnd_ms_works_application,
+    &T_vnd_oasis_opendocument_chart_template_application,
+    &T_vnd_oasis_opendocument_base_application,
+    &T_vnd_oasis_opendocument_formula_application,
+    &T_vnd_oasis_opendocument_flat_text_application,
+    &T_vnd_oasis_opendocument_flat_presentation_application,
+    &T_vnd_oasis_opendocument_flat_spreadsheet_application,
+    &T_vnd_oasis_opendocument_text_master_application,
     &T_vnd_openxmlformats_officedocument_presentationml_presentation_application,
     &T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application,
     &T_vnd_openxmlformats_officedocument_wordprocessingml_document_application,
@@ -30984,6 +36159,7 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_atari_floppy_disk_image_application,
     &T_x_adobe_indesign_application,
     &T_vnd_isac_fcs_application,
+    &T_vnd_adobe_indesign_idml_package_application,
     &T_x_adobe_indesign_interchange_application,
     &T_x_arj_application,
     &T_x_asprs_application,
@@ -31029,7 +36205,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_lzip_application,
     &T_x_mach_o_application,
     &T_x_ms_compress_szdd_application,
-    &T_x_mswrite_application,
     &T_x_nesrom_application,
     &T_x_netcdf_application,
     &T_x_parquet_application,
@@ -31169,7 +36344,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_mathematica_application,
     &T_postscript_application,
     &T_vnd_ms_cab_compressed_application,
-    &T_vnd_ms_excel_application,
     &T_x_archive_application,
     &T_x_iso9660_image_application,
     &T_x_tex_application,
@@ -31195,6 +36369,7 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_tika_ooxml_application,
     &T_zip_application,
     &T_xml_application,
+    &T_html_text,
     &T_zlib_application,
     &T_gzip_application,
     &T_x_dbf_application,
@@ -31228,13 +36403,13 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_vnd_msa_disk_image_application,
     &T_basic_audio,
     &T_midi_audio,
-    &T_mpeg_audio,
     &T_x_adpcm_audio,
     &T_x_aiff_audio,
     &T_x_dec_basic_audio,
     &T_x_dec_adpcm_audio,
     &T_vnd_wave_audio,
     &T_x_makefile_text,
+    &T_mpeg_audio,
     &T_plain_text,
     &T_activemessage_application,
     &T_andrew_inset_application,
@@ -31448,7 +36623,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_vnd_apple_installer_xml_application,
     &T_vnd_apple_unknown_13_application,
     &T_vnd_apple_keynote_application,
-    &T_vnd_apple_mpegurl_application,
     &T_vnd_apple_pages_application,
     &T_vnd_apple_numbers_application,
     &T_x_tika_iworks_protected_application,
@@ -31757,18 +36931,11 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_vnd_novadigm_edx_application,
     &T_vnd_novadigm_ext_application,
     &T_vnd_oasis_opendocument_chart_application,
-    &T_vnd_oasis_opendocument_chart_template_application,
-    &T_vnd_oasis_opendocument_base_application,
-    &T_vnd_oasis_opendocument_formula_application,
     &T_vnd_oasis_opendocument_formula_template_application,
     &T_vnd_oasis_opendocument_graphics_template_application,
     &T_vnd_oasis_opendocument_image_template_application,
     &T_vnd_oasis_opendocument_presentation_template_application,
     &T_vnd_oasis_opendocument_spreadsheet_template_application,
-    &T_vnd_oasis_opendocument_flat_text_application,
-    &T_vnd_oasis_opendocument_flat_presentation_application,
-    &T_vnd_oasis_opendocument_flat_spreadsheet_application,
-    &T_vnd_oasis_opendocument_text_master_application,
     &T_vnd_oasis_opendocument_text_template_application,
     &T_vnd_oasis_opendocument_text_web_application,
     &T_vnd_obn_application,
@@ -31984,7 +37151,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_abiword_application,
     &T_x_ace_compressed_application,
     &T_x_amf_application,
-    &T_vnd_adobe_indesign_idml_package_application,
     &T_x_apple_diskimage_application,
     &T_x_appleworks_application,
     &T_x_authorware_bin_application,
@@ -32017,7 +37183,6 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
     &T_x_font_speedo_application,
     &T_x_font_sunos_news_application,
     &T_x_font_vfont_application,
-    &T_x_foxmail_application,
     &T_x_futuresplash_application,
     &T_x_gnucash_application,
     &T_x_esri_layer_application,
@@ -32527,3243 +37692,3241 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
 ];
 
 pub static MIME_MAP: phf::Map<&'static str, &[&'static dyn MimeTypeChecker]> = phf_map! {
-"video/example" => &[&T_example_video],
-"application/mbms-protection-description+xml" => &[&T_mbms_protection_description_xml_application],
-"application/vnd.marlin.drm.conftoken+xml" => &[&T_vnd_marlin_drm_conftoken_xml_application],
-"application/tzif" => &[&T_tzif_application],
-"application/vnd.garmin.tcx+xml" => &[&T_vnd_garmin_tcx_xml_application],
-"application/x-autocad" => &[&T_vnd_dwg_image],
-"audio/l8" => &[&T_l8_audio],
-"image/vnd.sealedmedia.softseal.jpg" => &[&T_vnd_sealedmedia_softseal_jpg_image],
-"application/vnd.nervana" => &[&T_vnd_nervana_application],
-"application/vnd.ms-word" => &[&T_msword_application],
-"application/x-berkeley-db;format=hash;version=2" => &[&T_x_berkeley_db_format_hash_version_2_application],
-"application/vnd.oma.poc.groups+xml" => &[&T_vnd_oma_poc_groups_xml_application],
-"message/global-disposition-notification" => &[&T_global_disposition_notification_message],
-"application/vnd.ms-xpsdocument" => &[&T_vnd_ms_xpsdocument_application],
-"text/iso19139+xml" => &[&T_iso19139_xml_text],
-"application/x-shar" => &[&T_x_shar_application],
-"application/vnd.powerbuilder7" => &[&T_vnd_powerbuilder7_application],
-"application/vnd.scribus" => &[&T_vnd_scribus_application],
-"text/vnd.wap.wmlscript" => &[&T_vnd_wap_wmlscript_text],
-"image/x-raw-minolta" => &[&T_x_raw_minolta_image],
-"application/vnd.apple.pages" => &[&T_vnd_apple_pages_application],
-"application/vnd.dvb.notif-container+xml" => &[&T_vnd_dvb_notif_container_xml_application],
-"application/vnd.olpc-sugar" => &[&T_vnd_olpc_sugar_application],
-"audio/evrcwb1" => &[&T_evrcwb1_audio],
-"application/font-woff2" => &[&T_woff2_font],
-"message/example" => &[&T_example_message],
-"application/x-tika-ooxml-protected" => &[&T_x_tika_ooxml_protected_application],
-"application/srgs" => &[&T_srgs_application],
-"audio/ilbc" => &[&T_ilbc_audio],
-"video/x-m4v" => &[&T_x_m4v_video],
-"application/x-vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
-"application/x-authorware-bin" => &[&T_x_authorware_bin_application],
-"application/x-gzip" => &[&T_gzip_application],
-"application/photoshop" => &[&T_vnd_adobe_photoshop_image],
-"application/vnd.immervision-ivu" => &[&T_vnd_immervision_ivu_application],
-"application/vnd.ms-visio.drawing" => &[&T_vnd_ms_visio_drawing_application],
-"audio/3gpp2" => &[&T_3gpp2_video],
-"application/vnd.pg.osasli" => &[&T_vnd_pg_osasli_application],
-"application/x-amf" => &[&T_x_amf_application],
-"application/x-font-ghostscript" => &[&T_x_font_ghostscript_application],
-"application/vnd.epson.quickanime" => &[&T_vnd_epson_quickanime_application],
-"application/x-msclip" => &[&T_x_msclip_application],
-"audio/pcma" => &[&T_pcma_audio],
-"text/x-tika-text-based-message" => &[&T_x_tika_text_based_message_text],
-"audio/vnd.dolby.pl2" => &[&T_vnd_dolby_pl2_audio],
-"image/x-raw-red" => &[&T_x_raw_red_image],
-"application/vnd.ms-project" => &[&T_vnd_ms_project_application],
-"audio/dsr-es202050" => &[&T_dsr_es202050_audio],
-"audio/mpa" => &[&T_mpa_audio],
-"video/h263-1998" => &[&T_h263_1998_video],
-"application/vnd.intertrust.nncp" => &[&T_vnd_intertrust_nncp_application],
-"application/vnd.dolby.mobile.2" => &[&T_vnd_dolby_mobile_2_application],
-"application/vnd.3gpp.sms" => &[&T_vnd_3gpp_sms_application],
-"application/vnd.dvb.notif-init+xml" => &[&T_vnd_dvb_notif_init_xml_application],
-"application/vnd.hydrostatix.sof-data" => &[&T_vnd_hydrostatix_sof_data_application],
-"application/vnd.ms-asf" => &[&T_vnd_ms_asf_application],
-"application/mbms-associated-procedure-description+xml" => &[&T_mbms_associated_procedure_description_xml_application],
-"application/vnd.nokia.pcd+wbxml" => &[&T_vnd_nokia_pcd_wbxml_application],
-"application/vnd.simtech-mindmapper" => &[&T_vnd_simtech_mindmapper_application],
-"application/vnd.xara" => &[&T_vnd_xara_application],
-"application/x-isatab-investigation" => &[&T_x_isatab_investigation_application],
-"application/x-gnucash" => &[&T_x_gnucash_application],
-"application/x-stuffitx" => &[&T_x_stuffitx_application],
-"application/x-corelpresentations" => &[&T_x_corelpresentations_application],
-"application/x-bittorrent" => &[&T_x_bittorrent_application],
-"application/vnd.rim.cod" => &[&T_vnd_rim_cod_application],
-"application/x-vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
-"application/vnd.yamaha.hv-script" => &[&T_vnd_yamaha_hv_script_application],
-"application/vnd.openxmlformats-officedocument.presentationml.presentation" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
-"application/x-tika-unix-dump" => &[&T_x_tika_unix_dump_application],
-"application/vnd.ms-excel.sheet.macroenabled.12" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
-"application/vnd.ms-powerpoint.template.macroenabled.12" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
-"application/vnd.ms-excel.template.macroenabled.12" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
-"application/vnd.uplanet.channel" => &[&T_vnd_uplanet_channel_application],
-"model/iges" => &[&T_iges_model],
-"application/vnd.motorola.flexsuite.gotap" => &[&T_vnd_motorola_flexsuite_gotap_application],
-"audio/basic" => &[&T_basic_audio],
-"application/dca-rft" => &[&T_dca_rft_application],
-"image/gif" => &[&T_gif_image],
-"application/x-font-linux-psf" => &[&T_x_font_linux_psf_application],
-"application/vnd.sun.xml.calc" => &[&T_vnd_sun_xml_calc_application],
-"application/pls+xml" => &[&T_pls_xml_application],
-"audio/vnd.digital-winds" => &[&T_vnd_digital_winds_audio],
-"application/vnd.digilite.prolights" => &[&T_vnd_digilite_prolights_application],
-"application/x-tika-iworks-protected" => &[&T_x_tika_iworks_protected_application],
-"application/vnd.micrografx.flo" => &[&T_vnd_micrografx_flo_application],
-"application/vnd.omads-file+xml" => &[&T_vnd_omads_file_xml_application],
-"application/vnd.powerbuilder75" => &[&T_vnd_powerbuilder75_application],
-"application/vnd.ms-fontobject" => &[&T_vnd_ms_fontobject_application],
-"audio/g728" => &[&T_g728_audio],
-"application/x-mimearchive" => &[&T_related_multipart],
-"application/x-itunes-bplist" => &[&T_x_itunes_bplist_application],
-"model/x.stl-binary" => &[&T_x_stl_binary_model],
-"application/epp+xml" => &[&T_epp_xml_application],
-"application/x-troff" => &[&T_troff_text],
-"application/qsig" => &[&T_qsig_application],
-"image/vnd.zbrush.pcx" => &[&T_vnd_zbrush_pcx_image],
-"application/example" => &[&T_example_application],
-"video/pointer" => &[&T_pointer_video],
-"application/vnd.adobe.indesign-idml-package" => &[&T_vnd_adobe_indesign_idml_package_application],
-"application/vnd.msa-disk-image" => &[&T_vnd_msa_disk_image_application],
-"text/troff" => &[&T_troff_text],
-"application/x-fossil-global-conf" => &[&T_x_fossil_global_conf_application],
-"application/vnd.apple.keynote" => &[&T_vnd_apple_keynote_application],
-"application/vnd.lotus-organizer" => &[&T_vnd_lotus_organizer_application],
-"application/x-x509-ec-parameters" => &[&T_x_x509_ec_parameters_application],
-"audio/vnd.audiokoz" => &[&T_vnd_audiokoz_audio],
-"text/x-groovy" => &[&T_x_groovy_text],
-"application/resource-lists+xml" => &[&T_resource_lists_xml_application],
-"application/x-mspublisher" => &[&T_x_mspublisher_application],
-"application/vnd.ericsson.quickcall" => &[&T_vnd_ericsson_quickcall_application],
-"application/auth-policy+xml" => &[&T_auth_policy_xml_application],
-"application/x-pkcs7-certreqresp" => &[&T_x_pkcs7_certreqresp_application],
-"text/x-rexx" => &[&T_x_rexx_text],
-"model/x3d+xml" => &[&T_x3d_xml_model],
-"application/vnd.ezpix-album" => &[&T_vnd_ezpix_album_application],
-"application/vnd.musician" => &[&T_vnd_musician_application],
-"application/vnd.tao.intent-module-archive" => &[&T_vnd_tao_intent_module_archive_application],
-"application/vnd.kenameaapp" => &[&T_vnd_kenameaapp_application],
-"application/xcap-caps+xml" => &[&T_xcap_caps_xml_application],
-"image/x-tga" => &[&T_x_tga_image],
-"audio/dsr-es202212" => &[&T_dsr_es202212_audio],
-"application/vnd.ctc-posml" => &[&T_vnd_ctc_posml_application],
-"chemical/x-cif" => &[&T_x_cif_chemical],
-"application/x-font-ttf" => &[&T_x_font_ttf_application],
-"application/vnd.adobe.xdp+xml" => &[&T_vnd_adobe_xdp_xml_application],
-"application/x-msbinder" => &[&T_x_msbinder_application],
-"text/x-objcsrc" => &[&T_x_objcsrc_text],
-"application/x-xml" => &[&T_xml_application],
-"application/vnd.adobe.aftereffects.template" => &[&T_vnd_adobe_aftereffects_template_application],
-"application/vnd.stardivision.impress" => &[&T_vnd_stardivision_impress_application],
-"application/vnd.groove-help" => &[&T_vnd_groove_help_application],
-"audio/evrc-qcp" => &[&T_evrc_qcp_audio],
-"application/x-roxio-toast" => &[&T_x_roxio_toast_application],
-"application/vnd.ezpix-package" => &[&T_vnd_ezpix_package_application],
-"application/iotp" => &[&T_iotp_application],
-"application/applefile" => &[&T_applefile_application],
-"application/vnd.openxmlformats-officedocument.wordprocessingml.document" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
-"model/vnd.flatland.3dml" => &[&T_vnd_flatland_3dml_model],
-"application/vnd.eszigno3+xml" => &[&T_vnd_eszigno3_xml_application],
-"application/vnd.zzazz.deck+xml" => &[&T_vnd_zzazz_deck_xml_application],
-"application/x-lz4" => &[&T_x_lz4_application],
 "audio/dsr-es201108" => &[&T_dsr_es201108_audio],
-"audio/opus" => &[&T_opus_audio],
-"application/x-wine-extension-inf" => &[&T_inf_application],
-"text/x-java-properties" => &[&T_x_java_properties_text],
-"application/vnd.antix.game-component" => &[&T_vnd_antix_game_component_application],
-"application/x-vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
-"application/onenote" => &[&T_onenote_application],
-"application/vnd.motorola.flexsuite.adsi" => &[&T_vnd_motorola_flexsuite_adsi_application],
-"application/x-httpresponse" => &[&T_x_httpresponse_application],
-"application/vnd.genomatix.tuxedo" => &[&T_vnd_genomatix_tuxedo_application],
-"application/emma+xml" => &[&T_emma_xml_application],
-"application/x-msmetafile" => &[&T_wmf_image],
-"application/vnd.acucorp" => &[&T_vnd_acucorp_application],
-"audio/dls" => &[&T_dls_audio],
-"application/x-dvd-ifo" => &[&T_x_dvd_ifo_application],
-"image/x-xcf" => &[&T_x_xcf_image],
-"application/vnd.dolby.mobile.1" => &[&T_vnd_dolby_mobile_1_application],
-"application/tve-trigger" => &[&T_tve_trigger_application],
-"application/vnd.gmx" => &[&T_vnd_gmx_application],
-"application/x-sas-xport" => &[&T_x_sas_xport_application],
-"text/vnd.trolltech.linguist" => &[&T_vnd_trolltech_linguist_text],
-"audio/aiff" => &[&T_x_aiff_audio],
-"application/java-serialized-object" => &[&T_java_serialized_object_application],
-"application/vnd.groove-tool-message" => &[&T_vnd_groove_tool_message_application],
-"image/vnd.mozilla.apng" => &[&T_vnd_mozilla_apng_image],
-"application/batch-smtp" => &[&T_batch_smtp_application],
-"application/vnd.japannet-verification" => &[&T_vnd_japannet_verification_application],
-"application/vnd.ms-visio.template" => &[&T_vnd_ms_visio_template_application],
-"application/x-fictionbook+xml" => &[&T_x_fictionbook_xml_application],
-"text/x-yacc" => &[&T_x_yacc_text],
-"text/css" => &[&T_css_text],
-"application/vnd.avistar+xml" => &[&T_vnd_avistar_xml_application],
-"application/x-erdas-hfa" => &[&T_x_erdas_hfa_application],
-"multipart/voice-message" => &[&T_voice_message_multipart],
-"application/mikey" => &[&T_mikey_application],
-"image/x-jb2" => &[&T_x_jbig2_image],
-"video/x-ogm" => &[&T_x_ogm_video],
-"application/vnd.wap.wmlscriptc" => &[&T_vnd_wap_wmlscriptc_application],
-"application/vnd.sss-ntf" => &[&T_vnd_sss_ntf_application],
+"text/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_text],
+"message/sip" => &[&T_sip_message],
+"font/ttf" => &[&T_x_font_ttf_application],
+"application/vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
+"application/illustrator+ps" => &[&T_illustrator_ps_application],
+"application/vnd.oasis.opendocument.database" => &[&T_vnd_oasis_opendocument_base_application],
+"application/x-ustar" => &[&T_x_ustar_application],
+"application/x-berkeley-db;format=hash" => &[&T_x_berkeley_db_format_hash_application],
+"audio/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_audio],
+"application/vnd.netfpx" => &[&T_vnd_netfpx_application],
+"application/vnd.omads-folder+xml" => &[&T_vnd_omads_folder_xml_application],
+"text/vnd.sun.j2me.app-descriptor" => &[&T_vnd_sun_j2me_app_descriptor_text],
+"application/x-mif" => &[&T_vnd_mif_application],
+"application/vnd.arastra.swi" => &[&T_vnd_arastra_swi_application],
+"text/tab-separated-values" => &[&T_tab_separated_values_text],
+"video/x-daala" => &[&T_daala_video],
+"application/x-mysql-table-definition" => &[&T_x_mysql_table_definition_application],
+"image/x-psd" => &[&T_vnd_adobe_photoshop_image],
+"application/vnd.oma.group-usage-list+xml" => &[&T_vnd_oma_group_usage_list_xml_application],
+"audio/g726-40" => &[&T_g726_40_audio],
+"application/x-abiword" => &[&T_x_abiword_application],
+"application/vnd.oasis.opendocument.base" => &[&T_vnd_oasis_opendocument_base_application],
+"application/vnd.stardivision.math" => &[&T_vnd_stardivision_math_application],
+"application/vnd.japannet-payment-wakeup" => &[&T_vnd_japannet_payment_wakeup_application],
+"application/vnd.xmpie.ppkg" => &[&T_vnd_xmpie_ppkg_application],
+"application/vnd.s3sms" => &[&T_vnd_s3sms_application],
+"application/slate" => &[&T_slate_application],
+"application/x-ms-shortcut" => &[&T_x_ms_shortcut_application],
+"application/x-chrome-package" => &[&T_x_chrome_package_application],
 "application/dash+xml" => &[&T_dash_xml_application],
-"application/vnd.yamaha.openscoreformat" => &[&T_vnd_yamaha_openscoreformat_application],
-"application/vnd.oma.bcast.smartcard-trigger+xml" => &[&T_vnd_oma_bcast_smartcard_trigger_xml_application],
-"audio/vnd.cmles.radio-events" => &[&T_vnd_cmles_radio_events_audio],
-"image/vnd.zbrush.dcx" => &[&T_vnd_zbrush_dcx_image],
-"application/x-ogg" => &[&T_ogg_application,&T_vorbis_audio],
-"application/vnd.fluxtime.clip" => &[&T_vnd_fluxtime_clip_application],
-"application/x-acad" => &[&T_vnd_dwg_image],
-"application/vnd.fujitsu.oasys" => &[&T_vnd_fujitsu_oasys_application],
-"application/vnd.stardivision.writer-global" => &[&T_vnd_stardivision_writer_global_application],
-"application/x-endnote-style" => &[&T_x_endnote_style_application],
-"text/x-tcl" => &[&T_x_tcl_text],
-"text/x-cobol" => &[&T_x_cobol_text],
-"multipart/mixed" => &[&T_mixed_multipart],
-"application/vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
-"audio/x-ogg-pcm" => &[&T_x_oggpcm_audio],
-"application/vnd.fujixerox.ddd" => &[&T_vnd_fujixerox_ddd_application],
-"application/x-pdf" => &[&T_pdf_application],
-"application/vnd.piaccess.application-licence" => &[&T_vnd_piaccess_application_licence_application],
-"multipart/related" => &[&T_related_multipart],
-"application/rtf" => &[&T_rtf_application],
-"application/javascript" => &[&T_javascript_text],
-"application/vnd.ms-visio" => &[&T_vnd_visio_application],
-"application/java-vm" => &[&T_java_vm_application],
-"application/vnd.shana.informed.package" => &[&T_vnd_shana_informed_package_application],
-"image/x-raw-nikon" => &[&T_x_raw_nikon_image],
-"application/x-pkcs7-certificates" => &[&T_x_pkcs7_certificates_application],
-"text/x-modula" => &[&T_x_modula_text],
-"application/x-authorware-map" => &[&T_x_authorware_map_application],
-"text/x-yaml" => &[&T_x_yaml_text],
-"text/x-assembly" => &[&T_x_assembly_text],
-"application/x-coredump" => &[&T_x_coredump_application],
-"audio/vnd.qcelp" => &[&T_vnd_qcelp_audio],
-"audio/smv" => &[&T_smv_audio],
-"application/vnd.japannet-registration-wakeup" => &[&T_vnd_japannet_registration_wakeup_application],
-"application/x-bentley-localization" => &[&T_x_bentley_localization_application],
-"application/x-sas-utility" => &[&T_x_sas_utility_application],
-"audio/g719" => &[&T_g719_audio],
-"text/x-fortran" => &[&T_x_fortran_text],
-"text/x-setext" => &[&T_x_setext_text],
-"application/vnd.lotus-approach" => &[&T_vnd_lotus_approach_application],
-"application/vnd.dvb.notif-generic+xml" => &[&T_vnd_dvb_notif_generic_xml_application],
-"application/vnd.fints" => &[&T_vnd_fints_application],
-"application/vnd.symbian.install" => &[&T_vnd_symbian_install_application],
-"application/vnd.businessobjects" => &[&T_vnd_businessobjects_application],
-"application/vnd.cybank" => &[&T_vnd_cybank_application],
-"application/vnd.hp-hpgl" => &[&T_vnd_hp_hpgl_application],
-"application/vnd.americandynamics.acc" => &[&T_vnd_americandynamics_acc_application],
-"application/vnd.oasis.opendocument.tika.flat.document" => &[&T_vnd_oasis_opendocument_tika_flat_document_application],
-"application/vnd.yamaha.openscoreformat.osfpvg+xml" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
-"application/x-tika-old-excel" => &[&T_x_tika_old_excel_application],
-"image/x-raw-panasonic" => &[&T_x_raw_panasonic_image],
-"application/dvcs" => &[&T_dvcs_application],
-"application/vnd.apple.numbers" => &[&T_vnd_apple_numbers_application],
-"application/x-lzma" => &[&T_x_lzma_application],
-"audio/sp-midi" => &[&T_sp_midi_audio],
-"application/vnd.ibm.minipay" => &[&T_vnd_ibm_minipay_application],
-"application/xcap-error+xml" => &[&T_xcap_error_xml_application],
+"application/vnd.kde.kchart" => &[&T_vnd_kde_kchart_application],
+"image/x-pict" => &[&T_x_pict_image],
+"application/vnd.muvee.style" => &[&T_vnd_muvee_style_application],
+"application/vnd.motorola.flexsuite.kmr" => &[&T_vnd_motorola_flexsuite_kmr_application],
+"application/x-doom" => &[&T_x_doom_application],
+"application/x-quattro-pro;version=6" => &[&T_x_quattro_pro_version_6_application],
+"audio/evrcb" => &[&T_evrcb_audio],
+"application/x-sharedlib" => &[&T_x_sharedlib_application],
+"image/vnd.mix" => &[&T_vnd_mix_image],
+"application/vnd.sealed.net" => &[&T_vnd_sealed_net_application],
+"application/vnd.openxmlformats-officedocument.presentationml.slideshow" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
+"application/x-stata-dta;version=12" => &[&T_x_stata_dta_version_12_application],
+"application/onix-message-short+xml" => &[&T_onix_message_short_xml_application],
+"application/vnd.iptc.g2.planningitem+xml" => &[&T_vnd_iptc_g2_planningitem_xml_application],
+"application/resource-lists+xml" => &[&T_resource_lists_xml_application],
+"application/x-java-jnilib" => &[&T_x_java_jnilib_application],
+"application/vnd.is-xpr" => &[&T_vnd_is_xpr_application],
+"video/3gpp" => &[&T_3gpp_video],
+"application/xslfo+xml" => &[&T_xslfo_xml_application],
+"audio/smv0" => &[&T_smv0_audio],
+"application/dita+xml" => &[&T_dita_xml_application],
+"application/vnd.omads-file+xml" => &[&T_vnd_omads_file_xml_application],
+"text/vnd.abc" => &[&T_vnd_abc_text],
+"application/vnd.immervision-ivu" => &[&T_vnd_immervision_ivu_application],
+"chemical/x-cml" => &[&T_x_cml_chemical],
+"message/rfc822" => &[&T_rfc822_message],
+"application/simple-message-summary" => &[&T_simple_message_summary_application],
+"audio/x-adpcm" => &[&T_x_adpcm_audio],
+"application/vnd.shx" => &[&T_vnd_shx_application],
+"application/x-speex" => &[&T_speex_audio],
+"application/x-atari-floppy-disk-image" => &[&T_x_atari_floppy_disk_image_application],
+"application/sparql-results+xml" => &[&T_sparql_results_xml_application],
+"application/vnd.webturbo" => &[&T_vnd_webturbo_application],
+"application/vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
+"text/x-haskell" => &[&T_x_haskell_text],
+"application/x-lzip" => &[&T_x_lzip_application,&T_lzip_application],
+"image/vnd.globalgraphics.pgb" => &[&T_vnd_globalgraphics_pgb_image],
+"application/vnd.lotus-1-2-3;version=3" => &[&T_vnd_lotus_1_2_3_version_3_application],
+"application/vnd.yamaha.smaf-audio" => &[&T_vnd_yamaha_smaf_audio_application],
+"application/set-registration-initiation" => &[&T_set_registration_initiation_application],
+"text/x-asciidoc" => &[&T_x_asciidoc_text],
+"model/vnd.dwf;version=2" => &[&T_vnd_dwf_version_2_model],
+"application/x-troff-ms" => &[&T_troff_text],
+"audio/amr-wb+" => &[&T_amr_wb__audio],
+"application/tve-trigger" => &[&T_tve_trigger_application],
+"application/vnd.vividence.scriptfile" => &[&T_vnd_vividence_scriptfile_application],
+"image/vnd.dgn;version=7" => &[&T_vnd_dgn_version_7_image],
+"application/vnd.ms-excel.sheet.3" => &[&T_vnd_ms_excel_sheet_3_application],
+"application/x-berkeley-db;format=btree;version=4" => &[&T_x_berkeley_db_format_btree_version_4_application],
+"audio/evrcwb" => &[&T_evrcwb_audio],
+"application/vnd.ruckus.download" => &[&T_vnd_ruckus_download_application],
+"text/x-sass" => &[&T_x_sass_text],
+"application/tzif" => &[&T_tzif_application],
+"application/x-snappy-framed" => &[&T_x_snappy_framed_application],
+"application/vnd.previewsystems.box" => &[&T_vnd_previewsystems_box_application],
+"image/heic" => &[&T_heic_image],
+"application/vnd.ms-package.3dmanufacturing-3dmodel+xml" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
+"application/vnd.trid.tpt" => &[&T_vnd_trid_tpt_application],
+"application/x-sas-dmdb" => &[&T_x_sas_dmdb_application],
+"application/vnd.adobe.xdp+xml" => &[&T_vnd_adobe_xdp_xml_application],
+"application/vnd.mobius.mbk" => &[&T_vnd_mobius_mbk_application],
+"application/x-x509-key;format=der" => &[&T_x_x509_key_format_der_application],
+"image/vnd.svf" => &[&T_vnd_svf_image],
+"video/vnd.dlna.mpeg-tts" => &[&T_vnd_dlna_mpeg_tts_video],
+"application/vnd.igloader" => &[&T_vnd_igloader_application],
+"application/x-isatab" => &[&T_x_isatab_application],
+"application/vnd.oma.bcast.associated-procedure-parameter+xml" => &[&T_vnd_oma_bcast_associated_procedure_parameter_xml_application],
+"application/vnd.dir-bi.plate-dl-nosuffix" => &[&T_vnd_dir_bi_plate_dl_nosuffix_application],
 "image/x-portable-bitmap" => &[&T_x_portable_bitmap_image],
-"text/x-pascal" => &[&T_x_pascal_text],
-"video/celb" => &[&T_celb_video],
-"text/x-haxe" => &[&T_x_haxe_text],
+"application/vnd.stardivision.writer" => &[&T_vnd_stardivision_writer_application],
+"video/vnd.vivo" => &[&T_vnd_vivo_video],
+"application/x-prt" => &[&T_x_prt_application],
+"application/x-ms-installer" => &[&T_x_ms_installer_application],
+"image/x-niff" => &[&T_x_niff_image],
+"application/vnd.etsi.asic-s+zip" => &[&T_vnd_etsi_asic_s_zip_application],
+"image/vnd.fst" => &[&T_vnd_fst_image],
+"drawing/dwg" => &[&T_vnd_dwg_image],
+"application/vnd.dolby.mobile.2" => &[&T_vnd_dolby_mobile_2_application],
+"application/vnd.ms-lrm" => &[&T_vnd_ms_lrm_application],
+"audio/pcmu" => &[&T_pcmu_audio],
+"application/x-appleworks" => &[&T_x_appleworks_application],
+"application/vnd.hp-hpgl" => &[&T_vnd_hp_hpgl_application],
+"application/dita+xml;format=concept" => &[&T_dita_xml_format_concept_application],
+"image/x-raw-hasselblad" => &[&T_x_raw_hasselblad_image],
+"application/x-rpm" => &[&T_x_rpm_application],
+"application/vnd.ms-wmdrm.lic-resp" => &[&T_vnd_ms_wmdrm_lic_resp_application],
+"text/x-sql" => &[&T_x_sql_text],
+"audio/t38" => &[&T_t38_audio],
+"application/mpeg4-iod-xmt" => &[&T_mpeg4_iod_xmt_application],
+"application/vnd.3m.post-it-notes" => &[&T_vnd_3m_post_it_notes_application],
+"application/vnd.ms-excel" => &[&T_vnd_ms_excel_application],
+"application/vnd.uplanet.channel" => &[&T_vnd_uplanet_channel_application],
+"application/vnd.lotus-wordpro" => &[&T_vnd_lotus_wordpro_application],
+"application/vnd.oma.bcast.ltkm" => &[&T_vnd_oma_bcast_ltkm_application],
+"application/vnd.oma.bcast.smartcard-trigger+xml" => &[&T_vnd_oma_bcast_smartcard_trigger_xml_application],
+"application/vnd.wfa.wsc" => &[&T_vnd_wfa_wsc_application],
+"application/x-compress" => &[&T_x_compress_application],
+"application/x-dex" => &[&T_x_dex_application],
+"application/x-font-linux-psf" => &[&T_x_font_linux_psf_application],
+"audio/vnd.sealedmedia.softseal.mpeg" => &[&T_vnd_sealedmedia_softseal_mpeg_audio],
+"video/example" => &[&T_example_video],
+"image/bpg" => &[&T_bpg_image],
+"application/vnd.mobius.msl" => &[&T_vnd_mobius_msl_application],
+"application/x-font-ghostscript" => &[&T_x_font_ghostscript_application],
+"image/icns" => &[&T_icns_image],
+"application/srgs" => &[&T_srgs_application],
+"application/example" => &[&T_example_application],
+"application/vnd.fujitsu.oasys3" => &[&T_vnd_fujitsu_oasys3_application],
+"model/example" => &[&T_example_model],
+"application/x-x509-cert;format=der" => &[&T_x_x509_cert_format_der_application],
+"application/vnd.yellowriver-custom-menu" => &[&T_vnd_yellowriver_custom_menu_application],
+"application/vnd.oma.bcast.stkm" => &[&T_vnd_oma_bcast_stkm_application],
+"text/x-setext" => &[&T_x_setext_text],
+"application/kpml-request+xml" => &[&T_kpml_request_xml_application],
+"video/parityfec" => &[&T_parityfec_video],
+"application/vnd.3gpp.pic-bw-large" => &[&T_vnd_3gpp_pic_bw_large_application],
+"font/otf" => &[&T_x_font_otf_application],
+"audio/evrc0" => &[&T_evrc0_audio],
+"video/vc1" => &[&T_vc1_video],
+"application/x-mach-o-object" => &[&T_x_mach_o_object_application],
+"video/x-flc" => &[&T_x_flc_video],
+"application/pkcs7-signature" => &[&T_pkcs7_signature_application],
+"application/xcap-ns+xml" => &[&T_xcap_ns_xml_application],
+"application/xcon-conference-info-diff+xml" => &[&T_xcon_conference_info_diff_xml_application],
+"video/mp4" => &[&T_mp4_video],
+"application/rss+xml" => &[&T_rss_xml_application],
+"text/x-expect" => &[&T_x_expect_text],
+"application/vnd.powerbuilder75-s" => &[&T_vnd_powerbuilder75_s_application],
+"application/x-mach-o-preload" => &[&T_x_mach_o_preload_application],
+"application/x-dosexec" => &[&T_x_dosexec_application],
+"image/x-raw-mamiya" => &[&T_x_raw_mamiya_image],
+"video/vnd.iptvforum.1dparityfec-2005" => &[&T_vnd_iptvforum_1dparityfec_2005_video],
+"application/x-yaml" => &[&T_x_yaml_text],
+"application/sbml+xml" => &[&T_sbml_xml_application],
+"application/vnd.oma.poc.optimized-progress-report+xml" => &[&T_vnd_oma_poc_optimized_progress_report_xml_application],
+"application/vnd.multiad.creator" => &[&T_vnd_multiad_creator_application],
+"application/vnd.mobius.txf" => &[&T_vnd_mobius_txf_application],
+"application/x-msdownload" => &[&T_x_msdownload_application],
+"application/pidf-diff+xml" => &[&T_pidf_diff_xml_application],
+"application/vnd.crick.clicker.template" => &[&T_vnd_crick_clicker_template_application],
+"application/vnd.ms-visio.template.macroEnabled.12" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
+"image/x-raw-red" => &[&T_x_raw_red_image],
+"application/pls+xml" => &[&T_pls_xml_application],
+"application/x-berkeley-db;format=btree;version=3" => &[&T_x_berkeley_db_format_btree_version_3_application],
+"image/vnd.dgn;ver=8" => &[&T_vnd_dgn_version_8_image],
+"application/x-httpd-jsp" => &[&T_x_jsp_text],
+"application/vnd.sealed.doc" => &[&T_vnd_sealed_doc_application],
+"video/vnd.sealed.mpeg4" => &[&T_vnd_sealed_mpeg4_video],
+"application/x-fossil-repository" => &[&T_x_fossil_repository_application],
+"application/http" => &[&T_http_application],
+"application/x-sfdu" => &[&T_x_sfdu_application],
+"application/scvp-cv-response" => &[&T_scvp_cv_response_application],
+"image/vnd.fujixerox.edmics-rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
+"application/x-mach-o-universal" => &[&T_x_mach_o_universal_application],
+"image/jxs" => &[&T_jxs_image],
+"audio/vnd.nortel.vbk" => &[&T_vnd_nortel_vbk_audio],
+"audio/x-mpegurl" => &[&T_x_mpegurl_audio],
+"application/index" => &[&T_index_application],
+"message/http" => &[&T_http_message],
+"application/x-sas-putility" => &[&T_x_sas_putility_application],
+"application/vnd.ezpix-package" => &[&T_vnd_ezpix_package_application],
+"application/x-dtbncx+xml" => &[&T_x_dtbncx_xml_application],
+"application/vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
+"application/javascript" => &[&T_javascript_text],
+"image/ief" => &[&T_ief_image],
+"application/dwg" => &[&T_vnd_dwg_image],
+"application/scvp-vp-request" => &[&T_scvp_vp_request_application],
+"multipart/report" => &[&T_report_multipart],
+"application/activemessage" => &[&T_activemessage_application],
+"application/vnd.ctc-posml" => &[&T_vnd_ctc_posml_application],
+"application/vnd.intercon.formnet" => &[&T_vnd_intercon_formnet_application],
+"application/vnd.shana.informed.package" => &[&T_vnd_shana_informed_package_application],
+"application/vnd.frogans.ltf" => &[&T_vnd_frogans_ltf_application],
+"application/x-fat-diskimage" => &[&T_x_fat_diskimage_application],
+"audio/vnd.dolby.pl2x" => &[&T_vnd_dolby_pl2x_audio],
+"application/x-adobe-indesign-interchange" => &[&T_x_adobe_indesign_interchange_application],
+"application/vnd.preminet" => &[&T_vnd_preminet_application],
+"application/vnd.apple.mpegurl" => &[&T_vnd_apple_mpegurl_application],
+"audio/x-oggflac" => &[&T_x_oggflac_audio],
+"application/vnd.ms-visio.drawing" => &[&T_vnd_ms_visio_drawing_application],
+"application/vnd.apache.parquet" => &[&T_x_parquet_application],
+"application/vnd.noblenet-sealer" => &[&T_vnd_noblenet_sealer_application],
+"application/x-vhd" => &[&T_x_vhd_application],
+"audio/mpeg" => &[&T_mpeg_audio],
+"video/mp2t" => &[&T_mp2t_video],
+"application/x-sv4cpio" => &[&T_x_sv4cpio_application],
+"application/applixware" => &[&T_applixware_application],
+"application/x-gnucash" => &[&T_x_gnucash_application],
+"application/vnd.framemaker" => &[&T_vnd_framemaker_application],
+"application/x-mysql-misam-compressed-index" => &[&T_x_mysql_misam_compressed_index_application],
+"application/mediaservercontrol+xml" => &[&T_mediaservercontrol_xml_application],
+"application/vnd.oma.dcdc" => &[&T_vnd_oma_dcdc_application],
+"video/vnd.sealedmedia.softseal.mov" => &[&T_vnd_sealedmedia_softseal_mov_video],
+"message/global-disposition-notification" => &[&T_global_disposition_notification_message],
+"application/x-ogg" => &[&T_ogg_application,&T_vorbis_audio],
+"application/vnd.olpc-sugar" => &[&T_vnd_olpc_sugar_application],
+"application/x-cdf" => &[&T_x_cdf_application],
+"application/x-latex" => &[&T_x_latex_application],
+"application/x-sas-fdb" => &[&T_x_sas_fdb_application],
+"text/vnd.iptc.newsml" => &[&T_vnd_iptc_newsml_text],
+"application/x-unix-archive" => &[&T_x_archive_application],
+"application/mbms-protection-description+xml" => &[&T_mbms_protection_description_xml_application],
+"text/x-stsrc" => &[&T_x_stsrc_text],
+"audio/dls" => &[&T_dls_audio],
+"application/xv+xml" => &[&T_xv_xml_application],
+"video/3gpp-tt" => &[&T_3gpp_tt_video],
+"audio/vnd.vmx.cvsd" => &[&T_vnd_vmx_cvsd_audio],
+"application/vnd.data-vision.rdz" => &[&T_vnd_data_vision_rdz_application],
+"application/xenc+xml" => &[&T_xenc_xml_application],
+"audio/mpa-robust" => &[&T_mpa_robust_audio],
+"chemical/x-cmdf" => &[&T_x_cmdf_chemical],
+"image/vnd.dgn" => &[&T_vnd_dgn_image],
+"application/vnd.cups-raw" => &[&T_vnd_cups_raw_application],
+"application/x-ace-compressed" => &[&T_x_ace_compressed_application],
+"application/x-msdownload;format=pe-arm7" => &[&T_x_msdownload_format_pe_arm7_application],
+"application/x-axcrypt" => &[&T_x_axcrypt_application],
+"image/x-raw-minolta" => &[&T_x_raw_minolta_image],
+"application/vnd.oma.drm.risd+xml" => &[&T_vnd_oma_drm_risd_xml_application],
+"application/vnd.oma.bcast.drm-trigger+xml" => &[&T_vnd_oma_bcast_drm_trigger_xml_application],
+"application/x-shockwave-flash" => &[&T_x_shockwave_flash_application],
+"application/vnd.openofficeorg.extension" => &[&T_vnd_openofficeorg_extension_application],
+"application/vnd.airzip.filesecure.azs" => &[&T_vnd_airzip_filesecure_azs_application],
+"application/vnd.fujixerox.ddd" => &[&T_vnd_fujixerox_ddd_application],
+"application/vnd.mophun.application" => &[&T_vnd_mophun_application_application],
+"audio/gsm-efr" => &[&T_gsm_efr_audio],
+"application/vnd.sss-dtf" => &[&T_vnd_sss_dtf_application],
+"image/ntf" => &[&T_nitf_image],
+"application/vnd.mediastation.cdkey" => &[&T_vnd_mediastation_cdkey_application],
+"application/vnd.oma.bcast.sgboot" => &[&T_vnd_oma_bcast_sgboot_application],
+"application/x-font-libgrx" => &[&T_x_font_libgrx_application],
+"application/vnd.etsi.iptvprofile+xml" => &[&T_vnd_etsi_iptvprofile_xml_application],
+"image/vnd.fastbidsheet" => &[&T_vnd_fastbidsheet_image],
+"image/x-raw-leaf" => &[&T_x_raw_leaf_image],
+"application/x-chess-pgn" => &[&T_x_chess_pgn_application],
+"application/x-vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
+"application/vnd.zul" => &[&T_vnd_zul_application],
+"application/vnd.xmpie.xlim" => &[&T_vnd_xmpie_xlim_application],
+"application/vnd.canon-lips" => &[&T_vnd_canon_lips_application],
+"application/pkcs7-mime" => &[&T_pkcs7_mime_application],
+"audio/vnd.cns.anp1" => &[&T_vnd_cns_anp1_audio],
+"text/vnd.wap.wmlscript" => &[&T_vnd_wap_wmlscript_text],
+"text/vnd.in3d.spot" => &[&T_vnd_in3d_spot_text],
+"application/x-sas-backup" => &[&T_x_sas_backup_application],
+"audio/x-wav" => &[&T_vnd_wave_audio],
+"audio/g722" => &[&T_g722_audio],
+"application/qsig" => &[&T_qsig_application],
+"application/vnd.powerbuilder7" => &[&T_vnd_powerbuilder7_application],
+"audio/vnd.lucent.voice" => &[&T_vnd_lucent_voice_audio],
+"multipart/digest" => &[&T_digest_multipart],
+"application/wita" => &[&T_wita_application],
+"application/vnd.dvb.notif-generic+xml" => &[&T_vnd_dvb_notif_generic_xml_application],
+"application/x-x509-key" => &[&T_x_x509_key_application],
+"text/x-vcard" => &[&T_x_vcard_text],
+"application/x-font-snf" => &[&T_x_font_snf_application],
+"application/vnd.lotus-screencam" => &[&T_vnd_lotus_screencam_application],
+"application/oebps-package+xml" => &[&T_oebps_package_xml_application],
+"application/poc-settings+xml" => &[&T_poc_settings_xml_application],
+"application/vnd.motorola.flexsuite.gotap" => &[&T_vnd_motorola_flexsuite_gotap_application],
+"video/ogg" => &[&T_ogg_video],
+"image/x-jb2" => &[&T_x_jbig2_image],
+"application/vnd.bluetooth.ep.oob" => &[&T_vnd_bluetooth_ep_oob_application],
+"audio/ilbc" => &[&T_ilbc_audio],
+"application/dca-rft" => &[&T_dca_rft_application],
+"application/vnd.vcx" => &[&T_vnd_vcx_application],
 "application/x-esri-layer" => &[&T_x_esri_layer_application],
-"text/properties" => &[&T_x_java_properties_text],
-"application/vnd.spotfire.sfs" => &[&T_vnd_spotfire_sfs_application],
-"application/vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
-"application/isup" => &[&T_isup_application],
+"application/lzip" => &[&T_lzip_application],
+"image/heic-sequence" => &[&T_heic_sequence_image],
+"application/vnd.shana.informed.interchange" => &[&T_vnd_shana_informed_interchange_application],
+"application/vnd.etsi.mcid+xml" => &[&T_vnd_etsi_mcid_xml_application],
+"application/vnd.hcl-bireports" => &[&T_vnd_hcl_bireports_application],
 "application/vnd.motorola.flexsuite.ttc" => &[&T_vnd_motorola_flexsuite_ttc_application],
-"application/vnd.wv.csp+wbxml" => &[&T_vnd_wv_csp_wbxml_application],
-"application/vnd.xmpie.plan" => &[&T_vnd_xmpie_plan_application],
-"image/x-raw-kodak" => &[&T_x_raw_kodak_image],
-"application/vnd.rn-realmedia" => &[&T_vnd_rn_realmedia_application],
-"audio/g723" => &[&T_g723_audio],
-"audio/vnd.3gpp.iufp" => &[&T_vnd_3gpp_iufp_audio],
-"application/vnd.etsi.iptvdiscovery+xml" => &[&T_vnd_etsi_iptvdiscovery_xml_application],
-"application/x-idl-save-file" => &[&T_x_idl_save_file_application],
-"application/x-mach-o-dylib" => &[&T_x_mach_o_dylib_application],
-"application/vnd.kde.kformula" => &[&T_vnd_kde_kformula_application],
-"application/index.cmd" => &[&T_index_cmd_application],
-"text/x-applescript" => &[&T_x_applescript_text],
-"application/vnd.vidsoft.vidconference" => &[&T_vnd_vidsoft_vidconference_application],
-"application/x-frame" => &[&T_vnd_mif_application],
-"application/vnd.uplanet.channel-wbxml" => &[&T_vnd_uplanet_channel_wbxml_application],
-"application/x-tika-ooxml" => &[&T_x_tika_ooxml_application],
+"application/kate" => &[&T_kate_application],
+"audio/g729e" => &[&T_g729e_audio],
+"audio/l8" => &[&T_l8_audio],
+"audio/pcma" => &[&T_pcma_audio],
+"application/font-tdpfr" => &[&T_font_tdpfr_application],
+"application/dec-dx" => &[&T_dec_dx_application],
+"application/vnd.mobius.dis" => &[&T_vnd_mobius_dis_application],
+"application/vnd.noblenet-web" => &[&T_vnd_noblenet_web_application],
+"application/x-mysql-db" => &[&T_x_mysql_db_application],
+"application/x-stuffitx" => &[&T_x_stuffitx_application],
+"application/vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
+"application/vnd.sealed.xls" => &[&T_vnd_sealed_xls_application],
+"video/x-m4v" => &[&T_x_m4v_video],
+"application/x-chat" => &[&T_x_chat_application],
+"application/x-hwp" => &[&T_x_hwp_application],
+"application/vnd.3gpp2.bcmcsinfo+xml" => &[&T_vnd_3gpp2_bcmcsinfo_xml_application],
+"application/xslt+xml" => &[&T_xslt_xml_application],
+"audio/evrcb0" => &[&T_evrcb0_audio],
 "text/vnd.curl.scurl" => &[&T_vnd_curl_scurl_text],
+"video/bmpeg" => &[&T_bmpeg_video],
+"text/vnd.graphviz" => &[&T_vnd_graphviz_text],
+"application/x-xmind" => &[&T_x_xmind_application],
+"video/x-dirac" => &[&T_x_dirac_video],
+"image/x-ms-bmp" => &[&T_bmp_image],
+"audio/x-psf" => &[&T_x_psf_audio],
+"application/vnd.dynageo" => &[&T_vnd_dynageo_application],
+"model/vnd.dwf;version=6" => &[&T_vnd_dwf_version_6_model],
+"application/vnd.ms-excel.sheet.4" => &[&T_vnd_ms_excel_sheet_4_application],
+"application/zip" => &[&T_zip_application],
+"video/vnd.cctv" => &[&T_vnd_cctv_video],
+"application/vnd.uplanet.channel-wbxml" => &[&T_vnd_uplanet_channel_wbxml_application],
+"multipart/parallel" => &[&T_parallel_multipart],
+"application/x-memgraph" => &[&T_x_memgraph_application],
+"application/vnd.piaccess.application-licence" => &[&T_vnd_piaccess_application_licence_application],
+"multipart/alternative" => &[&T_alternative_multipart],
+"x-conference/x-cooltalk" => &[&T_x_cooltalk_x_conference],
+"application/x-kspread" => &[&T_vnd_kde_kspread_application],
+"application/vnd.dvb.notif-init+xml" => &[&T_vnd_dvb_notif_init_xml_application],
+"application/vnd.fujixerox.docuworks.binder" => &[&T_vnd_fujixerox_docuworks_binder_application],
+"application/vnd.emclient.accessrequest+xml" => &[&T_vnd_emclient_accessrequest_xml_application],
+"chemical/x-xyz" => &[&T_x_xyz_chemical],
+"application/vnd.oma.bcast.simple-symbol-container" => &[&T_vnd_oma_bcast_simple_symbol_container_application],
+"application/commonground" => &[&T_commonground_application],
+"application/vnd.crick.clicker.palette" => &[&T_vnd_crick_clicker_palette_application],
+"audio/l20" => &[&T_l20_audio],
+"message/global-headers" => &[&T_global_headers_message],
+"video/theora" => &[&T_theora_video],
+"image/example" => &[&T_example_image],
+"application/vnd.irepository.package+xml" => &[&T_vnd_irepository_package_xml_application],
+"video/iso.segment" => &[&T_iso_segment_video],
+"audio/l24" => &[&T_l24_audio],
+"application/vnd.apple.unknown.13" => &[&T_vnd_apple_unknown_13_application],
+"application/x-stata-dta;version=8" => &[&T_x_stata_dta_version_8_application],
 "application/json" => &[&T_json_application],
 "application/vnd.accpac.simply.imp" => &[&T_vnd_accpac_simply_imp_application],
-"application/x-yaml" => &[&T_x_yaml_text],
-"application/vnd.stardivision.calc" => &[&T_vnd_stardivision_calc_application],
-"application/x-ms-xbap" => &[&T_x_ms_xbap_application],
-"application/x-vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
-"text/example" => &[&T_example_text],
-"text/x-c++src" => &[&T_x_c__src_text],
-"image/vnd.adobe.photoshop" => &[&T_vnd_adobe_photoshop_image],
-"application/pidf+xml" => &[&T_pidf_xml_application],
-"application/vnd.dvb.notif-ia-registration-request+xml" => &[&T_vnd_dvb_notif_ia_registration_request_xml_application],
-"application/x-texinfo" => &[&T_x_texinfo_application],
-"application/vnd.swiftview-ics" => &[&T_vnd_swiftview_ics_application],
-"model/vnd.parasolid.transmit.text" => &[&T_vnd_parasolid_transmit_text_model],
-"application/vnd.dvb.ipdcdftnotifaccess" => &[&T_vnd_dvb_ipdcdftnotifaccess_application],
-"application/x-sas-program-data" => &[&T_x_sas_program_data_application],
-"audio/g726-16" => &[&T_g726_16_audio],
-"application/ulpfec" => &[&T_ulpfec_application],
-"application/x-kword" => &[&T_vnd_kde_kword_application],
-"application/vnd.ms-publisher" => &[&T_x_mspublisher_application],
-"application/simple-message-summary" => &[&T_simple_message_summary_application],
-"text/vnd.yaml" => &[&T_x_yaml_text],
-"application/x-stata-dta;version=12" => &[&T_x_stata_dta_version_12_application],
-"application/java-archive" => &[&T_java_archive_application],
-"application/x-mysql-table-definition" => &[&T_x_mysql_table_definition_application],
-"application/x-spectrum-tzx" => &[&T_x_spectrum_tzx_application],
-"image/x-raw-imacon" => &[&T_x_raw_imacon_image],
-"application/x-kspread" => &[&T_vnd_kde_kspread_application],
-"application/index" => &[&T_index_application],
-"video/vnd.objectvideo" => &[&T_vnd_objectvideo_video],
-"application/vnd.hp-pcl" => &[&T_vnd_hp_pcl_application],
-"application/hyperstudio" => &[&T_hyperstudio_application],
-"application/vnd.wap.slc" => &[&T_vnd_wap_slc_application],
-"video/x-ogg-rgb" => &[&T_x_oggrgb_video],
-"application/dif+xml" => &[&T_dif_xml_application],
-"application/vnd.motorola.flexsuite.fis" => &[&T_vnd_motorola_flexsuite_fis_application],
-"application/mosskey-request" => &[&T_mosskey_request_application],
-"application/vnd.neurolanguage.nlu" => &[&T_vnd_neurolanguage_nlu_application],
-"application/x-font-snf" => &[&T_x_font_snf_application],
-"application/x-ace-compressed" => &[&T_x_ace_compressed_application],
-"application/x-geopackage; version=1.1Or1.0" => &[&T_x_geopackage__version_1_1Or1_0_application],
-"image/vnd.dgn" => &[&T_vnd_dgn_image],
-"image/bpg" => &[&T_bpg_image],
-"application/x-troff-man" => &[&T_troff_text],
-"application/vnd.wmc" => &[&T_vnd_wmc_application],
-"audio/x-realaudio" => &[&T_x_pn_realaudio_audio],
-"audio/adpcm" => &[&T_adpcm_audio],
-"application/msword" => &[&T_msword_application],
-"text/vnd.iptc.nitf" => &[&T_vnd_iptc_nitf_text],
-"video/x-jng" => &[&T_x_jng_video],
-"application/vnd.netfpx" => &[&T_vnd_netfpx_application],
-"application/vnd.oma-scws-http-response" => &[&T_vnd_oma_scws_http_response_application],
-"application/vnd.pocketlearn" => &[&T_vnd_pocketlearn_application],
-"application/x-isatab" => &[&T_x_isatab_application],
-"audio/x-mod" => &[&T_x_mod_audio],
-"text/x-d" => &[&T_x_d_text],
-"application/x-mach-o-core" => &[&T_x_mach_o_core_application],
-"application/vnd.etsi.iptvprofile+xml" => &[&T_vnd_etsi_iptvprofile_xml_application],
-"application/vnd.dna" => &[&T_vnd_dna_application],
-"application/x-mobipocket-ebook" => &[&T_x_mobipocket_ebook_application],
-"application/vnd.syncml.dm.notification" => &[&T_vnd_syncml_dm_notification_application],
-"application/vnd.ncd.control" => &[&T_vnd_ncd_control_application],
-"application/x-bat" => &[&T_x_bat_application],
-"image/x-raw-mamiya" => &[&T_x_raw_mamiya_image],
-"application/vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
-"image/icns" => &[&T_icns_image],
-"application/pkix-cert" => &[&T_pkix_cert_application],
-"application/vnd.oma-scws-http-request" => &[&T_vnd_oma_scws_http_request_application],
-"application/vnd.mophun.application" => &[&T_vnd_mophun_application_application],
-"application/vnd.ecowin.filerequest" => &[&T_vnd_ecowin_filerequest_application],
-"application/vemmi" => &[&T_vemmi_application],
-"application/vnd.openxmlformats-officedocument.spreadsheetml.template" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
-"application/vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
-"application/x-ms-application" => &[&T_x_ms_application_application],
-"application/x-stata-dta;version=13" => &[&T_x_stata_dta_version_13_application],
-"application/x-ms-nls" => &[&T_x_ms_nls_application],
-"application/x-tika-msoffice-embedded;format=ole10_native" => &[&T_x_tika_msoffice_embedded_format_ole10_native_application],
-"text/vnd.wap.wml" => &[&T_vnd_wap_wml_text],
-"application/vnd.software602.filler.form+xml" => &[&T_vnd_software602_filler_form_xml_application],
-"application/x-vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
-"application/vnd.uoml+xml" => &[&T_vnd_uoml_xml_application],
-"text/directory" => &[&T_directory_text],
-"text/x-properties" => &[&T_x_java_properties_text],
-"application/cellml+xml" => &[&T_cellml_xml_application],
-"application/vnd.pvi.ptid1" => &[&T_vnd_pvi_ptid1_application],
-"application/watcherinfo+xml" => &[&T_watcherinfo_xml_application],
-"application/patch-ops-error+xml" => &[&T_patch_ops_error_xml_application],
-"application/x-stata-dta;version=8" => &[&T_x_stata_dta_version_8_application],
-"text/x-makefile" => &[&T_x_makefile_text],
-"application/vnd.ms-wmdrm.lic-chlg-req" => &[&T_vnd_ms_wmdrm_lic_chlg_req_application],
-"application/x-vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
-"application/x-tmx" => &[&T_x_tmx_application],
-"text/vtt" => &[&T_vtt_text],
-"image/vnd.fujixerox.edmics-rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
-"application/onix-message+xml" => &[&T_onix_message_xml_application],
-"multipart/example" => &[&T_example_multipart],
-"text/x-asciidoc" => &[&T_x_asciidoc_text],
-"application/x-tika-msoffice" => &[&T_x_tika_msoffice_application],
-"text/enriched" => &[&T_enriched_text],
-"image/x-rgb" => &[&T_x_rgb_image],
-"audio/mpegurl" => &[&T_x_mpegurl_audio],
-"application/cpl+xml" => &[&T_cpl_xml_application],
-"application/vnd.crick.clicker.palette" => &[&T_vnd_crick_clicker_palette_application],
-"application/vnd.oasis.opendocument.database" => &[&T_vnd_oasis_opendocument_base_application],
-"application/vnd.kde.kspread" => &[&T_vnd_kde_kspread_application],
-"application/vnd.eudora.data" => &[&T_vnd_eudora_data_application],
-"audio/mp4a-latm" => &[&T_mp4a_latm_audio],
-"application/x-internet-archive" => &[&T_x_internet_archive_application],
-"text/vnd.graphviz" => &[&T_vnd_graphviz_text],
-"image/x-niff" => &[&T_x_niff_image],
-"application/gpx+xml" => &[&T_gpx_xml_application],
-"application/vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
-"application/vnd.route66.link66+xml" => &[&T_vnd_route66_link66_xml_application],
-"application/x-ole-storage" => &[&T_x_ole_storage_application],
-"application/vnd.multiad.creator" => &[&T_vnd_multiad_creator_application],
-"video/vnd.motorola.videop" => &[&T_vnd_motorola_videop_video],
-"text/rss" => &[&T_rss_xml_application],
-"message/external-body" => &[&T_external_body_message],
-"application/x-sas-dmdb" => &[&T_x_sas_dmdb_application],
-"model/vnd.dwfx+xps" => &[&T_vnd_dwfx_xps_model],
-"application/vnd.oasis.opendocument.base" => &[&T_vnd_oasis_opendocument_base_application],
-"application/vnd.ecowin.fileupdate" => &[&T_vnd_ecowin_fileupdate_application],
-"video/smpte292m" => &[&T_smpte292m_video],
-"application/vnd.nokia.radio-preset" => &[&T_vnd_nokia_radio_preset_application],
-"application/vnd.vectorworks" => &[&T_vnd_vectorworks_application],
-"application/x-font-bdf" => &[&T_x_font_bdf_application],
-"video/x-theora" => &[&T_theora_video],
-"application/news-transmission" => &[&T_news_transmission_application],
-"image/x-cdr" => &[&T_coreldraw_application],
-"application/xhtml-voice+xml" => &[&T_xhtml_voice_xml_application],
-"application/x-sas-itemstor" => &[&T_x_sas_itemstor_application],
-"application/x-font-framemaker" => &[&T_x_font_framemaker_application],
-"text/x-stsrc" => &[&T_x_stsrc_text],
-"application/vnd.lotus-notes" => &[&T_vnd_lotus_notes_application],
-"application/vnd.ms-visio.drawing.macroEnabled.12" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
-"image/x-raw-sony" => &[&T_x_raw_sony_image],
-"application/vnd.wap.wbxml" => &[&T_vnd_wap_wbxml_application],
-"application/x-123" => &[&T_vnd_lotus_1_2_3_application],
-"video/vnd.sealed.mpeg4" => &[&T_vnd_sealed_mpeg4_video],
-"application/warc" => &[&T_warc_application],
-"application/vnd.yamaha.smaf-audio" => &[&T_vnd_yamaha_smaf_audio_application],
-"application/vnd.xfdl.webform" => &[&T_vnd_xfdl_webform_application],
-"application/vnd.nokia.catalogs" => &[&T_vnd_nokia_catalogs_application],
-"application/x-apple-diskimage" => &[&T_x_apple_diskimage_application],
-"application/vnd.handheld-entertainment+xml" => &[&T_vnd_handheld_entertainment_xml_application],
-"application/vnd.dir-bi.plate-dl-nosuffix" => &[&T_vnd_dir_bi_plate_dl_nosuffix_application],
-"application/vnd.uplanet.list-wbxml" => &[&T_vnd_uplanet_list_wbxml_application],
-"audio/gsm-efr" => &[&T_gsm_efr_audio],
-"application/vnd.sealedmedia.softseal.pdf" => &[&T_vnd_sealedmedia_softseal_pdf_application],
-"application/vnd.oma.bcast.simple-symbol-container" => &[&T_vnd_oma_bcast_simple_symbol_container_application],
-"application/x-debian-package" => &[&T_x_debian_package_application],
-"application/vnd.sealed.3df" => &[&T_vnd_sealed_3df_application],
-"application/x-x509-user-cert" => &[&T_x_x509_cert_application],
-"application/vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
-"audio/flac" => &[&T_x_flac_audio],
-"application/x-chrome-extension" => &[&T_x_chrome_extension_application],
-"application/x-cpio" => &[&T_x_cpio_application],
-"application/vnd.curl.pcurl" => &[&T_vnd_curl_pcurl_application],
-"application/vnd.wv.csp+xml" => &[&T_vnd_wv_csp_xml_application],
-"application/nasdata" => &[&T_nasdata_application],
-"application/vnd.uplanet.list" => &[&T_vnd_uplanet_list_application],
-"application/vnd.anser-web-funds-transfer-initiation" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
-"application/slate" => &[&T_slate_application],
-"application/vnd.oasis.opendocument.flat.text" => &[&T_vnd_oasis_opendocument_flat_text_application],
-"application/dialog-info+xml" => &[&T_dialog_info_xml_application],
-"application/vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
-"image/svg+xml" => &[&T_svg_xml_image],
-"application/vnd.lotus-1-2-3;version=3" => &[&T_vnd_lotus_1_2_3_version_3_application],
-"application/vnd.mobius.txf" => &[&T_vnd_mobius_txf_application],
-"application/vnd.muvee.style" => &[&T_vnd_muvee_style_application],
-"application/xcap-el+xml" => &[&T_xcap_el_xml_application],
-"application/vnd.poc.group-advertisement+xml" => &[&T_vnd_poc_group_advertisement_xml_application],
-"application/vnd.oma.bcast.sgdu" => &[&T_vnd_oma_bcast_sgdu_application],
-"application/vnd.ctct.ws+xml" => &[&T_vnd_ctct_ws_xml_application],
-"image/x-canon-cr2" => &[&T_x_canon_cr2_image],
-"application/pgp-signature" => &[&T_pgp_signature_application],
-"application/vnd.uplanet.cacheop-wbxml" => &[&T_vnd_uplanet_cacheop_wbxml_application],
-"text/vnd.in3d.spot" => &[&T_vnd_in3d_spot_text],
-"application/vnd.openxmlformats-officedocument.presentationml.slideshow" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
-"application/vnd.semf" => &[&T_vnd_semf_application],
-"text/x-python" => &[&T_x_python_text],
-"text/asp" => &[&T_asp_text],
-"application/vnd.sss-cod" => &[&T_vnd_sss_cod_application],
-"application/vnd.epson.esf" => &[&T_vnd_epson_esf_application],
-"image/vnd.fujixerox.edmics-mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
-"application/vnd.enliven" => &[&T_vnd_enliven_application],
-"text/red" => &[&T_red_text],
-"application/vnd.oma.dcd" => &[&T_vnd_oma_dcd_application],
-"application/ocsp-request" => &[&T_ocsp_request_application],
-"audio/evrcwb" => &[&T_evrcwb_audio],
-"image/x-gimp-gbr" => &[&T_x_gimp_gbr_image],
-"audio/x-unknown" => &[&T_x_unknown_audio],
-"image/heic-sequence" => &[&T_heic_sequence_image],
-"application/shf+xml" => &[&T_shf_xml_application],
-"video/mpeg4-generic" => &[&T_mpeg4_generic_video],
-"application/x-mach-o-kext-bundle" => &[&T_x_mach_o_kext_bundle_application],
-"application/vnd.macports.portpkg" => &[&T_vnd_macports_portpkg_application],
-"application/davmount+xml" => &[&T_davmount_xml_application],
-"application/x-x509-ca-cert" => &[&T_x_x509_cert_application],
-"x-conference/x-cooltalk" => &[&T_x_cooltalk_x_conference],
-"image/cgm" => &[&T_cgm_image],
-"text/x-haml" => &[&T_x_haml_text],
-"image/cdr" => &[&T_coreldraw_application],
-"application/vnd.groove-vcard" => &[&T_vnd_groove_vcard_application],
-"text/x-lex" => &[&T_x_lex_text],
-"application/vnd.fsc.weblaunch" => &[&T_vnd_fsc_weblaunch_application],
-"application/oda" => &[&T_oda_application],
-"video/raw" => &[&T_raw_video],
-"application/vnd.ms-word.document.macroenabled.12" => &[&T_vnd_ms_word_document_macroenabled_12_application],
-"application/vnd.ms-visio.template.macroEnabled.12" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
-"application/ibe-key-request+xml" => &[&T_ibe_key_request_xml_application],
-"application/x-brotli" => &[&T_x_brotli_application],
-"image/webp" => &[&T_webp_image],
-"application/vnd.japannet-jpnstore-wakeup" => &[&T_vnd_japannet_jpnstore_wakeup_application],
-"application/vnd.truedoc" => &[&T_vnd_truedoc_application],
-"text/x-jsp" => &[&T_x_jsp_text],
-"audio/prs.sid" => &[&T_prs_sid_audio],
-"application/x-font-vfont" => &[&T_x_font_vfont_application],
-"audio/mp4" => &[&T_mp4_audio],
-"text/x-csrc" => &[&T_x_c_text],
-"application/vnd.nokia.n-gage.data" => &[&T_vnd_nokia_n_gage_data_application],
-"message/sipfrag" => &[&T_sipfrag_message],
-"application/mpeg4-generic" => &[&T_mpeg4_generic_application],
-"application/vnd.liberty-request+xml" => &[&T_vnd_liberty_request_xml_application],
-"application/vnd.ms-excel.sheet.3" => &[&T_vnd_ms_excel_sheet_3_application],
-"application/vnd.powerbuilder6" => &[&T_vnd_powerbuilder6_application],
-"application/x-latex" => &[&T_x_latex_application],
-"application/x-sas-putility" => &[&T_x_sas_putility_application],
-"application/vnd.oma.group-usage-list+xml" => &[&T_vnd_oma_group_usage_list_xml_application],
-"application/x-matlab-data" => &[&T_x_matlab_data_application],
-"application/vnd.ms-outlook" => &[&T_vnd_ms_outlook_application],
-"application/vnd.ms-excel.sheet.2" => &[&T_vnd_ms_excel_sheet_2_application],
-"application/x-openscad" => &[&T_x_openscad_application],
-"audio/x-wav" => &[&T_vnd_wave_audio],
-"application/kpml-response+xml" => &[&T_kpml_response_xml_application],
-"application/x-netcdf" => &[&T_x_netcdf_application],
-"audio/pcma-wb" => &[&T_pcma_wb_audio],
-"application/x-sas-mddb" => &[&T_x_sas_mddb_application],
-"audio/ulpfec" => &[&T_ulpfec_audio],
-"application/vnd.xmi+xml" => &[&T_vnd_xmi_xml_application],
-"message/vnd.si.simp" => &[&T_vnd_si_simp_message],
-"application/vnd.java.hprof.text" => &[&T_vnd_java_hprof_text_application],
-"image/vnd.radiance" => &[&T_vnd_radiance_image],
-"application/vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
-"application/sereal" => &[&T_sereal_application],
-"video/vnd.sealedmedia.softseal.mov" => &[&T_vnd_sealedmedia_softseal_mov_video],
-"application/vnd.svd" => &[&T_vnd_svd_application],
-"application/yaml" => &[&T_x_yaml_text],
-"application/vnd.llamagraphics.life-balance.desktop" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
-"model/vnd.vtu" => &[&T_vnd_vtu_model],
-"video/mp2t" => &[&T_mp2t_video],
-"image/x-3ds" => &[&T_x_3ds_image],
-"application/vnd.xmpie.ppkg" => &[&T_vnd_xmpie_ppkg_application],
-"video/vnd.mpegurl" => &[&T_vnd_mpegurl_video],
-"application/x-bibtex-text-file" => &[&T_x_bibtex_text_file_application],
-"image/avif" => &[&T_avif_image],
-"text/x-web-markdown" => &[&T_x_web_markdown_text],
-"application/vnd.dvb.ipdcesgaccess" => &[&T_vnd_dvb_ipdcesgaccess_application],
-"application/vnd.mediastation.cdkey" => &[&T_vnd_mediastation_cdkey_application],
-"text/x-vcalendar" => &[&T_x_vcalendar_text],
-"video/msvideo" => &[&T_x_msvideo_video],
-"application/oebps-package+xml" => &[&T_oebps_package_xml_application],
-"text/x-clojure" => &[&T_x_clojure_text],
-"application/vnd.xmpie.dpkg" => &[&T_vnd_xmpie_dpkg_application],
-"application/x-cdf" => &[&T_x_cdf_application],
-"application/vnd.omaloc-supl-init" => &[&T_vnd_omaloc_supl_init_application],
-"application/autocad_dwg" => &[&T_vnd_dwg_image],
-"application/whoispp-response" => &[&T_whoispp_response_application],
-"application/x-x509-cert;format=der" => &[&T_x_x509_cert_format_der_application],
-"image/x-cmu-raster" => &[&T_x_cmu_raster_image],
-"application/x-java-vm" => &[&T_java_vm_application],
-"application/vnd.nokia.conml+wbxml" => &[&T_vnd_nokia_conml_wbxml_application],
-"text/x-scala" => &[&T_x_scala_text],
-"text/x-java" => &[&T_x_java_source_text],
-"application/hwp+zip" => &[&T_hwp_zip_application],
-"application/wordperfect5.1" => &[&T_wordperfect5_1_application],
-"application/index.response" => &[&T_index_response_application],
-"application/vnd.cups-raw" => &[&T_vnd_cups_raw_application],
-"application/vnd.audiograph" => &[&T_vnd_audiograph_application],
-"application/vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
-"application/vnd.uplanet.alert-wbxml" => &[&T_vnd_uplanet_alert_wbxml_application],
-"model/e57" => &[&T_e57_model],
-"multipart/digest" => &[&T_digest_multipart],
-"application/x-rar-compressed;version=4" => &[&T_x_rar_compressed_version_4_application],
-"text/prs.lines.tag" => &[&T_prs_lines_tag_text],
-"application/x-rar" => &[&T_x_rar_compressed_application],
-"application/vnd.semd" => &[&T_vnd_semd_application],
-"application/vnd.spotfire.dxp" => &[&T_vnd_spotfire_dxp_application],
-"application/vnd.xmpie.cpkg" => &[&T_vnd_xmpie_cpkg_application],
-"image/vnd.dxf;format=ascii" => &[&T_vnd_dxf_format_ascii_image],
-"application/remote-printing" => &[&T_remote_printing_application],
-"application/x-vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
-"application/whoispp-query" => &[&T_whoispp_query_application],
-"text/vnd.curl.dcurl" => &[&T_vnd_curl_dcurl_text],
-"application/vnd.igloader" => &[&T_vnd_igloader_application],
-"image/jpm" => &[&T_jpm_image],
-"video/vnd.iptvforum.1dparityfec-1010" => &[&T_vnd_iptvforum_1dparityfec_1010_video],
-"application/bat" => &[&T_x_bat_application],
-"application/vnd.multiad.creator.cif" => &[&T_vnd_multiad_creator_cif_application],
-"application/vnd.wap.sic" => &[&T_vnd_wap_sic_application],
-"application/x-compress" => &[&T_x_compress_application],
-"application/x-mysql-misam-compressed-index" => &[&T_x_mysql_misam_compressed_index_application],
-"application/soap+fastinfoset" => &[&T_soap_fastinfoset_application],
-"text/calendar" => &[&T_calendar_text],
-"application/vnd.ipunplugged.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
-"video/vnd.dvb.file" => &[&T_vnd_dvb_file_video],
-"application/vnd.aether.imp" => &[&T_vnd_aether_imp_application],
-"audio/g7221" => &[&T_g7221_audio],
-"audio/x-aac" => &[&T_x_aac_audio],
-"text/dns" => &[&T_dns_text],
-"audio/ape" => &[&T_ape_audio],
-"application/beep+xml" => &[&T_beep_xml_application],
-"application/simple-filter+xml" => &[&T_simple_filter_xml_application],
-"application/vnd.ms-visio.stencil.macroEnabled.12" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
-"audio/x-dec-adpcm" => &[&T_x_dec_adpcm_audio],
-"application/vnd.etsi.iptvueprofile+xml" => &[&T_vnd_etsi_iptvueprofile_xml_application],
-"text/ecmascript" => &[&T_ecmascript_text],
-"text/vnd.iptc.newsml" => &[&T_vnd_iptc_newsml_text],
-"application/vnd.sealed.net" => &[&T_vnd_sealed_net_application],
-"application/mpeg4-iod" => &[&T_mpeg4_iod_application],
-"audio/pcmu-wb" => &[&T_pcmu_wb_audio],
-"application/vnd.uplanet.alert" => &[&T_vnd_uplanet_alert_application],
-"video/h263-2000" => &[&T_h263_2000_video],
-"application/x-vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
-"application/vnd.sun.wadl+xml" => &[&T_vnd_sun_wadl_xml_application],
-"image/ief" => &[&T_ief_image],
-"application/vnd.apache.parquet" => &[&T_x_parquet_application],
-"text/vnd.motorola.reflex" => &[&T_vnd_motorola_reflex_text],
-"application/x-sas-transport" => &[&T_x_sas_transport_application],
-"application/onenote;format=one" => &[&T_onenote_format_one_application],
-"text/x-diff" => &[&T_x_diff_text],
-"text/vnd.net2phone.commcenter.command" => &[&T_vnd_net2phone_commcenter_command_text],
-"video/vnd.motorola.video" => &[&T_vnd_motorola_video_video],
-"text/parityfec" => &[&T_parityfec_text],
-"video/x-ms-asf" => &[&T_x_ms_asf_video],
-"application/x-arj-compressed" => &[&T_x_arj_application],
-"application/vnd.oma.bcast.sgboot" => &[&T_vnd_oma_bcast_sgboot_application],
-"audio/vnd.wave" => &[&T_vnd_wave_audio],
-"application/vnd.fujitsu.oasys2" => &[&T_vnd_fujitsu_oasys2_application],
-"application/x-abiword" => &[&T_x_abiword_application],
-"audio/vnd.lucent.voice" => &[&T_vnd_lucent_voice_audio],
-"text/vnd.latex-z" => &[&T_vnd_latex_z_text],
-"application/vnd.previewsystems.box" => &[&T_vnd_previewsystems_box_application],
-"application/x-sas-backup" => &[&T_x_sas_backup_application],
-"audio/ogg" => &[&T_ogg_audio],
-"application/vnd.ms-powerpoint" => &[&T_vnd_ms_powerpoint_application],
-"video/x-flc" => &[&T_x_flc_video],
-"application/vnd.omads-folder+xml" => &[&T_vnd_omads_folder_xml_application],
-"application/prs.cww" => &[&T_prs_cww_application],
-"audio/smv0" => &[&T_smv0_audio],
-"application/x-mach-o-dsym" => &[&T_x_mach_o_dsym_application],
-"application/sparql-query" => &[&T_sparql_query_application],
-"application/x-sas-access" => &[&T_x_sas_access_application],
-"application/vnd.tmobile-livetv" => &[&T_vnd_tmobile_livetv_application],
-"application/atom+xml" => &[&T_atom_xml_application],
-"application/x-dtbncx+xml" => &[&T_x_dtbncx_xml_application],
-"application/inf" => &[&T_inf_application],
-"image/x-raw-casio" => &[&T_x_raw_casio_image],
-"application/owl+xml" => &[&T_owl_xml_application],
-"application/x-vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
-"message/http" => &[&T_http_message],
-"application/scvp-vp-request" => &[&T_scvp_vp_request_application],
-"application/vnd.openofficeorg.autotext" => &[&T_vnd_openofficeorg_autotext_application],
-"image/vnd.ms-modi" => &[&T_vnd_ms_modi_image],
-"image/x-xpixmap" => &[&T_x_xpixmap_image],
-"application/cals-1840" => &[&T_cals_1840_application],
-"multipart/form-data" => &[&T_form_data_multipart],
-"application/vnd.iptc.g2.newsitem+xml" => &[&T_vnd_iptc_g2_newsitem_xml_application],
-"application/illustrator" => &[&T_illustrator_application],
-"image/x-pict" => &[&T_x_pict_image],
-"text/x-tex" => &[&T_x_tex_application],
-"audio/t38" => &[&T_t38_audio],
-"application/vnd.japannet-setstore-wakeup" => &[&T_vnd_japannet_setstore_wakeup_application],
-"application/vnd.wap.wmlc" => &[&T_vnd_wap_wmlc_application],
-"application/x-x509-cert;format=pem" => &[&T_x_x509_cert_format_pem_application],
-"image/jpeg" => &[&T_jpeg_image],
-"image/vnd.sealed.png" => &[&T_vnd_sealed_png_image],
-"application/ecmascript" => &[&T_ecmascript_application],
-"image/heif" => &[&T_heif_image],
-"application/vnd.ms-artgalry" => &[&T_vnd_ms_artgalry_application],
-"application/vnd.smaf" => &[&T_vnd_smaf_application],
-"image/x-jp2-container" => &[&T_x_jp2_container_image],
-"application/x-xfig" => &[&T_x_xfig_application],
-"application/vnd.fujitsu.oasysprs" => &[&T_vnd_fujitsu_oasysprs_application],
-"application/sgml-open-catalog" => &[&T_sgml_open_catalog_application],
-"application/vnd.dvb.notif-aggregate-root+xml" => &[&T_vnd_dvb_notif_aggregate_root_xml_application],
-"application/pdf" => &[&T_pdf_application],
-"image/x-raw-olympus" => &[&T_x_raw_olympus_image],
-"video/h261" => &[&T_h261_video],
-"application/x-geopackage" => &[&T_x_geopackage_application],
-"application/vnd.fdf" => &[&T_vnd_fdf_application],
-"application/vnd.openofficeorg.extension" => &[&T_vnd_openofficeorg_extension_application],
-"video/mp1s" => &[&T_mp1s_video],
-"image/x-gimp-pat" => &[&T_x_gimp_pat_image],
-"application/x-amiga-disk-format" => &[&T_x_amiga_disk_format_application],
-"audio/wave" => &[&T_vnd_wave_audio],
-"application/x-lha" => &[&T_x_lha_application],
-"text/x-go" => &[&T_x_go_text],
-"application/vnd.sealed.mht" => &[&T_vnd_sealed_mht_application],
-"audio/vnd.4sb" => &[&T_vnd_4sb_audio],
-"application/resource-lists-diff+xml" => &[&T_resource_lists_diff_xml_application],
-"application/x-fossil-repository" => &[&T_x_fossil_repository_application],
-"application/vnd.stardivision.math" => &[&T_vnd_stardivision_math_application],
-"application/x-berkeley-db;format=btree;version=3" => &[&T_x_berkeley_db_format_btree_version_3_application],
-"application/vnd.motorola.flexsuite.kmr" => &[&T_vnd_motorola_flexsuite_kmr_application],
-"application/vnd.msign" => &[&T_vnd_msign_application],
-"audio/lpc" => &[&T_lpc_audio],
-"text/vnd.dmclientscript" => &[&T_vnd_dmclientscript_text],
-"video/daala" => &[&T_daala_video],
-"application/x-elc" => &[&T_x_elc_application],
-"text/vnd.sun.j2me.app-descriptor" => &[&T_vnd_sun_j2me_app_descriptor_text],
-"application/vnd.httphone" => &[&T_vnd_httphone_application],
-"application/vnd.minisoft-hp3000-save" => &[&T_vnd_minisoft_hp3000_save_application],
-"application/reginfo+xml" => &[&T_reginfo_xml_application],
-"application/cea-2018+xml" => &[&T_cea_2018_xml_application],
-"application/vnd.cups-raster" => &[&T_vnd_cups_raster_application],
-"application/dita+xml" => &[&T_dita_xml_application],
-"application/x-chrome-package" => &[&T_x_chrome_package_application],
-"text/x-ocaml" => &[&T_x_ocaml_text],
-"application/vnd.sun.xml.writer.global" => &[&T_vnd_sun_xml_writer_global_application],
-"application/applixware" => &[&T_applixware_application],
-"application/x-object" => &[&T_x_object_application],
-"image/x-bpg" => &[&T_x_bpg_image],
-"application/rlmi+xml" => &[&T_rlmi_xml_application],
-"audio/x-caf" => &[&T_x_caf_audio],
-"audio/vnd.nokia.mobile-xmf" => &[&T_vnd_nokia_mobile_xmf_audio],
-"audio/x-pn-realaudio-plugin" => &[&T_x_pn_realaudio_plugin_audio],
-"application/vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
-"application/pgp" => &[&T_pgp_encrypted_application],
-"application/x-lharc" => &[&T_x_lharc_application],
-"text/x-lua" => &[&T_x_lua_text],
-"application/vnd.mophun.certificate" => &[&T_vnd_mophun_certificate_application],
-"application/x-vnd.datapackage+json" => &[&T_x_vnd_datapackage_json_application],
-"video/jpm" => &[&T_jpm_image],
-"application/vnd.kinar" => &[&T_vnd_kinar_application],
-"image/x-raw-logitech" => &[&T_x_raw_logitech_image],
-"application/vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
-"application/x-berkeley-db;format=btree;version=2" => &[&T_x_berkeley_db_format_btree_version_2_application],
-"audio/vnd.nuera.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
-"application/x-mach-o-preload" => &[&T_x_mach_o_preload_application],
-"application/vnd.apple.unknown.13" => &[&T_vnd_apple_unknown_13_application],
-"application/x-bzip2" => &[&T_x_bzip2_application],
-"text/x-ini" => &[&T_x_ini_text],
-"model/x.stl-ascii" => &[&T_x_stl_ascii_model],
-"font/collection" => &[&T_collection_font],
-"application/mac-binhex40" => &[&T_mac_binhex40_application],
-"application/x-ms-wmd" => &[&T_x_ms_wmd_application],
-"audio/vorbis-config" => &[&T_vorbis_config_audio],
-"application/vnd.oma.xcap-directory+xml" => &[&T_vnd_oma_xcap_directory_xml_application],
-"application/ibe-pkg-reply+xml" => &[&T_ibe_pkg_reply_xml_application],
-"application/vnd.3m.post-it-notes" => &[&T_vnd_3m_post_it_notes_application],
-"audio/amr" => &[&T_amr_audio],
-"application/vnd.debian.binary-package" => &[&T_x_debian_package_application],
-"text/rfc822-headers" => &[&T_rfc822_headers_text],
-"image/nitf" => &[&T_nitf_image],
-"message/x-emlx" => &[&T_x_emlx_message],
-"application/vnd.hp-pclxl" => &[&T_vnd_hp_pclxl_application],
-"text/x-c++hdr" => &[&T_x_c__hdr_text],
-"image/x-icns" => &[&T_icns_image],
-"application/vnd.wmf.bootstrap" => &[&T_vnd_wmf_bootstrap_application],
-"application/vnd.fujitsu.oasys3" => &[&T_vnd_fujitsu_oasys3_application],
-"application/x-msmoney" => &[&T_x_msmoney_application],
-"message/sip" => &[&T_sip_message],
-"application/x400-bp" => &[&T_x400_bp_application],
-"video/x-flv" => &[&T_x_flv_video],
-"video/vnd.sealed.mpeg1" => &[&T_vnd_sealed_mpeg1_video],
-"application/x-berkeley-db;format=hash" => &[&T_x_berkeley_db_format_hash_application],
-"audio/x-ms-wax" => &[&T_x_ms_wax_audio],
-"application/rdf+xml" => &[&T_rdf_xml_application],
-"application/x-authorware-seg" => &[&T_x_authorware_seg_application],
-"audio/x-oggpcm" => &[&T_x_oggpcm_audio],
-"application/vnd.ms-ims" => &[&T_vnd_ms_ims_application],
-"application/x-sas-data" => &[&T_x_sas_data_application],
-"text/x-rst" => &[&T_x_rst_text],
-"application/x-sas-data-index" => &[&T_x_sas_data_index_application],
-"application/vnd.accpac.simply.aso" => &[&T_vnd_accpac_simply_aso_application],
-"application/sereal;version=2" => &[&T_sereal_version_2_application],
-"video/x-daala" => &[&T_daala_video],
-"text/x-vcard" => &[&T_x_vcard_text],
-"application/x-Gnumeric-spreadsheet" => &[&T_x_gnumeric_application],
-"audio/amr-wb" => &[&T_amr_wb_audio],
-"text/x-vhdl" => &[&T_x_vhdl_text],
-"application/x-yml" => &[&T_x_yaml_text],
-"application/vnd.marlin.drm.license+xml" => &[&T_vnd_marlin_drm_license_xml_application],
-"application/x-unix-archive" => &[&T_x_archive_application],
-"application/vnd.hbci" => &[&T_vnd_hbci_application],
-"application/vnd.etsi.iptvsad-npvr+xml" => &[&T_vnd_etsi_iptvsad_npvr_xml_application],
-"application/http" => &[&T_http_application],
-"application/rsd+xml" => &[&T_rsd_xml_application],
-"application/pkix-pkipath" => &[&T_pkix_pkipath_application],
-"application/vnd.etsi.cug+xml" => &[&T_vnd_etsi_cug_xml_application],
-"application/vnd.dvb.ipdcroaming" => &[&T_vnd_dvb_ipdcroaming_application],
-"video/ogg" => &[&T_ogg_video],
-"application/x-prt" => &[&T_x_prt_application],
-"application/x-stuffit" => &[&T_x_stuffit_application],
-"application/cdr" => &[&T_coreldraw_application],
-"application/zstd" => &[&T_zstd_application],
-"drawing/x-dwf" => &[&T_vnd_dwf_model],
-"text/vnd.fly" => &[&T_vnd_fly_text],
-"application/vnd.oma.bcast.drm-trigger+xml" => &[&T_vnd_oma_bcast_drm_trigger_xml_application],
-"image/x-canon-cr3" => &[&T_x_canon_cr3_image],
-"application/scvp-vp-response" => &[&T_scvp_vp_response_application],
-"application/x-stata-dta" => &[&T_x_stata_dta_application],
-"audio/vnd.dts.hd" => &[&T_vnd_dts_hd_audio],
-"application/vnd.uplanet.listcmd" => &[&T_vnd_uplanet_listcmd_application],
-"application/x-rar-compressed" => &[&T_x_rar_compressed_application],
-"application/vnd.openxmlformats-officedocument.wordprocessingml.template" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
-"application/vnd.trid.tpt" => &[&T_vnd_trid_tpt_application],
-"application/vnd.stardivision.writer" => &[&T_vnd_stardivision_writer_application],
-"application/x-zoo" => &[&T_x_zoo_application],
-"image/vnd.fastbidsheet" => &[&T_vnd_fastbidsheet_image],
-"application/x-vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
-"audio/x-ms-wma" => &[&T_x_ms_wma_audio],
-"application/vnd.irepository.package+xml" => &[&T_vnd_irepository_package_xml_application],
-"application/vnd.ms-excel.sheet.binary.macroenabled.12" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
-"text/plain" => &[&T_plain_text],
-"application/vnd.iptc.g2.packageitem+xml" => &[&T_vnd_iptc_g2_packageitem_xml_application],
-"application/vnd.oma.bcast.provisioningtrigger" => &[&T_vnd_oma_bcast_provisioningtrigger_application],
-"video/vnd.nokia.interleaved-multimedia" => &[&T_vnd_nokia_interleaved_multimedia_video],
-"audio/x-dec-basic" => &[&T_x_dec_basic_audio],
-"application/news-checkgroups" => &[&T_news_checkgroups_application],
-"application/rss+xml" => &[&T_rss_xml_application],
-"application/x-mach-o-bundle" => &[&T_x_mach_o_bundle_application],
-"application/vnd.informix-visionary" => &[&T_vnd_informix_visionary_application],
-"application/x-ms-installer" => &[&T_x_ms_installer_application],
-"application/x-shockwave-flash" => &[&T_x_shockwave_flash_application],
-"application/vnd.3gpp2.sms" => &[&T_vnd_3gpp2_sms_application],
-"application/vnd.sun.xml.impress.template" => &[&T_vnd_sun_xml_impress_template_application],
-"application/vnd.tcpdump.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
-"image/x-xwindowdump" => &[&T_x_xwindowdump_image],
-"audio/vnd.octel.sbc" => &[&T_vnd_octel_sbc_audio],
-"application/vnd.intu.qbo" => &[&T_vnd_intu_qbo_application],
-"application/mbms-msk+xml" => &[&T_mbms_msk_xml_application],
-"application/vnd.groove-account" => &[&T_vnd_groove_account_application],
-"text/x-vbscript" => &[&T_x_vbscript_text],
-"text/xsl" => &[&T_xslfo_xml_application,&T_xslt_xml_application],
-"application/vnd.adobe.xfdf" => &[&T_vnd_adobe_xfdf_application],
-"application/dita+xml;format=val" => &[&T_dita_xml_format_val_application],
-"application/vnd.groove-identity-message" => &[&T_vnd_groove_identity_message_application],
-"image/x-ms-bmp" => &[&T_bmp_image],
-"application/vnd.etsi.mcid+xml" => &[&T_vnd_etsi_mcid_xml_application],
-"text/ulpfec" => &[&T_ulpfec_text],
-"application/x-ms-shortcut" => &[&T_x_ms_shortcut_application],
-"application/vnd.trueapp" => &[&T_vnd_trueapp_application],
-"application/msexcel" => &[&T_vnd_ms_excel_application],
-"video/theora" => &[&T_theora_video],
-"application/vnd.fujixerox.art4" => &[&T_vnd_fujixerox_art4_application],
-"application/vnd.sun.xml.draw.template" => &[&T_vnd_sun_xml_draw_template_application],
-"application/media_control+xml" => &[&T_media_control_xml_application],
-"audio/midi" => &[&T_midi_audio],
-"audio/g722" => &[&T_g722_audio],
-"application/dns" => &[&T_dns_application],
-"application/x-ebu-stl" => &[&T_x_ebu_stl_application],
-"application/x-tcl" => &[&T_x_tcl_text],
-"application/spirits-event+xml" => &[&T_spirits_event_xml_application],
-"application/x-adobe-indesign" => &[&T_x_adobe_indesign_application],
-"text/vnd.fmi.flexstor" => &[&T_vnd_fmi_flexstor_text],
-"application/vnd.sqlite3" => &[&T_x_sqlite3_application],
-"application/dicom" => &[&T_dicom_application],
-"application/vnd.ecdis-update" => &[&T_vnd_ecdis_update_application],
-"application/vnd.lotus-freelance" => &[&T_vnd_lotus_freelance_application],
-"application/ocsp-response" => &[&T_ocsp_response_application],
-"audio/x-mpegurl" => &[&T_x_mpegurl_audio],
-"application/x-kdelnk" => &[&T_x_kdelnk_application],
-"application/x-futuresplash" => &[&T_x_futuresplash_application],
-"application/vnd.sema" => &[&T_vnd_sema_application],
-"audio/vnd.cns.inf1" => &[&T_vnd_cns_inf1_audio],
-"model/vnd.moml+xml" => &[&T_vnd_moml_xml_model],
-"audio/amr-wb+" => &[&T_amr_wb__audio],
-"video/rtx" => &[&T_rtx_video],
-"application/x-berkeley-db;format=log" => &[&T_x_berkeley_db_format_log_application],
-"audio/eac3" => &[&T_eac3_audio],
-"audio/l20" => &[&T_l20_audio],
-"audio/vnd.nortel.vbk" => &[&T_vnd_nortel_vbk_audio],
-"application/vnd.ms-excel.addin.macroenabled.12" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
-"application/x-berkeley-db;format=btree;version=4" => &[&T_x_berkeley_db_format_btree_version_4_application],
-"application/vnd.ffsns" => &[&T_vnd_ffsns_application],
-"application/vnd.lotus-1-2-3;version=2" => &[&T_vnd_lotus_1_2_3_version_2_application],
-"application/vnd.apple.installer+xml" => &[&T_vnd_apple_installer_xml_application],
-"image/fits" => &[&T_fits_image],
-"image/x-os2-graphics; charset=binary" => &[&T_x_os2_graphics__charset_binary_image],
-"application/xcap-ns+xml" => &[&T_xcap_ns_xml_application],
-"application/vnd.picsel" => &[&T_vnd_picsel_application],
-"audio/vnd.celp" => &[&T_vnd_celp_audio],
-"text/x-awk" => &[&T_x_awk_text],
-"application/x-ms-compress-szdd" => &[&T_x_ms_compress_szdd_application],
-"application/x-rpm" => &[&T_x_rpm_application],
-"multipart/parallel" => &[&T_parallel_multipart],
-"image/x-cmx" => &[&T_x_cmx_image],
-"application/vnd.canon-lips" => &[&T_vnd_canon_lips_application],
-"application/x-msdownload;format=pe-itanium" => &[&T_x_msdownload_format_pe_itanium_application],
-"text/rtx" => &[&T_rtx_text],
-"application/x-msdownload;format=pe64" => &[&T_x_msdownload_format_pe64_application],
-"application/coreldraw" => &[&T_coreldraw_application],
-"application/x-adobe-indesign-interchange" => &[&T_x_adobe_indesign_interchange_application],
-"application/vnd.etsi.sci+xml" => &[&T_vnd_etsi_sci_xml_application],
-"image/jxl" => &[&T_jxl_image],
-"application/x-lzip" => &[&T_x_lzip_application,&T_lzip_application],
-"application/samlassertion+xml" => &[&T_samlassertion_xml_application],
-"video/x-ogg-yuv" => &[&T_x_oggyuv_video],
-"application/vnd.ms-excel.workspace.4" => &[&T_vnd_ms_excel_workspace_4_application],
-"image/example" => &[&T_example_image],
-"application/vnd.wordperfect;version=4.2" => &[&T_vnd_wordperfect_version_4_2_application],
-"application/vnd.oma.bcast.sprov+xml" => &[&T_vnd_oma_bcast_sprov_xml_application],
-"application/ccxml+xml" => &[&T_ccxml_xml_application],
-"application/vnd.clonk.c4group" => &[&T_vnd_clonk_c4group_application],
-"application/mpeg4-iod-xmt" => &[&T_mpeg4_iod_xmt_application],
-"video/3gpp" => &[&T_3gpp_video],
-"application/vnd.hhe.lesson-player" => &[&T_vnd_hhe_lesson_player_application],
-"application/x-axcrypt" => &[&T_x_axcrypt_application],
-"video/parityfec" => &[&T_parityfec_video],
-"application/vnd.ms-powerpoint.slideshow.macroenabled.12" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
-"audio/evrcwb0" => &[&T_evrcwb0_audio],
-"audio/rtp-midi" => &[&T_rtp_midi_audio],
-"application/vnd.ms-wpl" => &[&T_vnd_ms_wpl_application],
-"application/oxps" => &[&T_vnd_ms_xpsdocument_application],
-"video/vnd.ms-playready.media.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
-"application/pkix-crl" => &[&T_pkix_crl_application],
-"application/vnd.wrq-hp3000-labelled" => &[&T_vnd_wrq_hp3000_labelled_application],
-"application/x-rar-compressed;version=5" => &[&T_x_rar_compressed_version_5_application],
-"application/vnd.oma.poc.detailed-progress-report+xml" => &[&T_vnd_oma_poc_detailed_progress_report_xml_application],
-"application/x-quattro-pro;version=1+5" => &[&T_x_quattro_pro_version_1_5_application],
-"application/gzip-compressed" => &[&T_gzip_application],
-"application/vnd.nokia.landmark+xml" => &[&T_vnd_nokia_landmark_xml_application],
-"application/x-texnicard" => &[&T_x_texnicard_application],
-"video/x-mng" => &[&T_x_mng_video],
-"application/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
-"application/vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
-"font/ttf" => &[&T_x_font_ttf_application],
-"application/vnd.epson.msf" => &[&T_vnd_epson_msf_application],
-"application/x-dbm" => &[&T_x_berkeley_db_application],
-"model/vnd.gs.gdl" => &[&T_vnd_gs_gdl_model],
-"image/g3fax" => &[&T_g3fax_image],
-"text/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_text],
-"application/vnd.etsi.iptvcommand+xml" => &[&T_vnd_etsi_iptvcommand_xml_application],
-"application/x-itunes-ipa" => &[&T_x_itunes_ipa_application],
-"application/vnd.dvb.notif-ia-registration-response+xml" => &[&T_vnd_dvb_notif_ia_registration_response_xml_application],
 "text/x-less" => &[&T_x_less_text],
-"image/x-portable-arbitrarymap" => &[&T_x_portable_arbitrarymap_image],
-"application/vnd.fut-misnet" => &[&T_vnd_fut_misnet_application],
-"video/vnd.iptvforum.1dparityfec-2005" => &[&T_vnd_iptvforum_1dparityfec_2005_video],
-"application/pkixcmp" => &[&T_pkixcmp_application],
-"application/vnd.mobius.dis" => &[&T_vnd_mobius_dis_application],
-"application/x-msdownload;format=pe-armLE" => &[&T_x_msdownload_format_pe_armLE_application],
-"text/tab-separated-values" => &[&T_tab_separated_values_text],
-"image/heic" => &[&T_heic_image],
-"audio/l16" => &[&T_l16_audio],
-"multipart/alternative" => &[&T_alternative_multipart],
-"application/sldworks" => &[&T_sldworks_application],
-"audio/vnd.nuera.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
-"video/3g2" => &[&T_3gpp2_video],
-"application/manifest+json" => &[&T_manifest_json_application],
-"application/mbms-register-response+xml" => &[&T_mbms_register_response_xml_application],
-"audio/t140c" => &[&T_t140c_audio],
-"multipart/byteranges" => &[&T_byteranges_multipart],
-"application/x-vnd.datapackage+zip" => &[&T_x_vnd_datapackage_zip_application],
-"application/vnd.f-secure.mobile" => &[&T_vnd_f_secure_mobile_application],
-"audio/vnd.dolby.heaac.2" => &[&T_vnd_dolby_heaac_2_audio],
-"application/dita+xml;format=map" => &[&T_dita_xml_format_map_application],
-"application/font-woff" => &[&T_woff_font],
-"application/vnd.shana.informed.formdata" => &[&T_vnd_shana_informed_formdata_application],
-"video/x-ms-wvx" => &[&T_x_ms_wvx_video],
-"application/x-xmind" => &[&T_x_xmind_application],
-"application/octet-stream" => &[&T_octet_stream_application],
-"application/soap+xml" => &[&T_soap_xml_application],
-"application/x-bcpio" => &[&T_x_bcpio_application],
-"application/vnd.sun.xml.math" => &[&T_vnd_sun_xml_math_application],
-"text/x-basic" => &[&T_x_basic_text],
-"application/xspf+xml" => &[&T_xspf_xml_application],
-"application/vnd.motorola.iprm" => &[&T_vnd_motorola_iprm_application],
-"application/vnd.cups-postscript" => &[&T_vnd_cups_postscript_application],
-"application/vnd.epson.ssf" => &[&T_vnd_epson_ssf_application],
-"application/vnd.geometry-explorer" => &[&T_vnd_geometry_explorer_application],
-"application/x-java-pack200" => &[&T_x_java_pack200_application],
-"application/vnd.dxr" => &[&T_vnd_dxr_application],
-"application/x-msdownload;format=pe-arm7" => &[&T_x_msdownload_format_pe_arm7_application],
-"application/poc-settings+xml" => &[&T_poc_settings_xml_application],
-"audio/3gpp" => &[&T_3gpp_video],
-"audio/vnd.vmx.cvsd" => &[&T_vnd_vmx_cvsd_audio],
-"application/dita+xml;format=concept" => &[&T_dita_xml_format_concept_application],
-"image/vnd.svf" => &[&T_vnd_svf_image],
-"application/x-setupscript" => &[&T_inf_application],
-"application/edi-consent" => &[&T_edi_consent_application],
-"application/vnd.dreamfactory" => &[&T_vnd_dreamfactory_application],
-"application/x-nesrom" => &[&T_x_nesrom_application],
-"application/pidf-diff+xml" => &[&T_pidf_diff_xml_application],
-"application/x-javascript" => &[&T_javascript_text],
+"image/x-raw-rawzor" => &[&T_x_raw_rawzor_image],
+"application/vnd.xmpie.cpkg" => &[&T_vnd_xmpie_cpkg_application],
+"application/acad" => &[&T_vnd_dwg_image],
+"application/vnd.wv.csp+wbxml" => &[&T_vnd_wv_csp_wbxml_application],
+"application/vnd.claymore" => &[&T_vnd_claymore_application],
+"application/news-transmission" => &[&T_news_transmission_application],
+"video/nv" => &[&T_nv_video],
+"application/vnd.hhe.lesson-player" => &[&T_vnd_hhe_lesson_player_application],
 "application/vnd.lotus-1-2-3;version=97+9.x" => &[&T_vnd_lotus_1_2_3_version_97_9_x_application],
-"application/vnd.sss-dtf" => &[&T_vnd_sss_dtf_application],
-"video/x-fli" => &[&T_x_fli_video],
-"application/gzip" => &[&T_gzip_application],
-"audio/clearmode" => &[&T_clearmode_audio],
-"image/vnd.djvu" => &[&T_vnd_djvu_image],
-"application/x-mach-o-dylib-stub" => &[&T_x_mach_o_dylib_stub_application],
-"audio/evrcb0" => &[&T_evrcb0_audio],
-"application/x-elf" => &[&T_x_elf_application],
-"image/x-targa" => &[&T_x_tga_image],
-"application/vnd.google-earth.kml+xml" => &[&T_vnd_google_earth_kml_xml_application],
-"application/x-fat-diskimage" => &[&T_x_fat_diskimage_application],
-"application/andrew-inset" => &[&T_andrew_inset_application],
-"audio/vdvi" => &[&T_vdvi_audio],
-"application/im-iscomposing+xml" => &[&T_im_iscomposing_xml_application],
+"chemical/x-cdx" => &[&T_x_cdx_chemical],
+"application/x-jeol-jdf" => &[&T_x_jeol_jdf_application],
+"text/x-vcalendar" => &[&T_x_vcalendar_text],
+"image/x-raw-adobe" => &[&T_x_raw_adobe_image],
+"application/vnd.visio" => &[&T_vnd_visio_application],
+"text/x-cobol" => &[&T_x_cobol_text],
+"application/x-bzip" => &[&T_x_bzip_application],
+"video/vnd.iptvforum.1dparityfec-1010" => &[&T_vnd_iptvforum_1dparityfec_1010_video],
+"application/vnd.cups-raster" => &[&T_vnd_cups_raster_application],
+"text/uri-list" => &[&T_uri_list_text],
+"application/vnd.micrografx.igx" => &[&T_vnd_micrografx_igx_application],
+"application/vnd.digilite.prolights" => &[&T_vnd_digilite_prolights_application],
+"application/sdp" => &[&T_sdp_application],
+"application/vnd.3gpp.pic-bw-var" => &[&T_vnd_3gpp_pic_bw_var_application],
+"application/vnd.nokia.pcd+xml" => &[&T_vnd_nokia_pcd_xml_application],
+"application/x-windows-installer" => &[&T_x_ms_installer_application],
+"application/x-adobe-indesign" => &[&T_x_adobe_indesign_application],
+"application/x-msclip" => &[&T_x_msclip_application],
+"application/vnd.pg.osasli" => &[&T_vnd_pg_osasli_application],
+"application/vnd.neurolanguage.nlu" => &[&T_vnd_neurolanguage_nlu_application],
+"application/vnd.wap.sic" => &[&T_vnd_wap_sic_application],
+"application/x-nesrom" => &[&T_x_nesrom_application],
+"application/x-pdf" => &[&T_pdf_application],
+"application/nasdata" => &[&T_nasdata_application],
+"application/x-subrip" => &[&T_x_subrip_application],
+"application/vnd.epson.salt" => &[&T_vnd_epson_salt_application],
+"image/vnd.dxf;format=ascii" => &[&T_vnd_dxf_format_ascii_image],
+"application/vnd.liberty-request+xml" => &[&T_vnd_liberty_request_xml_application],
+"application/x-foxmail" => &[&T_x_foxmail_application],
+"application/ipp" => &[&T_ipp_application],
+"application/index.vnd" => &[&T_index_vnd_application],
+"application/octet-stream" => &[&T_octet_stream_application],
+"application/vnd.stardivision.impress" => &[&T_vnd_stardivision_impress_application],
+"audio/vnd.nuera.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
+"image/x-icon" => &[&T_vnd_microsoft_icon_image],
+"application/x-font-otf" => &[&T_x_font_otf_application],
+"application/x-berkeley-db" => &[&T_x_berkeley_db_application],
+"application/vnd.epson.msf" => &[&T_vnd_epson_msf_application],
+"application/vnd.adobe.xfdf" => &[&T_vnd_adobe_xfdf_application],
+"application/vnd.tao.intent-module-archive" => &[&T_vnd_tao_intent_module_archive_application],
+"application/x-mach-o-core" => &[&T_x_mach_o_core_application],
+"application/x-quattro-pro" => &[&T_x_quattro_pro_application],
+"application/vnd.marlin.drm.conftoken+xml" => &[&T_vnd_marlin_drm_conftoken_xml_application],
+"audio/evrc-qcp" => &[&T_evrc_qcp_audio],
+"video/vnd.fvt" => &[&T_vnd_fvt_video],
+"application/vnd.oma.poc.invocation-descriptor+xml" => &[&T_vnd_oma_poc_invocation_descriptor_xml_application],
+"application/x-brotli" => &[&T_x_brotli_application],
+"text/x-assembly" => &[&T_x_assembly_text],
+"audio/x-m4a" => &[&T_mp4_audio],
+"video/x-jng" => &[&T_x_jng_video],
+"image/vnd.dwg" => &[&T_vnd_dwg_image],
+"application/zstd" => &[&T_zstd_application],
+"application/simplesymbolcontainer" => &[&T_simplesymbolcontainer_application],
+"audio/evrcwb0" => &[&T_evrcwb0_audio],
+"application/vnd.oma.poc.final-report+xml" => &[&T_vnd_oma_poc_final_report_xml_application],
+"audio/ogg" => &[&T_ogg_audio],
+"text/x-texinfo" => &[&T_x_texinfo_application],
+"text/x-prolog" => &[&T_x_prolog_text],
+"application/x-fossil-checkout" => &[&T_x_fossil_checkout_application],
+"application/marc" => &[&T_marc_application],
+"audio/vnd.dolby.mps" => &[&T_vnd_dolby_mps_audio],
+"model/vnd.vtu" => &[&T_vnd_vtu_model],
+"application/owl+xml" => &[&T_owl_xml_application],
+"image/x-raw-olympus" => &[&T_x_raw_olympus_image],
+"video/vnd.sealed.mpeg1" => &[&T_vnd_sealed_mpeg1_video],
+"video/msvideo" => &[&T_x_msvideo_video],
 "application/vnd.jcp.javame.midlet-rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
-"image/vnd.dgn;version=8" => &[&T_vnd_dgn_version_8_image],
-"video/vc1" => &[&T_vc1_video],
+"application/rls-services+xml" => &[&T_rls_services_xml_application],
+"application/vnd.etsi.asic-e+zip" => &[&T_vnd_etsi_asic_e_zip_application],
+"application/x-monotone-source-repo" => &[&T_x_monotone_source_repo_application],
+"audio/x-ms-wma" => &[&T_x_ms_wma_audio],
+"chemical/x-pdb" => &[&T_x_pdb_chemical],
+"text/x-java" => &[&T_x_java_source_text],
+"application/x-mach-o-fvmlib" => &[&T_x_mach_o_fvmlib_application],
+"application/macwriteii" => &[&T_macwriteii_application],
+"audio/vnd.nuera.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
+"application/inf" => &[&T_inf_application],
+"application/xcap-error+xml" => &[&T_xcap_error_xml_application],
+"application/vnd.3gpp.sms" => &[&T_vnd_3gpp_sms_application],
+"application/edi-x12" => &[&T_edi_x12_application],
+"audio/dsr-es202212" => &[&T_dsr_es202212_audio],
+"application/vnd.geometry-explorer" => &[&T_vnd_geometry_explorer_application],
+"application/x-cpio" => &[&T_x_cpio_application],
+"application/vnd.uplanet.list" => &[&T_vnd_uplanet_list_application],
+"application/x-msterminal" => &[&T_x_msterminal_application],
+"application/vnd.wolfram.wl" => &[&T_vnd_wolfram_wl_application],
+"audio/dat12" => &[&T_dat12_audio],
+"audio/t140c" => &[&T_t140c_audio],
+"audio/vnd.octel.sbc" => &[&T_vnd_octel_sbc_audio],
+"message/tracking-status" => &[&T_tracking_status_message],
+"application/photoshop" => &[&T_vnd_adobe_photoshop_image],
+"application/vnd.anser-web-funds-transfer-initiation" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
+"application/vnd.japannet-setstore-wakeup" => &[&T_vnd_japannet_setstore_wakeup_application],
+"audio/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_audio],
+"application/vnd.ctct.ws+xml" => &[&T_vnd_ctct_ws_xml_application],
+"application/srgs+xml" => &[&T_srgs_xml_application],
+"image/x-portable-anymap" => &[&T_x_portable_anymap_image],
+"audio/mpa" => &[&T_mpa_audio],
+"application/x-authorware-seg" => &[&T_x_authorware_seg_application],
+"application/vnd.ms-word.document.macroenabled.12" => &[&T_vnd_ms_word_document_macroenabled_12_application],
+"application/vnd.wap.wmlc" => &[&T_vnd_wap_wmlc_application],
+"application/vnd.bmi" => &[&T_vnd_bmi_application],
+"application/xcap-caps+xml" => &[&T_xcap_caps_xml_application],
+"application/yaml" => &[&T_x_yaml_text],
+"application/vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"application/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_application],
+"video/x-ms-wvx" => &[&T_x_ms_wvx_video],
+"model/vnd.gdl" => &[&T_vnd_gdl_model],
+"application/vnd.wordperfect;version=4.2" => &[&T_vnd_wordperfect_version_4_2_application],
+"application/vnd.ms-publisher" => &[&T_x_mspublisher_application],
+"application/vnd.etsi.iptvdiscovery+xml" => &[&T_vnd_etsi_iptvdiscovery_xml_application],
+"application/vnd.mindjet.mindmanager" => &[&T_vnd_mindjet_mindmanager_application],
+"application/vnd.solent.sdkm+xml" => &[&T_vnd_solent_sdkm_xml_application],
+"application/vnd.fsc.weblaunch" => &[&T_vnd_fsc_weblaunch_application],
+"application/vnd.mif" => &[&T_vnd_mif_application],
+"application/vnd.etsi.iptvcommand+xml" => &[&T_vnd_etsi_iptvcommand_xml_application],
+"application/vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
+"application/x-sas-data-index" => &[&T_x_sas_data_index_application],
+"application/vnd.novadigm.edx" => &[&T_vnd_novadigm_edx_application],
+"text/x-applescript" => &[&T_x_applescript_text],
+"application/vnd.cendio.thinlinc.clientconf" => &[&T_vnd_cendio_thinlinc_clientconf_application],
+"text/x-c" => &[&T_x_c_text],
+"application/vnd.sun.xml.calc" => &[&T_vnd_sun_xml_calc_application],
+"model/vnd.parasolid.transmit.binary" => &[&T_vnd_parasolid_transmit_binary_model],
+"application/vividence.scriptfile" => &[&T_vividence_scriptfile_application],
+"application/vnd.kinar" => &[&T_vnd_kinar_application],
+"application/auth-policy+xml" => &[&T_auth_policy_xml_application],
+"video/x-ms-asf" => &[&T_x_ms_asf_video],
+"application/vemmi" => &[&T_vemmi_application],
+"application/vnd.oma.bcast.provisioningtrigger" => &[&T_vnd_oma_bcast_provisioningtrigger_application],
+"application/vnd.openxmlformats-officedocument.presentationml.template" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
+"model/gltf-binary" => &[&T_gltf_binary_model],
+"application/x-tcl" => &[&T_x_tcl_text],
+"application/x-tika-ooxml" => &[&T_x_tika_ooxml_application],
+"application/x-rar" => &[&T_x_rar_compressed_application],
+"application/mxf" => &[&T_mxf_application],
+"text/vnd.in3d.3dml" => &[&T_vnd_in3d_3dml_text],
+"application/mathml+xml" => &[&T_mathml_xml_application],
+"application/riscos" => &[&T_riscos_application],
+"application/vnd.lotus-1-2-3;version=2" => &[&T_vnd_lotus_1_2_3_version_2_application],
+"chemical/x-csml" => &[&T_x_csml_chemical],
+"application/vnd.sun.xml.writer.global" => &[&T_vnd_sun_xml_writer_global_application],
+"application/ms-tnef" => &[&T_vnd_ms_tnef_application],
+"audio/evrcb1" => &[&T_evrcb1_audio],
+"application/x-deflate" => &[&T_zlib_application],
+"application/vnd.commonspace" => &[&T_vnd_commonspace_application],
+"video/vnd.mpegurl" => &[&T_vnd_mpegurl_video],
+"application/msword2" => &[&T_msword2_application],
+"text/javascript" => &[&T_javascript_text],
+"application/x-kchart" => &[&T_vnd_kde_kchart_application],
+"application/vnd.wv.ssp+xml" => &[&T_vnd_wv_ssp_xml_application],
+"application/xop+xml" => &[&T_xop_xml_application],
+"application/x-debian-package" => &[&T_x_debian_package_application],
+"application/vnd.cab-jscript" => &[&T_vnd_cab_jscript_application],
+"application/vnd.informix-visionary" => &[&T_vnd_informix_visionary_application],
+"application/x-mach-o-kext-bundle" => &[&T_x_mach_o_kext_bundle_application],
+"audio/red" => &[&T_red_audio],
+"audio/g728" => &[&T_g728_audio],
+"application/vnd.enliven" => &[&T_vnd_enliven_application],
+"application/x-elc" => &[&T_x_elc_application],
+"application/vnd.paos.xml" => &[&T_vnd_paos_xml_application],
+"application/vnd.openxmlformats-officedocument.wordprocessingml.template" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
+"application/vnd.japannet-verification" => &[&T_vnd_japannet_verification_application],
+"application/vnd.denovo.fcselayout-link" => &[&T_vnd_denovo_fcselayout_link_application],
+"application/vnd.ms-artgalry" => &[&T_vnd_ms_artgalry_application],
+"application/dita+xml;format=topic" => &[&T_dita_xml_format_topic_application],
+"application/vnd.hp-pcl" => &[&T_vnd_hp_pcl_application],
+"application/x-x509-cert;format=pem" => &[&T_x_x509_cert_format_pem_application],
+"application/dif+xml" => &[&T_dif_xml_application],
+"video/x-mng" => &[&T_x_mng_video],
+"application/vnd.epson.ssf" => &[&T_vnd_epson_ssf_application],
+"application/vnd.xara" => &[&T_vnd_xara_application],
+"application/vnd.f-secure.mobile" => &[&T_vnd_f_secure_mobile_application],
+"audio/midi" => &[&T_midi_audio],
+"application/vnd.openxmlformats-officedocument.wordprocessingml.document" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
+"application/vnd.dvb.notif-ia-registration-response+xml" => &[&T_vnd_dvb_notif_ia_registration_response_xml_application],
+"application/vnd.dolby.mobile.1" => &[&T_vnd_dolby_mobile_1_application],
+"image/tiff" => &[&T_tiff_image],
+"application/vnd.cups-postscript" => &[&T_vnd_cups_postscript_application],
+"chemical/x-cif" => &[&T_x_cif_chemical],
+"text/x-haml" => &[&T_x_haml_text],
+"application/dita+xml;format=val" => &[&T_dita_xml_format_val_application],
+"text/iso19139+xml" => &[&T_iso19139_xml_text],
+"audio/ape" => &[&T_ape_audio],
+"audio/vnd.qcelp" => &[&T_vnd_qcelp_audio],
+"image/x-raw-sigma" => &[&T_x_raw_sigma_image],
+"application/vnd.font-fontforge-sfd" => &[&T_vnd_font_fontforge_sfd_application],
+"application/x-mysql-misam-data" => &[&T_x_mysql_misam_data_application],
+"image/vnd.dxf;format=binary" => &[&T_vnd_dxf_format_binary_image],
+"application/pkix-pkipath" => &[&T_pkix_pkipath_application],
+"application/vnd.google-earth.kmz" => &[&T_vnd_google_earth_kmz_application],
+"application/x-amf" => &[&T_x_amf_application],
+"application/vnd.epson.quickanime" => &[&T_vnd_epson_quickanime_application],
+"image/jpm" => &[&T_jpm_image],
+"application/x-spectrum-tzx" => &[&T_x_spectrum_tzx_application],
+"application/x-vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
+"multipart/form-data" => &[&T_form_data_multipart],
+"application/ttml+xml" => &[&T_ttml_xml_application],
+"image/jxl" => &[&T_jxl_image],
+"audio/vnd.rhetorex.32kadpcm" => &[&T_vnd_rhetorex_32kadpcm_audio],
+"application/vnd.oma.bcast.sgdu" => &[&T_vnd_oma_bcast_sgdu_application],
+"application/vnd.ecdis-update" => &[&T_vnd_ecdis_update_application],
+"application/vnd.ms-excel.workspace.4" => &[&T_vnd_ms_excel_workspace_4_application],
+"application/soap+xml" => &[&T_soap_xml_application],
+"application/vnd.oasis.opendocument.flat.text" => &[&T_vnd_oasis_opendocument_flat_text_application],
+"model/vnd.dwfx+xps" => &[&T_vnd_dwfx_xps_model],
+"video/x-ogguvs" => &[&T_x_ogguvs_video],
+"application/x-silverlight-app" => &[&T_x_silverlight_app_application],
+"application/vnd.avistar+xml" => &[&T_vnd_avistar_xml_application],
+"video/h264" => &[&T_h264_video],
+"audio/evrcwb1" => &[&T_evrcwb1_audio],
+"application/vnd.fluxtime.clip" => &[&T_vnd_fluxtime_clip_application],
+"application/x-ole-storage" => &[&T_x_ole_storage_application],
+"application/x-xfig" => &[&T_x_xfig_application],
+"application/pgp-signature" => &[&T_pgp_signature_application],
+"application/vnd.ibm.modcap" => &[&T_vnd_ibm_modcap_application],
+"application/vnd.curl.car" => &[&T_vnd_curl_car_application],
+"application/vnd.americandynamics.acc" => &[&T_vnd_americandynamics_acc_application],
+"text/sgml" => &[&T_sgml_text],
+"application/x-7z-compressed" => &[&T_x_7z_compressed_application],
+"application/vnd.wordperfect;version=5.0" => &[&T_vnd_wordperfect_version_5_0_application],
+"application/vnd.macports.portpkg" => &[&T_vnd_macports_portpkg_application],
+"video/vnd.iptvforum.ttsavc" => &[&T_vnd_iptvforum_ttsavc_video],
+"application/vnd.hp-pclxl" => &[&T_vnd_hp_pclxl_application],
+"text/x-tex" => &[&T_x_tex_application],
+"application/conference-info+xml" => &[&T_conference_info_xml_application],
+"application/vnd.software602.filler.form+xml" => &[&T_vnd_software602_filler_form_xml_application],
+"application/xspf+xml" => &[&T_xspf_xml_application],
+"application/x-font-pcf" => &[&T_x_font_pcf_application],
+"application/vnd.android.package-archive" => &[&T_vnd_android_package_archive_application],
+"application/pkcs10" => &[&T_pkcs10_application],
+"application/vnd.kde.karbon" => &[&T_vnd_kde_karbon_application],
+"application/vnd.uplanet.bearer-choice-wbxml" => &[&T_vnd_uplanet_bearer_choice_wbxml_application],
+"application/x-lz4" => &[&T_x_lz4_application],
+"application/x-berkeley-db;format=queue" => &[&T_x_berkeley_db_format_queue_application],
+"text/rss" => &[&T_rss_xml_application],
+"application/x-mysql-misam-index" => &[&T_x_mysql_misam_index_application],
+"application/mbms-envelope+xml" => &[&T_mbms_envelope_xml_application],
+"application/vnd.lotus-approach" => &[&T_vnd_lotus_approach_application],
+"image/vnd.adobe.premiere" => &[&T_vnd_adobe_premiere_image],
+"video/daala" => &[&T_daala_video],
+"application/x-internet-archive" => &[&T_x_internet_archive_application],
+"application/mbms-register-response+xml" => &[&T_mbms_register_response_xml_application],
+"image/webp" => &[&T_webp_image],
+"text/x-uuencode" => &[&T_x_uuencode_text],
+"image/x-portable-graymap" => &[&T_x_portable_graymap_image],
+"application/vnd.ms-excel.sheet.2" => &[&T_vnd_ms_excel_sheet_2_application],
+"application/x-bat" => &[&T_x_bat_application],
+"image/fits" => &[&T_fits_image],
+"application/vnd.hp-jlyt" => &[&T_vnd_hp_jlyt_application],
+"application/x-spss-sav" => &[&T_x_spss_sav_application],
+"application/vnd.rapid" => &[&T_vnd_rapid_application],
+"image/heif" => &[&T_heif_image],
+"application/media_control+xml" => &[&T_media_control_xml_application],
+"text/example" => &[&T_example_text],
+"application/vnd.fujixerox.art-ex" => &[&T_vnd_fujixerox_art_ex_application],
+"application/vnd.wmf.bootstrap" => &[&T_vnd_wmf_bootstrap_application],
+"text/x-ini" => &[&T_x_ini_text],
+"application/vnd.intertrust.digibox" => &[&T_vnd_intertrust_digibox_application],
+"application/mp4" => &[&T_mp4_application],
+"application/x-xliff+zip" => &[&T_x_xliff_zip_application],
+"model/vnd.collada+xml" => &[&T_vnd_collada_xml_model],
+"video/x-ms-wm" => &[&T_x_ms_wm_video],
+"application/vnd.kde.kword" => &[&T_vnd_kde_kword_application],
+"application/vnd.openxmlformats-officedocument.presentationml.presentation" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
+"application/vnd.groove-injector" => &[&T_vnd_groove_injector_application],
+"application/fastsoap" => &[&T_fastsoap_application],
+"video/x-matroska" => &[&T_x_matroska_video],
+"audio/vnd.3gpp.iufp" => &[&T_vnd_3gpp_iufp_audio],
+"application/oxps" => &[&T_vnd_ms_xpsdocument_application],
+"text/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
+"image/x-raw-kodak" => &[&T_x_raw_kodak_image],
+"model/e57" => &[&T_e57_model],
+"application/prs.nprend" => &[&T_prs_nprend_application],
+"application/x-dbf" => &[&T_x_dbf_application],
+"application/x-bibtex-text-file" => &[&T_x_bibtex_text_file_application],
+"application/x-tika-msoffice-embedded" => &[&T_x_tika_msoffice_embedded_application],
+"application/vnd.ms-word2006ml" => &[&T_vnd_ms_word2006ml_application],
+"application/x-font-adobe-metric" => &[&T_x_font_adobe_metric_application],
+"message/global-delivery-status" => &[&T_global_delivery_status_message],
+"audio/vnd.everad.plj" => &[&T_vnd_everad_plj_audio],
+"audio/vnd.dolby.pl2z" => &[&T_vnd_dolby_pl2z_audio],
+"application/vnd.unity" => &[&T_vnd_unity_application],
+"image/x-canon-cr3" => &[&T_x_canon_cr3_image],
+"application/x-mach-o-bundle" => &[&T_x_mach_o_bundle_application],
+"text/parityfec" => &[&T_parityfec_text],
+"application/vnd.sun.wadl+xml" => &[&T_vnd_sun_wadl_xml_application],
+"video/mpeg4-generic" => &[&T_mpeg4_generic_video],
+"application/x-tika-java-web-archive" => &[&T_x_tika_java_web_archive_application],
+"application/vnd.llamagraphics.life-balance.exchange+xml" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
+"application/x-gunzip" => &[&T_gzip_application],
+"application/vnd.dpgraph" => &[&T_vnd_dpgraph_application],
+"application/vnd.wt.stf" => &[&T_vnd_wt_stf_application],
+"video/jpeg2000" => &[&T_jpeg2000_video],
+"application/vnd.wap.wbxml" => &[&T_vnd_wap_wbxml_application],
+"image/tiff-fx" => &[&T_tiff_fx_image],
+"model/x.stl-binary" => &[&T_x_stl_binary_model],
+"application/x-vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"application/autocad_dwg" => &[&T_vnd_dwg_image],
+"application/vnd.ms-pki.stl" => &[&T_vnd_ms_pki_stl_application],
+"image/x-gimp-gbr" => &[&T_x_gimp_gbr_image],
+"application/index.response" => &[&T_index_response_application],
+"application/x-jigdo" => &[&T_x_jigdo_application],
+"message/vnd.si.simp" => &[&T_vnd_si_simp_message],
+"application/wspolicy+xml" => &[&T_wspolicy_xml_application],
+"application/x-gnumeric" => &[&T_x_gnumeric_application],
+"model/vnd.parasolid.transmit.text" => &[&T_vnd_parasolid_transmit_text_model],
+"image/x-jp2-codestream" => &[&T_x_jp2_codestream_image],
+"video/h263-1998" => &[&T_h263_1998_video],
+"text/x-objcsrc" => &[&T_x_objcsrc_text],
+"text/x-forth" => &[&T_x_forth_text],
+"audio/mpegurl" => &[&T_x_mpegurl_audio],
+"application/vnd.pwg-xhtml-print+xml" => &[&T_vnd_pwg_xhtml_print_xml_application],
+"application/vnd.amazon.ebook" => &[&T_vnd_amazon_ebook_application],
+"image/x-freehand" => &[&T_x_freehand_image],
+"font/collection" => &[&T_collection_font],
+"video/3gp" => &[&T_3gpp_video],
+"text/css" => &[&T_css_text],
+"text/ecmascript" => &[&T_ecmascript_text],
+"application/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
+"application/vnd.ms-tnef" => &[&T_vnd_ms_tnef_application],
+"application/x-director" => &[&T_x_director_application],
+"application/vnd.immervision-ivp" => &[&T_vnd_immervision_ivp_application],
+"text/vnd.net2phone.commcenter.command" => &[&T_vnd_net2phone_commcenter_command_text],
+"application/vnd.sealed.3df" => &[&T_vnd_sealed_3df_application],
+"application/msonenote" => &[&T_onenote_application],
+"application/x-ms-reader" => &[&T_x_ms_reader_application],
+"application/vnd.nokia.conml+wbxml" => &[&T_vnd_nokia_conml_wbxml_application],
+"application/vnd.uplanet.alert-wbxml" => &[&T_vnd_uplanet_alert_wbxml_application],
+"application/x-kword" => &[&T_vnd_kde_kword_application],
+"application/x-xz" => &[&T_x_xz_application],
+"application/vnd.ms-asf" => &[&T_vnd_ms_asf_application],
+"text/x-yacc" => &[&T_x_yacc_text],
+"image/x-xwindowdump" => &[&T_x_xwindowdump_image],
+"application/x-xliff+xml" => &[&T_x_xliff_xml_application],
+"image/x-xpixmap" => &[&T_x_xpixmap_image],
+"application/x-msmediaview" => &[&T_x_msmediaview_application],
+"application/vnd.kde.kontour" => &[&T_vnd_kde_kontour_application],
+"application/vnd.ms-cab-compressed" => &[&T_vnd_ms_cab_compressed_application],
+"application/vnd.stardivision.writer-global" => &[&T_vnd_stardivision_writer_global_application],
+"application/vnd.wmc" => &[&T_vnd_wmc_application],
+"application/cpl+xml" => &[&T_cpl_xml_application],
+"application/x-pkcs12" => &[&T_x_pkcs12_application],
+"audio/g723" => &[&T_g723_audio],
+"application/x-setupscript" => &[&T_inf_application],
+"video/vnd.motorola.videop" => &[&T_vnd_motorola_videop_video],
+"application/vnd.xmi+xml" => &[&T_vnd_xmi_xml_application],
+"video/x-sgi-movie" => &[&T_x_sgi_movie_video],
+"image/x-os2-graphics; charset=binary" => &[&T_x_os2_graphics__charset_binary_image],
+"video/x-theora" => &[&T_theora_video],
+"application/whoispp-query" => &[&T_whoispp_query_application],
+"audio/vnd.digital-winds" => &[&T_vnd_digital_winds_audio],
+"application/ssml+xml" => &[&T_ssml_xml_application],
+"application/x-sas-utility" => &[&T_x_sas_utility_application],
+"image/wmf" => &[&T_wmf_image],
+"application/x-bplist" => &[&T_x_bplist_application],
+"application/vnd.accpac.simply.aso" => &[&T_vnd_accpac_simply_aso_application],
+"application/vnd.ms-htmlhelp" => &[&T_vnd_ms_htmlhelp_application],
+"font/woff2" => &[&T_woff2_font],
+"application/vnd.ipunplugged.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
+"application/eshop" => &[&T_eshop_application],
+"application/vnd.apple.iwork" => &[&T_vnd_apple_iwork_application],
+"application/atomicmail" => &[&T_atomicmail_application],
+"application/vnd.marlin.drm.mdcf" => &[&T_vnd_marlin_drm_mdcf_application],
+"application/vnd.sealedmedia.softseal.html" => &[&T_vnd_sealedmedia_softseal_html_application],
+"application/timestamp-query" => &[&T_timestamp_query_application],
+"application/vnd.semf" => &[&T_vnd_semf_application],
+"model/vnd.dwf" => &[&T_vnd_dwf_model],
+"audio/amr-wb" => &[&T_amr_wb_audio],
+"text/rfc822-headers" => &[&T_rfc822_headers_text],
+"application/lost+xml" => &[&T_lost_xml_application],
+"application/x-sas-access" => &[&T_x_sas_access_application],
+"application/x-geopackage" => &[&T_x_geopackage_application],
+"application/rsd+xml" => &[&T_rsd_xml_application],
+"application/vnd.etsi.cug+xml" => &[&T_vnd_etsi_cug_xml_application],
+"application/vnd.iccprofile" => &[&T_vnd_iccprofile_application],
+"image/vnd.cns.inf2" => &[&T_vnd_cns_inf2_image],
+"application/vnd.oasis.opendocument.tika.flat.document" => &[&T_vnd_oasis_opendocument_tika_flat_document_application],
+"application/whoispp-response" => &[&T_whoispp_response_application],
+"application/vnd.yamaha.hv-voice" => &[&T_vnd_yamaha_hv_voice_application],
+"application/vnd.yamaha.hv-dic" => &[&T_vnd_yamaha_hv_dic_application],
+"application/cals-1840" => &[&T_cals_1840_application],
+"application/samlassertion+xml" => &[&T_samlassertion_xml_application],
+"application/vnd.httphone" => &[&T_vnd_httphone_application],
+"application/vnd.ibm.rights-management" => &[&T_vnd_ibm_rights_management_application],
+"application/x-xar" => &[&T_x_xar_application],
+"application/patch-ops-error+xml" => &[&T_patch_ops_error_xml_application],
+"application/vnd.omaloc-supl-init" => &[&T_vnd_omaloc_supl_init_application],
+"application/mosskey-request" => &[&T_mosskey_request_application],
+"application/vnd.ms-pki.seccat" => &[&T_vnd_ms_pki_seccat_application],
+"application/vnd.blueice.multipass" => &[&T_vnd_blueice_multipass_application],
+"application/x-x509-key;format=pem" => &[&T_x_x509_key_format_pem_application],
+"application/x-vnd.datapackage+gz" => &[&T_x_vnd_datapackage_gz_application],
+"audio/mp4" => &[&T_mp4_audio],
+"application/vnd.oma-scws-http-request" => &[&T_vnd_oma_scws_http_request_application],
+"application/coreldraw" => &[&T_coreldraw_application],
+"application/vnd.ms-excel.addin.macroenabled.12" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
+"application/vnd.iptc.g2.newsmessage+xml" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
+"application/pics-rules" => &[&T_pics_rules_application],
+"application/vnd.java.hprof " => &[&T_vnd_java_hprof__application],
+"text/rtx" => &[&T_rtx_text],
+"image/x-dcx" => &[&T_vnd_zbrush_dcx_image],
+"application/vnd.ms-outlook" => &[&T_vnd_ms_outlook_application],
+"application/vnd.sun.xml.draw" => &[&T_vnd_sun_xml_draw_application],
+"application/x-tex-virtual-font" => &[&T_x_tex_virtual_font_application],
+"application/vnd.ffsns" => &[&T_vnd_ffsns_application],
+"application/x-java-jnlp-file" => &[&T_x_java_jnlp_file_application],
+"application/vnd.rn-realmedia" => &[&T_vnd_rn_realmedia_application],
+"application/x-font-dos" => &[&T_x_font_dos_application],
+"text/x-perl" => &[&T_x_perl_text],
+"text/x-vbscript" => &[&T_x_vbscript_text],
+"application/voicexml+xml" => &[&T_voicexml_xml_application],
+"application/vnd.ms-powerpoint.template.macroenabled.12" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
+"application/vnd.sbm.cid" => &[&T_vnd_sbm_cid_application],
+"audio/g729" => &[&T_g729_audio],
+"text/x-rexx" => &[&T_x_rexx_text],
+"application/x-asprs" => &[&T_x_asprs_application],
+"text/x-haxe" => &[&T_x_haxe_text],
+"application/vnd.sss-ntf" => &[&T_vnd_sss_ntf_application],
+"text/x-vbdotnet" => &[&T_x_vbdotnet_text],
 "application/x-koan" => &[&T_vnd_koan_application],
-"application/xml" => &[&T_xml_application],
+"application/vnd.minisoft-hp3000-save" => &[&T_vnd_minisoft_hp3000_save_application],
+"application/vnd.rim.cod" => &[&T_vnd_rim_cod_application],
+"application/prs.cww" => &[&T_prs_cww_application],
+"image/x-gimp-pat" => &[&T_x_gimp_pat_image],
+"application/x-mswrite" => &[&T_x_mswrite_application],
+"application/vnd.medcalcdata" => &[&T_vnd_medcalcdata_application],
+"application/x-troff-me" => &[&T_troff_text],
+"application/csta+xml" => &[&T_csta_xml_application],
+"audio/webm" => &[&T_webm_audio],
+"application/vnd.fuzzysheet" => &[&T_vnd_fuzzysheet_application],
+"application/vnd.nokia.ncd" => &[&T_vnd_nokia_ncd_application],
+"image/vnd.zbrush.pcx" => &[&T_vnd_zbrush_pcx_image],
+"drawing/x-dwf" => &[&T_vnd_dwf_model],
+"application/vnd.crick.clicker" => &[&T_vnd_crick_clicker_application],
+"application/vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
+"application/vnd.kidspiration" => &[&T_vnd_kidspiration_application],
+"application/font-woff" => &[&T_woff_font],
+"application/vnd.wordperfect" => &[&T_vnd_wordperfect_application],
+"text/vnd.iptc.nitf" => &[&T_vnd_iptc_nitf_text],
+"application/edifact" => &[&T_edifact_application],
+"application/vnd.apple.installer+xml" => &[&T_vnd_apple_installer_xml_application],
+"text/x-c++src" => &[&T_x_c__src_text],
+"video/h263" => &[&T_h263_video],
+"application/x-troff-man" => &[&T_troff_text],
+"application/vnd.quark.quarkxpress" => &[&T_vnd_quark_quarkxpress_application],
+"application/x-stata-dta;version=10" => &[&T_x_stata_dta_version_10_application],
+"application/gzip-compressed" => &[&T_gzip_application],
+"image/jpx" => &[&T_jpx_image],
+"application/x-tika-old-excel" => &[&T_x_tika_old_excel_application],
+"application/vnd.uplanet.cacheop-wbxml" => &[&T_vnd_uplanet_cacheop_wbxml_application],
+"audio/wave" => &[&T_vnd_wave_audio],
+"application/x-sas" => &[&T_x_sas_application],
+"application/vnd.proteus.magazine" => &[&T_vnd_proteus_magazine_application],
+"model/vnd.flatland.3dml" => &[&T_vnd_flatland_3dml_model],
+"application/vnd.intu.qbo" => &[&T_vnd_intu_qbo_application],
+"application/vnd.joost.joda-archive" => &[&T_vnd_joost_joda_archive_application],
+"model/vnd.moml+xml" => &[&T_vnd_moml_xml_model],
+"application/fastinfoset" => &[&T_fastinfoset_application],
+"gzip/document" => &[&T_gzip_application],
+"text/x-lex" => &[&T_x_lex_text],
+"image/x-dwg" => &[&T_vnd_dwg_image],
+"text/calendar" => &[&T_calendar_text],
+"application/vnd.ms-excel.sheet.macroenabled.12" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
+"video/vnd.sealed.swf" => &[&T_vnd_sealed_swf_video],
+"application/java-archive" => &[&T_java_archive_application],
+"application/x-itunes-ipa" => &[&T_x_itunes_ipa_application],
+"image/vnd.xiff" => &[&T_vnd_xiff_image],
+"application/vnd.smart.teacher" => &[&T_vnd_smart_teacher_application],
+"application/vnd.llamagraphics.life-balance.desktop" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
+"application/vnd.sealed.ppt" => &[&T_vnd_sealed_ppt_application],
+"application/x-bentley-besqlite" => &[&T_x_bentley_besqlite_application],
+"video/vnd.iptvforum.2dparityfec-2005" => &[&T_vnd_iptvforum_2dparityfec_2005_video],
+"image/x-raw-nikon" => &[&T_x_raw_nikon_image],
+"application/vnd.micrografx.flo" => &[&T_vnd_micrografx_flo_application],
+"image/cdr" => &[&T_coreldraw_application],
+"text/aspdotnet" => &[&T_aspdotnet_text],
+"application/wasm" => &[&T_wasm_application],
+"audio/x-dec-adpcm" => &[&T_x_dec_adpcm_audio],
+"application/vnd.dvb.notif-ia-msglist+xml" => &[&T_vnd_dvb_notif_ia_msglist_xml_application],
+"audio/x-ogg-flac" => &[&T_x_oggflac_audio],
+"image/x-xcf" => &[&T_x_xcf_image],
+"application/vnd.syncml.dm+wbxml" => &[&T_vnd_syncml_dm_wbxml_application],
+"text/x-properties" => &[&T_x_java_properties_text],
+"application/vnd.renlearn.rlprint" => &[&T_vnd_renlearn_rlprint_application],
+"image/gif" => &[&T_gif_image],
+"application/x-stuffit" => &[&T_x_stuffit_application],
+"application/x-ms-wmd" => &[&T_x_ms_wmd_application],
+"application/vnd.oma-scws-config" => &[&T_vnd_oma_scws_config_application],
+"image/x-raw-logitech" => &[&T_x_raw_logitech_image],
+"application/vnd.hp-hps" => &[&T_vnd_hp_hps_application],
+"application/timestamp-reply" => &[&T_timestamp_reply_application],
+"application/quicktime" => &[&T_quicktime_application],
+"application/vnd.fujixerox.art4" => &[&T_vnd_fujixerox_art4_application],
+"application/x-hdf" => &[&T_x_hdf_application],
+"application/x-msschedule" => &[&T_x_msschedule_application],
+"image/x-portable-pixmap" => &[&T_x_portable_pixmap_image],
+"application/vnd.powerbuilder75" => &[&T_vnd_powerbuilder75_application],
+"application/vnd.osgi.bundle" => &[&T_vnd_osgi_bundle_application],
+"application/vnd.dvb.ipdcroaming" => &[&T_vnd_dvb_ipdcroaming_application],
+"audio/x-realaudio" => &[&T_x_pn_realaudio_audio],
+"application/x-tika-msoffice-embedded;format=ole10_native" => &[&T_x_tika_msoffice_embedded_format_ole10_native_application],
+"application/ogg" => &[&T_ogg_application],
+"application/vnd.wap.slc" => &[&T_vnd_wap_slc_application],
+"image/vnd.radiance" => &[&T_vnd_radiance_image],
+"application/x-ms-application" => &[&T_x_ms_application_application],
+"multipart/appledouble" => &[&T_appledouble_multipart],
+"application/vnd.dvb.iptv.alfec-enhancement" => &[&T_vnd_dvb_iptv_alfec_enhancement_application],
 "application/vnd.osgi.dp" => &[&T_vnd_osgi_dp_application],
-"image/png" => &[&T_png_image],
+"application/vnd.ms-outlook-pst" => &[&T_vnd_ms_outlook_pst_application],
+"audio/dsr-es202211" => &[&T_dsr_es202211_audio],
 "application/x-archive" => &[&T_x_archive_application],
 "model/vrml" => &[&T_vrml_model],
-"application/x-project" => &[&T_x_project_application],
-"video/vnd.vivo" => &[&T_vnd_vivo_video],
-"gzip/document" => &[&T_gzip_application],
-"application/vnd.mseq" => &[&T_vnd_mseq_application],
-"application/vnd.mobius.plc" => &[&T_vnd_mobius_plc_application],
-"application/vnd.micrografx.igx" => &[&T_vnd_micrografx_igx_application],
-"application/vnd.kde.karbon" => &[&T_vnd_kde_karbon_application],
-"image/vnd.cns.inf2" => &[&T_vnd_cns_inf2_image],
-"image/x-raw-hasselblad" => &[&T_x_raw_hasselblad_image],
-"application/vnd.mobius.mbk" => &[&T_vnd_mobius_mbk_application],
-"text/yaml" => &[&T_x_yaml_text],
-"audio/dat12" => &[&T_dat12_audio],
-"text/vnd.wap.sl" => &[&T_vnd_wap_sl_text],
-"application/vnd.novadigm.edm" => &[&T_vnd_novadigm_edm_application],
-"application/kpml-request+xml" => &[&T_kpml_request_xml_application],
-"application/x-filemaker" => &[&T_x_filemaker_application],
-"application/vnd.ecowin.seriesrequest" => &[&T_vnd_ecowin_seriesrequest_application],
-"application/x-ibooks+zip" => &[&T_x_ibooks_zip_application],
-"audio/vnd.cns.anp1" => &[&T_vnd_cns_anp1_audio],
-"application/vnd.nokia.iptv.config+xml" => &[&T_vnd_nokia_iptv_config_xml_application],
-"application/vnd.acucobol" => &[&T_vnd_acucobol_application],
-"application/vnd.seemail" => &[&T_vnd_seemail_application],
-"application/vnd.wordperfect;version=5.0" => &[&T_vnd_wordperfect_version_5_0_application],
-"application/ttml+xml" => &[&T_ttml_xml_application],
-"application/vnd.lotus-screencam" => &[&T_vnd_lotus_screencam_application],
-"text/vnd.curl" => &[&T_vnd_curl_text],
-"application/vnd.dynageo" => &[&T_vnd_dynageo_application],
-"image/x-raw-adobe" => &[&T_x_raw_adobe_image],
-"application/vnd.cinderella" => &[&T_vnd_cinderella_application],
-"application/cybercash" => &[&T_cybercash_application],
-"application/vnd.ms-excel.workspace.3" => &[&T_vnd_ms_excel_workspace_3_application],
-"application/vnd.cirpack.isdn-ext" => &[&T_vnd_cirpack_isdn_ext_application],
-"image/x-raw-rawzor" => &[&T_x_raw_rawzor_image],
-"video/vnd.iptvforum.2dparityfec-1010" => &[&T_vnd_iptvforum_2dparityfec_1010_video],
-"application/rtx" => &[&T_rtx_application],
-"audio/evrcb1" => &[&T_evrcb1_audio],
-"application/x-xz" => &[&T_x_xz_application],
-"application/x-xar" => &[&T_x_xar_application],
-"application/x-font-dos" => &[&T_x_font_dos_application],
-"application/vnd.otps.ct-kip+xml" => &[&T_vnd_otps_ct_kip_xml_application],
-"application/x-chat" => &[&T_x_chat_application],
-"model/vnd.gtw" => &[&T_vnd_gtw_model],
-"application/vnd.visionary" => &[&T_vnd_visionary_application],
-"application/x-tar" => &[&T_x_tar_application],
-"application/x-x509-cert" => &[&T_x_x509_cert_application],
-"audio/g7291" => &[&T_g7291_audio],
-"application/x-sas-view" => &[&T_x_sas_view_application],
-"application/vnd.paos.xml" => &[&T_vnd_paos_xml_application],
-"application/x-sas-catalog" => &[&T_x_sas_catalog_application],
-"text/x-config" => &[&T_x_config_text],
-"video/mp4" => &[&T_mp4_video],
-"application/x-font-speedo" => &[&T_x_font_speedo_application],
-"text/x-rsrc" => &[&T_x_rsrc_text],
-"font/otf" => &[&T_x_font_otf_application],
-"application/kate" => &[&T_kate_application],
-"application/x-deflate" => &[&T_zlib_application],
-"application/vnd.oma.poc.final-report+xml" => &[&T_vnd_oma_poc_final_report_xml_application],
-"model/vnd.parasolid.transmit.binary" => &[&T_vnd_parasolid_transmit_binary_model],
-"audio/vnd.dolby.heaac.1" => &[&T_vnd_dolby_heaac_1_audio],
-"application/relax-ng-compact-syntax" => &[&T_relax_ng_compact_syntax_application],
-"video/mp4v-es" => &[&T_mp4v_es_video],
-"image/jp2" => &[&T_jp2_image],
-"application/vnd.ncd.reference" => &[&T_vnd_ncd_reference_application],
-"image/x-jp2-codestream" => &[&T_x_jp2_codestream_image],
-"image/vnd.dgn;ver=8" => &[&T_vnd_dgn_version_8_image],
-"application/vnd.smart.teacher" => &[&T_vnd_smart_teacher_application],
-"application/vnd.nokia.landmarkcollection+xml" => &[&T_vnd_nokia_landmarkcollection_xml_application],
-"application/x-sas-data-v6" => &[&T_x_sas_data_v6_application],
-"application/vnd.cups-pdf" => &[&T_vnd_cups_pdf_application],
-"application/x-mmm-digisonde" => &[&T_x_mmm_digisonde_application],
-"text/uri-list" => &[&T_uri_list_text],
-"application/x-speex" => &[&T_speex_audio],
-"text/x-ruby" => &[&T_x_ruby_text],
-"text/x-forth" => &[&T_x_forth_text],
-"audio/bv32" => &[&T_bv32_audio],
-"application/vnd.nokia.pcd+xml" => &[&T_vnd_nokia_pcd_xml_application],
-"application/x-font-libgrx" => &[&T_x_font_libgrx_application],
-"application/mbms-reception-report+xml" => &[&T_mbms_reception_report_xml_application],
-"application/set-payment" => &[&T_set_payment_application],
-"application/vnd.apple.mpegurl" => &[&T_vnd_apple_mpegurl_application],
-"application/xv+xml" => &[&T_xv_xml_application],
-"application/xcap-att+xml" => &[&T_xcap_att_xml_application],
-"application/vnd.wordperfect" => &[&T_vnd_wordperfect_application],
-"video/x-f4v" => &[&T_x_f4v_video],
-"application/vnd.adobe.air-application-installer-package+zip" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
-"application/dita+xml;format=task" => &[&T_dita_xml_format_task_application],
-"text/x-aspectj" => &[&T_x_aspectj_text],
-"application/vnd.airzip.filesecure.azs" => &[&T_vnd_airzip_filesecure_azs_application],
-"image/vnd.xiff" => &[&T_vnd_xiff_image],
-"video/h264" => &[&T_h264_video],
-"image/ntf" => &[&T_nitf_image],
-"application/smil+xml" => &[&T_smil_xml_application],
-"application/x-dvi" => &[&T_x_dvi_application],
-"text/x-asm" => &[&T_x_assembly_text],
-"application/vnd.contact.cmsg" => &[&T_vnd_contact_cmsg_application],
-"application/mxf" => &[&T_mxf_application],
-"application/onenote;format=onetoc2" => &[&T_onenote_format_onetoc2_application],
-"audio/musepack" => &[&T_musepack_audio],
-"video/quicktime" => &[&T_quicktime_video],
-"application/x-msmediaview" => &[&T_x_msmediaview_application],
-"application/vnd.shana.informed.interchange" => &[&T_vnd_shana_informed_interchange_application],
-"application/vnd.ibm.secure-container" => &[&T_vnd_ibm_secure_container_application],
-"application/x-stata-do" => &[&T_x_stata_do_application],
-"application/x-font-printer-metric" => &[&T_x_font_printer_metric_application],
-"application/vnd.stardivision.draw" => &[&T_vnd_stardivision_draw_application],
-"application/x-berkeley-db;format=btree" => &[&T_x_berkeley_db_format_btree_application],
-"video/bmpeg" => &[&T_bmpeg_video],
-"multipart/report" => &[&T_report_multipart],
-"application/set-payment-initiation" => &[&T_set_payment_initiation_application],
-"application/vnd.xfdl" => &[&T_vnd_xfdl_application],
-"chemical/x-cmdf" => &[&T_x_cmdf_chemical],
-"application/vnd.ms-tnef" => &[&T_vnd_ms_tnef_application],
-"application/x-fossil-checkout" => &[&T_x_fossil_checkout_application],
-"video/dv" => &[&T_dv_video],
-"application/vnd.lotus-1-2-3" => &[&T_vnd_lotus_1_2_3_application],
-"model/gltf-binary" => &[&T_gltf_binary_model],
-"application/vnd.ruckus.download" => &[&T_vnd_ruckus_download_application],
-"application/mathematica" => &[&T_mathematica_application],
-"application/vnd.wordperfect;version=5.1" => &[&T_vnd_wordperfect_version_5_1_application],
-"application/vnd.wordperfect;version=6.x" => &[&T_vnd_wordperfect_version_6_x_application],
-"application/xcon-conference-info+xml" => &[&T_xcon_conference_info_xml_application],
-"application/x-mscardfile" => &[&T_x_mscardfile_application],
-"application/mbms-msk-response+xml" => &[&T_mbms_msk_response_xml_application],
-"application/vnd.kde.kpresenter" => &[&T_vnd_kde_kpresenter_application],
-"application/vnd.sealed.xls" => &[&T_vnd_sealed_xls_application],
-"application/x-msdownload;format=pe32" => &[&T_x_msdownload_format_pe32_application],
-"audio/smv-qcp" => &[&T_smv_qcp_audio],
-"application/pkcs7-signature" => &[&T_pkcs7_signature_application],
-"application/vnd.yellowriver-custom-menu" => &[&T_vnd_yellowriver_custom_menu_application],
-"application/vnd.palm" => &[&T_vnd_palm_application],
-"audio/mpa-robust" => &[&T_mpa_robust_audio],
-"application/vnd.sealed.tiff" => &[&T_vnd_sealed_tiff_application],
-"application/x-sibelius" => &[&T_x_sibelius_application],
-"application/vnd.s3sms" => &[&T_vnd_s3sms_application],
-"audio/vnd.dlna.adts" => &[&T_vnd_dlna_adts_audio],
-"application/x-cdr" => &[&T_coreldraw_application],
-"image/prs.pti" => &[&T_prs_pti_image],
-"application/vnd.dpgraph" => &[&T_vnd_dpgraph_application],
-"application/zip" => &[&T_zip_application],
-"video/mj2" => &[&T_mj2_video],
-"text/x-dtd" => &[&T_xml_dtd_application],
-"application/vnd.koan" => &[&T_vnd_koan_application],
-"application/msword2" => &[&T_msword2_application],
-"application/moss-keys" => &[&T_moss_keys_application],
-"video/3gpp-tt" => &[&T_3gpp_tt_video],
-"video/x-ms-wmv" => &[&T_x_ms_wmv_video],
-"application/vnd.shp" => &[&T_vnd_shp_application],
-"application/ssml+xml" => &[&T_ssml_xml_application],
-"video/vnd.dlna.mpeg-tts" => &[&T_vnd_dlna_mpeg_tts_video],
-"text/html" => &[&T_html_text],
-"application/x-vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
-"application/x-x509-key;format=pem" => &[&T_x_x509_key_format_pem_application],
-"application/x-mach-o" => &[&T_x_mach_o_application],
-"message/rfc822" => &[&T_rfc822_message],
-"image/vnd.fst" => &[&T_vnd_fst_image],
-"text/t140" => &[&T_t140_text],
-"audio/wav" => &[&T_vnd_wave_audio],
-"application/prs.alvestrand.titrax-sheet" => &[&T_prs_alvestrand_titrax_sheet_application],
-"application/vnd.ms-playready.initiator+xml" => &[&T_vnd_ms_playready_initiator_xml_application],
-"text/sgml" => &[&T_sgml_text],
-"application/vnd.rn-realmedia-vbr" => &[&T_vnd_rn_realmedia_application],
-"application/vnd.obn" => &[&T_vnd_obn_application],
-"application/x-gtar" => &[&T_x_gtar_application],
-"application/x-asprs" => &[&T_x_asprs_application],
-"application/x-tex-tfm" => &[&T_x_tex_tfm_application],
-"application/x-xpinstall" => &[&T_x_xpinstall_application],
-"application/rls-services+xml" => &[&T_rls_services_xml_application],
-"application/edifact" => &[&T_edifact_application],
-"application/vnd.openxmlformats-officedocument.presentationml.slide" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
-"application/vnd.umajin" => &[&T_vnd_umajin_application],
-"application/vnd.syncml.dm+wbxml" => &[&T_vnd_syncml_dm_wbxml_application],
-"application/prs.plucker" => &[&T_prs_plucker_application],
-"application/vnd.groove-tool-template" => &[&T_vnd_groove_tool_template_application],
-"application/timestamped-data" => &[&T_timestamped_data_application],
-"application/vnd.mfer" => &[&T_vnd_mfer_application],
-"application/vnd.etsi.asic-s+zip" => &[&T_vnd_etsi_asic_s_zip_application],
-"message/disposition-notification" => &[&T_disposition_notification_message],
-"application/vnd.meridian-slingshot" => &[&T_vnd_meridian_slingshot_application],
-"application/fastinfoset" => &[&T_fastinfoset_application],
-"audio/evrc" => &[&T_evrc_audio],
-"image/x-dwg" => &[&T_vnd_dwg_image],
-"application/h224" => &[&T_h224_application],
-"application/vnd.geogebra.file" => &[&T_vnd_geogebra_file_application],
-"application/vnd.ms-powerpoint.slide.macroenabled.12" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
-"application/vnd.oma.bcast.sgdd+xml" => &[&T_vnd_oma_bcast_sgdd_xml_application],
-"application/vnd.visio" => &[&T_vnd_visio_application],
-"image/t38" => &[&T_t38_image],
-"application/xenc+xml" => &[&T_xenc_xml_application],
-"video/x-ms-wm" => &[&T_x_ms_wm_video],
-"application/x-mach-o-universal" => &[&T_x_mach_o_universal_application],
-"application/x-zip-compressed" => &[&T_zip_application],
-"application/vnd.ibm.afplinedata" => &[&T_vnd_ibm_afplinedata_application],
-"application/x-gnumeric" => &[&T_x_gnumeric_application],
-"application/bizagi-modeler" => &[&T_bizagi_modeler_application],
-"application/vnd.fujixerox.docuworks" => &[&T_vnd_fujixerox_docuworks_application],
-"model/vnd.dwf" => &[&T_vnd_dwf_model],
-"application/vnd.denovo.fcselayout-link" => &[&T_vnd_denovo_fcselayout_link_application],
-"application/vnd.jam" => &[&T_vnd_jam_application],
-"text/x-csharp" => &[&T_x_csharp_text],
-"application/vnd.nintendo.snes.rom" => &[&T_x_nesrom_application],
-"application/sieve" => &[&T_sieve_application],
-"application/x-font-otf" => &[&T_x_font_otf_application],
-"application/prs.nprend" => &[&T_prs_nprend_application],
-"application/vnd.crick.clicker.wordbank" => &[&T_vnd_crick_clicker_wordbank_application],
-"image/x-raw-epson" => &[&T_x_raw_epson_image],
-"application/x-vnd.datapackage+gz" => &[&T_x_vnd_datapackage_gz_application],
-"image/aces" => &[&T_aces_image],
-"application/vnd.arastra.swi" => &[&T_vnd_arastra_swi_application],
-"application/smil" => &[&T_smil_xml_application],
-"application/vnd.xmpie.xlim" => &[&T_vnd_xmpie_xlim_application],
-"application/vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
-"audio/x-oggflac" => &[&T_x_oggflac_audio],
-"application/vnd.joost.joda-archive" => &[&T_vnd_joost_joda_archive_application],
-"application/scvp-cv-request" => &[&T_scvp_cv_request_application],
-"application/vnd.groove-injector" => &[&T_vnd_groove_injector_application],
-"application/x-subrip" => &[&T_x_subrip_application],
-"audio/x-ogg-flac" => &[&T_x_oggflac_audio],
-"application/vnd.ms-opentype" => &[&T_x_font_otf_application],
-"application/vnd.intercon.formnet" => &[&T_vnd_intercon_formnet_application],
-"application/gml+xml" => &[&T_gml_xml_application],
-"application/cu-seeme" => &[&T_cu_seeme_application],
-"audio/x-mp4a" => &[&T_mp4_audio],
-"application/dwg" => &[&T_vnd_dwg_image],
-"application/cstadata+xml" => &[&T_cstadata_xml_application],
-"application/cbor" => &[&T_cbor_application],
-"application/quicktime" => &[&T_quicktime_application],
-"text/x-idl" => &[&T_x_idl_text],
-"application/x-appleworks" => &[&T_x_appleworks_application],
-"application/vnd.ms-wordml" => &[&T_vnd_ms_wordml_application],
-"application/x-touhou" => &[&T_x_touhou_application],
-"audio/g726-24" => &[&T_g726_24_audio],
-"application/vnd.marlin.drm.actiontoken+xml" => &[&T_vnd_marlin_drm_actiontoken_xml_application],
-"text/x-java-source" => &[&T_x_java_source_text],
-"application/x-grib" => &[&T_x_grib_application],
-"application/x-csh" => &[&T_x_csh_application],
-"application/vnd.anser-web-certificate-issue-initiation" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
-"application/illustrator+ps" => &[&T_illustrator_ps_application],
-"application/x-arj" => &[&T_x_arj_application],
-"application/x-font-type1" => &[&T_x_font_type1_application],
-"image/vnd.dxb" => &[&T_vnd_dxb_image],
-"video/vnd.sealed.swf" => &[&T_vnd_sealed_swf_video],
-"application/vnd.unity" => &[&T_vnd_unity_application],
-"audio/amr-nb" => &[&T_amr_audio],
-"application/gzipped" => &[&T_gzip_application],
-"application/vnd.powerbuilder6-s" => &[&T_vnd_powerbuilder6_s_application],
-"application/vnd.chemdraw+xml" => &[&T_vnd_chemdraw_xml_application],
-"application/vnd.preminet" => &[&T_vnd_preminet_application],
-"text/x-php" => &[&T_x_php_text],
-"application/vnd.publishare-delta-tree" => &[&T_vnd_publishare_delta_tree_application],
-"audio/vnd.everad.plj" => &[&T_vnd_everad_plj_audio],
-"application/vnd.vcx" => &[&T_vnd_vcx_application],
-"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
-"message/delivery-status" => &[&T_delivery_status_message],
-"application/vnd.commerce-battelle" => &[&T_vnd_commerce_battelle_application],
-"application/x-dosexec" => &[&T_x_dosexec_application],
-"application/wsdl+xml" => &[&T_wsdl_xml_application],
-"application/vnd.mozilla.xul+xml" => &[&T_vnd_mozilla_xul_xml_application],
-"application/x-dtbook+xml" => &[&T_x_dtbook_xml_application],
-"application/x-kpresenter" => &[&T_vnd_kde_kpresenter_application],
-"application/simplesymbolcontainer" => &[&T_simplesymbolcontainer_application],
-"application/x-tika-visio-ooxml" => &[&T_x_tika_visio_ooxml_application],
-"application/moss-signature" => &[&T_moss_signature_application],
-"application/vnd.intu.qfx" => &[&T_vnd_intu_qfx_application],
-"application/vnd.oasis.opendocument.flat.spreadsheet" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
-"text/x-sql" => &[&T_x_sql_text],
-"application/vnd.vsf" => &[&T_vnd_vsf_application],
-"application/vnd.etsi.asic-e+zip" => &[&T_vnd_etsi_asic_e_zip_application],
-"application/vnd.ms-wmdrm.lic-resp" => &[&T_vnd_ms_wmdrm_lic_resp_application],
-"text/x-uuencode" => &[&T_x_uuencode_text],
-"image/jxr" => &[&T_jxr_image],
-"audio/g729" => &[&T_g729_audio],
-"application/acad" => &[&T_vnd_dwg_image],
-"application/vnd.nokia.ncd" => &[&T_vnd_nokia_ncd_application],
-"application/font-tdpfr" => &[&T_font_tdpfr_application],
-"application/index.obj" => &[&T_index_obj_application],
-"application/x-snappy-framed" => &[&T_x_snappy_framed_application],
-"application/x-bentley-besqlite" => &[&T_x_bentley_besqlite_application],
-"application/vnd.ufdl" => &[&T_vnd_ufdl_application],
-"application/vnd.3gpp2.tcap" => &[&T_vnd_3gpp2_tcap_application],
-"application/vnd.shx" => &[&T_vnd_shx_application],
-"application/vnd.novadigm.ext" => &[&T_vnd_novadigm_ext_application],
-"message/tracking-status" => &[&T_tracking_status_message],
-"audio/telephone-event" => &[&T_telephone_event_audio],
-"application/vnd.fuzzysheet" => &[&T_vnd_fuzzysheet_application],
-"application/x-kchart" => &[&T_vnd_kde_kchart_application],
-"application/vnd.apple.iwork" => &[&T_vnd_apple_iwork_application],
-"text/x-verilog" => &[&T_x_verilog_text],
-"video/x-ogguvs" => &[&T_x_ogguvs_video],
-"application/vnd.iptc.g2.catalogitem+xml" => &[&T_vnd_iptc_g2_catalogitem_xml_application],
-"text/x-matlab" => &[&T_x_matlab_text],
-"text/x-scss" => &[&T_x_scss_text],
-"application/x-msi" => &[&T_x_ms_installer_application],
-"application/vnd.japannet-verification-wakeup" => &[&T_vnd_japannet_verification_wakeup_application],
-"application/vnd.pwg-multiplexed" => &[&T_vnd_pwg_multiplexed_application],
-"application/vnd.yamaha.hv-voice" => &[&T_vnd_yamaha_hv_voice_application],
-"application/x-ms-emz" => &[&T_x_emf_compressed_image],
-"text/x-vbdotnet" => &[&T_x_vbdotnet_text],
-"application/vnd.ms-spreadsheetml" => &[&T_vnd_ms_spreadsheetml_application],
-"video/vnd.iptvforum.ttsmpeg2" => &[&T_vnd_iptvforum_ttsmpeg2_video],
-"application/vnd.emclient.accessrequest+xml" => &[&T_vnd_emclient_accessrequest_xml_application],
-"image/x-pc-paintbrush" => &[&T_vnd_zbrush_pcx_image],
-"application/vnd.noblenet-sealer" => &[&T_vnd_noblenet_sealer_application],
-"application/vnd.oma.dcdc" => &[&T_vnd_oma_dcdc_application],
-"application/x-dex" => &[&T_x_dex_application],
-"application/vnd.framemaker" => &[&T_vnd_framemaker_application],
-"text/javascript" => &[&T_javascript_text],
-"application/vnd.canon-cpdl" => &[&T_vnd_canon_cpdl_application],
-"audio/red" => &[&T_red_audio],
-"message/s-http" => &[&T_s_http_message],
-"video/vnd.fvt" => &[&T_vnd_fvt_video],
-"application/lzip" => &[&T_lzip_application],
-"multipart/encrypted" => &[&T_encrypted_multipart],
-"application/vnd.ms-cab-compressed" => &[&T_vnd_ms_cab_compressed_application],
-"image/vnd.dgn;version=7" => &[&T_vnd_dgn_version_7_image],
-"application/ipp" => &[&T_ipp_application],
-"application/ogg" => &[&T_ogg_application],
-"font/woff" => &[&T_woff_font],
-"audio/cn" => &[&T_cn_audio],
-"text/x-haskell" => &[&T_x_haskell_text],
-"application/news-groupinfo" => &[&T_news_groupinfo_application],
-"application/vnd.ms-pki.stl" => &[&T_vnd_ms_pki_stl_application],
-"audio/dsr-es202211" => &[&T_dsr_es202211_audio],
-"application/atomicmail" => &[&T_atomicmail_application],
-"image/hevc" => &[&T_heic_image],
-"text/vnd.abc" => &[&T_vnd_abc_text],
-"application/x-gunzip" => &[&T_gzip_application],
-"audio/mpeg4-generic" => &[&T_mpeg4_generic_audio],
-"text/x-expect" => &[&T_x_expect_text],
-"application/x-installshield" => &[&T_x_installshield_application],
-"application/vnd.cups-ppd" => &[&T_vnd_cups_ppd_application],
-"application/vnd.jisp" => &[&T_vnd_jisp_application],
-"application/timestamp-query" => &[&T_timestamp_query_application],
-"audio/parityfec" => &[&T_parityfec_audio],
-"application/vnd.chipnuts.karaoke-mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
-"application/x-stata-dta;version=10" => &[&T_x_stata_dta_version_10_application],
-"application/x-uc2-compressed" => &[&T_x_uc2_compressed_application],
-"image/vnd.microsoft.icon" => &[&T_vnd_microsoft_icon_image],
-"text/x-erlang" => &[&T_x_erlang_text],
-"application/vnd.wqd" => &[&T_vnd_wqd_application],
-"application/mbms-deregister+xml" => &[&T_mbms_deregister_xml_application],
-"application/vnd.sealedmedia.softseal.html" => &[&T_vnd_sealedmedia_softseal_html_application],
-"application/vnd.ibm.modcap" => &[&T_vnd_ibm_modcap_application],
-"audio/aac" => &[&T_x_aac_audio],
-"application/x-mach-o-object" => &[&T_x_mach_o_object_application],
-"application/msword5" => &[&T_msword5_application],
-"application/winhlp" => &[&T_winhlp_application],
-"application/x-vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
-"application/x-guitar-pro" => &[&T_x_guitar_pro_application],
-"application/samlmetadata+xml" => &[&T_samlmetadata_xml_application],
-"application/vnd.nokia.n-gage.ac+xml" => &[&T_vnd_nokia_n_gage_ac_xml_application],
-"application/vnd.nokia.landmark+wbxml" => &[&T_vnd_nokia_landmark_wbxml_application],
-"image/x-icon" => &[&T_vnd_microsoft_icon_image],
-"audio/webm" => &[&T_webm_audio],
-"application/x-sv4cpio" => &[&T_x_sv4cpio_application],
-"text/x-sass" => &[&T_x_sass_text],
-"video/ulpfec" => &[&T_ulpfec_video],
-"application/x-ms-wmz" => &[&T_x_ms_wmz_application],
-"video/x-sgi-movie" => &[&T_x_sgi_movie_video],
-"application/sparql-results+xml" => &[&T_sparql_results_xml_application],
-"message/cpim" => &[&T_cpim_message],
-"application/mbms-user-service-description+xml" => &[&T_mbms_user_service_description_xml_application],
-"image/vnd.globalgraphics.pgb" => &[&T_vnd_globalgraphics_pgb_image],
-"application/font-sfnt" => &[&T_x_font_ttf_application],
-"application/vnd.hp-jlyt" => &[&T_vnd_hp_jlyt_application],
-"application/vnd.lotus-1-2-3;version=4" => &[&T_vnd_lotus_1_2_3_version_4_application],
-"audio/vnd.ms-playready.media.pya" => &[&T_vnd_ms_playready_media_pya_audio],
-"application/epub+zip" => &[&T_epub_zip_application],
-"application/vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
-"image/x-emf-compressed" => &[&T_x_emf_compressed_image],
-"video/vnd.hns.video" => &[&T_vnd_hns_video_video],
-"application/x-java-jnlp-file" => &[&T_x_java_jnlp_file_application],
-"application/x-endnote-refer" => &[&T_x_endnote_refer_application],
-"application/xslfo+xml" => &[&T_xslfo_xml_application],
-"audio/vnd.hns.audio" => &[&T_vnd_hns_audio_audio],
-"application/x-vhd" => &[&T_x_vhd_application],
-"audio/g729d" => &[&T_g729d_audio],
-"application/vnd.ibm.electronic-media" => &[&T_vnd_ibm_electronic_media_application],
-"application/set-registration" => &[&T_set_registration_application],
-"application/x-activemime" => &[&T_x_activemime_application],
-"text/x-eiffel" => &[&T_x_eiffel_text],
-"application/vnd.uiq.theme" => &[&T_vnd_uiq_theme_application],
-"video/vnd.nokia.videovoip" => &[&T_vnd_nokia_videovoip_video],
-"video/x-ms-wmx" => &[&T_x_ms_wmx_video],
-"application/x-chess-pgn" => &[&T_x_chess_pgn_application],
-"application/vnd.sun.xml.calc.template" => &[&T_vnd_sun_xml_calc_template_application],
-"application/x-tika-java-enterprise-archive" => &[&T_x_tika_java_enterprise_archive_application],
-"font/woff2" => &[&T_woff2_font],
-"audio/mpeg" => &[&T_mpeg_audio],
-"text/richtext" => &[&T_richtext_text],
-"multipart/header-set" => &[&T_header_set_multipart],
-"application/vnd.is-xpr" => &[&T_vnd_is_xpr_application],
-"application/vnd.iccprofile" => &[&T_vnd_iccprofile_application],
-"application/x-tika-java-web-archive" => &[&T_x_tika_java_web_archive_application],
-"application/vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
-"text/x-ada" => &[&T_x_ada_text],
-"application/vnd.crick.clicker" => &[&T_vnd_crick_clicker_application],
-"application/vnd.isac.fcs" => &[&T_vnd_isac_fcs_application],
-"application/vnd.3gpp.pic-bw-var" => &[&T_vnd_3gpp_pic_bw_var_application],
-"application/vnd.gridmp" => &[&T_vnd_gridmp_application],
-"application/vnd.ms-wmdrm.meter-resp" => &[&T_vnd_ms_wmdrm_meter_resp_application],
-"application/vnd.pg.format" => &[&T_vnd_pg_format_application],
-"audio/evrc0" => &[&T_evrc0_audio],
-"application/vnd.java.hprof " => &[&T_vnd_java_hprof__application],
-"application/pics-rules" => &[&T_pics_rules_application],
-"application/sdp" => &[&T_sdp_application],
-"application/msonenote" => &[&T_onenote_application],
-"text/x-yml" => &[&T_x_yaml_text],
-"application/x-sharedlib" => &[&T_x_sharedlib_application],
-"application/vnd.etsi.aoc+xml" => &[&T_vnd_etsi_aoc_xml_application],
-"image/x-bmp" => &[&T_bmp_image],
-"image/jpx" => &[&T_jpx_image],
-"application/vnd.uplanet.bearer-choice-wbxml" => &[&T_vnd_uplanet_bearer_choice_wbxml_application],
-"application/vnd.oma.poc.invocation-descriptor+xml" => &[&T_vnd_oma_poc_invocation_descriptor_xml_application],
-"application/x-berkeley-db" => &[&T_x_berkeley_db_application],
-"video/3gp" => &[&T_3gpp_video],
-"application/vnd.kahootz" => &[&T_vnd_kahootz_application],
-"application/xml-dtd" => &[&T_xml_dtd_application],
-"application/sereal;version=3" => &[&T_sereal_version_3_application],
-"application/xslt+xml" => &[&T_xslt_xml_application],
-"application/x-ustar" => &[&T_x_ustar_application],
-"application/x-windows-installer" => &[&T_x_ms_installer_application],
-"application/vnd.street-stream" => &[&T_vnd_street_stream_application],
-"application/x-tika-msworks-spreadsheet" => &[&T_x_tika_msworks_spreadsheet_application],
-"application/vnd.grafeq" => &[&T_vnd_grafeq_application],
-"application/x-troff-me" => &[&T_troff_text],
-"application/vnd.android.package-archive" => &[&T_vnd_android_package_archive_application],
-"application/vnd.adobe.aftereffects.project" => &[&T_vnd_adobe_aftereffects_project_application],
-"application/vnd.frogans.fnc" => &[&T_vnd_frogans_fnc_application],
-"drawing/dwg" => &[&T_vnd_dwg_image],
-"application/vnd.recordare.musicxml" => &[&T_vnd_recordare_musicxml_application],
-"audio/vnd.dolby.pl2x" => &[&T_vnd_dolby_pl2x_audio],
-"application/onix-message-short+xml" => &[&T_onix_message_short_xml_application],
-"application/x-msschedule" => &[&T_x_msschedule_application],
-"image/x-raw-canon" => &[&T_x_raw_canon_image],
-"application/vnd.fdsn.seed" => &[&T_vnd_fdsn_seed_application],
-"application/binhex" => &[&T_mac_binhex40_application],
-"model/mesh" => &[&T_mesh_model],
-"application/vnd.syncml+xml" => &[&T_vnd_syncml_xml_application],
-"application/vnd.noblenet-web" => &[&T_vnd_noblenet_web_application],
-"image/xcf" => &[&T_x_xcf_image],
-"application/vnd.kde.kword" => &[&T_vnd_kde_kword_application],
-"application/x-vmdk" => &[&T_x_vmdk_application],
-"application/wita" => &[&T_wita_application],
-"application/vnd.sealed.ppt" => &[&T_vnd_sealed_ppt_application],
-"application/x-dbf" => &[&T_x_dbf_application],
-"application/x-mswrite" => &[&T_x_mswrite_application],
-"application/x-sfdu" => &[&T_x_sfdu_application],
-"text/x-common-lisp" => &[&T_x_common_lisp_text],
-"application/warc+gz" => &[&T_warc_gz_application],
-"application/vnd.flographit" => &[&T_vnd_flographit_application],
-"application/vnd.ms-excel.sheet.4" => &[&T_vnd_ms_excel_sheet_4_application],
-"audio/ac3" => &[&T_ac3_audio],
-"audio/asc" => &[&T_asc_audio],
-"application/vnd.mindjet.mindmanager" => &[&T_vnd_mindjet_mindmanager_application],
-"text/x-robots" => &[&T_x_robots_text],
-"application/vnd.uplanet.signal" => &[&T_vnd_uplanet_signal_application],
-"application/x-xliff+zip" => &[&T_x_xliff_zip_application],
-"application/x-hwp" => &[&T_x_hwp_application],
-"application/x-pds" => &[&T_x_pds_application],
-"text/vnd.wap.si" => &[&T_vnd_wap_si_text],
-"application/vnd.etsi.simservs+xml" => &[&T_vnd_etsi_simservs_xml_application],
-"application/vnd.wolfram.wl" => &[&T_vnd_wolfram_wl_application],
-"application/x-mbtiles" => &[&T_x_mbtiles_application],
-"application/vnd.ms-word2006ml" => &[&T_vnd_ms_word2006ml_application],
-"audio/bv16" => &[&T_bv16_audio],
-"chemical/x-cml" => &[&T_x_cml_chemical],
-"application/vnd.cab-jscript" => &[&T_vnd_cab_jscript_application],
-"application/vnd.ms-works" => &[&T_vnd_ms_works_application],
-"image/vnd.mix" => &[&T_vnd_mix_image],
-"application/vnd.uplanet.bearer-choice" => &[&T_vnd_uplanet_bearer_choice_application],
-"application/vnd.hp-hps" => &[&T_vnd_hp_hps_application],
-"video/bt656" => &[&T_bt656_video],
-"text/vnd.in3d.3dml" => &[&T_vnd_in3d_3dml_text],
-"application/x-tex-virtual-font" => &[&T_x_tex_virtual_font_application],
-"image/x-emf" => &[&T_emf_image],
-"application/x-wacz" => &[&T_x_wacz_application],
-"application/vnd.intertrust.digibox" => &[&T_vnd_intertrust_digibox_application],
-"text/rtf" => &[&T_rtf_application],
-"application/vnd.wt.stf" => &[&T_vnd_wt_stf_application],
-"application/mspowerpoint" => &[&T_vnd_ms_powerpoint_application],
-"application/vnd.crick.clicker.template" => &[&T_vnd_crick_clicker_template_application],
-"application/x-silverlight-app" => &[&T_x_silverlight_app_application],
-"text/csv" => &[&T_csv_text],
-"image/vnd.wap.wbmp" => &[&T_vnd_wap_wbmp_image],
-"application/timestamp-reply" => &[&T_timestamp_reply_application],
-"image/x-dpx" => &[&T_x_dpx_image],
-"image/vnd.adobe.premiere" => &[&T_vnd_adobe_premiere_image],
-"application/x-director" => &[&T_x_director_application],
-"application/x-java-jnilib" => &[&T_x_java_jnilib_application],
-"application/vnd.ms-powerpoint.presentation.macroenabled.12" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
-"audio/vorbis" => &[&T_vorbis_audio],
-"application/x-msdownload;format=pe" => &[&T_x_msdownload_format_pe_application],
-"text/vnd.ms-mediapackage" => &[&T_vnd_ms_mediapackage_text],
-"application/vnd.sealed.csf" => &[&T_vnd_sealed_csf_application],
-"application/vnd.curl.car" => &[&T_vnd_curl_car_application],
-"application/vnd.bmi" => &[&T_vnd_bmi_application],
-"application/vnd.iptc.g2.knowledgeitem+xml" => &[&T_vnd_iptc_g2_knowledgeitem_xml_application],
-"application/vnd.mif" => &[&T_vnd_mif_application],
-"application/x-jeol-jdf" => &[&T_x_jeol_jdf_application],
-"application/x-7z-compressed" => &[&T_x_7z_compressed_application],
-"application/vnd.informedcontrol.rms+xml" => &[&T_vnd_informedcontrol_rms_xml_application],
-"application/vnd.syncml.ds.notification" => &[&T_vnd_syncml_ds_notification_application],
-"video/x-matroska" => &[&T_x_matroska_video],
-"application/vnd.shana.informed.formtemplate" => &[&T_vnd_shana_informed_formtemplate_application],
-"message/news" => &[&T_news_message],
-"text/x-sed" => &[&T_x_sed_text],
-"application/mbms-register+xml" => &[&T_mbms_register_xml_application],
-"audio/dvi4" => &[&T_dvi4_audio],
-"audio/pcmu" => &[&T_pcmu_audio],
-"application/vnd.fdsn.mseed" => &[&T_vnd_fdsn_mseed_application],
-"text/x-chdr" => &[&T_x_chdr_text],
-"application/x-vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
-"application/vnd.oasis.opendocument.flat.presentation" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
-"text/xml" => &[&T_xml_application],
-"application/vnd.wv.ssp+xml" => &[&T_vnd_wv_ssp_xml_application],
-"application/vnd.frogans.ltf" => &[&T_vnd_frogans_ltf_application],
-"audio/x-adpcm" => &[&T_x_adpcm_audio],
-"application/vnd.marlin.drm.mdcf" => &[&T_vnd_marlin_drm_mdcf_application],
-"audio/x-flac" => &[&T_x_flac_audio],
-"application/x-doom" => &[&T_x_doom_application],
-"application/vnd.immervision-ivp" => &[&T_vnd_immervision_ivp_application],
-"application/vnd.sbm.cid" => &[&T_vnd_sbm_cid_application],
-"application/vnd.zul" => &[&T_vnd_zul_application],
-"application/vnd.quark.quarkxpress" => &[&T_vnd_quark_quarkxpress_application],
-"application/x-msterminal" => &[&T_x_msterminal_application],
-"application/x-sh" => &[&T_x_sh_application],
-"audio/mobile-xmf" => &[&T_mobile_xmf_audio],
-"application/pkcs7-mime" => &[&T_pkcs7_mime_application],
-"application/vnd.oma.drm.risd+xml" => &[&T_vnd_oma_drm_risd_xml_application],
-"application/x-berkeley-db;format=queue" => &[&T_x_berkeley_db_format_queue_application],
-"video/nv" => &[&T_nv_video],
-"text/x-texinfo" => &[&T_x_texinfo_application],
-"audio/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_audio],
-"application/vnd.commonspace" => &[&T_vnd_commonspace_application],
-"application/vnd.novadigm.edx" => &[&T_vnd_novadigm_edx_application],
-"application/vnd.kidspiration" => &[&T_vnd_kidspiration_application],
-"application/vnd.nokia.conml+xml" => &[&T_vnd_nokia_conml_xml_application],
-"audio/vnd.dts" => &[&T_vnd_dts_audio],
-"application/conference-info+xml" => &[&T_conference_info_xml_application],
-"application/vnd.google-earth.kmz" => &[&T_vnd_google_earth_kmz_application],
-"application/vnd.ms-excel" => &[&T_vnd_ms_excel_application],
-"audio/vnd.adobe.soundbooth" => &[&T_vnd_adobe_soundbooth_audio],
-"image/naplps" => &[&T_naplps_image],
-"application/activemessage" => &[&T_activemessage_application],
-"application/vnd.crick.clicker.keyboard" => &[&T_vnd_crick_clicker_keyboard_application],
-"audio/x-matroska" => &[&T_x_matroska_audio],
-"application/vnd.rapid" => &[&T_vnd_rapid_application],
-"image/x-psd" => &[&T_vnd_adobe_photoshop_image],
-"application/x-berkeley-db;format=hash;version=4" => &[&T_x_berkeley_db_format_hash_version_4_application],
-"audio/x-psf" => &[&T_x_psf_audio],
-"application/matlab-mat" => &[&T_x_matlab_data_application],
-"application/x-mach-o-executable" => &[&T_x_mach_o_executable_application],
-"application/x-mysql-misam-index" => &[&T_x_mysql_misam_index_application],
-"application/xhtml+xml" => &[&T_xhtml_xml_application],
-"application/x-ms-reader" => &[&T_x_ms_reader_application],
-"application/x-sas-audit" => &[&T_x_sas_audit_application],
-"text/x-prolog" => &[&T_x_prolog_text],
-"application/x-mysql-db" => &[&T_x_mysql_db_application],
-"video/iso.segment" => &[&T_iso_segment_video],
-"application/vnd.qualcomm.brew-app-res" => &[&T_vnd_qualcomm_brew_app_res_application],
-"application/vnd.claymore" => &[&T_vnd_claymore_application],
-"video/vnd.iptvforum.ttsavc" => &[&T_vnd_iptvforum_ttsavc_video],
-"image/prs.btif" => &[&T_prs_btif_image],
-"application/vnd.ms-word.template.macroenabled.12" => &[&T_vnd_ms_word_template_macroenabled_12_application],
-"application/vnd.oma.bcast.imd+xml" => &[&T_vnd_oma_bcast_imd_xml_application],
-"application/vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
-"application/x-executable" => &[&T_x_executable_application],
-"image/x-raw-leaf" => &[&T_x_raw_leaf_image],
-"message/global-delivery-status" => &[&T_global_delivery_status_message],
-"application/mathml+xml" => &[&T_mathml_xml_application],
-"text/x-c" => &[&T_x_c_text],
-"image/wmf" => &[&T_wmf_image],
-"application/x-font-pcf" => &[&T_x_font_pcf_application],
-"application/vnd.fujixerox.hbpl" => &[&T_vnd_fujixerox_hbpl_application],
-"application/x-quattro-pro;version=6" => &[&T_x_quattro_pro_version_6_application],
-"application/eshop" => &[&T_eshop_application],
-"message/partial" => &[&T_partial_message],
-"application/vnd.kde.kontour" => &[&T_vnd_kde_kontour_application],
-"application/vnd.fujitsu.oasysgp" => &[&T_vnd_fujitsu_oasysgp_application],
-"application/vnd.mfmp" => &[&T_vnd_mfmp_application],
-"video/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_video],
-"text/vnd.curl.mcurl" => &[&T_vnd_curl_mcurl_text],
-"model/vnd.dwf;version=6" => &[&T_vnd_dwf_version_6_model],
-"application/sgml" => &[&T_sgml_application],
-"video/3gpp2" => &[&T_3gpp2_video],
-"application/vnd.ms-powerpoint.addin.macroenabled.12" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
-"application/vnd.tcpdump.pcap" => &[&T_vnd_tcpdump_pcap_application],
-"application/vnd.sun.xml.impress" => &[&T_vnd_sun_xml_impress_application],
-"application/vnd.mobius.msl" => &[&T_vnd_mobius_msl_application],
-"audio/vnd.sealedmedia.softseal.mpeg" => &[&T_vnd_sealedmedia_softseal_mpeg_audio],
 "application/vnd.dvb.esgcontainer" => &[&T_vnd_dvb_esgcontainer_application],
-"audio/x-sap" => &[&T_x_sap_audio],
+"text/properties" => &[&T_x_java_properties_text],
+"application/vnd.frogans.fnc" => &[&T_vnd_frogans_fnc_application],
+"application/epub+zip" => &[&T_epub_zip_application],
 "video/jpeg" => &[&T_jpeg_video],
-"video/avi" => &[&T_x_msvideo_video],
-"application/vnd.oma.dd2+xml" => &[&T_vnd_oma_dd2_xml_application],
-"application/vnd.nokia.isds-radio-presets" => &[&T_vnd_nokia_isds_radio_presets_application],
-"application/x-font-sunos-news" => &[&T_x_font_sunos_news_application],
-"application/parityfec" => &[&T_parityfec_application],
-"application/vnd.ibm.rights-management" => &[&T_vnd_ibm_rights_management_application],
-"application/pkcs10" => &[&T_pkcs10_application],
-"application/x-vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
-"audio/g726-40" => &[&T_g726_40_audio],
-"application/vnd.ms-wmdrm.meter-chlg-req" => &[&T_vnd_ms_wmdrm_meter_chlg_req_application],
-"application/x-hdf" => &[&T_x_hdf_application],
-"application/x-staroffice-template" => &[&T_x_staroffice_template_application],
-"application/vnd.vd-study" => &[&T_vnd_vd_study_application],
-"application/x-esri-spatially-enabled-db" => &[&T_x_esri_spatially_enabled_db_application],
-"audio/tone" => &[&T_tone_audio],
-"application/x-java-keystore" => &[&T_x_java_keystore_application],
-"image/x-portable-anymap" => &[&T_x_portable_anymap_image],
-"audio/example" => &[&T_example_audio],
-"application/onenote; format=package" => &[&T_onenote__format_package_application],
-"application/vnd.proteus.magazine" => &[&T_vnd_proteus_magazine_application],
-"application/vnd.cendio.thinlinc.clientconf" => &[&T_vnd_cendio_thinlinc_clientconf_application],
-"application/x-monotone-source-repo" => &[&T_x_monotone_source_repo_application],
-"application/xmpp+xml" => &[&T_xmpp_xml_application],
-"audio/evrcb" => &[&T_evrcb_audio],
-"application/pgp-keys" => &[&T_pgp_keys_application],
-"audio/vnd.dolby.pl2z" => &[&T_vnd_dolby_pl2z_audio],
-"application/vnd.dvb.iptv.alfec-base" => &[&T_vnd_dvb_iptv_alfec_base_application],
-"application/x-matroska" => &[&T_x_matroska_application],
-"application/vnd.3gpp.pic-bw-small" => &[&T_vnd_3gpp_pic_bw_small_application],
-"application/x-zim" => &[&T_x_zim_application],
-"video/vnd.cctv" => &[&T_vnd_cctv_video],
-"application/vnd.oma.bcast.notification+xml" => &[&T_vnd_oma_bcast_notification_xml_application],
-"audio/evrc1" => &[&T_evrc1_audio],
-"application/zlib" => &[&T_zlib_application],
-"application/vnd.iptc.g2.planningitem+xml" => &[&T_vnd_iptc_g2_planningitem_xml_application],
-"application/vnd.nokia.radio-presets" => &[&T_vnd_nokia_radio_presets_application],
-"application/vnd.kde.kchart" => &[&T_vnd_kde_kchart_application],
-"image/vnd.dwg" => &[&T_vnd_dwg_image],
-"application/vnd.osa.netdeploy" => &[&T_vnd_osa_netdeploy_application],
-"application/x-hwp-v5" => &[&T_x_hwp_v5_application],
-"application/vnd.openxmlformats-officedocument.presentationml.template" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
-"application/vnd.bluetooth.ep.oob" => &[&T_vnd_bluetooth_ep_oob_application],
-"image/x-raw-pentax" => &[&T_x_raw_pentax_image],
-"application/vnd.3gpp2.bcmcsinfo+xml" => &[&T_vnd_3gpp2_bcmcsinfo_xml_application],
-"application/vnd.ms-package.3dmanufacturing-3dmodel+xml" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
-"application/vnd.renlearn.rlprint" => &[&T_vnd_renlearn_rlprint_application],
-"application/vnd.solent.sdkm+xml" => &[&T_vnd_solent_sdkm_xml_application],
-"application/vnd.music-niff" => &[&T_vnd_music_niff_application],
-"application/x-foxmail" => &[&T_x_foxmail_application],
-"video/vnd.iptvforum.2dparityfec-2005" => &[&T_vnd_iptvforum_2dparityfec_2005_video],
-"application/pgp-encrypted" => &[&T_pgp_encrypted_application],
-"application/vnd.data-vision.rdz" => &[&T_vnd_data_vision_rdz_application],
-"application/riscos" => &[&T_riscos_application],
-"application/vnd.sus-calendar" => &[&T_vnd_sus_calendar_application],
-"application/x-parquet" => &[&T_x_parquet_application],
-"application/x-httpd-jsp" => &[&T_x_jsp_text],
-"application/vnd.japannet-directory-service" => &[&T_vnd_japannet_directory_service_application],
-"application/nss" => &[&T_nss_application],
-"application/vnd.sbm.mid2" => &[&T_vnd_sbm_mid2_application],
-"application/x-shapefile" => &[&T_x_shapefile_application],
-"application/x-sv4crc" => &[&T_x_sv4crc_application],
-"application/mp4" => &[&T_mp4_application],
-"application/vnd.etsi.iptvsad-bc+xml" => &[&T_vnd_etsi_iptvsad_bc_xml_application],
-"message/rfc2557" => &[&T_related_multipart],
-"application/csta+xml" => &[&T_csta_xml_application],
-"application/mosskey-data" => &[&T_mosskey_data_application],
-"application/x-quattro-pro;version=1-4" => &[&T_x_quattro_pro_version_1_4_application],
-"application/vnd.ms-visio.stencil" => &[&T_vnd_ms_visio_stencil_application],
-"application/vnd.oma.bcast.stkm" => &[&T_vnd_oma_bcast_stkm_application],
-"image/emf" => &[&T_emf_image],
-"application/vnd.powerbuilder75-s" => &[&T_vnd_powerbuilder75_s_application],
-"model/vnd.dwf;version=2" => &[&T_vnd_dwf_version_2_model],
-"application/x-quattro-pro;version=5" => &[&T_x_quattro_pro_version_5_application],
-"image/x-raw-fuji" => &[&T_x_raw_fuji_image],
-"text/x-actionscript" => &[&T_x_actionscript_text],
-"video/jpeg2000" => &[&T_jpeg2000_video],
-"application/dec-dx" => &[&T_dec_dx_application],
-"application/vnd.sun.xml.draw" => &[&T_vnd_sun_xml_draw_application],
-"audio/x-pn-realaudio" => &[&T_x_pn_realaudio_audio],
-"application/vnd.etsi.iptvsad-cod+xml" => &[&T_vnd_etsi_iptvsad_cod_xml_application],
-"image/vnd.dxf;format=binary" => &[&T_vnd_dxf_format_binary_image],
-"text/x-scheme" => &[&T_x_scheme_text],
-"video/mpeg" => &[&T_mpeg_video],
-"image/x-dcx" => &[&T_vnd_zbrush_dcx_image],
-"application/vnd.airzip.filesecure.azf" => &[&T_vnd_airzip_filesecure_azf_application],
-"application/vnd.3gpp.bsf+xml" => &[&T_vnd_3gpp_bsf_xml_application],
-"application/x-isatab-assay" => &[&T_x_isatab_assay_application],
-"application/vnd.japannet-payment-wakeup" => &[&T_vnd_japannet_payment_wakeup_application],
-"application/vnd.lotus-1-2-3;version=1" => &[&T_vnd_lotus_1_2_3_version_1_application],
-"application/sbml+xml" => &[&T_sbml_xml_application],
+"application/vnd.java.hprof.text" => &[&T_vnd_java_hprof_text_application],
+"application/vnd.oasis.opendocument.flat.presentation" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
+"text/x-verilog" => &[&T_x_verilog_text],
+"audio/vnd.adobe.soundbooth" => &[&T_vnd_adobe_soundbooth_audio],
+"application/vnd.ms-wmdrm.lic-chlg-req" => &[&T_vnd_ms_wmdrm_lic_chlg_req_application],
+"application/vnd.xmpie.plan" => &[&T_vnd_xmpie_plan_application],
+"application/x-vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
+"application/vnd.aether.imp" => &[&T_vnd_aether_imp_application],
+"audio/adpcm" => &[&T_adpcm_audio],
+"audio/ulpfec" => &[&T_ulpfec_audio],
+"application/x-stata-dta" => &[&T_x_stata_dta_application],
+"application/vnd.yamaha.openscoreformat.osfpvg+xml" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
+"application/x-uc2-compressed" => &[&T_x_uc2_compressed_application],
+"application/vnd.syncml.ds.notification" => &[&T_vnd_syncml_ds_notification_application],
+"audio/x-sap" => &[&T_x_sap_audio],
+"application/vnd.sealed.csf" => &[&T_vnd_sealed_csf_application],
+"application/vnd.nokia.pcd+wbxml" => &[&T_vnd_nokia_pcd_wbxml_application],
+"application/x-mobipocket-ebook" => &[&T_x_mobipocket_ebook_application],
+"application/ulpfec" => &[&T_ulpfec_application],
+"application/onenote;format=one" => &[&T_onenote_format_one_application],
+"text/plain" => &[&T_plain_text],
 "text/x-coldfusion" => &[&T_x_coldfusion_text],
-"audio/l24" => &[&T_l24_audio],
-"application/x-sas" => &[&T_x_sas_application],
-"application/x-bzip" => &[&T_x_bzip_application],
-"image/x-raw-phaseone" => &[&T_x_raw_phaseone_image],
-"video/x-dirac" => &[&T_x_dirac_video],
-"application/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_application],
-"application/vnd.oma.bcast.ltkm" => &[&T_vnd_oma_bcast_ltkm_application],
-"application/atomsvc+xml" => &[&T_atomsvc_xml_application],
-"application/edi-x12" => &[&T_edi_x12_application],
-"application/x-berkeley-db;format=hash;version=3" => &[&T_x_berkeley_db_format_hash_version_3_application],
-"application/vnd.hcl-bireports" => &[&T_vnd_hcl_bireports_application],
-"text/x-vbasic" => &[&T_x_vbasic_text],
-"image/hevc-sequence" => &[&T_heic_sequence_image],
-"application/commonground" => &[&T_commonground_application],
-"text/prs.fallenstein.rst" => &[&T_prs_fallenstein_rst_text],
-"video/x-ogg-uvs" => &[&T_x_ogguvs_video],
-"application/vnd.motorola.flexsuite.wem" => &[&T_vnd_motorola_flexsuite_wem_application],
-"application/x-bplist" => &[&T_x_bplist_application],
-"text/x-log" => &[&T_x_log_text],
-"image/vnd.fpx" => &[&T_vnd_fpx_image],
-"application/srgs+xml" => &[&T_srgs_xml_application],
-"audio/rtx" => &[&T_rtx_audio],
-"application/vnd.vividence.scriptfile" => &[&T_vnd_vividence_scriptfile_application],
-"application/vividence.scriptfile" => &[&T_vividence_scriptfile_application],
-"audio/vnd.rhetorex.32kadpcm" => &[&T_vnd_rhetorex_32kadpcm_audio],
-"image/heif-sequence" => &[&T_heif_sequence_image],
-"application/vnd.oma-scws-config" => &[&T_vnd_oma_scws_config_application],
-"model/example" => &[&T_example_model],
-"application/vnd.autopackage" => &[&T_vnd_autopackage_application],
-"application/vnd.triscape.mxs" => &[&T_vnd_triscape_mxs_application],
-"application/x-sas-fdb" => &[&T_x_sas_fdb_application],
-"application/dita+xml;format=topic" => &[&T_dita_xml_format_topic_application],
-"audio/x-aiff" => &[&T_x_aiff_audio],
-"application/x-mach-o-fvmlib" => &[&T_x_mach_o_fvmlib_application],
-"multipart/appledouble" => &[&T_appledouble_multipart],
-"application/envi.hdr" => &[&T_envi_hdr_application],
-"application/vnd.oma.bcast.associated-procedure-parameter+xml" => &[&T_vnd_oma_bcast_associated_procedure_parameter_xml_application],
-"application/x-vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
-"application/vnd.osgi.bundle" => &[&T_vnd_osgi_bundle_application],
-"application/vnd.llamagraphics.life-balance.exchange+xml" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
-"application/sereal;version=1" => &[&T_sereal_version_1_application],
-"application/vnd.syncml.dm+xml" => &[&T_vnd_syncml_dm_xml_application],
-"application/vnd.uplanet.listcmd-wbxml" => &[&T_vnd_uplanet_listcmd_wbxml_application],
-"application/set-registration-initiation" => &[&T_set_registration_initiation_application],
-"application/vnd.iptc.g2.newsmessage+xml" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
-"application/xop+xml" => &[&T_xop_xml_application],
-"application/x-java" => &[&T_java_vm_application],
-"application/vnd.nokia.n-gage.symbian.install" => &[&T_vnd_nokia_n_gage_symbian_install_application],
-"image/jxs" => &[&T_jxs_image],
-"application/ms-tnef" => &[&T_vnd_ms_tnef_application],
-"application/vnd.dvb.notif-ia-msglist+xml" => &[&T_vnd_dvb_notif_ia_msglist_xml_application],
-"application/vnd.sun.xml.writer.template" => &[&T_vnd_sun_xml_writer_template_application],
-"application/vnd.sealed.doc" => &[&T_vnd_sealed_doc_application],
-"application/x-msdownload" => &[&T_x_msdownload_application],
-"image/x-xbitmap" => &[&T_x_xbitmap_image],
-"application/mediaservercontrol+xml" => &[&T_mediaservercontrol_xml_application],
-"application/vnd.kodak-descriptor" => &[&T_vnd_kodak_descriptor_application],
-"video/h263" => &[&T_h263_video],
-"application/xcon-conference-info-diff+xml" => &[&T_xcon_conference_info_diff_xml_application],
-"application/vnd.hzn-3d-crossword" => &[&T_vnd_hzn_3d_crossword_application],
-"audio/g729e" => &[&T_g729e_audio],
-"application/vnd.ecowin.chart" => &[&T_vnd_ecowin_chart_application],
-"image/x-portable-graymap" => &[&T_x_portable_graymap_image],
-"application/x-font-adobe-metric" => &[&T_x_font_adobe_metric_application],
-"text/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
-"image/tiff" => &[&T_tiff_image],
-"application/vnd.criticaltools.wbs+xml" => &[&T_vnd_criticaltools_wbs_xml_application],
-"application/vnd.omads-email+xml" => &[&T_vnd_omads_email_xml_application],
-"application/vnd.ecowin.series" => &[&T_vnd_ecowin_series_application],
-"application/x-mif" => &[&T_vnd_mif_application],
-"application/vnd.ms-pki.seccat" => &[&T_vnd_ms_pki_seccat_application],
-"application/x-vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
-"application/vnd.dvb.iptv.alfec-enhancement" => &[&T_vnd_dvb_iptv_alfec_enhancement_application],
-"text/vnd.esmertec.theme-descriptor" => &[&T_vnd_esmertec_theme_descriptor_text],
-"application/x-spss-sav" => &[&T_x_spss_sav_application],
-"text/x-emacs-lisp" => &[&T_x_emacs_lisp_text],
-"application/xquery" => &[&T_xquery_application],
-"application/vnd.mobius.daf" => &[&T_vnd_mobius_daf_application],
-"application/vnd.recordare.musicxml+xml" => &[&T_vnd_recordare_musicxml_xml_application],
-"video/x-msvideo" => &[&T_x_msvideo_video],
-"application/vnd.amiga.ami" => &[&T_vnd_amiga_ami_application],
-"chemical/x-xyz" => &[&T_x_xyz_chemical],
-"text/aspdotnet" => &[&T_aspdotnet_text],
-"model/vnd.mts" => &[&T_vnd_mts_model],
-"application/x-quattro-pro" => &[&T_x_quattro_pro_application],
-"application/x-tex" => &[&T_x_tex_application],
-"application/vnd.amazon.ebook" => &[&T_vnd_amazon_ebook_application],
-"application/x-berkeley-db;format=hash;version=5" => &[&T_x_berkeley_db_format_hash_version_5_application],
-"image/vnd.sealedmedia.softseal.gif" => &[&T_vnd_sealedmedia_softseal_gif_image],
-"text/vnd.si.uricatalogue" => &[&T_vnd_si_uricatalogue_text],
-"audio/vnd.nuera.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
-"video/mp2p" => &[&T_mp2p_video],
-"application/iges" => &[&T_iges_application],
-"application/mac-binhex" => &[&T_mac_binhex40_application],
-"application/x-coreldraw" => &[&T_coreldraw_application],
-"application/x-x509-key;format=der" => &[&T_x_x509_key_format_der_application],
-"audio/speex" => &[&T_speex_audio],
-"audio/vmr-wb" => &[&T_vmr_wb_audio],
-"application/vnd.sealed.eml" => &[&T_vnd_sealed_eml_application],
-"multipart/signed" => &[&T_signed_multipart],
-"application/vnd.fujixerox.art-ex" => &[&T_vnd_fujixerox_art_ex_application],
-"application/x-tika-staroffice" => &[&T_x_tika_staroffice_application],
-"audio/g726-32" => &[&T_g726_32_audio],
-"image/x-raw-sigma" => &[&T_x_raw_sigma_image],
-"application/x-dwg" => &[&T_vnd_dwg_image],
-"application/vnd.ms-htmlhelp" => &[&T_vnd_ms_htmlhelp_application],
-"application/vnd.ecowin.seriesupdate" => &[&T_vnd_ecowin_seriesupdate_application],
-"application/vnd.yamaha.smaf-phrase" => &[&T_vnd_yamaha_smaf_phrase_application],
-"application/x-mysql-misam-data" => &[&T_x_mysql_misam_data_application],
-"application/x-troff-ms" => &[&T_troff_text],
-"application/vnd.software602.filler.form-xml-zip" => &[&T_vnd_software602_filler_form_xml_zip_application],
-"application/x-vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
-"application/voicexml+xml" => &[&T_voicexml_xml_application],
-"image/x-freehand" => &[&T_x_freehand_image],
-"application/mbox" => &[&T_mbox_application],
-"application/wasm" => &[&T_wasm_application],
-"application/vnd.japannet-registration" => &[&T_vnd_japannet_registration_application],
-"application/x-tika-msoffice-embedded" => &[&T_x_tika_msoffice_embedded_application],
-"application/x-mach-o-dylinker" => &[&T_x_mach_o_dylinker_application],
-"application/vnd.motorola.flexsuite" => &[&T_vnd_motorola_flexsuite_application],
-"video/webm" => &[&T_webm_video],
-"application/x-x509-key" => &[&T_x_x509_key_application],
-"model/vnd.collada+xml" => &[&T_vnd_collada_xml_model],
-"chemical/x-cdx" => &[&T_x_cdx_chemical],
-"message/global-headers" => &[&T_global_headers_message],
-"application/x-ms-asx" => &[&T_x_ms_asx_application],
-"audio/x-mpeg" => &[&T_mpeg_audio],
-"application/scvp-cv-response" => &[&T_scvp_cv_response_application],
-"application/vnd.epson.salt" => &[&T_vnd_epson_salt_application],
-"application/vnd.geogebra.tool" => &[&T_vnd_geogebra_tool_application],
-"application/atomcat+xml" => &[&T_atomcat_xml_application],
-"application/x-memgraph" => &[&T_x_memgraph_application],
-"application/wspolicy+xml" => &[&T_wspolicy_xml_application],
-"application/vnd.uplanet.cacheop" => &[&T_vnd_uplanet_cacheop_application],
-"application/vnd.mitsubishi.misty-guard.trustweb" => &[&T_vnd_mitsubishi_misty_guard_trustweb_application],
-"application/marc" => &[&T_marc_application],
-"application/x-iso9660-image" => &[&T_x_iso9660_image_application],
-"application/mbms-envelope+xml" => &[&T_mbms_envelope_xml_application],
-"image/vnd.net-fpx" => &[&T_vnd_net_fpx_image],
-"application/x-dtbresource+xml" => &[&T_x_dtbresource_xml_application],
-"model/vnd.gdl" => &[&T_vnd_gdl_model],
-"application/vnd.medcalcdata" => &[&T_vnd_medcalcdata_application],
-"application/x-x509-dsa-parameters" => &[&T_x_x509_dsa_parameters_application],
-"text/x-coffeescript" => &[&T_x_coffeescript_text],
-"application/postscript" => &[&T_postscript_application],
-"application/x-tika-msoffice-embedded;format=comp_obj" => &[&T_x_tika_msoffice_embedded_format_comp_obj_application],
-"chemical/x-csml" => &[&T_x_csml_chemical],
-"font/sfnt" => &[&T_x_font_ttf_application],
-"application/x-xliff+xml" => &[&T_x_xliff_xml_application],
-"application/x-jigdo" => &[&T_x_jigdo_application],
-"chemical/x-pdb" => &[&T_x_pdb_chemical],
-"application/lost+xml" => &[&T_lost_xml_application],
-"application/x-emf" => &[&T_emf_image],
-"image/x-portable-pixmap" => &[&T_x_portable_pixmap_image],
-"application/fits" => &[&T_fits_application],
-"application/vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
-"application/vnd.ms-lrm" => &[&T_vnd_ms_lrm_application],
-"application/x-killustrator" => &[&T_x_killustrator_application],
-"text/vnd.iptc.anpa" => &[&T_vnd_iptc_anpa_text],
-"application/vnd.font-fontforge-sfd" => &[&T_vnd_font_fontforge_sfd_application],
-"application/vnd.mobius.mqy" => &[&T_vnd_mobius_mqy_application],
-"model/vnd.dwf;version=5" => &[&T_vnd_dwf_version_5_model],
-"image/x-jbig2" => &[&T_x_jbig2_image],
-"video/x-oggyuv" => &[&T_x_oggyuv_video],
-"audio/vnd.dolby.mps" => &[&T_vnd_dolby_mps_audio],
-"message/imdn+xml" => &[&T_imdn_xml_message],
-"application/x-sqlite3" => &[&T_x_sqlite3_application],
-"application/vnd.oma.poc.optimized-progress-report+xml" => &[&T_vnd_oma_poc_optimized_progress_report_xml_application],
-"application/vnd.powerbuilder7-s" => &[&T_vnd_powerbuilder7_s_application],
-"application/cnrp+xml" => &[&T_cnrp_xml_application],
-"application/x-msaccess" => &[&T_x_msaccess_application],
-"application/x-webarchive" => &[&T_x_webarchive_application],
-"image/bmp" => &[&T_bmp_image],
-"model/vnd.gs-gdl" => &[&T_vnd_gs_gdl_model],
-"text/x-cgi" => &[&T_x_cgi_text],
-"image/x-pcx" => &[&T_vnd_zbrush_pcx_image],
-"message/global" => &[&T_global_message],
-"application/vnd.ms-outlook-pst" => &[&T_vnd_ms_outlook_pst_application],
-"application/vnd.fujixerox.docuworks.binder" => &[&T_vnd_fujixerox_docuworks_binder_application],
-"application/vnd.webturbo" => &[&T_vnd_webturbo_application],
-"application/x-stata-dta;version=14" => &[&T_x_stata_dta_version_14_application],
-"audio/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_audio],
-"application/ibe-pp-data" => &[&T_ibe_pp_data_application],
-"image/tiff-fx" => &[&T_tiff_fx_image],
-"application/vnd.yamaha.hv-dic" => &[&T_vnd_yamaha_hv_dic_application],
-"audio/vnd.cisco.nse" => &[&T_vnd_cisco_nse_audio],
-"audio/x-m4a" => &[&T_mp4_audio],
-"image/x-wmf" => &[&T_wmf_image],
-"application/macwriteii" => &[&T_macwriteii_application],
-"application/x-pkcs12" => &[&T_x_pkcs12_application],
-"video/mpv" => &[&T_mpv_video],
+"application/x-sibelius" => &[&T_x_sibelius_application],
+"application/vnd.japannet-verification-wakeup" => &[&T_vnd_japannet_verification_wakeup_application],
+"message/delivery-status" => &[&T_delivery_status_message],
+"application/x-vnd.datapackage+zip" => &[&T_x_vnd_datapackage_zip_application],
+"application/sereal" => &[&T_sereal_application],
+"text/x-csrc" => &[&T_x_c_text],
+"application/pgp-encrypted" => &[&T_pgp_encrypted_application],
+"audio/vnd.audiokoz" => &[&T_vnd_audiokoz_audio],
+"application/x-amiga-disk-format" => &[&T_x_amiga_disk_format_application],
+"text/x-clojure" => &[&T_x_clojure_text],
 "image/vnd.dxf" => &[&T_vnd_dxf_image],
-"application/vnd.lotus-wordpro" => &[&T_vnd_lotus_wordpro_application],
-"application/x-cdlink" => &[&T_x_cdlink_application],
-"application/x-sc" => &[&T_x_sc_application],
-"application/x-wais-source" => &[&T_x_wais_source_application],
-"application/vnd.iptc.g2.conceptitem+xml" => &[&T_vnd_iptc_g2_conceptitem_xml_application],
-"application/vnd.mcd" => &[&T_vnd_mcd_application],
-"application/vnd.wfa.wsc" => &[&T_vnd_wfa_wsc_application],
-"audio/qcelp" => &[&T_qcelp_audio],
-"text/x-ml" => &[&T_x_ml_text],
-"application/mac-compactpro" => &[&T_mac_compactpro_application],
-"application/vnd.kde.kivio" => &[&T_vnd_kde_kivio_application],
-"application/vnd.noblenet-directory" => &[&T_vnd_noblenet_directory_application],
-"application/vnd.pwg-xhtml-print+xml" => &[&T_vnd_pwg_xhtml_print_xml_application],
-"audio/gsm" => &[&T_gsm_audio],
-"application/fastsoap" => &[&T_fastsoap_application],
-"application/index.vnd" => &[&T_index_vnd_application],
-"application/vnd.hp-hpid" => &[&T_vnd_hp_hpid_application],
-"application/vnd.3gpp.pic-bw-large" => &[&T_vnd_3gpp_pic_bw_large_application],
-"application/vnd.cosmocaller" => &[&T_vnd_cosmocaller_application],
-"application/x-atari-floppy-disk-image" => &[&T_x_atari_floppy_disk_image_application],
-"audio/32kadpcm" => &[&T_32kadpcm_audio],
+"application/x-vmdk" => &[&T_x_vmdk_application],
+"application/x-roxio-toast" => &[&T_x_roxio_toast_application],
+"application/vnd.marlin.drm.actiontoken+xml" => &[&T_vnd_marlin_drm_actiontoken_xml_application],
+"application/vnd.crick.clicker.keyboard" => &[&T_vnd_crick_clicker_keyboard_application],
+"application/vnd.3gpp.bsf+xml" => &[&T_vnd_3gpp_bsf_xml_application],
+"text/vnd.curl.mcurl" => &[&T_vnd_curl_mcurl_text],
+"application/warc+gz" => &[&T_warc_gz_application],
+"application/vnd.genomatix.tuxedo" => &[&T_vnd_genomatix_tuxedo_application],
+"application/vnd.ms-visio" => &[&T_vnd_visio_application],
+"application/vnd.sealedmedia.softseal.pdf" => &[&T_vnd_sealedmedia_softseal_pdf_application],
+"image/g3fax" => &[&T_g3fax_image],
+"text/x-aspectj" => &[&T_x_aspectj_text],
+"text/vnd.esmertec.theme-descriptor" => &[&T_vnd_esmertec_theme_descriptor_text],
+"audio/vnd.dts" => &[&T_vnd_dts_audio],
+"application/ibe-key-request+xml" => &[&T_ibe_key_request_xml_application],
+"application/vnd.crick.clicker.wordbank" => &[&T_vnd_crick_clicker_wordbank_application],
+"application/binhex" => &[&T_mac_binhex40_application],
+"image/x-raw-casio" => &[&T_x_raw_casio_image],
+"application/vnd.ecowin.fileupdate" => &[&T_vnd_ecowin_fileupdate_application],
+"application/x-gtar" => &[&T_x_gtar_application],
+"application/x-java" => &[&T_java_vm_application],
+"application/x-msi" => &[&T_x_ms_installer_application],
+"application/simple-filter+xml" => &[&T_simple_filter_xml_application],
+"application/vnd.ms-fontobject" => &[&T_vnd_ms_fontobject_application],
+"image/vnd.sealedmedia.softseal.jpg" => &[&T_vnd_sealedmedia_softseal_jpg_image],
+"text/x-vbasic" => &[&T_x_vbasic_text],
+"text/x-config" => &[&T_x_config_text],
+"application/vnd.nokia.n-gage.ac+xml" => &[&T_vnd_nokia_n_gage_ac_xml_application],
+"text/vnd.si.uricatalogue" => &[&T_vnd_si_uricatalogue_text],
+"video/vnd.nokia.interleaved-multimedia" => &[&T_vnd_nokia_interleaved_multimedia_video],
+"application/vnd.nokia.n-gage.symbian.install" => &[&T_vnd_nokia_n_gage_symbian_install_application],
+"application/cstadata+xml" => &[&T_cstadata_xml_application],
+"application/x-dvi" => &[&T_x_dvi_application],
+"application/x-javascript" => &[&T_javascript_text],
+"application/vnd.sun.xml.math" => &[&T_vnd_sun_xml_math_application],
+"application/vnd.grafeq" => &[&T_vnd_grafeq_application],
+"text/vnd.wap.wml" => &[&T_vnd_wap_wml_text],
+"image/x-canon-cr2" => &[&T_x_canon_cr2_image],
+"text/xsl" => &[&T_xslfo_xml_application,&T_xslt_xml_application],
+"application/reginfo+xml" => &[&T_reginfo_xml_application],
+"application/vnd.openxmlformats-officedocument.spreadsheetml.template" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
+"application/gzipped" => &[&T_gzip_application],
+"application/set-payment" => &[&T_set_payment_application],
+"application/x-sas-data-v6" => &[&T_x_sas_data_v6_application],
+"application/vnd.mobius.plc" => &[&T_vnd_mobius_plc_application],
+"video/mpv" => &[&T_mpv_video],
+"application/vnd.intu.qfx" => &[&T_vnd_intu_qfx_application],
+"application/vnd.mobius.daf" => &[&T_vnd_mobius_daf_application],
+"application/vnd.ms-wmdrm.meter-resp" => &[&T_vnd_ms_wmdrm_meter_resp_application],
+"audio/parityfec" => &[&T_parityfec_audio],
+"application/vnd.spotfire.dxp" => &[&T_vnd_spotfire_dxp_application],
+"application/vnd.japannet-directory-service" => &[&T_vnd_japannet_directory_service_application],
+"application/pkix-crl" => &[&T_pkix_crl_application],
+"message/s-http" => &[&T_s_http_message],
+"application/ibe-pkg-reply+xml" => &[&T_ibe_pkg_reply_xml_application],
+"application/vnd.garmin.tcx+xml" => &[&T_vnd_garmin_tcx_xml_application],
+"application/vnd.jisp" => &[&T_vnd_jisp_application],
+"application/x-coredump" => &[&T_x_coredump_application],
+"audio/clearmode" => &[&T_clearmode_audio],
+"application/vnd.meridian-slingshot" => &[&T_vnd_meridian_slingshot_application],
+"application/x-dwg" => &[&T_vnd_dwg_image],
+"text/vnd.trolltech.linguist" => &[&T_vnd_trolltech_linguist_text],
+"application/x-zoo" => &[&T_x_zoo_application],
+"application/x-coreldraw" => &[&T_coreldraw_application],
+"text/x-ada" => &[&T_x_ada_text],
+"application/sereal;version=1" => &[&T_sereal_version_1_application],
+"message/disposition-notification" => &[&T_disposition_notification_message],
+"application/xcap-att+xml" => &[&T_xcap_att_xml_application],
+"audio/vnd.hns.audio" => &[&T_vnd_hns_audio_audio],
+"audio/vnd.ms-playready.media.pya" => &[&T_vnd_ms_playready_media_pya_audio],
+"application/x-font-vfont" => &[&T_x_font_vfont_application],
+"application/vnd.nokia.radio-preset" => &[&T_vnd_nokia_radio_preset_application],
+"audio/x-aiff" => &[&T_x_aiff_audio],
+"application/vnd.oma.bcast.imd+xml" => &[&T_vnd_oma_bcast_imd_xml_application],
+"application/x-executable" => &[&T_x_executable_application],
+"application/x-tika-msoffice-embedded;format=comp_obj" => &[&T_x_tika_msoffice_embedded_format_comp_obj_application],
+"application/vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
+"application/vnd.yamaha.hv-script" => &[&T_vnd_yamaha_hv_script_application],
+"image/x-rgb" => &[&T_x_rgb_image],
+"application/vnd.etsi.aoc+xml" => &[&T_vnd_etsi_aoc_xml_application],
+"application/vnd.ecowin.seriesrequest" => &[&T_vnd_ecowin_seriesrequest_application],
+"image/vnd.zbrush.dcx" => &[&T_vnd_zbrush_dcx_image],
+"text/x-python" => &[&T_x_python_text],
+"application/vnd.shana.informed.formdata" => &[&T_vnd_shana_informed_formdata_application],
+"application/vnd.xmpie.dpkg" => &[&T_vnd_xmpie_dpkg_application],
+"audio/smv-qcp" => &[&T_smv_qcp_audio],
+"application/x-wine-extension-inf" => &[&T_inf_application],
+"application/font-woff2" => &[&T_woff2_font],
+"text/x-web-markdown" => &[&T_x_web_markdown_text],
+"application/vnd.ms-playready.initiator+xml" => &[&T_vnd_ms_playready_initiator_xml_application],
+"application/prs.plucker" => &[&T_prs_plucker_application],
+"application/remote-printing" => &[&T_remote_printing_application],
+"application/vnd.yamaha.openscoreformat" => &[&T_vnd_yamaha_openscoreformat_application],
+"application/x-sas-transport" => &[&T_x_sas_transport_application],
+"application/vnd.vectorworks" => &[&T_vnd_vectorworks_application],
+"application/vnd.uoml+xml" => &[&T_vnd_uoml_xml_application],
+"application/pgp" => &[&T_pgp_encrypted_application],
+"message/rfc2557" => &[&T_related_multipart],
+"application/vnd.uplanet.alert" => &[&T_vnd_uplanet_alert_application],
+"application/vnd.iptc.g2.packageitem+xml" => &[&T_vnd_iptc_g2_packageitem_xml_application],
+"application/warc" => &[&T_warc_application],
+"application/epp+xml" => &[&T_epp_xml_application],
+"text/prs.fallenstein.rst" => &[&T_prs_fallenstein_rst_text],
+"application/x-installshield" => &[&T_x_installshield_application],
+"application/vnd.software602.filler.form-xml-zip" => &[&T_vnd_software602_filler_form_xml_zip_application],
+"application/x-123" => &[&T_vnd_lotus_1_2_3_application],
+"image/xcf" => &[&T_x_xcf_image],
+"model/vnd.mts" => &[&T_vnd_mts_model],
+"application/x-dvd-ifo" => &[&T_x_dvd_ifo_application],
+"image/x-pcx" => &[&T_vnd_zbrush_pcx_image],
+"text/vnd.latex-z" => &[&T_vnd_latex_z_text],
+"application/vnd.geogebra.file" => &[&T_vnd_geogebra_file_application],
+"application/vnd.ms-excel.workspace.3" => &[&T_vnd_ms_excel_workspace_3_application],
+"application/vnd.ms-powerpoint.slideshow.macroenabled.12" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
+"application/bizagi-modeler" => &[&T_bizagi_modeler_application],
+"application/x-tex-tfm" => &[&T_x_tex_tfm_application],
+"application/vnd.ms-spreadsheetml" => &[&T_vnd_ms_spreadsheetml_application],
+"model/vnd.gtw" => &[&T_vnd_gtw_model],
+"application/vnd.stardivision.draw" => &[&T_vnd_stardivision_draw_application],
+"audio/x-ogg-pcm" => &[&T_x_oggpcm_audio],
+"application/x-vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
+"message/x-emlx" => &[&T_x_emlx_message],
+"application/x-x509-user-cert" => &[&T_x_x509_cert_application],
+"video/vnd.iptvforum.2dparityfec-1010" => &[&T_vnd_iptvforum_2dparityfec_1010_video],
+"application/vnd.sbm.mid2" => &[&T_vnd_sbm_mid2_application],
+"application/news-checkgroups" => &[&T_news_checkgroups_application],
+"text/x-jsp" => &[&T_x_jsp_text],
+"image/heif-sequence" => &[&T_heif_sequence_image],
+"application/vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
+"audio/x-mpeg" => &[&T_mpeg_audio],
 "application/x-plist" => &[&T_x_plist_application],
-"text/x-perl" => &[&T_x_perl_text],
-"application/vnd.blueice.multipass" => &[&T_vnd_blueice_multipass_application],
-"video/x-oggrgb" => &[&T_x_oggrgb_video],
+"application/pidf+xml" => &[&T_pidf_xml_application],
+"message/news" => &[&T_news_message],
+"application/x-mimearchive" => &[&T_related_multipart],
+"application/im-iscomposing+xml" => &[&T_im_iscomposing_xml_application],
+"audio/vnd.dlna.adts" => &[&T_vnd_dlna_adts_audio],
+"text/vnd.curl" => &[&T_vnd_curl_text],
+"image/t38" => &[&T_t38_image],
+"application/vnd.pvi.ptid1" => &[&T_vnd_pvi_ptid1_application],
+"model/mesh" => &[&T_mesh_model],
+"application/dita+xml;format=map" => &[&T_dita_xml_format_map_application],
+"application/set-payment-initiation" => &[&T_set_payment_initiation_application],
+"audio/qcelp" => &[&T_qcelp_audio],
+"application/cellml+xml" => &[&T_cellml_xml_application],
+"text/x-common-lisp" => &[&T_x_common_lisp_text],
+"application/vnd.airzip.filesecure.azf" => &[&T_vnd_airzip_filesecure_azf_application],
+"application/x-authorware-bin" => &[&T_x_authorware_bin_application],
+"application/vnd.ms-word.template.macroenabled.12" => &[&T_vnd_ms_word_template_macroenabled_12_application],
+"application/vnd.cups-ppd" => &[&T_vnd_cups_ppd_application],
+"image/vnd.sealed.png" => &[&T_vnd_sealed_png_image],
+"audio/vnd.cisco.nse" => &[&T_vnd_cisco_nse_audio],
+"video/avi" => &[&T_x_msvideo_video],
+"application/vnd.commerce-battelle" => &[&T_vnd_commerce_battelle_application],
+"application/x-msmetafile" => &[&T_wmf_image],
+"application/x-tar" => &[&T_x_tar_application],
+"application/vnd.noblenet-directory" => &[&T_vnd_noblenet_directory_application],
+"application/vnd.groove-account" => &[&T_vnd_groove_account_application],
+"application/vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
+"application/vnd.jam" => &[&T_vnd_jam_application],
+"application/vnd.omads-email+xml" => &[&T_vnd_omads_email_xml_application],
+"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
+"application/bat" => &[&T_x_bat_application],
+"application/vnd.oma.poc.detailed-progress-report+xml" => &[&T_vnd_oma_poc_detailed_progress_report_xml_application],
+"application/vnd.nokia.isds-radio-presets" => &[&T_vnd_nokia_isds_radio_presets_application],
+"video/pointer" => &[&T_pointer_video],
+"application/vnd.powerbuilder6-s" => &[&T_vnd_powerbuilder6_s_application],
+"text/x-d" => &[&T_x_d_text],
+"application/moss-keys" => &[&T_moss_keys_application],
+"application/vnd.dvb.iptv.alfec-base" => &[&T_vnd_dvb_iptv_alfec_base_application],
+"application/vnd.shp" => &[&T_vnd_shp_application],
+"application/vnd.wv.csp+xml" => &[&T_vnd_wv_csp_xml_application],
+"application/vnd.scribus" => &[&T_vnd_scribus_application],
+"application/vnd.mfmp" => &[&T_vnd_mfmp_application],
+"audio/eac3" => &[&T_eac3_audio],
+"audio/evrc" => &[&T_evrc_audio],
+"application/spirits-event+xml" => &[&T_spirits_event_xml_application],
+"audio/x-caf" => &[&T_x_caf_audio],
+"image/x-raw-imacon" => &[&T_x_raw_imacon_image],
+"text/x-modula" => &[&T_x_modula_text],
+"application/sieve" => &[&T_sieve_application],
+"video/vnd.nokia.videovoip" => &[&T_vnd_nokia_videovoip_video],
+"application/x-geopackage; version=1.1Or1.0" => &[&T_x_geopackage__version_1_1Or1_0_application],
+"application/vnd.mozilla.xul+xml" => &[&T_vnd_mozilla_xul_xml_application],
+"application/vnd.trueapp" => &[&T_vnd_trueapp_application],
+"image/x-xbitmap" => &[&T_x_xbitmap_image],
+"application/x-msdownload;format=pe" => &[&T_x_msdownload_format_pe_application],
+"application/vnd.sss-cod" => &[&T_vnd_sss_cod_application],
+"application/x-berkeley-db;format=btree;version=2" => &[&T_x_berkeley_db_format_btree_version_2_application],
+"multipart/mixed" => &[&T_mixed_multipart],
+"application/x-stata-dta;version=13" => &[&T_x_stata_dta_version_13_application],
+"application/vnd.nokia.catalogs" => &[&T_vnd_nokia_catalogs_application],
+"audio/asc" => &[&T_asc_audio],
+"video/x-ms-wmv" => &[&T_x_ms_wmv_video],
+"text/x-php" => &[&T_x_php_text],
+"application/vnd.etsi.iptvsad-cod+xml" => &[&T_vnd_etsi_iptvsad_cod_xml_application],
+"application/x-cdr" => &[&T_coreldraw_application],
+"application/vnd.mobius.mqy" => &[&T_vnd_mobius_mqy_application],
+"application/x-font-ttf" => &[&T_x_font_ttf_application],
+"text/richtext" => &[&T_richtext_text],
+"application/cu-seeme" => &[&T_cu_seeme_application],
+"application/vnd.apple.pages" => &[&T_vnd_apple_pages_application],
+"application/hwp+zip" => &[&T_hwp_zip_application],
+"audio/g726-32" => &[&T_g726_32_audio],
+"application/vnd.cybank" => &[&T_vnd_cybank_application],
+"application/vnd.fdf" => &[&T_vnd_fdf_application],
+"application/x-font-sunos-news" => &[&T_x_font_sunos_news_application],
+"audio/mp4a-latm" => &[&T_mp4a_latm_audio],
+"application/vnd.ms-word" => &[&T_msword_application],
+"text/x-groovy" => &[&T_x_groovy_text],
+"application/vnd.mitsubishi.misty-guard.trustweb" => &[&T_vnd_mitsubishi_misty_guard_trustweb_application],
+"application/vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
+"application/vnd.nokia.iptv.config+xml" => &[&T_vnd_nokia_iptv_config_xml_application],
+"application/vnd.route66.link66+xml" => &[&T_vnd_route66_link66_xml_application],
+"application/x-mach-o-dsym" => &[&T_x_mach_o_dsym_application],
+"application/x-java-vm" => &[&T_java_vm_application],
+"image/prs.btif" => &[&T_prs_btif_image],
+"application/vnd.osa.netdeploy" => &[&T_vnd_osa_netdeploy_application],
+"image/x-raw-panasonic" => &[&T_x_raw_panasonic_image],
+"application/vnd.poc.group-advertisement+xml" => &[&T_vnd_poc_group_advertisement_xml_application],
+"application/vnd.vidsoft.vidconference" => &[&T_vnd_vidsoft_vidconference_application],
+"audio/vnd.cns.inf1" => &[&T_vnd_cns_inf1_audio],
+"application/x-kdelnk" => &[&T_x_kdelnk_application],
+"application/atom+xml" => &[&T_atom_xml_application],
+"application/x-sc" => &[&T_x_sc_application],
+"application/vnd.kodak-descriptor" => &[&T_vnd_kodak_descriptor_application],
+"application/vnd.eudora.data" => &[&T_vnd_eudora_data_application],
+"application/x-filemaker" => &[&T_x_filemaker_application],
+"audio/g726-16" => &[&T_g726_16_audio],
+"audio/mobile-xmf" => &[&T_mobile_xmf_audio],
+"audio/x-pn-realaudio" => &[&T_x_pn_realaudio_audio],
+"application/vnd.adobe.indesign-idml-package" => &[&T_vnd_adobe_indesign_idml_package_application],
+"application/x-ms-emz" => &[&T_x_emf_compressed_image],
+"application/vnd.ecowin.chart" => &[&T_vnd_ecowin_chart_application],
+"application/vnd.lotus-1-2-3;version=1" => &[&T_vnd_lotus_1_2_3_version_1_application],
+"application/atomcat+xml" => &[&T_atomcat_xml_application],
+"video/vnd.ms-playready.media.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
+"application/vnd.mfer" => &[&T_vnd_mfer_application],
+"application/vnd.obn" => &[&T_vnd_obn_application],
+"application/dns" => &[&T_dns_application],
+"application/vnd.pg.format" => &[&T_vnd_pg_format_application],
+"audio/vnd.dolby.heaac.1" => &[&T_vnd_dolby_heaac_1_audio],
+"image/vnd.sealedmedia.softseal.gif" => &[&T_vnd_sealedmedia_softseal_gif_image],
+"video/bt656" => &[&T_bt656_video],
+"application/vnd.motorola.flexsuite" => &[&T_vnd_motorola_flexsuite_application],
+"application/onenote" => &[&T_onenote_application],
+"application/x-mach-o-dylinker" => &[&T_x_mach_o_dylinker_application],
+"model/x.stl-ascii" => &[&T_x_stl_ascii_model],
+"application/vnd.publishare-delta-tree" => &[&T_vnd_publishare_delta_tree_application],
+"application/onix-message+xml" => &[&T_onix_message_xml_application],
+"video/vnd.objectvideo" => &[&T_vnd_objectvideo_video],
+"application/x-vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
+"application/vnd.kde.kformula" => &[&T_vnd_kde_kformula_application],
+"application/vnd.ms-excel.sheet.binary.macroenabled.12" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
+"audio/vnd.dts.hd" => &[&T_vnd_dts_hd_audio],
+"application/vnd.mcd" => &[&T_vnd_mcd_application],
+"application/x-mach-o" => &[&T_x_mach_o_application],
+"application/nss" => &[&T_nss_application],
+"application/x-x509-cert" => &[&T_x_x509_cert_application],
+"application/x-msdownload;format=pe-itanium" => &[&T_x_msdownload_format_pe_itanium_application],
+"application/vnd.visionary" => &[&T_vnd_visionary_application],
+"application/mosskey-data" => &[&T_mosskey_data_application],
+"application/x-ms-nls" => &[&T_x_ms_nls_application],
+"application/x-webarchive" => &[&T_x_webarchive_application],
+"application/xml-dtd" => &[&T_xml_dtd_application],
+"application/gpx+xml" => &[&T_gpx_xml_application],
+"application/vnd.oma-scws-http-response" => &[&T_vnd_oma_scws_http_response_application],
+"application/sereal;version=3" => &[&T_sereal_version_3_application],
+"application/x-berkeley-db;format=hash;version=3" => &[&T_x_berkeley_db_format_hash_version_3_application],
+"audio/mpeg4-generic" => &[&T_mpeg4_generic_audio],
+"audio/x-dec-basic" => &[&T_x_dec_basic_audio],
+"audio/x-oggpcm" => &[&T_x_oggpcm_audio],
+"text/yaml" => &[&T_x_yaml_text],
+"application/pkixcmp" => &[&T_pkixcmp_application],
+"application/x-apple-diskimage" => &[&T_x_apple_diskimage_application],
+"application/vnd.nokia.n-gage.data" => &[&T_vnd_nokia_n_gage_data_application],
+"audio/basic" => &[&T_basic_audio],
+"image/x-cdr" => &[&T_coreldraw_application],
+"application/vnd.msign" => &[&T_vnd_msign_application],
+"video/x-f4v" => &[&T_x_f4v_video],
+"text/vnd.wap.sl" => &[&T_vnd_wap_sl_text],
+"application/x-isatab-investigation" => &[&T_x_isatab_investigation_application],
+"application/vnd.motorola.flexsuite.adsi" => &[&T_vnd_motorola_flexsuite_adsi_application],
+"application/hyperstudio" => &[&T_hyperstudio_application],
+"text/dns" => &[&T_dns_text],
+"application/vnd.ms-visio.stencil" => &[&T_vnd_ms_visio_stencil_application],
+"application/vnd.fujitsu.oasysprs" => &[&T_vnd_fujitsu_oasysprs_application],
+"application/x-sas-itemstor" => &[&T_x_sas_itemstor_application],
+"application/vnd.uplanet.bearer-choice" => &[&T_vnd_uplanet_bearer_choice_application],
+"application/vnd.chipnuts.karaoke-mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
+"application/vnd.uplanet.listcmd-wbxml" => &[&T_vnd_uplanet_listcmd_wbxml_application],
+"image/jxr" => &[&T_jxr_image],
+"application/vnd.acucobol" => &[&T_vnd_acucobol_application],
+"model/vnd.gs-gdl" => &[&T_vnd_gs_gdl_model],
+"audio/g726-24" => &[&T_g726_24_audio],
+"application/x-ms-compress-szdd" => &[&T_x_ms_compress_szdd_application],
+"application/x-xml" => &[&T_xml_application],
+"application/x-x509-ca-cert" => &[&T_x_x509_cert_application],
+"application/vnd.kde.kspread" => &[&T_vnd_kde_kspread_application],
+"application/x-msmoney" => &[&T_x_msmoney_application],
+"text/x-log" => &[&T_x_log_text],
+"application/vnd.fujitsu.oasys2" => &[&T_vnd_fujitsu_oasys2_application],
+"text/x-makefile" => &[&T_x_makefile_text],
+"application/vnd.iptc.g2.knowledgeitem+xml" => &[&T_vnd_iptc_g2_knowledgeitem_xml_application],
+"audio/amr-nb" => &[&T_amr_audio],
+"model/vnd.dwf;version=5" => &[&T_vnd_dwf_version_5_model],
+"text/x-cgi" => &[&T_x_cgi_text],
+"text/x-dtd" => &[&T_xml_dtd_application],
+"application/x-iso9660-image" => &[&T_x_iso9660_image_application],
+"application/vnd.groove-vcard" => &[&T_vnd_groove_vcard_application],
 "application/x-gzip-compressed" => &[&T_gzip_application],
+"application/vnd.seemail" => &[&T_vnd_seemail_application],
+"application/vnd.adobe.aftereffects.template" => &[&T_vnd_adobe_aftereffects_template_application],
+"application/relax-ng-compact-syntax" => &[&T_relax_ng_compact_syntax_application],
+"application/kpml-response+xml" => &[&T_kpml_response_xml_application],
+"text/prs.lines.tag" => &[&T_prs_lines_tag_text],
+"application/vnd.uplanet.signal" => &[&T_vnd_uplanet_signal_application],
+"application/x-gzip" => &[&T_gzip_application],
+"application/vnd.nokia.landmark+wbxml" => &[&T_vnd_nokia_landmark_wbxml_application],
+"audio/vnd.4sb" => &[&T_vnd_4sb_audio],
+"application/vnd.ibm.minipay" => &[&T_vnd_ibm_minipay_application],
+"application/vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
+"application/x-x509-dsa-parameters" => &[&T_x_x509_dsa_parameters_application],
+"application/vnd.ms-xpsdocument" => &[&T_vnd_ms_xpsdocument_application],
+"audio/amr" => &[&T_amr_audio],
+"application/vnd.recordare.musicxml+xml" => &[&T_vnd_recordare_musicxml_xml_application],
+"image/vnd.microsoft.icon" => &[&T_vnd_microsoft_icon_image],
+"application/x-elf" => &[&T_x_elf_application],
+"text/vnd.fly" => &[&T_vnd_fly_text],
+"text/x-scheme" => &[&T_x_scheme_text],
+"video/h263-2000" => &[&T_h263_2000_video],
+"application/x-openscad" => &[&T_x_openscad_application],
+"application/vnd.umajin" => &[&T_vnd_umajin_application],
+"application/vnd.uplanet.list-wbxml" => &[&T_vnd_uplanet_list_wbxml_application],
+"application/x-font-bdf" => &[&T_x_font_bdf_application],
+"application/vnd.swiftview-ics" => &[&T_vnd_swiftview_ics_application],
+"text/x-eiffel" => &[&T_x_eiffel_text],
+"application/x-sas-mddb" => &[&T_x_sas_mddb_application],
+"application/x-touhou" => &[&T_x_touhou_application],
+"application/vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
+"application/x-berkeley-db;format=hash;version=5" => &[&T_x_berkeley_db_format_hash_version_5_application],
+"application/x-tika-unix-dump" => &[&T_x_tika_unix_dump_application],
+"audio/lpc" => &[&T_lpc_audio],
+"application/x-vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
+"application/vnd.chemdraw+xml" => &[&T_vnd_chemdraw_xml_application],
+"application/vnd.ezpix-album" => &[&T_vnd_ezpix_album_application],
+"video/rtx" => &[&T_rtx_video],
+"application/index.obj" => &[&T_index_obj_application],
+"audio/flac" => &[&T_x_flac_audio],
+"text/x-go" => &[&T_x_go_text],
+"application/smil" => &[&T_smil_xml_application],
+"image/naplps" => &[&T_naplps_image],
+"audio/3gpp" => &[&T_3gpp_video],
+"application/vnd.eszigno3+xml" => &[&T_vnd_eszigno3_xml_application],
+"application/x-activemime" => &[&T_x_activemime_application],
+"image/avif" => &[&T_avif_image],
+"video/vnd.iptvforum.ttsmpeg2" => &[&T_vnd_iptvforum_ttsmpeg2_video],
+"application/vnd.msa-disk-image" => &[&T_vnd_msa_disk_image_application],
+"application/vnd.syncml+xml" => &[&T_vnd_syncml_xml_application],
+"text/red" => &[&T_red_text],
+"image/x-raw-fuji" => &[&T_x_raw_fuji_image],
+"image/vnd.adobe.photoshop" => &[&T_vnd_adobe_photoshop_image],
+"text/ulpfec" => &[&T_ulpfec_text],
+"application/matlab-mat" => &[&T_x_matlab_data_application],
+"application/x-authorware-map" => &[&T_x_authorware_map_application],
+"application/vnd.lotus-1-2-3;version=4" => &[&T_vnd_lotus_1_2_3_version_4_application],
+"application/vnd.recordare.musicxml" => &[&T_vnd_recordare_musicxml_application],
+"text/troff" => &[&T_troff_text],
+"application/vnd.clonk.c4group" => &[&T_vnd_clonk_c4group_application],
+"image/jp2" => &[&T_jp2_image],
+"application/vnd.lotus-organizer" => &[&T_vnd_lotus_organizer_application],
+"image/vnd.ms-modi" => &[&T_vnd_ms_modi_image],
+"application/vnd.businessobjects" => &[&T_vnd_businessobjects_application],
+"video/mj2" => &[&T_mj2_video],
+"application/andrew-inset" => &[&T_andrew_inset_application],
+"application/vnd.ms-visio.stencil.macroEnabled.12" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
+"multipart/related" => &[&T_related_multipart],
+"application/x-matlab-data" => &[&T_x_matlab_data_application],
+"application/onenote;format=onetoc2" => &[&T_onenote_format_onetoc2_application],
+"image/vnd.mozilla.apng" => &[&T_vnd_mozilla_apng_image],
+"application/mbms-msk+xml" => &[&T_mbms_msk_xml_application],
+"image/vnd.fpx" => &[&T_vnd_fpx_image],
+"application/vnd.dreamfactory" => &[&T_vnd_dreamfactory_application],
+"application/vnd.zzazz.deck+xml" => &[&T_vnd_zzazz_deck_xml_application],
+"application/soap+fastinfoset" => &[&T_soap_fastinfoset_application],
+"application/vnd.ibm.secure-container" => &[&T_vnd_ibm_secure_container_application],
+"application/x-httpresponse" => &[&T_x_httpresponse_application],
+"video/jpm" => &[&T_jpm_image],
+"application/vnd.oasis.opendocument.flat.spreadsheet" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
+"audio/x-matroska" => &[&T_x_matroska_audio],
+"audio/vnd.cmles.radio-events" => &[&T_vnd_cmles_radio_events_audio],
+"audio/x-mod" => &[&T_x_mod_audio],
+"application/smil+xml" => &[&T_smil_xml_application],
+"application/x-bzip2" => &[&T_x_bzip2_application],
+"image/prs.pti" => &[&T_prs_pti_image],
+"image/x-emf" => &[&T_emf_image],
+"application/vnd.dvb.notif-aggregate-root+xml" => &[&T_vnd_dvb_notif_aggregate_root_xml_application],
+"application/vnd.kenameaapp" => &[&T_vnd_kenameaapp_application],
+"application/vnd.ms-wmdrm.meter-chlg-req" => &[&T_vnd_ms_wmdrm_meter_chlg_req_application],
+"application/vnd.ms-visio.drawing.macroEnabled.12" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
+"application/vnd.vd-study" => &[&T_vnd_vd_study_application],
+"audio/aiff" => &[&T_x_aiff_audio],
+"application/x-mscardfile" => &[&T_x_mscardfile_application],
+"application/ibe-pp-data" => &[&T_ibe_pp_data_application],
+"application/vnd.mseq" => &[&T_vnd_mseq_application],
+"application/ccxml+xml" => &[&T_ccxml_xml_application],
+"application/x-endnote-style" => &[&T_x_endnote_style_application],
+"text/x-awk" => &[&T_x_awk_text],
+"audio/wav" => &[&T_vnd_wave_audio],
+"application/x-shar" => &[&T_x_shar_application],
+"text/x-coffeescript" => &[&T_x_coffeescript_text],
+"text/rtf" => &[&T_rtf_application],
+"text/x-csharp" => &[&T_x_csharp_text],
+"application/vnd.sus-calendar" => &[&T_vnd_sus_calendar_application],
+"application/mbms-deregister+xml" => &[&T_mbms_deregister_xml_application],
+"image/x-tga" => &[&T_x_tga_image],
+"video/3g2" => &[&T_3gpp2_video],
+"application/vnd.fujitsu.oasys" => &[&T_vnd_fujitsu_oasys_application],
+"application/dialog-info+xml" => &[&T_dialog_info_xml_application],
+"text/x-scss" => &[&T_x_scss_text],
+"application/vnd.ms-wpl" => &[&T_vnd_ms_wpl_application],
+"message/sipfrag" => &[&T_sipfrag_message],
+"application/vnd.oma.dcd" => &[&T_vnd_oma_dcd_application],
+"multipart/header-set" => &[&T_header_set_multipart],
+"application/iges" => &[&T_iges_application],
+"video/celb" => &[&T_celb_video],
+"application/timestamped-data" => &[&T_timestamped_data_application],
+"audio/dvi4" => &[&T_dvi4_audio],
+"audio/vnd.nuera.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
+"application/vnd.pocketlearn" => &[&T_vnd_pocketlearn_application],
+"application/xhtml-voice+xml" => &[&T_xhtml_voice_xml_application],
+"application/x-killustrator" => &[&T_x_killustrator_application],
+"application/vnd.triscape.mxs" => &[&T_vnd_triscape_mxs_application],
+"audio/ac3" => &[&T_ac3_audio],
+"video/x-fli" => &[&T_x_fli_video],
+"application/x-vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
+"image/x-icns" => &[&T_icns_image],
+"application/x-tika-ooxml-protected" => &[&T_x_tika_ooxml_protected_application],
+"application/x-fossil-global-conf" => &[&T_x_fossil_global_conf_application],
+"audio/bv32" => &[&T_bv32_audio],
+"application/vnd.criticaltools.wbs+xml" => &[&T_vnd_criticaltools_wbs_xml_application],
+"text/x-fortran" => &[&T_x_fortran_text],
+"application/vnd.ncd.reference" => &[&T_vnd_ncd_reference_application],
+"application/mac-binhex" => &[&T_mac_binhex40_application],
+"application/vnd.apple.numbers" => &[&T_vnd_apple_numbers_application],
+"application/illustrator" => &[&T_illustrator_application],
+"audio/rtx" => &[&T_rtx_audio],
+"application/vnd.ms-wordml" => &[&T_vnd_ms_wordml_application],
+"application/oda" => &[&T_oda_application],
+"application/x-arj" => &[&T_x_arj_application],
+"application/x-rar-compressed;version=4" => &[&T_x_rar_compressed_version_4_application],
+"application/vnd.sun.xml.calc.template" => &[&T_vnd_sun_xml_calc_template_application],
+"application/vnd.adobe.aftereffects.project" => &[&T_vnd_adobe_aftereffects_project_application],
+"application/x-ms-wmz" => &[&T_x_ms_wmz_application],
+"application/vnd.yamaha.smaf-phrase" => &[&T_vnd_yamaha_smaf_phrase_application],
+"application/rtx" => &[&T_rtx_application],
+"text/x-sed" => &[&T_x_sed_text],
+"application/vnd.stardivision.calc" => &[&T_vnd_stardivision_calc_application],
+"application/vnd.wap.wmlscriptc" => &[&T_vnd_wap_wmlscriptc_application],
+"application/vnd.ibm.afplinedata" => &[&T_vnd_ibm_afplinedata_application],
+"text/vnd.dmclientscript" => &[&T_vnd_dmclientscript_text],
+"application/vnd.uplanet.listcmd" => &[&T_vnd_uplanet_listcmd_application],
+"application/vnd.dxr" => &[&T_vnd_dxr_application],
+"application/atomsvc+xml" => &[&T_atomsvc_xml_application],
+"application/x-isatab-assay" => &[&T_x_isatab_assay_application],
+"application/ecmascript" => &[&T_ecmascript_application],
+"text/directory" => &[&T_directory_text],
+"video/x-flv" => &[&T_x_flv_video],
+"application/x-texnicard" => &[&T_x_texnicard_application],
+"application/x-sas-view" => &[&T_x_sas_view_application],
+"application/x-lha" => &[&T_x_lha_application],
+"application/x-object" => &[&T_x_object_application],
+"application/x-java-pack200" => &[&T_x_java_pack200_application],
+"application/x-mbtiles" => &[&T_x_mbtiles_application],
+"application/vnd.pwg-multiplexed" => &[&T_vnd_pwg_multiplexed_application],
+"application/vnd.intertrust.nncp" => &[&T_vnd_intertrust_nncp_application],
+"application/vnd.sun.xml.draw.template" => &[&T_vnd_sun_xml_draw_template_application],
+"application/x-endnote-refer" => &[&T_x_endnote_refer_application],
+"application/x-matroska" => &[&T_x_matroska_application],
+"application/x-Gnumeric-spreadsheet" => &[&T_x_gnumeric_application],
+"audio/aac" => &[&T_x_aac_audio],
+"text/x-erlang" => &[&T_x_erlang_text],
+"application/x-tika-staroffice" => &[&T_x_tika_staroffice_application],
+"application/cbor" => &[&T_cbor_application],
+"application/vnd.groove-identity-message" => &[&T_vnd_groove_identity_message_application],
+"image/vnd.djvu" => &[&T_vnd_djvu_image],
+"application/x-tex" => &[&T_x_tex_application],
+"application/vnd.cups-pdf" => &[&T_vnd_cups_pdf_application],
+"application/wsdl+xml" => &[&T_wsdl_xml_application],
+"application/rdf+xml" => &[&T_rdf_xml_application],
+"application/vnd.mophun.certificate" => &[&T_vnd_mophun_certificate_application],
+"application/msword5" => &[&T_msword5_application],
+"video/vnd.motorola.video" => &[&T_vnd_motorola_video_video],
+"application/vnd.dna" => &[&T_vnd_dna_application],
+"audio/vorbis" => &[&T_vorbis_audio],
+"application/msexcel" => &[&T_vnd_ms_excel_application],
+"application/x-vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
+"application/x-berkeley-db;format=hash;version=4" => &[&T_x_berkeley_db_format_hash_version_4_application],
+"image/x-raw-canon" => &[&T_x_raw_canon_image],
+"application/vnd.lotus-notes" => &[&T_vnd_lotus_notes_application],
+"application/vnd.etsi.sci+xml" => &[&T_vnd_etsi_sci_xml_application],
+"application/vnd.sun.xml.impress.template" => &[&T_vnd_sun_xml_impress_template_application],
+"audio/vnd.celp" => &[&T_vnd_celp_audio],
+"image/bmp" => &[&T_bmp_image],
+"audio/32kadpcm" => &[&T_32kadpcm_audio],
+"application/x-guitar-pro" => &[&T_x_guitar_pro_application],
+"application/x-msaccess" => &[&T_x_msaccess_application],
+"application/rtf" => &[&T_rtf_application],
+"text/enriched" => &[&T_enriched_text],
+"application/xhtml+xml" => &[&T_xhtml_xml_application],
+"multipart/byteranges" => &[&T_byteranges_multipart],
+"multipart/signed" => &[&T_signed_multipart],
+"image/cgm" => &[&T_cgm_image],
+"application/x-chrome-extension" => &[&T_x_chrome_extension_application],
+"application/vnd.nokia.landmarkcollection+xml" => &[&T_vnd_nokia_landmarkcollection_xml_application],
+"application/x-stata-do" => &[&T_x_stata_do_application],
+"application/vnd.nintendo.snes.rom" => &[&T_x_nesrom_application],
+"application/x-x509-ec-parameters" => &[&T_x_x509_ec_parameters_application],
+"audio/pcma-wb" => &[&T_pcma_wb_audio],
+"audio/l16" => &[&T_l16_audio],
+"text/vnd.wap.si" => &[&T_vnd_wap_si_text],
+"image/x-emf-compressed" => &[&T_x_emf_compressed_image],
+"application/vnd.ms-excel.template.macroenabled.12" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
+"application/vnd.3gpp2.tcap" => &[&T_vnd_3gpp2_tcap_application],
+"application/x-ms-asx" => &[&T_x_ms_asx_application],
+"application/mbms-associated-procedure-description+xml" => &[&T_mbms_associated_procedure_description_xml_application],
+"audio/dsr-es202050" => &[&T_dsr_es202050_audio],
+"text/x-diff" => &[&T_x_diff_text],
+"application/x-pkcs7-certreqresp" => &[&T_x_pkcs7_certreqresp_application],
+"application/vnd.groove-help" => &[&T_vnd_groove_help_application],
+"text/x-vhdl" => &[&T_x_vhdl_text],
+"application/x-mspublisher" => &[&T_x_mspublisher_application],
+"application/vnd.oma.bcast.sgdd+xml" => &[&T_vnd_oma_bcast_sgdd_xml_application],
+"text/vnd.iptc.anpa" => &[&T_vnd_iptc_anpa_text],
+"application/x-berkeley-db;format=log" => &[&T_x_berkeley_db_format_log_application],
+"application/vnd.sealed.mht" => &[&T_vnd_sealed_mht_application],
+"audio/speex" => &[&T_speex_audio],
+"application/vnd.dvb.notif-container+xml" => &[&T_vnd_dvb_notif_container_xml_application],
+"application/vnd.rn-realmedia-vbr" => &[&T_vnd_rn_realmedia_application],
+"text/x-chdr" => &[&T_x_chdr_text],
+"application/x-berkeley-db;format=hash;version=2" => &[&T_x_berkeley_db_format_hash_version_2_application],
+"application/x-futuresplash" => &[&T_x_futuresplash_application],
+"video/mp4v-es" => &[&T_mp4v_es_video],
+"video/mpeg" => &[&T_mpeg_video],
+"application/envi.hdr" => &[&T_envi_hdr_application],
+"application/vnd.amiga.ami" => &[&T_vnd_amiga_ami_application],
+"application/x-vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
+"application/sgml-open-catalog" => &[&T_sgml_open_catalog_application],
+"audio/smv" => &[&T_smv_audio],
+"application/iotp" => &[&T_iotp_application],
+"application/dita+xml;format=task" => &[&T_dita_xml_format_task_application],
+"image/vnd.fujixerox.edmics-mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
+"application/vnd.debian.binary-package" => &[&T_x_debian_package_application],
+"application/vnd.ms-ims" => &[&T_vnd_ms_ims_application],
+"application/vnd.powerbuilder7-s" => &[&T_vnd_powerbuilder7_s_application],
+"text/vnd.yaml" => &[&T_x_yaml_text],
+"audio/vmr-wb" => &[&T_vmr_wb_audio],
+"application/sparql-query" => &[&T_sparql_query_application],
+"application/vnd.nokia.radio-presets" => &[&T_vnd_nokia_radio_presets_application],
+"audio/sp-midi" => &[&T_sp_midi_audio],
+"application/vnd.tcpdump.pcap" => &[&T_vnd_tcpdump_pcap_application],
+"text/vtt" => &[&T_vtt_text],
+"image/vnd.dgn;version=8" => &[&T_vnd_dgn_version_8_image],
+"application/vnd.koan" => &[&T_vnd_koan_application],
+"application/x-font-framemaker" => &[&T_x_font_framemaker_application],
+"application/mspowerpoint" => &[&T_vnd_ms_powerpoint_application],
+"application/set-registration" => &[&T_set_registration_application],
+"application/vnd.motorola.flexsuite.wem" => &[&T_vnd_motorola_flexsuite_wem_application],
+"audio/vdvi" => &[&T_vdvi_audio],
+"application/moss-signature" => &[&T_moss_signature_application],
+"audio/x-pn-realaudio-plugin" => &[&T_x_pn_realaudio_plugin_audio],
+"application/vnd.shana.informed.formtemplate" => &[&T_vnd_shana_informed_formtemplate_application],
+"application/vnd.japannet-registration" => &[&T_vnd_japannet_registration_application],
+"application/vnd.fdsn.mseed" => &[&T_vnd_fdsn_mseed_application],
+"audio/prs.sid" => &[&T_prs_sid_audio],
+"video/vnd.dvb.file" => &[&T_vnd_dvb_file_video],
+"application/vnd.geogebra.tool" => &[&T_vnd_geogebra_tool_application],
+"application/vnd.wrq-hp3000-labelled" => &[&T_vnd_wrq_hp3000_labelled_application],
+"audio/g719" => &[&T_g719_audio],
+"application/vnd.contact.cmsg" => &[&T_vnd_contact_cmsg_application],
+"text/asp" => &[&T_asp_text],
+"video/mp2p" => &[&T_mp2p_video],
+"application/vnd.ms-opentype" => &[&T_x_font_otf_application],
+"application/index.cmd" => &[&T_index_cmd_application],
+"application/watcherinfo+xml" => &[&T_watcherinfo_xml_application],
+"application/vnd.kde.kivio" => &[&T_vnd_kde_kivio_application],
+"text/x-java-source" => &[&T_x_java_source_text],
+"application/cea-2018+xml" => &[&T_cea_2018_xml_application],
+"application/vnd.etsi.iptvueprofile+xml" => &[&T_vnd_etsi_iptvueprofile_xml_application],
+"image/png" => &[&T_png_image],
+"application/vnd.gridmp" => &[&T_vnd_gridmp_application],
+"application/mikey" => &[&T_mikey_application],
+"text/x-basic" => &[&T_x_basic_text],
+"application/manifest+json" => &[&T_manifest_json_application],
+"application/vnd.autopackage" => &[&T_vnd_autopackage_application],
+"application/vnd.lotus-freelance" => &[&T_vnd_lotus_freelance_application],
+"application/vnd.novadigm.ext" => &[&T_vnd_novadigm_ext_application],
+"application/vnd.iptc.g2.conceptitem+xml" => &[&T_vnd_iptc_g2_conceptitem_xml_application],
+"application/vnd.hydrostatix.sof-data" => &[&T_vnd_hydrostatix_sof_data_application],
+"application/vnd.fujitsu.oasysgp" => &[&T_vnd_fujitsu_oasysgp_application],
+"application/x-ibooks+zip" => &[&T_x_ibooks_zip_application],
+"application/xcon-conference-info+xml" => &[&T_xcon_conference_info_xml_application],
+"application/sgml" => &[&T_sgml_application],
+"application/vnd.3gpp.pic-bw-small" => &[&T_vnd_3gpp_pic_bw_small_application],
+"application/vnd.nokia.conml+xml" => &[&T_vnd_nokia_conml_xml_application],
+"application/vnd.google-earth.kml+xml" => &[&T_vnd_google_earth_kml_xml_application],
+"application/emma+xml" => &[&T_emma_xml_application],
+"application/vnd.apple.keynote" => &[&T_vnd_apple_keynote_application],
+"image/svg+xml" => &[&T_svg_xml_image],
+"image/x-portable-arbitrarymap" => &[&T_x_portable_arbitrarymap_image],
+"application/xcap-el+xml" => &[&T_xcap_el_xml_application],
+"application/vnd.ms-project" => &[&T_vnd_ms_project_application],
+"application/wordperfect5.1" => &[&T_wordperfect5_1_application],
+"text/x-matlab" => &[&T_x_matlab_text],
+"application/x400-bp" => &[&T_x400_bp_application],
+"text/x-ocaml" => &[&T_x_ocaml_text],
+"application/vnd.otps.ct-kip+xml" => &[&T_vnd_otps_ct_kip_xml_application],
+"application/vnd.wordperfect;version=5.1" => &[&T_vnd_wordperfect_version_5_1_application],
+"application/vnd.sealed.tiff" => &[&T_vnd_sealed_tiff_application],
+"application/vnd.nokia.landmark+xml" => &[&T_vnd_nokia_landmark_xml_application],
+"text/x-pascal" => &[&T_x_pascal_text],
+"image/x-wmf" => &[&T_wmf_image],
+"application/x-itunes-bplist" => &[&T_x_itunes_bplist_application],
+"application/vnd.uiq.theme" => &[&T_vnd_uiq_theme_application],
+"image/x-3ds" => &[&T_x_3ds_image],
+"application/x-sv4crc" => &[&T_x_sv4crc_application],
+"application/x-rar-compressed;version=5" => &[&T_x_rar_compressed_version_5_application],
+"multipart/encrypted" => &[&T_encrypted_multipart],
+"application/x-zip-compressed" => &[&T_zip_application],
+"video/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_video],
+"audio/rtp-midi" => &[&T_rtp_midi_audio],
+"application/mpeg4-iod" => &[&T_mpeg4_iod_application],
+"application/x-vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
+"application/winhlp" => &[&T_winhlp_application],
+"audio/evrc1" => &[&T_evrc1_audio],
+"application/x-tika-iworks-protected" => &[&T_x_tika_iworks_protected_application],
+"image/vnd.net-fpx" => &[&T_vnd_net_fpx_image],
+"application/vnd.cosmocaller" => &[&T_vnd_cosmocaller_application],
+"application/gml+xml" => &[&T_gml_xml_application],
+"application/x-tmx" => &[&T_x_tmx_application],
+"model/x3d+xml" => &[&T_x3d_xml_model],
+"application/vnd.ecowin.series" => &[&T_vnd_ecowin_series_application],
+"audio/vnd.wave" => &[&T_vnd_wave_audio],
+"text/x-lua" => &[&T_x_lua_text],
+"video/mp1s" => &[&T_mp1s_video],
+"application/x-dbm" => &[&T_x_berkeley_db_application],
+"application/x-arj-compressed" => &[&T_x_arj_application],
+"image/x-raw-epson" => &[&T_x_raw_epson_image],
+"text/x-ml" => &[&T_x_ml_text],
+"application/vnd.adobe.air-application-installer-package+zip" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
+"application/x-quattro-pro;version=5" => &[&T_x_quattro_pro_version_5_application],
+"text/x-tcl" => &[&T_x_tcl_text],
+"application/vnd.fujixerox.docuworks" => &[&T_vnd_fujixerox_docuworks_application],
+"image/hevc" => &[&T_heic_image],
+"audio/vorbis-config" => &[&T_vorbis_config_audio],
+"application/x-kpresenter" => &[&T_vnd_kde_kpresenter_application],
+"application/vnd.kahootz" => &[&T_vnd_kahootz_application],
+"application/vnd.iptc.g2.newsitem+xml" => &[&T_vnd_iptc_g2_newsitem_xml_application],
+"application/vnd.ms-visio.template" => &[&T_vnd_ms_visio_template_application],
+"audio/example" => &[&T_example_audio],
+"application/x-sas-audit" => &[&T_x_sas_audit_application],
+"application/x-tika-visio-ooxml" => &[&T_x_tika_visio_ooxml_application],
+"application/mathematica" => &[&T_mathematica_application],
+"application/vnd.anser-web-certificate-issue-initiation" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
+"application/pgp-keys" => &[&T_pgp_keys_application],
+"application/x-pds" => &[&T_x_pds_application],
+"image/x-jp2-container" => &[&T_x_jp2_container_image],
+"application/vnd.openxmlformats-officedocument.presentationml.slide" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
+"application/parityfec" => &[&T_parityfec_application],
+"application/x-vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
+"application/x-stata-dta;version=14" => &[&T_x_stata_dta_version_14_application],
+"application/x-project" => &[&T_x_project_application],
+"application/scvp-vp-response" => &[&T_scvp_vp_response_application],
+"audio/bv16" => &[&T_bv16_audio],
+"video/x-ogg-rgb" => &[&T_x_oggrgb_video],
+"text/x-actionscript" => &[&T_x_actionscript_text],
+"application/cybercash" => &[&T_cybercash_application],
+"video/webm" => &[&T_webm_video],
+"application/vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
+"application/vnd.cirpack.isdn-ext" => &[&T_vnd_cirpack_isdn_ext_application],
+"application/x-sas-catalog" => &[&T_x_sas_catalog_application],
+"application/x-grib" => &[&T_x_grib_application],
+"application/x-msdownload;format=pe32" => &[&T_x_msdownload_format_pe32_application],
+"application/x-mmm-digisonde" => &[&T_x_mmm_digisonde_application],
+"application/cnrp+xml" => &[&T_cnrp_xml_application],
+"application/vnd.iptc.g2.catalogitem+xml" => &[&T_vnd_iptc_g2_catalogitem_xml_application],
+"application/x-csh" => &[&T_x_csh_application],
+"video/x-ogm" => &[&T_x_ogm_video],
+"application/x-mach-o-dylib-stub" => &[&T_x_mach_o_dylib_stub_application],
+"application/x-sqlite3" => &[&T_x_sqlite3_application],
+"application/vnd.fujixerox.hbpl" => &[&T_vnd_fujixerox_hbpl_application],
+"application/mbms-user-service-description+xml" => &[&T_mbms_user_service_description_xml_application],
+"application/x-quattro-pro;version=1-4" => &[&T_x_quattro_pro_version_1_4_application],
+"application/x-yml" => &[&T_x_yaml_text],
+"application/vnd.ms-works" => &[&T_vnd_ms_works_application],
+"text/x-yml" => &[&T_x_yaml_text],
+"application/x-tika-java-enterprise-archive" => &[&T_x_tika_java_enterprise_archive_application],
+"application/x-frame" => &[&T_vnd_mif_application],
+"application/xml" => &[&T_xml_application],
+"application/vnd.cinderella" => &[&T_vnd_cinderella_application],
+"application/x-dtbook+xml" => &[&T_x_dtbook_xml_application],
+"text/vnd.motorola.reflex" => &[&T_vnd_motorola_reflex_text],
+"application/vnd.ms-powerpoint.addin.macroenabled.12" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
+"application/vnd.ncd.control" => &[&T_vnd_ncd_control_application],
+"application/x-erdas-hfa" => &[&T_x_erdas_hfa_application],
+"application/vnd.curl.pcurl" => &[&T_vnd_curl_pcurl_application],
+"multipart/voice-message" => &[&T_voice_message_multipart],
+"application/x-autocad" => &[&T_vnd_dwg_image],
+"application/x-vnd.datapackage+json" => &[&T_x_vnd_datapackage_json_application],
+"application/vnd.hp-hpid" => &[&T_vnd_hp_hpid_application],
+"image/hevc-sequence" => &[&T_heic_sequence_image],
+"application/vnd.palm" => &[&T_vnd_palm_application],
+"application/x-xpinstall" => &[&T_x_xpinstall_application],
+"application/gzip" => &[&T_gzip_application],
+"application/x-berkeley-db;format=btree" => &[&T_x_berkeley_db_format_btree_application],
+"audio/x-mp4a" => &[&T_mp4_audio],
+"image/emf" => &[&T_emf_image],
+"application/x-zim" => &[&T_x_zim_application],
+"image/jpeg" => &[&T_jpeg_image],
+"application/x-sas-program-data" => &[&T_x_sas_program_data_application],
+"application/shf+xml" => &[&T_shf_xml_application],
+"video/dv" => &[&T_dv_video],
+"application/x-ms-xbap" => &[&T_x_ms_xbap_application],
+"audio/opus" => &[&T_opus_audio],
+"application/x-parquet" => &[&T_x_parquet_application],
+"audio/telephone-event" => &[&T_telephone_event_audio],
+"application/postscript" => &[&T_postscript_application],
+"application/x-bentley-localization" => &[&T_x_bentley_localization_application],
+"application/vnd.epson.esf" => &[&T_vnd_epson_esf_application],
+"application/vnd.dvb.ipdcdftnotifaccess" => &[&T_vnd_dvb_ipdcdftnotifaccess_application],
+"message/example" => &[&T_example_message],
+"video/x-oggyuv" => &[&T_x_oggyuv_video],
+"image/x-raw-phaseone" => &[&T_x_raw_phaseone_image],
+"image/x-raw-sony" => &[&T_x_raw_sony_image],
+"application/vnd.ericsson.quickcall" => &[&T_vnd_ericsson_quickcall_application],
+"application/vnd.tmobile-livetv" => &[&T_vnd_tmobile_livetv_application],
+"application/vnd.isac.fcs" => &[&T_vnd_isac_fcs_application],
+"application/news-groupinfo" => &[&T_news_groupinfo_application],
+"audio/cn" => &[&T_cn_audio],
+"video/3gpp2" => &[&T_3gpp2_video],
+"audio/3gpp2" => &[&T_3gpp2_video],
+"application/vnd.marlin.drm.license+xml" => &[&T_vnd_marlin_drm_license_xml_application],
+"application/x-fictionbook+xml" => &[&T_x_fictionbook_xml_application],
+"application/mac-binhex40" => &[&T_mac_binhex40_application],
+"application/x-sas-data" => &[&T_x_sas_data_application],
+"text/x-scala" => &[&T_x_scala_text],
+"application/zlib" => &[&T_zlib_application],
+"text/x-yaml" => &[&T_x_yaml_text],
+"application/vnd.musician" => &[&T_vnd_musician_application],
+"text/vnd.ms-mediapackage" => &[&T_vnd_ms_mediapackage_text],
+"application/scvp-cv-request" => &[&T_scvp_cv_request_application],
+"application/vnd.antix.game-component" => &[&T_vnd_antix_game_component_application],
+"application/vnd.hzn-3d-crossword" => &[&T_vnd_hzn_3d_crossword_application],
+"application/vnd.smaf" => &[&T_vnd_smaf_application],
+"application/x-sas-xport" => &[&T_x_sas_xport_application],
+"audio/vnd.dolby.heaac.2" => &[&T_vnd_dolby_heaac_2_audio],
+"audio/g7221" => &[&T_g7221_audio],
+"application/vnd.motorola.iprm" => &[&T_vnd_motorola_iprm_application],
+"image/nitf" => &[&T_nitf_image],
+"application/vnd.audiograph" => &[&T_vnd_audiograph_application],
+"application/vnd.informedcontrol.rms+xml" => &[&T_vnd_informedcontrol_rms_xml_application],
+"application/xmpp+xml" => &[&T_xmpp_xml_application],
+"image/vnd.dxb" => &[&T_vnd_dxb_image],
+"application/x-vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
+"application/vnd.kde.kpresenter" => &[&T_vnd_kde_kpresenter_application],
+"text/html" => &[&T_html_text],
+"text/x-rst" => &[&T_x_rst_text],
+"application/x-esri-spatially-enabled-db" => &[&T_x_esri_spatially_enabled_db_application],
+"message/external-body" => &[&T_external_body_message],
+"application/vnd.openofficeorg.autotext" => &[&T_vnd_openofficeorg_autotext_application],
+"audio/g729d" => &[&T_g729d_audio],
+"application/vnd.flographit" => &[&T_vnd_flographit_application],
+"application/vnd.canon-cpdl" => &[&T_vnd_canon_cpdl_application],
+"application/x-mach-o-executable" => &[&T_x_mach_o_executable_application],
+"application/vnd.syncml.dm+xml" => &[&T_vnd_syncml_dm_xml_application],
+"application/x-corelpresentations" => &[&T_x_corelpresentations_application],
+"application/vnd.ecowin.filerequest" => &[&T_vnd_ecowin_filerequest_application],
+"application/vnd.uplanet.cacheop" => &[&T_vnd_uplanet_cacheop_application],
+"application/vnd.groove-tool-template" => &[&T_vnd_groove_tool_template_application],
+"audio/pcmu-wb" => &[&T_pcmu_wb_audio],
+"application/vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
+"application/vnd.svd" => &[&T_vnd_svd_application],
+"text/x-asm" => &[&T_x_assembly_text],
+"application/vnd.japannet-jpnstore-wakeup" => &[&T_vnd_japannet_jpnstore_wakeup_application],
+"text/x-rsrc" => &[&T_x_rsrc_text],
+"text/x-java-properties" => &[&T_x_java_properties_text],
+"application/x-msbinder" => &[&T_x_msbinder_application],
+"application/vnd.music-niff" => &[&T_vnd_music_niff_application],
+"text/x-c++hdr" => &[&T_x_c__hdr_text],
+"application/sereal;version=2" => &[&T_sereal_version_2_application],
+"application/vnd.oma.xcap-directory+xml" => &[&T_vnd_oma_xcap_directory_xml_application],
+"application/vnd.japannet-registration-wakeup" => &[&T_vnd_japannet_registration_wakeup_application],
+"application/vnd.simtech-mindmapper" => &[&T_vnd_simtech_mindmapper_application],
+"text/t140" => &[&T_t140_text],
+"text/xml" => &[&T_xml_application],
+"video/smpte292m" => &[&T_smpte292m_video],
+"application/vnd.gmx" => &[&T_vnd_gmx_application],
+"application/vnd.etsi.iptvsad-npvr+xml" => &[&T_vnd_etsi_iptvsad_npvr_xml_application],
+"application/x-pkcs7-certificates" => &[&T_x_pkcs7_certificates_application],
+"application/vnd.truedoc" => &[&T_vnd_truedoc_application],
+"application/x-mach-o-dylib" => &[&T_x_mach_o_dylib_application],
+"audio/musepack" => &[&T_musepack_audio],
+"application/vnd.sema" => &[&T_vnd_sema_application],
+"application/x-tika-msoffice" => &[&T_x_tika_msoffice_application],
+"model/vnd.gs.gdl" => &[&T_vnd_gs_gdl_model],
+"text/vnd.curl.dcurl" => &[&T_vnd_curl_dcurl_text],
+"model/iges" => &[&T_iges_model],
+"application/vnd.powerbuilder6" => &[&T_vnd_powerbuilder6_application],
+"application/dicom" => &[&T_dicom_application],
+"application/vnd.ecowin.seriesupdate" => &[&T_vnd_ecowin_seriesupdate_application],
+"video/x-msvideo" => &[&T_x_msvideo_video],
+"application/vnd.dvb.ipdcesgaccess" => &[&T_vnd_dvb_ipdcesgaccess_application],
+"application/xquery" => &[&T_xquery_application],
+"application/vnd.tcpdump.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
+"application/fits" => &[&T_fits_application],
+"application/vnd.acucorp" => &[&T_vnd_acucorp_application],
+"image/x-jbig2" => &[&T_x_jbig2_image],
+"application/vnd.motorola.flexsuite.fis" => &[&T_vnd_motorola_flexsuite_fis_application],
+"application/batch-smtp" => &[&T_batch_smtp_application],
+"application/vnd.vsf" => &[&T_vnd_vsf_application],
+"application/vnd.sealed.eml" => &[&T_vnd_sealed_eml_application],
+"application/vnd.ms-powerpoint.presentation.macroenabled.12" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
+"application/vnd.xfdl.webform" => &[&T_vnd_xfdl_webform_application],
+"application/x-quattro-pro;version=1+5" => &[&T_x_quattro_pro_version_1_5_application],
+"application/rlmi+xml" => &[&T_rlmi_xml_application],
+"application/vnd.fints" => &[&T_vnd_fints_application],
+"application/x-hwp-v5" => &[&T_x_hwp_v5_application],
+"message/partial" => &[&T_partial_message],
+"application/x-vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
+"application/vnd.dvb.notif-ia-registration-request+xml" => &[&T_vnd_dvb_notif_ia_registration_request_xml_application],
+"application/vnd.sqlite3" => &[&T_x_sqlite3_application],
+"application/x-wais-source" => &[&T_x_wais_source_application],
+"application/mbox" => &[&T_mbox_application],
+"application/onenote; format=package" => &[&T_onenote__format_package_application],
+"application/mpeg4-generic" => &[&T_mpeg4_generic_application],
+"application/vnd.street-stream" => &[&T_vnd_street_stream_application],
+"application/x-lharc" => &[&T_x_lharc_application],
+"application/x-lzma" => &[&T_x_lzma_application],
+"application/x-vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
+"text/x-ruby" => &[&T_x_ruby_text],
+"image/x-targa" => &[&T_x_tga_image],
+"audio/x-ms-wax" => &[&T_x_ms_wax_audio],
+"video/x-ogg-yuv" => &[&T_x_oggyuv_video],
+"application/pdf" => &[&T_pdf_application],
+"application/vnd.etsi.iptvsad-bc+xml" => &[&T_vnd_etsi_iptvsad_bc_xml_application],
+"application/vnd.oma.bcast.notification+xml" => &[&T_vnd_oma_bcast_notification_xml_application],
+"message/global" => &[&T_global_message],
+"video/x-oggrgb" => &[&T_x_oggrgb_video],
+"application/java-vm" => &[&T_java_vm_application],
+"application/pkix-cert" => &[&T_pkix_cert_application],
+"audio/vnd.nokia.mobile-xmf" => &[&T_vnd_nokia_mobile_xmf_audio],
+"text/vnd.fmi.flexstor" => &[&T_vnd_fmi_flexstor_text],
+"application/prs.alvestrand.titrax-sheet" => &[&T_prs_alvestrand_titrax_sheet_application],
+"application/cdr" => &[&T_coreldraw_application],
+"audio/x-unknown" => &[&T_x_unknown_audio],
+"image/x-pc-paintbrush" => &[&T_vnd_zbrush_pcx_image],
+"video/x-ms-wmx" => &[&T_x_ms_wmx_video],
+"application/x-idl-save-file" => &[&T_x_idl_save_file_application],
+"image/x-bpg" => &[&T_x_bpg_image],
+"image/x-dpx" => &[&T_x_dpx_image],
+"application/vnd.xfdl" => &[&T_vnd_xfdl_application],
+"application/x-sh" => &[&T_x_sh_application],
+"application/mbms-register+xml" => &[&T_mbms_register_xml_application],
+"multipart/example" => &[&T_example_multipart],
+"application/vnd.oma.bcast.sprov+xml" => &[&T_vnd_oma_bcast_sprov_xml_application],
+"application/x-emf" => &[&T_emf_image],
+"audio/x-aac" => &[&T_x_aac_audio],
+"image/x-raw-pentax" => &[&T_x_raw_pentax_image],
+"message/cpim" => &[&T_cpim_message],
+"audio/tone" => &[&T_tone_audio],
+"application/x-bcpio" => &[&T_x_bcpio_application],
+"application/x-vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
+"image/vnd.wap.wbmp" => &[&T_vnd_wap_wbmp_image],
+"application/vnd.nervana" => &[&T_vnd_nervana_application],
+"application/vnd.oma.poc.groups+xml" => &[&T_vnd_oma_poc_groups_xml_application],
+"application/vnd.symbian.install" => &[&T_vnd_symbian_install_application],
+"application/isup" => &[&T_isup_application],
+"application/x-wacz" => &[&T_x_wacz_application],
+"application/sldworks" => &[&T_sldworks_application],
+"application/vnd.qualcomm.brew-app-res" => &[&T_vnd_qualcomm_brew_app_res_application],
+"application/vnd.wqd" => &[&T_vnd_wqd_application],
+"application/vnd.oma.dd2+xml" => &[&T_vnd_oma_dd2_xml_application],
+"application/vnd.etsi.simservs+xml" => &[&T_vnd_etsi_simservs_xml_application],
+"audio/g7291" => &[&T_g7291_audio],
+"application/vnd.lotus-1-2-3" => &[&T_vnd_lotus_1_2_3_application],
+"application/vnd.sun.xml.writer.template" => &[&T_vnd_sun_xml_writer_template_application],
+"audio/x-flac" => &[&T_x_flac_audio],
+"text/x-tika-text-based-message" => &[&T_x_tika_text_based_message_text],
+"video/h261" => &[&T_h261_video],
+"application/davmount+xml" => &[&T_davmount_xml_application],
+"text/x-robots" => &[&T_x_robots_text],
+"application/vnd.syncml.dm.notification" => &[&T_vnd_syncml_dm_notification_application],
+"video/x-ogg-uvs" => &[&T_x_ogguvs_video],
+"application/vnd.wordperfect;version=6.x" => &[&T_vnd_wordperfect_version_6_x_application],
+"audio/gsm" => &[&T_gsm_audio],
+"application/vnd.ms-powerpoint.slide.macroenabled.12" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
+"application/java-serialized-object" => &[&T_java_serialized_object_application],
+"application/vnd.handheld-entertainment+xml" => &[&T_vnd_handheld_entertainment_xml_application],
+"font/sfnt" => &[&T_x_font_ttf_application],
+"application/applefile" => &[&T_applefile_application],
+"font/woff" => &[&T_woff_font],
+"application/x-acad" => &[&T_vnd_dwg_image],
+"application/h224" => &[&T_h224_application],
+"application/ocsp-request" => &[&T_ocsp_request_application],
+"application/vnd.semd" => &[&T_vnd_semd_application],
+"application/mac-compactpro" => &[&T_mac_compactpro_application],
+"application/x-font-type1" => &[&T_x_font_type1_application],
+"image/x-cmu-raster" => &[&T_x_cmu_raster_image],
+"application/edi-consent" => &[&T_edi_consent_application],
+"text/x-emacs-lisp" => &[&T_x_emacs_lisp_text],
+"application/x-troff" => &[&T_troff_text],
+"application/samlmetadata+xml" => &[&T_samlmetadata_xml_application],
+"application/vnd.groove-tool-message" => &[&T_vnd_groove_tool_message_application],
+"image/x-cmx" => &[&T_x_cmx_image],
+"application/x-msdownload;format=pe64" => &[&T_x_msdownload_format_pe64_application],
+"application/x-font-speedo" => &[&T_x_font_speedo_application],
+"application/beep+xml" => &[&T_beep_xml_application],
+"application/dvcs" => &[&T_dvcs_application],
+"application/vnd.ms-powerpoint" => &[&T_vnd_ms_powerpoint_application],
+"application/vnd.ibm.electronic-media" => &[&T_vnd_ibm_electronic_media_application],
+"application/x-staroffice-template" => &[&T_x_staroffice_template_application],
+"application/msword" => &[&T_msword_application],
+"application/x-ebu-stl" => &[&T_x_ebu_stl_application],
+"application/ocsp-response" => &[&T_ocsp_response_application],
+"application/x-cdlink" => &[&T_x_cdlink_application],
+"audio/vnd.dolby.pl2" => &[&T_vnd_dolby_pl2_audio],
+"application/x-bittorrent" => &[&T_x_bittorrent_application],
+"application/font-sfnt" => &[&T_x_font_ttf_application],
+"application/vnd.spotfire.sfs" => &[&T_vnd_spotfire_sfs_application],
+"application/vnd.ufdl" => &[&T_vnd_ufdl_application],
+"text/csv" => &[&T_csv_text],
+"application/vnd.fut-misnet" => &[&T_vnd_fut_misnet_application],
+"application/x-font-printer-metric" => &[&T_x_font_printer_metric_application],
+"application/x-netcdf" => &[&T_x_netcdf_application],
+"application/x-java-keystore" => &[&T_x_java_keystore_application],
+"application/x-texinfo" => &[&T_x_texinfo_application],
+"image/aces" => &[&T_aces_image],
+"application/vnd.fdsn.seed" => &[&T_vnd_fdsn_seed_application],
+"application/vnd.picsel" => &[&T_vnd_picsel_application],
+"application/resource-lists-diff+xml" => &[&T_resource_lists_diff_xml_application],
+"application/x-msdownload;format=pe-armLE" => &[&T_x_msdownload_format_pe_armLE_application],
+"application/vnd.multiad.creator.cif" => &[&T_vnd_multiad_creator_cif_application],
+"video/quicktime" => &[&T_quicktime_video],
+"application/vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
+"application/x-rar-compressed" => &[&T_x_rar_compressed_application],
+"video/raw" => &[&T_raw_video],
+"application/x-vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
+"application/mbms-msk-response+xml" => &[&T_mbms_msk_response_xml_application],
+"application/vnd.novadigm.edm" => &[&T_vnd_novadigm_edm_application],
+"application/x-shapefile" => &[&T_x_shapefile_application],
+"text/x-idl" => &[&T_x_idl_text],
+"application/vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
+"video/ulpfec" => &[&T_ulpfec_video],
+"message/imdn+xml" => &[&T_imdn_xml_message],
+"application/vnd.sun.xml.impress" => &[&T_vnd_sun_xml_impress_application],
+"application/vnd.3gpp2.sms" => &[&T_vnd_3gpp2_sms_application],
+"video/vnd.hns.video" => &[&T_vnd_hns_video_video],
+"application/x-dtbresource+xml" => &[&T_x_dtbresource_xml_application],
+"application/mbms-reception-report+xml" => &[&T_mbms_reception_report_xml_application],
+"image/x-bmp" => &[&T_bmp_image],
+"application/vnd.hbci" => &[&T_vnd_hbci_application],
 
 };
 
 pub static EXT_MAP: phf::Map<&'static str, &[&'static dyn MimeTypeChecker]> = phf_map! {
-"*.fh7" => &[&T_x_freehand_image],
-"*.dataless" => &[&T_vnd_fdsn_seed_application],
-"*.jnlp" => &[&T_x_java_jnlp_file_application],
-"*.hdr" => &[&T_vnd_radiance_image],
-"README" => &[&T_plain_text],
-"*.dcm" => &[&T_dicom_application],
-"*.ktr" => &[&T_vnd_kahootz_application],
-"*.grb" => &[&T_x_grib_application],
-"*.ief" => &[&T_ief_image],
-"*.patch" => &[&T_x_diff_text],
-"*.groovy" => &[&T_x_groovy_text],
-"*.mpe" => &[&T_mpeg_video],
-"*.pls" => &[&T_pls_xml_application],
-"*.aj" => &[&T_x_aspectj_text],
-"*.cpp" => &[&T_x_c__src_text],
-"*.wrl" => &[&T_vrml_model],
-"*.xslt" => &[&T_xslt_xml_application],
-"*.scala" => &[&T_x_scala_text],
-"*.cdx" => &[&T_x_cdx_chemical],
-"*.mif" => &[&T_vnd_mif_application],
-"*.raf" => &[&T_x_raw_fuji_image],
-"*.su7" => &[&T_x_sas_utility_application],
-"*.dcs" => &[&T_x_raw_kodak_image],
-"*.spq" => &[&T_scvp_vp_request_application],
-"*.ost" => &[&T_vnd_ms_outlook_pst_application],
-"*.mmap" => &[&T_vnd_mindjet_mindmanager_application],
-"*.xenc" => &[&T_xenc_xml_application],
-"*.xlf" => &[&T_x_xliff_xml_application],
-"*.ksp" => &[&T_vnd_kde_kspread_application],
-"*.skd" => &[&T_vnd_koan_application],
-"*.vsl" => &[&T_plain_text],
-"*.wl" => &[&T_vnd_wolfram_wl_application],
-"*.memgraph" => &[&T_x_memgraph_application],
-"*.p12" => &[&T_x_pkcs12_application],
-"*.p7c" => &[&T_pkcs7_mime_application],
-"*.pcf" => &[&T_x_font_pcf_application],
-"*.gpkg" => &[&T_x_geopackage_application,&T_x_geopackage__version_1_1Or1_0_application],
-"*.qwt" => &[&T_vnd_quark_quarkxpress_application],
-"*.ttf" => &[&T_x_font_ttf_application],
-"*.wb3" => &[&T_x_quattro_pro_application],
-"*.xegrm" => &[&T_plain_text],
-"*.asf" => &[&T_x_ms_asf_video],
-"*.ppsx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
-"*.xlsb" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
-"*.xlw" => &[&T_vnd_ms_excel_application],
-"*.asciidoc" => &[&T_x_asciidoc_text],
-"*.fst" => &[&T_vnd_fst_image],
-"*.kia" => &[&T_vnd_kidspiration_application],
-"*.ppm" => &[&T_x_portable_pixmap_image],
-"*.pot" => &[&T_vnd_ms_powerpoint_application],
-"*.asice" => &[&T_vnd_etsi_asic_e_zip_application],
-"*.si7" => &[&T_x_sas_data_index_application],
-"*.rest" => &[&T_x_rst_text],
-"*.potm" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
-"*.gtw" => &[&T_vnd_gtw_model],
-"*.wmf" => &[&T_wmf_image],
-"*.srl" => &[&T_sereal_application],
-"*.manifest" => &[&T_plain_text],
-"*.log" => &[&T_x_log_text],
-"*.nb" => &[&T_mathematica_application],
-"*.spf" => &[&T_vnd_yamaha_smaf_phrase_application],
-"*.mqy" => &[&T_vnd_mobius_mqy_application],
-"*.ig" => &[&T_x_modula_text],
-"*.mlp" => &[&T_vnd_dolby_mlp_application],
-"*.adoc.txt" => &[&T_x_asciidoc_text],
-"*.cml" => &[&T_x_cml_chemical],
-"*.ice" => &[&T_x_cooltalk_x_conference],
-"*.pic" => &[&T_x_pict_image],
-"*.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
-"*.vstm" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
-"*.ico" => &[&T_vnd_microsoft_icon_image],
-"*.fli" => &[&T_x_fli_video],
-"*.vstx" => &[&T_vnd_ms_visio_template_application],
-"*.wq1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application],
-"*.hps" => &[&T_vnd_hp_hps_application],
-"*.mwf" => &[&T_vnd_mfer_application],
-"*.see" => &[&T_vnd_seemail_application],
-"*.warc" => &[&T_warc_application],
-"*.dcurl" => &[&T_vnd_curl_dcurl_text],
-"*.prf" => &[&T_pics_rules_application],
-"*.oas" => &[&T_vnd_fujitsu_oasys_application],
-"*.davmount" => &[&T_davmount_xml_application],
-"*.gqs" => &[&T_vnd_grafeq_application],
-"*.kfo" => &[&T_vnd_kde_kformula_application],
-"*.pfa" => &[&T_x_font_type1_application],
-"*.jif" => &[&T_jpeg_image],
-"*.xlog" => &[&T_plain_text],
-"*.fly" => &[&T_vnd_fly_text],
-"*.cnd" => &[&T_plain_text],
-"*.mht" => &[&T_related_multipart],
-"*.movie" => &[&T_x_sgi_movie_video],
-"*.kpt" => &[&T_vnd_kde_kpresenter_application],
-"*.vsf" => &[&T_vnd_vsf_application],
-"*.azw" => &[&T_vnd_amazon_ebook_application],
-"*.xport" => &[&T_x_sas_xport_application],
-"*.odc" => &[&T_vnd_oasis_opendocument_chart_application],
-"*.lsp" => &[&T_x_common_lisp_text],
-"*.src" => &[&T_x_wais_source_application],
-"*.xhvml" => &[&T_xv_xml_application],
-"*.viv" => &[&T_vnd_vivo_video],
-"*.cmp" => &[&T_vnd_yellowriver_custom_menu_application],
-"*.swf" => &[&T_x_shockwave_flash_application],
-"*.atom" => &[&T_atom_xml_application],
-"*.fsc" => &[&T_vnd_fsc_weblaunch_application],
-"*.vssx" => &[&T_vnd_ms_visio_stencil_application],
-"*.dsp" => &[&T_plain_text],
-"*.go" => &[&T_x_go_text],
-"*.semd" => &[&T_vnd_semd_application],
-"*.bash" => &[&T_x_sh_application],
-"*.pbm" => &[&T_x_portable_bitmap_image],
-"*.der" => &[&T_x_x509_cert_format_der_application],
-"*.xlt" => &[&T_vnd_ms_excel_application],
-"*.hxx" => &[&T_x_c__hdr_text],
-"*.cst" => &[&T_x_director_application],
-"*.acu" => &[&T_vnd_acucobol_application],
-"*.emma" => &[&T_emma_xml_application],
-"*.lwp" => &[&T_vnd_lotus_wordpro_application],
-"*.gv" => &[&T_vnd_graphviz_text],
-"*.wmz" => &[&T_x_ms_wmz_application],
-"*.adb" => &[&T_x_ada_text],
-"*.oa3" => &[&T_vnd_fujitsu_oasys3_application],
-"*.mdi" => &[&T_vnd_ms_modi_image],
-"*.tao" => &[&T_vnd_tao_intent_module_archive_application],
-"*.nar" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
-"*.dpr" => &[&T_x_pascal_text],
-"*.sas" => &[&T_x_sas_application],
-"*.str" => &[&T_vnd_pg_format_application],
-"*.edm" => &[&T_vnd_novadigm_edm_application],
-"*.clkk" => &[&T_vnd_crick_clicker_keyboard_application],
-"*.les" => &[&T_vnd_hhe_lesson_player_application],
-"*.kml" => &[&T_vnd_google_earth_kml_xml_application],
-"*.fcs" => &[&T_vnd_isac_fcs_application],
-"*.gsf" => &[&T_x_font_ghostscript_application],
-"*.Cob" => &[&T_x_cobol_text],
-"*.asnd" => &[&T_vnd_adobe_soundbooth_audio],
-"*.mj2" => &[&T_mj2_video],
-"*.rtf" => &[&T_rtf_application],
-"*.nlu" => &[&T_vnd_neurolanguage_nlu_application],
-"*.dd2" => &[&T_vnd_oma_dd2_xml_application],
-"*.jl" => &[&T_x_common_lisp_text],
-"*.ivp" => &[&T_vnd_immervision_ivp_application],
-"*.webmanifest" => &[&T_manifest_json_application],
-"*.jpgv" => &[&T_jpeg_video],
-"*.aifc" => &[&T_x_aiff_audio],
-"*.mde" => &[&T_x_msaccess_application],
-"*.mp2a" => &[&T_mpeg_audio],
-"*.sisx" => &[&T_vnd_symbian_install_application],
-"*.hvs" => &[&T_vnd_yamaha_hv_script_application],
-"*.apt" => &[&T_plain_text],
-"*.key" => &[&T_vnd_apple_keynote_application],
-"*.php4" => &[&T_x_php_text],
-"*.m4s" => &[&T_iso_segment_video],
-"*.lnk" => &[&T_x_ms_shortcut_application],
-"*.hvd" => &[&T_vnd_yamaha_hv_dic_application],
-"*.wsdl" => &[&T_wsdl_xml_application],
-"*.dll" => &[&T_x_msdownload_application],
-"*.mts" => &[&T_vnd_mts_model],
-"*.xlz" => &[&T_x_xliff_zip_application],
-"*.acutc" => &[&T_vnd_acucorp_application],
-"*.qwd" => &[&T_vnd_quark_quarkxpress_application],
-"*.aac" => &[&T_x_aac_audio],
-"*.ez" => &[&T_andrew_inset_application],
-"*.lostxml" => &[&T_lost_xml_application],
-"*.txf" => &[&T_vnd_mobius_txf_application],
-"*.xz" => &[&T_x_xz_application],
-"*.mkv" => &[&T_x_matroska_video],
-"*.ami" => &[&T_vnd_amiga_ami_application],
-"*.config" => &[&T_x_config_text],
-"*.xpm" => &[&T_x_xpixmap_image],
-"*.tk" => &[&T_x_tcl_text],
-"*.tpl" => &[&T_vnd_groove_tool_template_application],
-"*.clkx" => &[&T_vnd_crick_clicker_application],
-"*.las" => &[&T_x_asprs_application],
-"*.pya" => &[&T_vnd_ms_playready_media_pya_audio],
-"*.mc1" => &[&T_vnd_medcalcdata_application],
-"*.ecma" => &[&T_ecmascript_application],
-"*.apr" => &[&T_vnd_lotus_approach_application],
-"*.ibooks" => &[&T_x_ibooks_zip_application],
-"*.skp" => &[&T_vnd_koan_application],
-"*.oprc" => &[&T_vnd_palm_application],
-"*.pcap" => &[&T_vnd_tcpdump_pcap_application],
-"*.xul" => &[&T_vnd_mozilla_xul_xml_application],
-"*.xlc" => &[&T_vnd_ms_excel_application],
-"*.vcd" => &[&T_x_cdlink_application],
-"*.xquery" => &[&T_xquery_application],
-"*.gim" => &[&T_vnd_groove_identity_message_application],
-"*.au" => &[&T_basic_audio],
-"*.el" => &[&T_x_emacs_lisp_text],
-"*.f" => &[&T_x_fortran_text],
-"*.h263" => &[&T_h263_video],
-"*.crl" => &[&T_pkix_crl_application],
-"*.mvb" => &[&T_x_msmediaview_application],
-"*.fo" => &[&T_xslfo_xml_application],
-"*.cdkey" => &[&T_vnd_mediastation_cdkey_application],
-"*.p7b" => &[&T_x_pkcs7_certificates_application],
-"*.aep" => &[&T_vnd_adobe_aftereffects_project_application],
-"*.mid" => &[&T_midi_audio],
-"abs-linkmap" => &[&T_plain_text],
-"*.shx" => &[&T_vnd_shx_application],
-"*.mscml" => &[&T_mediaservercontrol_xml_application],
-"*.nef" => &[&T_x_raw_nikon_image],
-"*.qbo" => &[&T_vnd_intu_qbo_application],
-"*.wmlsc" => &[&T_vnd_wap_wmlscriptc_application],
-"*.kar" => &[&T_midi_audio],
-"*.wp5" => &[&T_vnd_wordperfect_application],
-"*.mesh" => &[&T_mesh_model],
-"*.s" => &[&T_x_assembly_text],
-"*.rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
-"*.sas7bndx" => &[&T_x_sas_data_index_application],
-"*.ngdat" => &[&T_vnd_nokia_n_gage_data_application],
-"*.ser" => &[&T_java_serialized_object_application],
-"*.wq2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_5_application],
-"*.stl" => &[&T_x_stl_binary_model],
-"*.rng" => &[&T_plain_text],
-"*.qxl" => &[&T_vnd_quark_quarkxpress_application],
-"*.cww" => &[&T_prs_cww_application],
-"*.imp" => &[&T_vnd_accpac_simply_imp_application],
-"*.vtu" => &[&T_vnd_vtu_model],
-"*.tsd" => &[&T_timestamped_data_application],
-"*.dae" => &[&T_vnd_collada_xml_model],
-"*.gnumeric" => &[&T_x_gnumeric_application],
-"*.scm" => &[&T_x_scheme_text],
-"*.efif" => &[&T_vnd_picsel_application],
-"*.knp" => &[&T_vnd_kinar_application],
-"*.itp" => &[&T_vnd_shana_informed_formtemplate_application],
-"*.sqlite" => &[&T_x_sqlite3_application],
-"*.json" => &[&T_json_application],
-"*.qcp" => &[&T_qcelp_audio],
-"LICENSE" => &[&T_plain_text],
-"*.ad.txt" => &[&T_x_asciidoc_text],
-"*.rw2" => &[&T_x_raw_panasonic_image],
-"*.psf" => &[&T_x_font_linux_psf_application],
-"*.gif" => &[&T_gif_image],
-"*.thmx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
-"*.qps" => &[&T_vnd_publishare_delta_tree_application],
-"*.junit" => &[&T_plain_text],
-"*.elc" => &[&T_octet_stream_application,&T_x_elc_application],
-"*.kwt" => &[&T_vnd_kde_kword_application],
-"*.tfm" => &[&T_x_tex_tfm_application],
-"*.vssm" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
-"*.atx" => &[&T_vnd_antix_game_component_application],
-"*.oga" => &[&T_ogg_audio],
-"*.ihtml" => &[&T_plain_text],
-"*.h264" => &[&T_h264_video],
-"*.uu" => &[&T_x_uuencode_text],
-"*.wks" => &[&T_vnd_ms_works_application],
-"*.nnw" => &[&T_vnd_noblenet_web_application],
-"*.msf" => &[&T_vnd_epson_msf_application],
-"*.snf" => &[&T_x_font_snf_application],
-"*.war" => &[&T_x_tika_java_web_archive_application],
-"*.HPP" => &[&T_x_c__hdr_text],
-"*.erf" => &[&T_x_raw_epson_image],
-"*.vhd" => &[&T_x_vhdl_text],
-"*.m1v" => &[&T_mpeg_video],
-"*.opf" => &[&T_oebps_package_xml_application],
-"*.exp" => &[&T_x_expect_text],
-"*.scq" => &[&T_scvp_cv_request_application],
-"*.mxf" => &[&T_mxf_application],
-"*.bcpio" => &[&T_x_bcpio_application],
-"*.rmi" => &[&T_midi_audio],
-"*.css" => &[&T_css_text],
-"*.docx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
-"*.mp4s" => &[&T_mp4_application],
-"*.as" => &[&T_x_actionscript_text],
-"*.ott" => &[&T_vnd_oasis_opendocument_text_template_application],
-"*.cr2" => &[&T_x_canon_cr2_image],
-"*.jpg" => &[&T_jpeg_image],
-"*.x3f" => &[&T_x_raw_sigma_image],
-"*.uri" => &[&T_uri_list_text],
-"*.mpga" => &[&T_mpeg_audio],
-"*.dsc" => &[&T_prs_lines_tag_text],
-"*.cii" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
-"*.application" => &[&T_x_ms_application_application],
-"s_*.txt" => &[&T_x_isatab_application],
-"*.jam" => &[&T_vnd_jam_application],
-"GNUMakefile" => &[&T_x_makefile_text],
-"*.lrf" => &[&T_octet_stream_application],
-"^rdf$" => &[&T_rdf_xml_application],
-"*.egrm" => &[&T_plain_text],
-"*.ent" => &[&T_plain_text],
-"*.awk" => &[&T_x_awk_text],
-"*.wmx" => &[&T_x_ms_wmx_video],
-"*.mmat" => &[&T_vnd_mindjet_mindmanager_application],
-"*.dwg" => &[&T_vnd_dwg_image],
-"*.xargs" => &[&T_plain_text],
-"*.grb1" => &[&T_x_grib_application],
-"*.psf1" => &[&T_x_psf_audio],
-"*.igl" => &[&T_vnd_igloader_application],
-"*.ini" => &[&T_x_ini_text],
-"*.gqf" => &[&T_vnd_grafeq_application],
-"*.psflib" => &[&T_x_psf_audio],
-"*.gbr" => &[&T_x_gimp_gbr_image],
-"*.pwn" => &[&T_vnd_3m_post_it_notes_application],
-"*.djvu" => &[&T_vnd_djvu_image],
-"*.st7" => &[&T_x_sas_audit_application],
-"*.ics" => &[&T_calendar_text],
-"*.xdp" => &[&T_vnd_adobe_xdp_xml_application],
-"*.mseed" => &[&T_vnd_fdsn_mseed_application],
-"*.xlsm" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
-"*.sdd" => &[&T_vnd_stardivision_impress_application],
-"*.ens" => &[&T_x_endnote_style_application],
-"*.h" => &[&T_x_chdr_text],
-"*.pl" => &[&T_x_perl_text],
-"*.xml" => &[&T_xml_application],
-"*.pdf" => &[&T_pdf_application],
-"*.ghf" => &[&T_vnd_groove_help_application],
-"*.midi" => &[&T_midi_audio],
-"*.sxw" => &[&T_vnd_sun_xml_writer_application],
-"*.bib" => &[&T_x_bibtex_text_file_application],
-"*.xht" => &[&T_xhtml_xml_application],
-"*.bibtex" => &[&T_x_bibtex_text_file_application],
-"*.msi" => &[&T_x_ms_installer_application],
-"*.epub" => &[&T_epub_zip_application],
-"*.aet" => &[&T_vnd_adobe_aftereffects_template_application],
-"*.ext" => &[&T_vnd_novadigm_ext_application],
-"*.rl" => &[&T_resource_lists_xml_application],
-"*.clkw" => &[&T_vnd_crick_clicker_wordbank_application],
-"*.crw" => &[&T_x_raw_canon_image],
-"*.amr" => &[&T_amr_audio],
-"*.xltx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
-"*.l" => &[&T_x_lex_text],
-"*.pm" => &[&T_x_perl_text],
-"*.ptx" => &[&T_x_raw_pentax_image],
-"*.xltm" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
-"*.ditamap" => &[&T_dita_xml_format_map_application],
-"*.m3u8" => &[&T_vnd_apple_mpegurl_application],
-"*.sdw" => &[&T_vnd_stardivision_writer_application],
-"*.eol" => &[&T_vnd_digital_winds_audio],
-"*.tr" => &[&T_troff_text],
-"*.susp" => &[&T_vnd_sus_calendar_application],
-"*.he5" => &[&T_x_hdf_application],
-"*.npx" => &[&T_vnd_net_fpx_image],
-"*.ft10" => &[&T_x_freehand_image],
-"*.woff" => &[&T_woff_font],
-"*.sav" => &[&T_x_spss_sav_application],
-"*.icns" => &[&T_icns_image],
-"*.tcl" => &[&T_x_tcl_text],
-"*.flw" => &[&T_vnd_kde_kivio_application],
-"tzfile" => &[&T_tzif_application],
-"*.uc2" => &[&T_x_uc2_compressed_application],
-"*.sfd-hdstx" => &[&T_vnd_hydrostatix_sof_data_application],
-"*.dita" => &[&T_dita_xml_format_topic_application],
-"*.ifo" => &[&T_x_dvd_ifo_application],
-"*.azs" => &[&T_vnd_airzip_filesecure_azs_application],
-"*.7z" => &[&T_x_7z_compressed_application],
-"*.mseq" => &[&T_vnd_mseq_application],
-"*.adp" => &[&T_adpcm_audio],
-"*.asm" => &[&T_x_assembly_text],
-"*.svg" => &[&T_svg_xml_image],
-"*.mdo" => &[&T_plain_text],
-"*.txd" => &[&T_vnd_genomatix_tuxedo_application],
-"*.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
-"*.ada" => &[&T_x_ada_text],
-"*.chrt" => &[&T_vnd_kde_kchart_application],
-"*.otm" => &[&T_vnd_oasis_opendocument_text_master_application],
-"*.ltf" => &[&T_vnd_frogans_ltf_application],
-"*.icc" => &[&T_vnd_iccprofile_application],
-"*.lyr" => &[&T_x_esri_layer_application],
-"*.seed" => &[&T_vnd_fdsn_seed_application],
-"*.onetmp" => &[&T_onenote_application],
-"*.ditaval" => &[&T_dita_xml_format_val_application],
-"*.pkg" => &[&T_octet_stream_application],
-"*.wps" => &[&T_vnd_ms_works_application],
-"*.wp" => &[&T_vnd_wordperfect_application],
-"*.fb2" => &[&T_x_fictionbook_xml_application],
-"*.slddrw" => &[&T_sldworks_application],
-"*.nml" => &[&T_vnd_enliven_application],
-"*.pfb" => &[&T_x_font_type1_application],
-"*.sd2" => &[&T_x_sas_data_v6_application],
-"*.wcm" => &[&T_vnd_ms_works_application],
-"*.curl" => &[&T_vnd_curl_text],
-"*.bpk" => &[&T_octet_stream_application],
-"*.3xd" => &[&T_x3d_xml_model],
-"*.htc" => &[&T_plain_text],
-"*.sbml" => &[&T_sbml_xml_application],
-"*.htke" => &[&T_vnd_kenameaapp_application],
-"*.ez3" => &[&T_vnd_ezpix_package_application],
-"*.mny" => &[&T_x_msmoney_application],
-"*.amfm" => &[&T_x_font_adobe_metric_application],
-"*.gram" => &[&T_srgs_application],
-"*.sas7butl" => &[&T_x_sas_utility_application],
-"*.xvm" => &[&T_xv_xml_application],
-"*.am" => &[&T_plain_text],
-"*.docm" => &[&T_vnd_ms_word_document_macroenabled_12_application],
-"*.vcs" => &[&T_x_vcalendar_text],
-"*.yaml" => &[&T_x_yaml_text],
-"*.rpm" => &[&T_x_rpm_application],
-"*.mb" => &[&T_mathematica_application],
-"*.sed" => &[&T_x_sed_text],
-"*.trm" => &[&T_x_msterminal_application],
-"*.m4a" => &[&T_mp4_audio],
-"*.jks" => &[&T_x_java_keystore_application],
-"*.afm" => &[&T_x_font_adobe_metric_application],
-"*.project" => &[&T_plain_text],
-"*.vsw" => &[&T_vnd_visio_application],
-"*.plb" => &[&T_vnd_3gpp_pic_bw_large_application],
-"*.sxi" => &[&T_vnd_sun_xml_impress_application],
-"*.ogv" => &[&T_ogg_video],
-"*.adoc" => &[&T_x_asciidoc_text],
-"*.bay" => &[&T_x_raw_casio_image],
-"*.dbf" => &[&T_x_dbf_application],
-"*.car" => &[&T_vnd_curl_car_application],
-"*.dpg" => &[&T_vnd_dpgraph_application],
-"*.pas" => &[&T_x_pascal_text],
-"*.f4v" => &[&T_x_f4v_video],
-"*.djv" => &[&T_vnd_djvu_image],
-"*.dms" => &[&T_octet_stream_application],
-"*.onetoc" => &[&T_onenote_format_onetoc2_application],
-"*.pclxl" => &[&T_vnd_hp_pclxl_application],
-"*.teacher" => &[&T_vnd_smart_teacher_application],
-"*.sib" => &[&T_x_sibelius_application],
-"*.xif" => &[&T_vnd_xiff_image],
-"*.lvp" => &[&T_vnd_lucent_voice_audio],
-"*.bz2" => &[&T_x_bzip2_application],
-"*.html" => &[&T_html_text],
-"*.arj" => &[&T_x_arj_application],
-"*.ft8" => &[&T_x_freehand_image],
-"*.odt" => &[&T_vnd_oasis_opendocument_text_application],
-"*.pvb" => &[&T_vnd_3gpp_pic_bw_var_application],
-"*.xdm" => &[&T_vnd_syncml_dm_xml_application],
-"*.heif" => &[&T_heif_image],
-"*.jp2" => &[&T_jp2_image],
-"*.yml" => &[&T_x_yaml_text],
-"*.stw" => &[&T_vnd_sun_xml_writer_template_application],
-"*.lha" => &[&T_octet_stream_application],
-"*.stx" => &[&T_x_sas_transport_application],
-"*.setpay" => &[&T_set_payment_initiation_application],
-"*.obd" => &[&T_x_msbinder_application],
-"*.xyz" => &[&T_x_xyz_chemical],
-"*.pgm" => &[&T_x_portable_graymap_image],
-"*.bsh" => &[&T_plain_text],
-"*.mf" => &[&T_plain_text],
-"*.h261" => &[&T_h261_video],
-"*.wmv" => &[&T_x_ms_wmv_video],
-"*.onetoc2" => &[&T_onenote_format_onetoc2_application],
-"*.oth" => &[&T_vnd_oasis_opendocument_text_web_application],
-"*.frm" => &[&T_x_vbasic_text],
-"*.ftc" => &[&T_vnd_fluxtime_clip_application],
-"*.haml" => &[&T_x_haml_text],
-"*.sis" => &[&T_vnd_symbian_install_application],
-"*.data" => &[&T_plain_text],
-"*.lhs" => &[&T_x_haskell_text],
-"*.drf" => &[&T_x_raw_kodak_image],
-"*.MF" => &[&T_plain_text],
-"*.deploy" => &[&T_octet_stream_application],
-"*.apk" => &[&T_vnd_android_package_archive_application],
-"*.vsdm" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
-"*.m4u" => &[&T_vnd_mpegurl_video],
-"*.wb1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_5_application],
-"*.nrw" => &[&T_x_raw_nikon_image],
-"*.fhc" => &[&T_x_freehand_image],
-"*.fh40" => &[&T_x_freehand_image],
-"*.Bas" => &[&T_x_basic_text],
-"*.jar" => &[&T_java_archive_application],
-"*.iiq" => &[&T_x_raw_phaseone_image],
-"*.gmx" => &[&T_vnd_gmx_application],
-"*.sf7" => &[&T_x_sas_fdb_application],
-"*.xwd" => &[&T_x_xwindowdump_image],
-"*.nitf" => &[&T_nitf_image],
-"*.skt" => &[&T_vnd_koan_application],
-"*.tmx" => &[&T_x_tmx_application],
-"*.sa7" => &[&T_x_sas_access_application],
-"*.mjs" => &[&T_javascript_text],
-"*.rdz" => &[&T_vnd_data_vision_rdz_application],
-"*.pptx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
-"*.tgz" => &[&T_gzip_application],
-"*.c++" => &[&T_x_c__src_text],
-"*.d" => &[&T_x_d_text],
-"*.PAS" => &[&T_x_pascal_text],
-"*.zip" => &[&T_zip_application],
-"*.xpi" => &[&T_x_xpinstall_application],
-"*.minipsf1" => &[&T_x_psf_audio],
-"*.cxx" => &[&T_x_c__src_text],
-"*.adf" => &[&T_x_amiga_disk_format_application],
-"*.jfif" => &[&T_jpeg_image],
-"*.fv" => &[&T_plain_text],
-"*.ogm" => &[&T_x_ogm_video],
-"*.mod" => &[&T_x_mod_audio],
-"*.wb2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_6_application],
-"*.xop" => &[&T_xop_xml_application],
-"*.cfc" => &[&T_x_coldfusion_text],
-"*.xcf" => &[&T_x_xcf_image],
-"*.minipsf" => &[&T_x_psf_audio],
-"*.wav" => &[&T_vnd_wave_audio],
-"*.amf" => &[&T_x_amf_application],
-"*.m3" => &[&T_x_modula_text],
-"*.xpt" => &[&T_x_sas_xport_application],
-"*.xmp" => &[&T_rdf_xml_application],
-"*.4th" => &[&T_x_forth_text],
-"*.fff" => &[&T_x_raw_imacon_image],
-"*.cpt" => &[&T_mac_compactpro_application],
-"*.rnc" => &[&T_relax_ng_compact_syntax_application],
-"*.atomsvc" => &[&T_atomsvc_xml_application],
-"*.pml" => &[&T_vnd_ctc_posml_application],
-"*.ogx" => &[&T_ogg_application],
-"*.dvi" => &[&T_x_dvi_application],
-"*.iso" => &[&T_x_iso9660_image_application],
-"*.lzh" => &[&T_octet_stream_application],
-"*.link66" => &[&T_vnd_route66_link66_xml_application],
-"*.eml" => &[&T_rfc822_message],
-"*.meta" => &[&T_plain_text],
-"NOTICE" => &[&T_plain_text],
-"*.nns" => &[&T_vnd_noblenet_sealer_application],
-"*.p7r" => &[&T_x_pkcs7_certreqresp_application],
-"*.ez2" => &[&T_vnd_ezpix_album_application],
-"*.wdb" => &[&T_vnd_ms_works_application],
-"*.udeb" => &[&T_x_debian_package_application],
-"*.gz" => &[&T_gzip_application],
-"*.cfml" => &[&T_x_coldfusion_text],
-"*.air" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
-"*.xll" => &[&T_vnd_ms_excel_application],
-"*.mpx" => &[&T_x_project_application],
-"*.xo" => &[&T_vnd_olpc_sugar_application],
-"*.sldm" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
-"*.tbz" => &[&T_x_bzip_application],
-"*.com" => &[&T_x_msdownload_application],
-"*.sd7" => &[&T_x_sas_data_application],
-"*.dwfx" => &[&T_vnd_dwfx_xps_model],
-"*.H" => &[&T_x_c__hdr_text],
-"*.cdxml" => &[&T_vnd_chemdraw_xml_application],
-"*.rss" => &[&T_rss_xml_application],
-"*.mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
-"a_*.txt" => &[&T_x_isatab_assay_application],
-"*.types" => &[&T_plain_text],
-"*.xbm" => &[&T_x_xbitmap_image],
-"*.sas7bvew" => &[&T_x_sas_view_application],
-"*.xlr" => &[&T_x_tika_msworks_spreadsheet_application],
-"*.CBL" => &[&T_x_cobol_text],
-"*.otp" => &[&T_vnd_oasis_opendocument_presentation_template_application],
-"*.gex" => &[&T_vnd_geometry_explorer_application],
-"*.aab" => &[&T_x_authorware_bin_application],
-"*.tcap" => &[&T_vnd_3gpp2_tcap_application],
-"*.ra" => &[&T_x_pn_realaudio_audio],
-"*.semf" => &[&T_vnd_semf_application],
-"*.xsl" => &[&T_xml_application],
-"*.nc" => &[&T_x_netcdf_application],
-"*.pst" => &[&T_vnd_ms_outlook_pst_application],
-"*.aas" => &[&T_x_authorware_seg_application],
-"*.numbers" => &[&T_vnd_apple_numbers_application],
-"*.ccxml" => &[&T_ccxml_xml_application],
-"*.sas7bdat" => &[&T_x_sas_data_application],
-"*.java" => &[&T_x_java_source_text],
-"*.rpss" => &[&T_vnd_nokia_radio_presets_application],
-"*.list3820" => &[&T_vnd_ibm_modcap_application],
-"*.pfx" => &[&T_x_pkcs12_application],
-"*.jpe" => &[&T_jpeg_image],
-"*.dbase3" => &[&T_x_dbf_application],
-"*.pki" => &[&T_pkixcmp_application],
-"*.jisp" => &[&T_vnd_jisp_application],
-"*.twd" => &[&T_vnd_simtech_mindmapper_application],
-"*.sdc" => &[&T_vnd_stardivision_calc_application],
-"*.hfa" => &[&T_x_erdas_hfa_application],
-"*.mbk" => &[&T_vnd_mobius_mbk_application],
-"*.enw" => &[&T_x_endnote_refer_application],
-"*.gslib" => &[&T_x_psf_audio],
-"*.mef" => &[&T_x_raw_mamiya_image],
-"*.xpw" => &[&T_vnd_intercon_formnet_application],
-"*.applescript" => &[&T_x_applescript_text],
-"*.nsf" => &[&T_vnd_lotus_notes_application],
-"*.pqa" => &[&T_vnd_palm_application],
-"*.drc" => &[&T_x_dirac_video],
-"*.jxl" => &[&T_jxl_image],
-"*.smil" => &[&T_smil_xml_application],
-"*.fits" => &[&T_fits_application],
-"*.esf" => &[&T_vnd_epson_esf_application],
-"*.owl" => &[&T_rdf_xml_application,&T_owl_xml_application],
-"*.xspf" => &[&T_xspf_xml_application],
-"*.ustar" => &[&T_x_ustar_application],
-"*.f90" => &[&T_x_fortran_text],
-"*.ipk" => &[&T_vnd_shana_informed_package_application],
-"*.lbe" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
-"*.cgi" => &[&T_x_cgi_text],
-"*.sxm" => &[&T_vnd_sun_xml_math_application],
-"*.gre" => &[&T_vnd_geometry_explorer_application],
-"*.tif" => &[&T_tiff_image],
-"*.vtt" => &[&T_vtt_text],
-"*.sr2" => &[&T_x_raw_sony_image],
-"*.al" => &[&T_x_perl_text],
-"*.oda" => &[&T_oda_application],
-"*.mmp" => &[&T_vnd_mindjet_mindmanager_application],
-"*.z" => &[&T_x_compress_application],
-"*.jdf" => &[&T_x_jeol_jdf_application],
-"*.fh4" => &[&T_x_freehand_image],
-"*.ods" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
-"*.srf" => &[&T_x_raw_sony_image],
-"*.dxb" => &[&T_vnd_dxb_image],
-"*.et3" => &[&T_vnd_eszigno3_xml_application],
-"*.ppz" => &[&T_vnd_ms_powerpoint_application],
-"*.abw" => &[&T_x_abiword_application],
-"*.sas7bfdb" => &[&T_x_sas_fdb_application],
-"*.rpst" => &[&T_vnd_nokia_radio_preset_application],
-"*.cel" => &[&T_vnd_dgn_image],
-"*.vrml" => &[&T_vrml_model],
-"*.kdc" => &[&T_x_raw_kodak_image],
-"*.cbor" => &[&T_cbor_application],
-"*.mxu" => &[&T_vnd_mpegurl_video],
-"*.accdb" => &[&T_x_msaccess_application],
-"*.emz" => &[&T_x_emf_compressed_image],
-"*.grxml" => &[&T_srgs_xml_application],
-"*.xer" => &[&T_patch_ops_error_xml_application],
-"*.MYD" => &[&T_x_mysql_misam_data_application],
-"*.fti" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
-"*.jpm" => &[&T_jpm_image],
-"*.vor" => &[&T_x_staroffice_template_application],
-"*.i3" => &[&T_x_modula_text],
-"*.joda" => &[&T_vnd_joost_joda_archive_application],
-"*.vsd" => &[&T_vnd_visio_application],
-"*.gtm" => &[&T_vnd_groove_tool_message_application],
-"*.distz" => &[&T_octet_stream_application],
-"*.odp" => &[&T_vnd_oasis_opendocument_presentation_application],
-"*.xvml" => &[&T_xv_xml_application],
-"*.jng" => &[&T_x_jng_video],
-"*.wk1" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
-"*.aiff" => &[&T_x_aiff_audio],
-"*.itk" => &[&T_x_tcl_text],
-"*.hdf" => &[&T_x_hdf_application],
-"*.ktz" => &[&T_vnd_kahootz_application],
-"*.w3d" => &[&T_x_director_application],
-"*.jb2" => &[&T_x_jbig2_image],
-"*.psb" => &[&T_vnd_3gpp_pic_bw_small_application],
-"*.bmp" => &[&T_bmp_image],
-"*.fh10" => &[&T_x_freehand_image],
-"*.eot" => &[&T_vnd_ms_fontobject_application],
-"*.schemas" => &[&T_plain_text],
-"*.me" => &[&T_troff_text],
-"*.laz" => &[&T_x_asprs_application],
-"*.fg5" => &[&T_vnd_fujitsu_oasysgp_application],
-"*.wpl" => &[&T_vnd_ms_wpl_application],
-"*.shp" => &[&T_x_shapefile_application,&T_vnd_shp_application],
-"*.dpx" => &[&T_x_dpx_image],
-"*.wml" => &[&T_vnd_wap_wml_text],
-"*.cbl" => &[&T_x_cobol_text],
-"*.psd" => &[&T_vnd_adobe_photoshop_image],
-"*.wpt" => &[&T_vnd_wordperfect_application],
-"*.webp" => &[&T_webp_image],
-"*.iso19139" => &[&T_iso19139_xml_text],
-"*.Cls" => &[&T_x_vbasic_text],
-"*.tra" => &[&T_vnd_trueapp_application],
-"*.wk4" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_4_application],
-"*.mdb" => &[&T_x_msaccess_application],
-"*.torrent" => &[&T_x_bittorrent_application],
-"*.xhtml" => &[&T_xhtml_xml_application],
-"*.dp" => &[&T_vnd_osgi_dp_application],
-"*.m4" => &[&T_plain_text],
-"*.pen" => &[&T_plain_text],
-"*.prt" => &[&T_x_prt_application],
-"*.xweb" => &[&T_plain_text],
-"*.p" => &[&T_x_pascal_text],
-"*.mp4v" => &[&T_mp4_video],
-"*.roff" => &[&T_troff_text],
-"*.geo" => &[&T_vnd_dynageo_application],
-"*.y" => &[&T_x_yacc_text],
-"*.iges" => &[&T_iges_model],
-"*.spc" => &[&T_x_pkcs7_certificates_application],
-"*.axx" => &[&T_x_axcrypt_application],
-"*.flx" => &[&T_vnd_fmi_flexstor_text],
-"*.sig" => &[&T_pgp_signature_application],
-"*.lbd" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
-"*.123" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_97_9_x_application],
-"*.bup" => &[&T_x_dvd_ifo_application],
-"*.txt" => &[&T_plain_text],
-"*.ft" => &[&T_plain_text],
-"*.csp" => &[&T_vnd_commonspace_application],
-"*.dmg" => &[&T_x_apple_diskimage_application],
-"*.c4f" => &[&T_vnd_clonk_c4group_application],
-"*.c4g" => &[&T_vnd_clonk_c4group_application],
-"*.markdown" => &[&T_x_web_markdown_text],
-"*.clkp" => &[&T_vnd_crick_clicker_palette_application],
-"*.cif" => &[&T_x_cif_chemical],
-"*.msty" => &[&T_vnd_muvee_style_application],
-"*.ncx" => &[&T_x_dtbncx_xml_application],
-"*.ifm" => &[&T_vnd_shana_informed_formdata_application],
-"*.wax" => &[&T_x_ms_wax_audio],
-"*.3g2" => &[&T_3gpp2_video],
-"*.unityweb" => &[&T_vnd_unity_application],
-"*.zmm" => &[&T_vnd_handheld_entertainment_xml_application],
-"*.sass" => &[&T_x_sass_text],
-"*.htm" => &[&T_html_text],
-"*.parquet" => &[&T_x_parquet_application],
-"*.flv" => &[&T_x_flv_video],
-"*.toast" => &[&T_x_roxio_toast_application],
-"*.clp" => &[&T_x_msclip_application],
-"*.dgn" => &[&T_vnd_dgn_image],
-"*.mime" => &[&T_rfc822_message],
-"*.ufdl" => &[&T_vnd_ufdl_application],
-"*.cil" => &[&T_vnd_ms_artgalry_application],
-"*.deb" => &[&T_x_debian_package_application],
-"*.hx" => &[&T_x_haxe_text],
-"*.m2a" => &[&T_mpeg_audio],
-"*.fh" => &[&T_x_freehand_image],
-"*.sas7bpgm" => &[&T_x_sas_program_data_application],
-"*.box" => &[&T_vnd_previewsystems_box_application],
-"*.doc" => &[&T_msword_application],
-"*.std" => &[&T_vnd_sun_xml_draw_template_application],
-"*.ppd" => &[&T_vnd_cups_ppd_application],
-"*.lz" => &[&T_x_lzip_application,&T_lzip_application],
-"*.jbig2" => &[&T_x_jbig2_image],
-"*.xdw" => &[&T_vnd_fujixerox_docuworks_application],
-"*.mpn" => &[&T_vnd_mophun_application_application],
-"*.cmdf" => &[&T_x_cmdf_chemical],
-"*.ft11" => &[&T_x_freehand_image],
-"*.potx" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
-"*.hwpx" => &[&T_hwp_zip_application],
-"*.mxml" => &[&T_xv_xml_application],
-"*.dir" => &[&T_x_director_application],
-"*.text" => &[&T_plain_text],
-"*.vm" => &[&T_plain_text],
-"*.lisp" => &[&T_x_common_lisp_text],
-"*.coffee" => &[&T_x_coffeescript_text],
-"*.voc" => &[&T_x_unknown_audio],
-"*.odg" => &[&T_vnd_oasis_opendocument_graphics_application],
-"*.dot" => &[&T_msword_application],
-"*.jfi" => &[&T_jpeg_image],
-"*.jxs" => &[&T_jxs_image],
-"*.btif" => &[&T_prs_btif_image],
-"*.nnd" => &[&T_vnd_noblenet_directory_application],
-"*.sldx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
-"*.Frm" => &[&T_x_vbasic_text],
-"*.es3" => &[&T_vnd_eszigno3_xml_application],
-"*.man" => &[&T_troff_text],
-"*.bpg" => &[&T_x_bpg_image,&T_bpg_image],
-"*.c4p" => &[&T_vnd_clonk_c4group_application],
-"*.shar" => &[&T_x_shar_application],
-"*.gac" => &[&T_vnd_groove_account_application],
-"*.aif" => &[&T_x_aiff_audio],
-"*.xlex" => &[&T_plain_text],
-"*.uue" => &[&T_x_uuencode_text],
-"*.h++" => &[&T_x_c__hdr_text],
-"*.lit" => &[&T_x_ms_reader_application],
-"*.erl" => &[&T_x_erlang_text],
-"*.sr7" => &[&T_x_sas_itemstor_application],
-"*.vss" => &[&T_vnd_visio_application],
-"*.stf" => &[&T_vnd_wt_stf_application],
-"*.heic" => &[&T_heic_image],
-"*.atc" => &[&T_vnd_acucorp_application],
-"*.kon" => &[&T_vnd_kde_kontour_application],
-"*.srx" => &[&T_sparql_results_xml_application],
-"*.icm" => &[&T_vnd_iccprofile_application],
-"^owl$" => &[&T_rdf_xml_application],
-"*.zirz" => &[&T_vnd_zul_application],
-"*.gtar" => &[&T_x_gtar_application],
-"*.kil" => &[&T_x_killustrator_application],
-"*.pct" => &[&T_x_pict_image],
-"*.dif" => &[&T_dif_xml_application],
-"*.ppam" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
-"*.qpw" => &[&T_x_quattro_pro_application],
-"*.xlm" => &[&T_vnd_ms_excel_application],
-"*.m2v" => &[&T_mpeg_video],
-"*.rwz" => &[&T_x_raw_rawzor_image],
-"*.mpg" => &[&T_mpeg_video],
-"*.pkipath" => &[&T_pkix_pkipath_application],
-"*.wbs" => &[&T_vnd_criticaltools_wbs_xml_application],
-"*.lzma" => &[&T_x_lzma_application],
-"*.ntf" => &[&T_nitf_image],
-"*.svgz" => &[&T_svg_xml_image],
-"*.glb" => &[&T_gltf_binary_model],
-"*.pre" => &[&T_vnd_lotus_freelance_application],
-"*.aspx" => &[&T_aspdotnet_text],
-"*.hpgl" => &[&T_vnd_hp_hpgl_application],
-"*.dtshd" => &[&T_vnd_dts_hd_audio],
-"*.vcg" => &[&T_vnd_groove_vcard_application],
-"*.maker" => &[&T_vnd_framemaker_application],
-"*.mus" => &[&T_vnd_musician_application],
-"*.wmd" => &[&T_x_ms_wmd_application],
-"*.hp" => &[&T_x_c__hdr_text],
-"*.CPP" => &[&T_x_c__src_text],
-"*.irm" => &[&T_vnd_ibm_rights_management_application],
-"*.F" => &[&T_x_fortran_text],
-"*.swi" => &[&T_vnd_arastra_swi_application],
-"*.csml" => &[&T_x_csml_chemical],
-"*.tzx" => &[&T_x_spectrum_tzx_application],
-"*.mxs" => &[&T_vnd_triscape_mxs_application],
-"*.warc.gz" => &[&T_warc_gz_application],
-"*.pp" => &[&T_x_pascal_text],
-"*.zaz" => &[&T_vnd_zzazz_deck_xml_application],
-"*.mng" => &[&T_x_mng_video],
-"*.xps" => &[&T_vnd_ms_xpsdocument_application],
-"*.jpgm" => &[&T_jpm_image],
-"*.wkq" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application,&T_x_quattro_pro_version_5_application],
-"*.clkt" => &[&T_vnd_crick_clicker_template_application],
-"*.restx" => &[&T_x_rst_text],
-"*.avif" => &[&T_avif_image],
-"*.cct" => &[&T_x_director_application],
-"*.ggb" => &[&T_vnd_geogebra_file_application],
-"*.xsd" => &[&T_xml_application],
-"*.dotm" => &[&T_vnd_ms_word_template_macroenabled_12_application],
-"*.pem" => &[&T_x_x509_cert_format_pem_application],
-"*.webm" => &[&T_webm_video],
-"*.csv" => &[&T_csv_text],
-"*.sc" => &[&T_vnd_ibm_secure_container_application],
-"*.kpr" => &[&T_vnd_kde_kpresenter_application],
-"*.tiff" => &[&T_tiff_image],
-"*.sus" => &[&T_vnd_sus_calendar_application],
-"*.w60" => &[&T_vnd_wordperfect_application],
-"*.xcat" => &[&T_plain_text],
-"*.osfpvg" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
-"*.bas" => &[&T_x_basic_text],
-"*.sxc" => &[&T_vnd_sun_xml_calc_application],
-"*.ocaml" => &[&T_x_ocaml_text],
-"*.py" => &[&T_x_python_text],
-"*.ar" => &[&T_x_archive_application],
-"*.ft9" => &[&T_x_freehand_image],
-"*.brotli" => &[&T_x_brotli_application],
-"*.dist" => &[&T_octet_stream_application],
-"*.ims" => &[&T_vnd_ms_ims_application],
-"*.grb2" => &[&T_x_grib_application],
-"*.minigsf" => &[&T_x_psf_audio],
-"*.C" => &[&T_x_c__src_text],
-"*.sp7" => &[&T_x_sas_putility_application],
-"*.pgp" => &[&T_pgp_encrypted_application],
-"*.kwd" => &[&T_vnd_kde_kword_application],
-"*.oxps" => &[&T_vnd_ms_xpsdocument_application],
-"*.pgn" => &[&T_x_chess_pgn_application],
-"*.sz" => &[&T_x_snappy_framed_application],
-"*.mjp2" => &[&T_mj2_video],
-"*.xtest" => &[&T_plain_text],
-"*.FRM" => &[&T_x_vbasic_text],
-"*.vb" => &[&T_x_vbdotnet_text],
-"*.gph" => &[&T_vnd_flographit_application],
-"*.azf" => &[&T_vnd_airzip_filesecure_azf_application],
-"*.vis" => &[&T_vnd_visionary_application],
-"*.sti" => &[&T_vnd_sun_xml_impress_template_application],
-"*.wk2" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
-"*.shf" => &[&T_shf_xml_application],
-"*.wqd" => &[&T_vnd_wqd_application],
-"*.qxb" => &[&T_vnd_quark_quarkxpress_application],
-"*.xfdl" => &[&T_vnd_xfdl_application],
-"*.cod" => &[&T_vnd_rim_cod_application],
-"*.mst" => &[&T_x_ms_installer_application],
-"*.xconf" => &[&T_x_config_text],
-"*.c4d" => &[&T_vnd_clonk_c4group_application],
-"*.aaf" => &[&T_octet_stream_application],
-"*.st" => &[&T_x_stsrc_text],
-"*.qt" => &[&T_quicktime_video],
-"*.hprof.txt" => &[&T_vnd_java_hprof_text_application],
-"*.qxd" => &[&T_vnd_quark_quarkxpress_application],
-"*.pict" => &[&T_x_pict_image],
-"*.vcf" => &[&T_x_vcard_text],
-"*.xlam" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
-"*.odb" => &[&T_vnd_oasis_opendocument_base_application],
-"*.cap" => &[&T_vnd_tcpdump_pcap_application],
-"*.pro" => &[&T_x_prolog_text],
-"*.flac" => &[&T_x_flac_audio],
-"*.cmd" => &[&T_x_bat_application],
-"*.mxl" => &[&T_vnd_recordare_musicxml_application],
-"*.indd" => &[&T_x_adobe_indesign_application],
-"*.mp4a" => &[&T_mp4_audio],
-"*.one" => &[&T_onenote_format_one_application],
-"*.rmp" => &[&T_x_pn_realaudio_plugin_audio],
-"*.fh9" => &[&T_x_freehand_image],
-"*.kmz" => &[&T_vnd_google_earth_kmz_application],
-"*.jmx" => &[&T_plain_text],
-"*.lua" => &[&T_x_lua_text],
-"*.org" => &[&T_vnd_lotus_organizer_application],
-"*.mpkg" => &[&T_vnd_apple_installer_xml_application],
-"*.dsw" => &[&T_plain_text],
-"*.sh" => &[&T_x_sh_application],
-"*.wvx" => &[&T_x_ms_wvx_video],
-"*.sdp" => &[&T_sdp_application],
-"*.c4u" => &[&T_vnd_clonk_c4group_application],
-"*.do" => &[&T_x_stata_do_application],
-"*.jpeg" => &[&T_jpeg_image],
-"*.S" => &[&T_x_assembly_text],
-"*.tld" => &[&T_plain_text],
-"*.fh8" => &[&T_x_freehand_image],
-"*.vxml" => &[&T_voicexml_xml_application],
-"*.pub" => &[&T_x_mspublisher_application],
-"*.setreg" => &[&T_set_registration_initiation_application],
-"*.jsp" => &[&T_x_jsp_text],
-"*.msl" => &[&T_vnd_mobius_msl_application],
-"*.php" => &[&T_x_php_text],
-"*.r3d" => &[&T_x_raw_red_image],
-"*.portpkg" => &[&T_vnd_macports_portpkg_application],
-"*.dex" => &[&T_x_dex_application],
-"*.afp" => &[&T_vnd_ibm_modcap_application],
-"*.xla" => &[&T_vnd_ms_excel_application],
-"*.cdr" => &[&T_coreldraw_application],
-"*.xliff" => &[&T_x_xliff_xml_application],
-"*.sda" => &[&T_vnd_stardivision_draw_application],
-"*.m" => &[&T_x_objcsrc_text],
-"*.perl" => &[&T_x_perl_text],
-"*.Cbl" => &[&T_x_cobol_text],
-"*.xbap" => &[&T_x_ms_xbap_application],
-"*.hs" => &[&T_x_haskell_text],
-"*.wmlc" => &[&T_vnd_wap_wmlc_application],
-"*.sldprt" => &[&T_sldworks_application],
-"*.igx" => &[&T_vnd_micrografx_igx_application],
-"*.3mf" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
-"*.xap" => &[&T_x_silverlight_app_application],
-"*.fzs" => &[&T_vnd_fuzzysheet_application],
-"*.mfm" => &[&T_vnd_mfmp_application],
-"*.gpg" => &[&T_pgp_encrypted_application],
-"*.ddd" => &[&T_vnd_fujixerox_ddd_application],
-"*.sas7bcat" => &[&T_x_sas_catalog_application],
-"*.frame" => &[&T_vnd_framemaker_application],
-"*.sxg" => &[&T_vnd_sun_xml_writer_global_application],
-"*.fbs" => &[&T_vnd_fastbidsheet_image],
-"*.enr" => &[&T_x_endnote_refer_application],
-"*.jnilib" => &[&T_x_java_jnilib_application],
-"*.xmind" => &[&T_x_xmind_application],
-"*.plf" => &[&T_vnd_pocketlearn_application],
-"*.x32" => &[&T_x_authorware_bin_application],
-"*.sldasm" => &[&T_sldworks_application],
-"*.mpm" => &[&T_vnd_blueice_multipass_application],
-"*.aw" => &[&T_applixware_application],
-"*.chm" => &[&T_vnd_ms_htmlhelp_application],
-"*.ps" => &[&T_postscript_application],
-"*.cmc" => &[&T_vnd_cosmocaller_application],
-"*.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
-"*.ptid" => &[&T_vnd_pvi_ptid1_application],
-"*.mli" => &[&T_x_ocaml_text],
-"*.e57" => &[&T_e57_model],
-"*.cls" => &[&T_x_vbasic_text],
-"*.hlp" => &[&T_winhlp_application],
-"*.ivu" => &[&T_vnd_immervision_ivu_application],
-"*.silo" => &[&T_mesh_model],
-"*.jxr" => &[&T_jxr_image],
-"*.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
-"*.woff2" => &[&T_woff2_font],
-"i_*.txt" => &[&T_x_isatab_investigation_application],
-"*.dump" => &[&T_octet_stream_application],
-"*.vcx" => &[&T_vnd_vcx_application],
-"*.latex" => &[&T_x_latex_application],
-"*.fdf" => &[&T_vnd_fdf_application],
-"*.s7m" => &[&T_x_sas_dmdb_application],
-"*.rsd" => &[&T_rsd_xml_application],
-"*.texi" => &[&T_x_texinfo_application],
-"*.mp3" => &[&T_mpeg_audio],
-"Makefile" => &[&T_x_makefile_text],
-"*.bdm" => &[&T_vnd_syncml_dm_wbxml_application],
-"*.ssml" => &[&T_ssml_xml_application],
-"*.karbon" => &[&T_vnd_kde_karbon_application],
-"*.wsdd" => &[&T_plain_text],
-"*.kne" => &[&T_vnd_kinar_application],
-"*.ggt" => &[&T_vnd_geogebra_tool_application],
-"*.webarchive" => &[&T_x_webarchive_application],
-"*.crt" => &[&T_x_x509_cert_application],
-"*.xbd" => &[&T_vnd_fujixerox_docuworks_binder_application],
-"*.properties" => &[&T_x_java_properties_text],
-"*.less" => &[&T_x_less_text],
-"*.saf" => &[&T_vnd_yamaha_smaf_audio_application],
-"*.n-gage" => &[&T_vnd_nokia_n_gage_symbian_install_application],
-"*.COB" => &[&T_x_cobol_text],
-"*.BAS" => &[&T_x_basic_text],
-"*.vda" => &[&T_x_tga_image],
-"*.xpr" => &[&T_vnd_is_xpr_application],
-"*.umj" => &[&T_vnd_umajin_application],
-"*.m4v" => &[&T_x_m4v_video],
-"*.oxt" => &[&T_vnd_openofficeorg_extension_application],
-"*.xq" => &[&T_xquery_application],
-"*.gdl" => &[&T_vnd_gdl_model],
-"*.dgnlib" => &[&T_vnd_dgn_image],
-"*.mpd" => &[&T_dash_xml_application],
-"*.wasm" => &[&T_wasm_application],
-"*.uoml" => &[&T_vnd_uoml_xml_application],
-"*.acfm" => &[&T_x_font_adobe_metric_application],
-"*.g" => &[&T_plain_text],
-"*.n3" => &[&T_plain_text],
-"*.ppj" => &[&T_vnd_adobe_premiere_image],
-"*.urls" => &[&T_uri_list_text],
-"*.scss" => &[&T_x_scss_text],
-"*.emlx" => &[&T_x_emlx_message],
-"*.sml" => &[&T_smil_xml_application],
-"*.gpx" => &[&T_gpx_xml_application],
-"*.cfm" => &[&T_x_coldfusion_text],
-"*.fm" => &[&T_vnd_framemaker_application],
-"*.rq" => &[&T_sparql_query_application],
-"*.vf" => &[&T_x_tex_virtual_font_application],
-"*.mathml" => &[&T_mathml_xml_application],
-"*.dcr" => &[&T_x_director_application],
-"*.pbd" => &[&T_vnd_powerbuilder6_application],
-"*.cdf" => &[&T_x_netcdf_application],
-"*.cu" => &[&T_cu_seeme_application],
-"*.bpm" => &[&T_bizagi_modeler_application],
-"*.tbz2" => &[&T_x_bzip2_application],
-"*.hbci" => &[&T_vnd_hbci_application],
-"*.m13" => &[&T_x_msmediaview_application],
-"*.scad" => &[&T_x_openscad_application],
-"*.osf" => &[&T_vnd_yamaha_openscoreformat_application],
-"*.h5" => &[&T_x_hdf_application],
-"*.xgrm" => &[&T_plain_text],
-"*.tar" => &[&T_x_tar_application],
-"*.cc" => &[&T_x_c__src_text],
-"*.snd" => &[&T_basic_audio],
-"*.3gp" => &[&T_3gpp_video],
-"*.ppt" => &[&T_vnd_ms_powerpoint_application],
-"*.plc" => &[&T_vnd_mobius_plc_application],
-"*.mpp" => &[&T_vnd_ms_project_application],
-"*-gz" => &[&T_gzip_application],
+"*.onepkg" => &[&T_onenote__format_package_application],
 "*.ots" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
+"*.dvb" => &[&T_vnd_dvb_file_video],
+"*.cdxml" => &[&T_vnd_chemdraw_xml_application],
+"*.ggt" => &[&T_vnd_geogebra_tool_application],
+"*.mmas" => &[&T_vnd_mindjet_mindmanager_application],
+"*.pdb" => &[&T_x_pdb_chemical],
+"*.com" => &[&T_x_msdownload_application],
+"*.project" => &[&T_plain_text],
+"*.air" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
+"*.adoc.txt" => &[&T_x_asciidoc_text],
+"*.rnx" => &[&T_plain_text],
+"*.nroff" => &[&T_troff_text],
+"*.rtx" => &[&T_richtext_text],
+"*.mf" => &[&T_plain_text],
+"*.nes" => &[&T_x_nesrom_application],
+"*.acfm" => &[&T_x_font_adobe_metric_application],
+"*.rif" => &[&T_reginfo_xml_application],
+"*.sv4crc" => &[&T_x_sv4crc_application],
+"*.ada" => &[&T_x_ada_text],
+"*.mmf" => &[&T_vnd_smaf_application],
+"*.cs" => &[&T_x_csharp_text],
+"*.idml" => &[&T_vnd_adobe_indesign_idml_package_application],
+"*.ppz" => &[&T_vnd_ms_powerpoint_application],
+"*.stc" => &[&T_vnd_sun_xml_calc_template_application],
+"*.mp2" => &[&T_mpeg_audio],
+"*.scad" => &[&T_x_openscad_application],
+"*.xslfo" => &[&T_xslfo_xml_application],
+"*.rld" => &[&T_resource_lists_diff_xml_application],
+"*.kmz" => &[&T_vnd_google_earth_kmz_application],
+"*.mp4a" => &[&T_mp4_audio],
+"*.CBL" => &[&T_x_cobol_text],
+"*.nc" => &[&T_x_netcdf_application],
+"*.h263" => &[&T_h263_video],
+"*.jng" => &[&T_x_jng_video],
+"*.pbm" => &[&T_x_portable_bitmap_image],
+"*.vtt" => &[&T_vtt_text],
+"*.ditamap" => &[&T_dita_xml_format_map_application],
+"*.dsp" => &[&T_plain_text],
+"*.pml" => &[&T_vnd_ctc_posml_application],
+"*.ft9" => &[&T_x_freehand_image],
+"*.aet" => &[&T_vnd_adobe_aftereffects_template_application],
+"*.acutc" => &[&T_vnd_acucorp_application],
+"*.hlp" => &[&T_winhlp_application],
+"*.pod" => &[&T_plain_text],
+"*.rm" => &[&T_vnd_rn_realmedia_application],
+"*.xlam" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
+"*.daf" => &[&T_vnd_mobius_daf_application],
+"*.mpx" => &[&T_x_project_application],
+"*.hvd" => &[&T_vnd_yamaha_hv_dic_application],
+"*.sxi" => &[&T_vnd_sun_xml_impress_application],
+"*.gsf" => &[&T_x_font_ghostscript_application],
+"*.eml" => &[&T_rfc822_message],
+"*.mst" => &[&T_x_ms_installer_application],
+"*.dwf" => &[&T_vnd_dwf_model],
+"*.css" => &[&T_css_text],
+"*.p7r" => &[&T_x_pkcs7_certreqresp_application],
+"*.zoo" => &[&T_x_zoo_application],
+"*.classpath" => &[&T_plain_text],
+"*.aw" => &[&T_applixware_application],
+"*.xsp" => &[&T_plain_text],
+"*.yaml" => &[&T_x_yaml_text],
+"*.cer" => &[&T_pkix_cert_application],
+"*.spl" => &[&T_x_futuresplash_application],
+"*.rdf" => &[&T_rdf_xml_application],
+"*.karbon" => &[&T_vnd_kde_karbon_application],
 "*.grm" => &[&T_plain_text],
-"*.php3" => &[&T_x_php_text],
-"*.vbs" => &[&T_x_vbscript_text],
-"*.gml" => &[&T_gml_xml_application],
-"*.flc" => &[&T_x_flc_video],
-"*.etx" => &[&T_x_setext_text],
-"*.rexx" => &[&T_x_rexx_text],
-"*.mp4" => &[&T_mp4_video],
-"*.so" => &[&T_octet_stream_application],
+"*.pm" => &[&T_x_perl_text],
+"*.go" => &[&T_x_go_text],
+"*.otf" => &[&T_x_font_otf_application],
+"*.ez" => &[&T_andrew_inset_application],
+"*.fti" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
+"*.tbz2" => &[&T_x_bzip2_application],
+"*.bpk" => &[&T_octet_stream_application],
+"*.pptx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
+"*.stl" => &[&T_x_stl_binary_model],
+"GNUMakefile" => &[&T_x_makefile_text],
+"*.cdbcmsg" => &[&T_vnd_contact_cmsg_application],
+"*.tgz" => &[&T_gzip_application],
+"*.wma" => &[&T_x_ms_wma_audio],
+"^rdf$" => &[&T_rdf_xml_application],
+"*.cxx" => &[&T_x_c__src_text],
+"*.jdf" => &[&T_x_jeol_jdf_application],
+"*.am" => &[&T_plain_text],
+"*.sxc" => &[&T_vnd_sun_xml_calc_application],
+"*.fh7" => &[&T_x_freehand_image],
+"*.nb" => &[&T_mathematica_application],
+"*.bz" => &[&T_x_bzip_application],
+"*.e57" => &[&T_e57_model],
+"*.mxs" => &[&T_vnd_triscape_mxs_application],
+"s_*.txt" => &[&T_x_isatab_application],
+"*.rpss" => &[&T_vnd_nokia_radio_presets_application],
+"*.ufdl" => &[&T_vnd_ufdl_application],
+"*.setreg" => &[&T_set_registration_initiation_application],
+"*.aas" => &[&T_x_authorware_seg_application],
+"*.dts" => &[&T_vnd_dts_audio],
+"*.elc" => &[&T_octet_stream_application,&T_x_elc_application],
+"*.rwz" => &[&T_x_raw_rawzor_image],
+"*.afp" => &[&T_vnd_ibm_modcap_application],
+"*.ms" => &[&T_troff_text],
+"*.flv" => &[&T_x_flv_video],
+"*.cab" => &[&T_vnd_ms_cab_compressed_application],
+"*.gre" => &[&T_vnd_geometry_explorer_application],
+"*.mmap" => &[&T_vnd_mindjet_mindmanager_application],
+"*.nns" => &[&T_vnd_noblenet_sealer_application],
+"*.oth" => &[&T_vnd_oasis_opendocument_text_web_application],
+"*.crd" => &[&T_x_mscardfile_application],
+"*.jpeg" => &[&T_jpeg_image],
+"*.wp6" => &[&T_vnd_wordperfect_application],
 "*.mcurl" => &[&T_vnd_curl_mcurl_text],
-"*.texinfo" => &[&T_x_texinfo_application],
-"*.mos" => &[&T_x_raw_leaf_image],
-"*.cla" => &[&T_vnd_claymore_application],
-"*.edx" => &[&T_vnd_novadigm_edx_application],
-"*.sdkd" => &[&T_vnd_solent_sdkm_xml_application],
-"*.mdtext" => &[&T_x_web_markdown_text],
+"*.c4p" => &[&T_vnd_clonk_c4group_application],
+"*.dwg" => &[&T_vnd_dwg_image],
+"*.xsm" => &[&T_vnd_syncml_xml_application],
+"*.sas7butl" => &[&T_x_sas_utility_application],
+"*.cbl" => &[&T_x_cobol_text],
+"*.sxg" => &[&T_vnd_sun_xml_writer_global_application],
+"*.adoc" => &[&T_x_asciidoc_text],
+"*.ttml" => &[&T_ttml_xml_application],
+"*.qxt" => &[&T_vnd_quark_quarkxpress_application],
+"*.msf" => &[&T_vnd_epson_msf_application],
+"*.sfd-hdstx" => &[&T_vnd_hydrostatix_sof_data_application],
+"*.gqf" => &[&T_vnd_grafeq_application],
+"*.dd2" => &[&T_vnd_oma_dd2_xml_application],
+"*.me" => &[&T_troff_text],
+"*.fnc" => &[&T_vnd_frogans_fnc_application],
+"*.wb1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_5_application],
+"*.awk" => &[&T_x_awk_text],
+"*.xls" => &[&T_vnd_ms_excel_application],
+"*.toast" => &[&T_x_roxio_toast_application],
+"*.heif" => &[&T_heif_image],
+"*.ft11" => &[&T_x_freehand_image],
+"*.amf" => &[&T_x_amf_application],
+"*.mwf" => &[&T_vnd_mfer_application],
+"*.dotm" => &[&T_vnd_ms_word_template_macroenabled_12_application],
+"*.aifc" => &[&T_x_aiff_audio],
+"README" => &[&T_plain_text],
 "*.sgml" => &[&T_sgml_text],
-"*.asx" => &[&T_x_ms_asx_application],
-"*.dtb" => &[&T_x_dtbook_xml_application],
-"*.MYI" => &[&T_x_mysql_misam_compressed_index_application],
-"*.fods" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
-"*.wbxml" => &[&T_vnd_wap_wbxml_application],
-"*.mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
-"*.cwk" => &[&T_x_appleworks_application],
-"*.crx" => &[&T_x_chrome_package_application,&T_x_chrome_extension_application],
+"*.dpg" => &[&T_vnd_dpgraph_application],
+"*.es3" => &[&T_vnd_eszigno3_xml_application],
+"*.g" => &[&T_plain_text],
+"*.pen" => &[&T_plain_text],
+"*.sas7bmdb" => &[&T_x_sas_mddb_application],
+"*.xvm" => &[&T_xv_xml_application],
+"*.wmls" => &[&T_vnd_wap_wmlscript_text],
+"*.mpp" => &[&T_vnd_ms_project_application],
+"*.rgb" => &[&T_x_rgb_image],
+"*.pkg" => &[&T_octet_stream_application],
+"*.gtm" => &[&T_vnd_groove_tool_message_application],
+"*.ustar" => &[&T_x_ustar_application],
+"*.jpg" => &[&T_jpeg_image],
+"*.ocaml" => &[&T_x_ocaml_text],
+"*.rtf" => &[&T_rtf_application],
+"*.qwt" => &[&T_vnd_quark_quarkxpress_application],
+"*.vmdk" => &[&T_x_vmdk_application],
+"*.mjs" => &[&T_javascript_text],
+"*.grxml" => &[&T_srgs_xml_application],
+"*.oprc" => &[&T_vnd_palm_application],
+"*.su7" => &[&T_x_sas_utility_application],
+"tzfile" => &[&T_tzif_application],
+"*.distz" => &[&T_octet_stream_application],
+"*.fe_launch" => &[&T_vnd_denovo_fcselayout_link_application],
+"*.pya" => &[&T_vnd_ms_playready_media_pya_audio],
+"*.fst" => &[&T_vnd_fst_image],
+"*.pom" => &[&T_plain_text],
+"*.lbe" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
+"*.qxd" => &[&T_vnd_quark_quarkxpress_application],
+"*.sis" => &[&T_vnd_symbian_install_application],
+"*.scss" => &[&T_x_scss_text],
+"*.xhvml" => &[&T_xv_xml_application],
+"*.flc" => &[&T_x_flc_video],
+"*.sap" => &[&T_x_sap_audio],
+"*.pkipath" => &[&T_pkix_pkipath_application],
+"*.gpkg" => &[&T_x_geopackage_application,&T_x_geopackage__version_1_1Or1_0_application],
+"*.xliff" => &[&T_x_xliff_xml_application],
+"*.sz" => &[&T_x_snappy_framed_application],
+"*.obd" => &[&T_x_msbinder_application],
+"*.sv4cpio" => &[&T_x_sv4cpio_application],
+"*.amr" => &[&T_amr_audio],
+"*.mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
+"*.clkt" => &[&T_vnd_crick_clicker_template_application],
+"*.data" => &[&T_plain_text],
+"*.yml" => &[&T_x_yaml_text],
+"*.qwd" => &[&T_vnd_quark_quarkxpress_application],
+"*.xlex" => &[&T_plain_text],
+"*.spf" => &[&T_vnd_yamaha_smaf_phrase_application],
+"*.psd" => &[&T_vnd_adobe_photoshop_image],
+"*.epsf" => &[&T_postscript_application],
+"*.spq" => &[&T_scvp_vp_request_application],
+"*.mxf" => &[&T_mxf_application],
+"*.sldm" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
+"*.flw" => &[&T_vnd_kde_kivio_application],
+"*.ogg" => &[&T_vorbis_audio],
+"*.xif" => &[&T_vnd_xiff_image],
+"*.dump" => &[&T_octet_stream_application],
+"*.mrw" => &[&T_x_raw_minolta_image],
+"*.xpt" => &[&T_x_sas_xport_application],
+"*.ics" => &[&T_calendar_text],
+"*.bsh" => &[&T_plain_text],
+"*.ccxml" => &[&T_ccxml_xml_application],
+"*.scurl" => &[&T_vnd_curl_scurl_text],
+"*.3xd" => &[&T_x3d_xml_model],
+"*.spc" => &[&T_x_pkcs7_certificates_application],
+"*.docx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
+"*.cdy" => &[&T_vnd_cinderella_application],
 "*.sit" => &[&T_x_stuffit_application],
+"*.hfa" => &[&T_x_erdas_hfa_application],
+"*.dif" => &[&T_dif_xml_application],
+"*.xmp" => &[&T_rdf_xml_application],
+"*.sas" => &[&T_x_sas_application],
+"*.saf" => &[&T_vnd_yamaha_smaf_audio_application],
+"*.gtw" => &[&T_vnd_gtw_model],
+"*.p12" => &[&T_x_pkcs12_application],
+"*.xop" => &[&T_xop_xml_application],
+"*.vcg" => &[&T_vnd_groove_vcard_application],
+"*.ims" => &[&T_vnd_ms_ims_application],
+"*.iges" => &[&T_iges_model],
+"*.wpl" => &[&T_vnd_ms_wpl_application],
+"*.hxx" => &[&T_x_c__hdr_text],
+"*.rl" => &[&T_resource_lists_xml_application],
+"*.vxml" => &[&T_voicexml_xml_application],
+"*.enr" => &[&T_x_endnote_refer_application],
+"*.ost" => &[&T_vnd_ms_outlook_pst_application],
+"*.ppd" => &[&T_vnd_cups_ppd_application],
+"*.svd" => &[&T_vnd_svd_application],
+"*.lzma" => &[&T_x_lzma_application],
+"*.dxr" => &[&T_x_director_application],
+"*.ltf" => &[&T_vnd_frogans_ltf_application],
+"*.mos" => &[&T_x_raw_leaf_image],
+"*.lvp" => &[&T_vnd_lucent_voice_audio],
+"*.ihtml" => &[&T_plain_text],
+"*.jx" => &[&T_plain_text],
+"*.clp" => &[&T_x_msclip_application],
+"*.n3" => &[&T_plain_text],
+"*.tsv" => &[&T_tab_separated_values_text],
+"*.ape" => &[&T_ape_audio],
+"*.wpd" => &[&T_vnd_wordperfect_application],
+"*.cu" => &[&T_cu_seeme_application],
+"*.avif" => &[&T_avif_image],
+"*.dae" => &[&T_vnd_collada_xml_model],
+"*.onetoc2" => &[&T_onenote_format_onetoc2_application],
+"*.wasm" => &[&T_wasm_application],
+"*.bz2" => &[&T_x_bzip2_application],
+"*.prc" => &[&T_x_mobipocket_ebook_application],
+"*.mpy" => &[&T_vnd_ibm_minipay_application],
+"*.ps" => &[&T_postscript_application],
+"*.mesh" => &[&T_mesh_model],
+"*.emz" => &[&T_x_emf_compressed_image],
+"*.sig" => &[&T_pgp_signature_application],
+"*.c4u" => &[&T_vnd_clonk_c4group_application],
+"*.sse" => &[&T_vnd_kodak_descriptor_application],
+"*.jpgm" => &[&T_jpm_image],
+"*.dp" => &[&T_vnd_osgi_dp_application],
+"*.r3d" => &[&T_x_raw_red_image],
+"*.laz" => &[&T_x_asprs_application],
+"*.htke" => &[&T_vnd_kenameaapp_application],
+"*.sgm" => &[&T_sgml_text],
+"*.p" => &[&T_x_pascal_text],
+"*.cr2" => &[&T_x_canon_cr2_image],
+"*.mdb" => &[&T_x_msaccess_application],
+"*.wb3" => &[&T_x_quattro_pro_application],
+"Makefile" => &[&T_x_makefile_text],
+"*.fb2" => &[&T_x_fictionbook_xml_application],
+"*.oda" => &[&T_oda_application],
+"*.mfm" => &[&T_vnd_mfmp_application],
+"*.gnucash" => &[&T_x_gnucash_application],
+"*.parquet" => &[&T_x_parquet_application],
+"*.config" => &[&T_x_config_text],
+"*.dita" => &[&T_dita_xml_format_topic_application],
+"*.vss" => &[&T_vnd_visio_application],
+"*.smil" => &[&T_smil_xml_application],
+"*.pot" => &[&T_vnd_ms_powerpoint_application],
+"*.p7b" => &[&T_x_pkcs7_certificates_application],
+"*.aj" => &[&T_x_aspectj_text],
+"*.hpgl" => &[&T_vnd_hp_hpgl_application],
+"*.gqs" => &[&T_vnd_grafeq_application],
+"*.qpw" => &[&T_x_quattro_pro_application],
+"*.bat" => &[&T_x_bat_application],
+"*.mathml" => &[&T_mathml_xml_application],
+"*.sas7bbak" => &[&T_x_sas_backup_application],
+"*.iso19139" => &[&T_iso19139_xml_text],
+"*.edm" => &[&T_vnd_novadigm_edm_application],
+"*.iiq" => &[&T_x_raw_phaseone_image],
+"*.CLS" => &[&T_x_vbasic_text],
+"*.ss7" => &[&T_x_sas_program_data_application],
+"*.mdo" => &[&T_plain_text],
+"*.owl" => &[&T_rdf_xml_application,&T_owl_xml_application],
+"*.cil" => &[&T_vnd_ms_artgalry_application],
+"*.hbci" => &[&T_vnd_hbci_application],
+"*.mng" => &[&T_x_mng_video],
+"*.azw" => &[&T_vnd_amazon_ebook_application],
+"*.ico" => &[&T_vnd_microsoft_icon_image],
+"*.fff" => &[&T_x_raw_imacon_image],
+"*.tcap" => &[&T_vnd_3gpp2_tcap_application],
+"*.html" => &[&T_html_text],
+"*.skt" => &[&T_vnd_koan_application],
+"*.ifb" => &[&T_calendar_text],
+"*.mhtml" => &[&T_related_multipart],
+"*.m" => &[&T_x_objcsrc_text],
+"*.sf7" => &[&T_x_sas_fdb_application],
+"*.xlm" => &[&T_vnd_ms_excel_application],
+"*.xslt" => &[&T_xslt_xml_application],
+"*.ram" => &[&T_x_pn_realaudio_audio],
+"INSTALL" => &[&T_plain_text],
+"*.ras" => &[&T_x_cmu_raster_image],
+"*.fly" => &[&T_vnd_fly_text],
+"*.applescript" => &[&T_x_applescript_text],
+"*.lua" => &[&T_x_lua_text],
+"*.crw" => &[&T_x_raw_canon_image],
+"*.class" => &[&T_java_vm_application],
+"*.cpp" => &[&T_x_c__src_text],
+"*.tcx" => &[&T_vnd_garmin_tcx_xml_application],
+"*.sitx" => &[&T_x_stuffitx_application],
+"*.dpx" => &[&T_x_dpx_image],
+"*.php4" => &[&T_x_php_text],
+"*.kml" => &[&T_vnd_google_earth_kml_xml_application],
+"*.hvp" => &[&T_vnd_yamaha_hv_voice_application],
+"*.m4u" => &[&T_vnd_mpegurl_video],
+"*-gz" => &[&T_gzip_application],
+"*.cdf" => &[&T_x_netcdf_application],
+"*.ft7" => &[&T_x_freehand_image],
+"*.zir" => &[&T_vnd_zul_application],
+"*.wk3" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_3_application],
+"*.minigsf" => &[&T_x_psf_audio],
+"*.ft" => &[&T_plain_text],
+"*.mdi" => &[&T_vnd_ms_modi_image],
+"*.pclxl" => &[&T_vnd_hp_pclxl_application],
+"*.ief" => &[&T_ief_image],
+"*.gim" => &[&T_vnd_groove_identity_message_application],
+"*.apt" => &[&T_plain_text],
+"*.snf" => &[&T_x_font_snf_application],
+"*.Cob" => &[&T_x_cobol_text],
+"*.jpe" => &[&T_jpeg_image],
+"*.pas" => &[&T_x_pascal_text],
+"*.ivp" => &[&T_vnd_immervision_ivp_application],
+"*.xbap" => &[&T_x_ms_xbap_application],
+"*.fhc" => &[&T_x_freehand_image],
+"*.icns" => &[&T_icns_image],
+"*.x32" => &[&T_x_authorware_bin_application],
+"*.Cls" => &[&T_x_vbasic_text],
+"*.bpg" => &[&T_x_bpg_image,&T_bpg_image],
+"*.clkw" => &[&T_vnd_crick_clicker_wordbank_application],
+"*.jsp" => &[&T_x_jsp_text],
+"*.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
+"*.mkd" => &[&T_x_web_markdown_text],
+"*.sd2" => &[&T_x_sas_data_v6_application],
+"*.mag" => &[&T_vnd_ecowin_chart_application],
+"*.ptid" => &[&T_vnd_pvi_ptid1_application],
+"*.aab" => &[&T_x_authorware_bin_application],
+"*.accde" => &[&T_x_msaccess_application],
+"*.axx" => &[&T_x_axcrypt_application],
+"*.rng" => &[&T_plain_text],
+"*.pptm" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
+"*.kpr" => &[&T_vnd_kde_kpresenter_application],
+"*.igx" => &[&T_vnd_micrografx_igx_application],
+"*.ptx" => &[&T_x_raw_pentax_image],
+"*.minipsf" => &[&T_x_psf_audio],
+"*.box" => &[&T_vnd_previewsystems_box_application],
+"*.types" => &[&T_plain_text],
+"*.restx" => &[&T_x_rst_text],
+"*.xbd" => &[&T_vnd_fujixerox_docuworks_binder_application],
+"*.tr" => &[&T_troff_text],
+"*.sxd" => &[&T_vnd_sun_xml_draw_application],
+"*.bash" => &[&T_x_sh_application],
+"*.fodt" => &[&T_vnd_oasis_opendocument_flat_text_application],
+"*.qam" => &[&T_vnd_epson_quickanime_application],
+"*.iso" => &[&T_x_iso9660_image_application],
+"*.wk2" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
+"*.pict" => &[&T_x_pict_image],
+"*.bdm" => &[&T_vnd_syncml_dm_wbxml_application],
+"*.org" => &[&T_vnd_lotus_organizer_application],
+"*.dcm" => &[&T_dicom_application],
+"*.j2c" => &[&T_x_jp2_codestream_image],
+"*.udeb" => &[&T_x_debian_package_application],
+"*.ncx" => &[&T_x_dtbncx_xml_application],
+"*.p10" => &[&T_pkcs10_application],
+"*.rs" => &[&T_rls_services_xml_application],
+"*.handlers" => &[&T_plain_text],
+"*.cob" => &[&T_x_cobol_text],
+"*.hqx" => &[&T_mac_binhex40_application],
+"NOTICE" => &[&T_plain_text],
+"*.ibooks" => &[&T_x_ibooks_zip_application],
+"abs-menulinks" => &[&T_plain_text],
+"*.xegrm" => &[&T_plain_text],
+"*.odft" => &[&T_vnd_oasis_opendocument_formula_template_application],
+"*.json" => &[&T_json_application],
+"*.numbers" => &[&T_vnd_apple_numbers_application],
+"*.xul" => &[&T_vnd_mozilla_xul_xml_application],
+"*.vsdx" => &[&T_vnd_ms_visio_drawing_application],
+"*.scd" => &[&T_x_msschedule_application],
+"*.sfdu" => &[&T_x_sfdu_application],
+"*.c4f" => &[&T_vnd_clonk_c4group_application],
+"*.ra" => &[&T_x_pn_realaudio_audio],
+"*.properties" => &[&T_x_java_properties_text],
+"*.cls" => &[&T_x_vbasic_text],
+"*.vbs" => &[&T_x_vbscript_text],
+"*.lit" => &[&T_x_ms_reader_application],
+"*.x3d" => &[&T_vnd_hzn_3d_crossword_application],
+"*.osfpvg" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
+"*.dxf" => &[&T_vnd_dxf_image],
+"*.php3" => &[&T_x_php_text],
+"*.MYI" => &[&T_x_mysql_misam_compressed_index_application],
+"*.xfdl" => &[&T_vnd_xfdl_application],
+"*.bmp" => &[&T_bmp_image],
+"*.psb" => &[&T_vnd_3gpp_pic_bw_small_application],
+"*.ami" => &[&T_vnd_amiga_ami_application],
+"*.wqd" => &[&T_vnd_wqd_application],
+"*.sm7" => &[&T_x_sas_mddb_application],
+"*.list3820" => &[&T_vnd_ibm_modcap_application],
+"*.srx" => &[&T_sparql_results_xml_application],
+"*.ditaval" => &[&T_dita_xml_format_val_application],
+"*.S" => &[&T_x_assembly_text],
+"*.mpc" => &[&T_vnd_mophun_certificate_application,&T_musepack_audio],
+"*.listafp" => &[&T_vnd_ibm_modcap_application],
+"*.tar" => &[&T_x_tar_application],
+"*.mny" => &[&T_x_msmoney_application],
+"*.hp" => &[&T_x_c__hdr_text],
+"*.mp2a" => &[&T_mpeg_audio],
+"*.sldprt" => &[&T_sldworks_application],
+"*.dcl" => &[&T_plain_text],
+"*.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
+"*.fvt" => &[&T_vnd_fvt_video],
+"*.vsf" => &[&T_vnd_vsf_application],
+"*.ghf" => &[&T_vnd_groove_help_application],
+"*.flx" => &[&T_vnd_fmi_flexstor_text],
+"*.xlsb" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
+"*.sisx" => &[&T_vnd_symbian_install_application],
+"*.mj2" => &[&T_mj2_video],
+"*.pages" => &[&T_vnd_apple_pages_application],
+"*.mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
+"*.irm" => &[&T_vnd_ibm_rights_management_application],
+"*.ice" => &[&T_x_cooltalk_x_conference],
+"*.lwp" => &[&T_vnd_lotus_wordpro_application],
+"*.wk1" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
+"*.qt" => &[&T_quicktime_video],
+"*.schemas" => &[&T_plain_text],
+"*.CPP" => &[&T_x_c__src_text],
+"*.mqv" => &[&T_quicktime_video],
+"*.caf" => &[&T_x_caf_audio],
+"*.rest" => &[&T_x_rst_text],
+"*.xlsm" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
+"*.inx" => &[&T_x_adobe_indesign_interchange_application],
+"*.htm" => &[&T_html_text],
+"*.wbs" => &[&T_vnd_criticaltools_wbs_xml_application],
+"*.shw" => &[&T_x_corelpresentations_application],
+"*.icm" => &[&T_vnd_iccprofile_application],
+"*.swi" => &[&T_vnd_arastra_swi_application],
+"*.xwd" => &[&T_x_xwindowdump_image],
+"*.mus" => &[&T_vnd_musician_application],
+"*.mime" => &[&T_rfc822_message],
+"*.unityweb" => &[&T_vnd_unity_application],
+"*.mpeg" => &[&T_mpeg_video],
+"*.str" => &[&T_vnd_pg_format_application],
+"*.knp" => &[&T_vnd_kinar_application],
+"*.l" => &[&T_x_lex_text],
+"*.cat" => &[&T_vnd_ms_pki_seccat_application],
+"*.fh8" => &[&T_x_freehand_image],
+"*.plf" => &[&T_vnd_pocketlearn_application],
+"*.bcpio" => &[&T_x_bcpio_application],
+"*.wri" => &[&T_x_mswrite_application],
+"*.lbd" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
+"*.geo" => &[&T_vnd_dynageo_application],
+"*.qxl" => &[&T_vnd_quark_quarkxpress_application],
+"*.mpn" => &[&T_vnd_mophun_application_application],
+"*.mpm" => &[&T_vnd_blueice_multipass_application],
+"*.rdz" => &[&T_vnd_data_vision_rdz_application],
+"*.vcd" => &[&T_x_cdlink_application],
+"*.pcx" => &[&T_vnd_zbrush_pcx_image],
+"*.mde" => &[&T_x_msaccess_application],
+"*.esf" => &[&T_vnd_epson_esf_application],
+"*.csp" => &[&T_vnd_commonspace_application],
+"*.stx" => &[&T_x_sas_transport_application],
+"*.xml" => &[&T_xml_application],
+"*.car" => &[&T_vnd_curl_car_application],
+"*.xo" => &[&T_vnd_olpc_sugar_application],
+"*.snd" => &[&T_basic_audio],
+"*.rw2" => &[&T_x_raw_panasonic_image],
+"*.text" => &[&T_plain_text],
+"*.r" => &[&T_x_rsrc_text],
+"*.itp" => &[&T_vnd_shana_informed_formtemplate_application],
+"*.zipx" => &[&T_zip_application],
+"*.sass" => &[&T_x_sass_text],
+"*.m4b" => &[&T_mp4_audio],
+"*.rar" => &[&T_x_rar_compressed_application],
+"*.p7s" => &[&T_pkcs7_signature_application],
+"*.nlu" => &[&T_vnd_neurolanguage_nlu_application],
+"*.jxl" => &[&T_jxl_image],
+"*.xhtml2" => &[&T_xhtml_xml_application],
+"*.xbm" => &[&T_x_xbitmap_image],
+"*.rb" => &[&T_x_ruby_text],
+"*.xar" => &[&T_vnd_xara_application,&T_x_xar_application],
+"*.wp61" => &[&T_vnd_wordperfect_application],
+"*.bibtex" => &[&T_x_bibtex_text_file_application],
+"*.ttc" => &[&T_x_font_ttf_application,&T_collection_font],
+"*.jb2" => &[&T_x_jbig2_image],
+"*.jif" => &[&T_jpeg_image],
+"*.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
+"*.dcx" => &[&T_vnd_zbrush_dcx_image],
+"*.ods" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
+"*.grb1" => &[&T_x_grib_application],
+"*.vrml" => &[&T_vrml_model],
+"*.oa2" => &[&T_vnd_fujitsu_oasys2_application],
+"*.mat" => &[&T_x_matlab_data_application],
+"*.fv" => &[&T_plain_text],
+"*.pfb" => &[&T_x_font_type1_application],
+"*.lyr" => &[&T_x_esri_layer_application],
+"*.pic" => &[&T_x_pict_image],
+"*.swf" => &[&T_x_shockwave_flash_application],
+"*.sfs" => &[&T_vnd_spotfire_sfs_application],
+"*.groovy" => &[&T_x_groovy_text],
+"abs-linkmap" => &[&T_plain_text],
+"*.rpst" => &[&T_vnd_nokia_radio_preset_application],
+"*.xweb" => &[&T_plain_text],
+"*.mkv" => &[&T_x_matroska_video],
+"*.haml" => &[&T_x_haml_text],
+"*.jnilib" => &[&T_x_java_jnilib_application],
+"*.setpay" => &[&T_set_payment_initiation_application],
+"*.ggb" => &[&T_vnd_geogebra_file_application],
+"*.seed" => &[&T_vnd_fdsn_seed_application],
+"*.pst" => &[&T_vnd_ms_outlook_pst_application],
+"*.ppt" => &[&T_vnd_ms_powerpoint_application],
+"*.vda" => &[&T_x_tga_image],
+"*.Bas" => &[&T_x_basic_text],
+"*.wb2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_6_application],
+"*.stk" => &[&T_hyperstudio_application],
+"*.tga" => &[&T_x_tga_image],
+"*.fo" => &[&T_xslfo_xml_application],
+"*.sxm" => &[&T_vnd_sun_xml_math_application],
+"*.webp" => &[&T_webp_image],
+"*.cgi" => &[&T_x_cgi_text],
+"*.F" => &[&T_x_fortran_text],
+"*.hs" => &[&T_x_haskell_text],
+"*.scala" => &[&T_x_scala_text],
+"*.md" => &[&T_x_web_markdown_text],
+"*.abw" => &[&T_x_abiword_application],
+"*.link66" => &[&T_vnd_route66_link66_xml_application],
+"*.cst" => &[&T_x_director_application],
+"*.rmp" => &[&T_x_pn_realaudio_plugin_audio],
+"*.wvx" => &[&T_x_ms_wvx_video],
+"*.jlt" => &[&T_vnd_hp_jlyt_application],
+"*.sdkm" => &[&T_vnd_solent_sdkm_xml_application],
+"*.sdw" => &[&T_vnd_stardivision_writer_application],
+"*.el" => &[&T_x_emacs_lisp_text],
+"*.tcl" => &[&T_x_tcl_text],
+"*.sqlite" => &[&T_x_sqlite3_application],
+"*.amfm" => &[&T_x_font_adobe_metric_application],
+"*.FRM" => &[&T_x_vbasic_text],
+"*.pcf" => &[&T_x_font_pcf_application],
+"*.dbase" => &[&T_x_dbf_application],
+"*.fits" => &[&T_fits_application],
+"*.xquery" => &[&T_xquery_application],
+"*.fig" => &[&T_x_xfig_application],
+"*.cct" => &[&T_x_director_application],
+"*.tpl" => &[&T_vnd_groove_tool_template_application],
+"*.application" => &[&T_x_ms_application_application],
+"*.nef" => &[&T_x_raw_nikon_image],
+"*.gram" => &[&T_srgs_application],
+"*.jmx" => &[&T_plain_text],
+"*.kar" => &[&T_midi_audio],
+"*.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
+"*.srt" => &[&T_x_subrip_application],
+"*.src" => &[&T_x_wais_source_application],
+"*.kon" => &[&T_vnd_kde_kontour_application],
+"*.twd" => &[&T_vnd_simtech_mindmapper_application],
+"*.wax" => &[&T_x_ms_wax_audio],
+"*.uri" => &[&T_uri_list_text],
+"*.xll" => &[&T_vnd_ms_excel_application],
+"*.wp" => &[&T_vnd_wordperfect_application],
+"*.f77" => &[&T_x_fortran_text],
+"*.g3" => &[&T_g3fax_image],
+"*.msp" => &[&T_x_ms_installer_application],
+"*.vsw" => &[&T_vnd_visio_application],
+"*.aam" => &[&T_x_authorware_map_application],
+"*.gml" => &[&T_gml_xml_application],
+"*.psf" => &[&T_x_font_linux_psf_application],
+"*.c4d" => &[&T_vnd_clonk_c4group_application],
+"*.ppsx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
+"*.zst" => &[&T_zstd_application],
+"*.pgp" => &[&T_pgp_encrypted_application],
+"*.jisp" => &[&T_vnd_jisp_application],
+"*.sd7" => &[&T_x_sas_data_application],
+"*.heic" => &[&T_heic_image],
+"*.ft8" => &[&T_x_freehand_image],
+"*.xcat" => &[&T_plain_text],
+"*.hvs" => &[&T_vnd_yamaha_hv_script_application],
+"*.eot" => &[&T_vnd_ms_fontobject_application],
+"*.xmap" => &[&T_plain_text],
+"*.pam" => &[&T_x_portable_arbitrarymap_image],
+"*.asice" => &[&T_vnd_etsi_asic_e_zip_application],
+"*.chrt" => &[&T_vnd_kde_kchart_application],
+"*.clkp" => &[&T_vnd_crick_clicker_palette_application],
+"*.lrf" => &[&T_octet_stream_application],
+"*.sdkd" => &[&T_vnd_solent_sdkm_xml_application],
+"*.mht" => &[&T_related_multipart],
+"*.vhdl" => &[&T_x_vhdl_text],
+"*.sema" => &[&T_vnd_sema_application],
+"*.z" => &[&T_x_compress_application],
+"*.epub" => &[&T_epub_zip_application],
+"*.scs" => &[&T_scvp_cv_response_application],
+"*.cwk" => &[&T_x_appleworks_application],
+"*.dwfx" => &[&T_vnd_dwfx_xps_model],
+"*.man" => &[&T_troff_text],
+"*.H" => &[&T_x_c__hdr_text],
+"*.hx" => &[&T_x_haxe_text],
+"*.wsdl" => &[&T_wsdl_xml_application],
+"*.accdb" => &[&T_x_msaccess_application],
+"*.dtd" => &[&T_xml_dtd_application],
+"*.psf1" => &[&T_x_psf_audio],
+"*.wrl" => &[&T_vrml_model],
+"*.vsdm" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
+"*.gnumeric" => &[&T_x_gnumeric_application],
+"*.php" => &[&T_x_php_text],
+"*.mc1" => &[&T_vnd_medcalcdata_application],
+"*.swa" => &[&T_x_director_application],
+"*.viv" => &[&T_vnd_vivo_video],
+"*.midi" => &[&T_midi_audio],
+"*.3fr" => &[&T_x_raw_hasselblad_image],
+"*.pki" => &[&T_pkixcmp_application],
+"*.ppa" => &[&T_vnd_ms_powerpoint_application],
+"*.teacher" => &[&T_vnd_smart_teacher_application],
+"*.ipa" => &[&T_x_itunes_ipa_application],
+"*.fm" => &[&T_vnd_framemaker_application],
+"*.cfml" => &[&T_x_coldfusion_text],
+"*.dxp" => &[&T_vnd_spotfire_dxp_application],
+"*.cbor" => &[&T_cbor_application],
+"*.sas7bitm" => &[&T_x_sas_itemstor_application],
+"*.xcf" => &[&T_x_xcf_image],
+"*.t" => &[&T_troff_text],
+"*.js" => &[&T_javascript_text],
+"*.clj" => &[&T_x_clojure_text],
+"*.sxw" => &[&T_vnd_sun_xml_writer_application],
+"*.fgd" => &[&T_x_director_application],
+"*.webm" => &[&T_webm_video],
+"*.xsd" => &[&T_xml_application],
+"*.cif" => &[&T_x_cif_chemical],
+"*.oxt" => &[&T_vnd_openofficeorg_extension_application],
+"*.bdf" => &[&T_x_font_bdf_application],
+"*.MYD" => &[&T_x_mysql_misam_data_application],
+"*.cwiki" => &[&T_plain_text],
+"*.f90" => &[&T_x_fortran_text],
+"*.ens" => &[&T_x_endnote_style_application],
+"*.gslib" => &[&T_x_psf_audio],
+"*.fn" => &[&T_plain_text],
+"*.e" => &[&T_x_eiffel_text],
+"*.slt" => &[&T_vnd_epson_salt_application],
+"*.dis" => &[&T_vnd_mobius_dis_application],
+"*.BAS" => &[&T_x_basic_text],
+"*.h" => &[&T_x_chdr_text],
+"*.lha" => &[&T_octet_stream_application],
+"*.uoml" => &[&T_vnd_uoml_xml_application],
+"*.uris" => &[&T_uri_list_text],
+"*.acc" => &[&T_vnd_americandynamics_acc_application],
+"*.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
+"*.pcap" => &[&T_vnd_tcpdump_pcap_application],
+"*.wmx" => &[&T_x_ms_wmx_video],
+"*.ft12" => &[&T_x_freehand_image],
+"*.dcs" => &[&T_x_raw_kodak_image],
+"*.mbk" => &[&T_vnd_mobius_mbk_application],
+"*.gmx" => &[&T_vnd_gmx_application],
+"*.svg" => &[&T_svg_xml_image],
+"*.djvu" => &[&T_vnd_djvu_image],
+"*.kpt" => &[&T_vnd_kde_kpresenter_application],
+"*.msty" => &[&T_vnd_muvee_style_application],
+"*.vf" => &[&T_x_tex_virtual_font_application],
+"*.dng" => &[&T_x_raw_adobe_image],
+"*.wm" => &[&T_x_ms_wm_video],
+"*.davmount" => &[&T_davmount_xml_application],
+"*.epsi" => &[&T_postscript_application],
+"*.rep" => &[&T_vnd_businessobjects_application],
+"*.potm" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
+"*.m3u" => &[&T_x_mpegurl_audio],
+"*.mp4v" => &[&T_mp4_video],
+"*.eps" => &[&T_postscript_application],
+"*.lostxml" => &[&T_lost_xml_application],
+"*.atc" => &[&T_vnd_acucorp_application],
+"*.wmd" => &[&T_x_ms_wmd_application],
+"*.deploy" => &[&T_octet_stream_application],
+"*.qfx" => &[&T_vnd_intu_qfx_application],
+"*.prt" => &[&T_x_prt_application],
+"*.junit" => &[&T_plain_text],
+"*.hpid" => &[&T_vnd_hp_hpid_application],
+"*.v" => &[&T_x_verilog_text],
+"*.lisp" => &[&T_x_common_lisp_text],
+"*.pvb" => &[&T_vnd_3gpp_pic_bw_var_application],
+"*.pub" => &[&T_x_mspublisher_application],
+"*.xspf" => &[&T_xspf_xml_application],
+"*.al" => &[&T_x_perl_text],
+"*.wk4" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_4_application],
+"*.jad" => &[&T_vnd_sun_j2me_app_descriptor_text],
+"*.umj" => &[&T_vnd_umajin_application],
+"*.bmi" => &[&T_vnd_bmi_application],
+"*.cla" => &[&T_vnd_claymore_application],
+"*.lz4" => &[&T_x_lz4_application],
+"*.indd" => &[&T_x_adobe_indesign_application],
+"*.ma" => &[&T_mathematica_application],
+"*.xsl" => &[&T_xml_application],
+"*.ktr" => &[&T_vnd_kahootz_application],
+"*.mmp" => &[&T_vnd_mindjet_mindmanager_application],
+"*.zaz" => &[&T_vnd_zzazz_deck_xml_application],
+"*.svgz" => &[&T_svg_xml_image],
+"*.joda" => &[&T_vnd_joost_joda_archive_application],
+"*.sed" => &[&T_x_sed_text],
+"*.k25" => &[&T_x_raw_kodak_image],
+"*.py" => &[&T_x_python_text],
+"*.xlf" => &[&T_x_xliff_xml_application],
+"*.arw" => &[&T_x_raw_sony_image],
+"*.mgz" => &[&T_vnd_proteus_magazine_application],
+"*.sas7bvew" => &[&T_x_sas_view_application],
+"*.mif" => &[&T_vnd_mif_application],
+"*.pem" => &[&T_x_x509_cert_format_pem_application],
+"*.fh4" => &[&T_x_freehand_image],
+"*.ad.txt" => &[&T_x_asciidoc_text],
+"*.ngdat" => &[&T_vnd_nokia_n_gage_data_application],
+"*.et3" => &[&T_vnd_eszigno3_xml_application],
+"*.s7m" => &[&T_x_sas_dmdb_application],
+"*.rmi" => &[&T_midi_audio],
+"*.spx" => &[&T_speex_audio],
+"*.dtb" => &[&T_x_dtbook_xml_application],
+"*.odi" => &[&T_vnd_oasis_opendocument_image_application],
+"*.dpr" => &[&T_x_pascal_text],
+"*.clkx" => &[&T_vnd_crick_clicker_application],
+"*.mscml" => &[&T_mediaservercontrol_xml_application],
+"*.bh2" => &[&T_vnd_fujitsu_oasysprs_application],
+"*.one" => &[&T_onenote_format_one_application],
+"*.latex" => &[&T_x_latex_application],
+"*.jp2" => &[&T_jp2_image],
+"*.jpm" => &[&T_jpm_image],
+"*.pgm" => &[&T_x_portable_graymap_image],
+"*.dot" => &[&T_msword_application],
+"*.perl" => &[&T_x_perl_text],
+"*.fli" => &[&T_x_fli_video],
+"*.xpr" => &[&T_vnd_is_xpr_application],
+"*.trm" => &[&T_x_msterminal_application],
+"*.he5" => &[&T_x_hdf_application],
+"*.mli" => &[&T_x_ocaml_text],
+"*.xla" => &[&T_vnd_ms_excel_application],
+"*.lsp" => &[&T_x_common_lisp_text],
+"*.wq2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_5_application],
+"*.xdw" => &[&T_vnd_fujixerox_docuworks_application],
+"*.wkq" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application,&T_x_quattro_pro_version_5_application],
+"*.pps" => &[&T_vnd_ms_powerpoint_application],
+"*.sdp" => &[&T_sdp_application],
+"*.fh" => &[&T_x_freehand_image],
+"*.manifest" => &[&T_plain_text],
+"*.conf" => &[&T_x_config_text],
+"*.sas7bfdb" => &[&T_x_sas_fdb_application],
+"*.roles" => &[&T_plain_text],
+"*.itk" => &[&T_x_tcl_text],
+"*.dataless" => &[&T_vnd_fdsn_seed_application],
+"*.sv7" => &[&T_x_sas_view_application],
+"*.7z" => &[&T_x_7z_compressed_application],
+"*.memgraph" => &[&T_x_memgraph_application],
+"*.ads" => &[&T_x_ada_text],
+"*.emlx" => &[&T_x_emlx_message],
+"*.chat" => &[&T_x_chat_application],
+"*.COB" => &[&T_x_cobol_text],
+"*.ecma" => &[&T_ecmascript_application],
+"*.pre" => &[&T_vnd_lotus_freelance_application],
+"*.vhd" => &[&T_x_vhdl_text],
+"*.docm" => &[&T_vnd_ms_word_document_macroenabled_12_application],
+"*.xsamples" => &[&T_plain_text],
+"*.dvi" => &[&T_x_dvi_application],
+"*.fh5" => &[&T_x_freehand_image],
+"*.cmx" => &[&T_x_cmx_image],
+"*.tsd" => &[&T_timestamped_data_application],
+"*.tld" => &[&T_plain_text],
+"*.atx" => &[&T_vnd_antix_game_component_application],
+"*.xargs" => &[&T_plain_text],
+"*.sgl" => &[&T_vnd_stardivision_writer_global_application],
+"*.jpf" => &[&T_jpx_image],
+"*.xyz" => &[&T_x_xyz_chemical],
+"*.warc.gz" => &[&T_warc_gz_application],
+"*.bin" => &[&T_octet_stream_application],
+"*.pcurl" => &[&T_vnd_curl_pcurl_application],
+"*.C" => &[&T_x_c__src_text],
+"*.ktz" => &[&T_vnd_kahootz_application],
+"*.adb" => &[&T_x_ada_text],
+"*.skd" => &[&T_vnd_koan_application],
+"*.pbd" => &[&T_vnd_powerbuilder6_application],
+"*.wad" => &[&T_x_doom_application],
+"*.d" => &[&T_x_d_text],
+"*.lz" => &[&T_x_lzip_application,&T_lzip_application],
+"*.cmdf" => &[&T_x_cmdf_chemical],
+"*.sti" => &[&T_vnd_sun_xml_impress_template_application],
+"*.m3u8" => &[&T_vnd_apple_mpegurl_application],
+"*.urls" => &[&T_uri_list_text],
+"*.doc" => &[&T_msword_application],
+"*.mxml" => &[&T_xv_xml_application],
+"KEYS" => &[&T_plain_text],
+"*.htc" => &[&T_plain_text],
+"*.java" => &[&T_x_java_source_text],
+"i_*.txt" => &[&T_x_isatab_investigation_application],
+"*.mef" => &[&T_x_raw_mamiya_image],
+"*.icc" => &[&T_vnd_iccprofile_application],
+"*.wmv" => &[&T_x_ms_wmv_video],
+"*.fcs" => &[&T_vnd_isac_fcs_application],
+"*.123" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_97_9_x_application],
+"*.csh" => &[&T_x_csh_application],
+"*.hdf" => &[&T_x_hdf_application],
+"*.coffee" => &[&T_x_coffeescript_text],
+"*.oti" => &[&T_vnd_oasis_opendocument_image_template_application],
+"*.scm" => &[&T_x_scheme_text],
+"*.mrc" => &[&T_marc_application],
+"*.pdf" => &[&T_pdf_application],
+"*.odg" => &[&T_vnd_oasis_opendocument_graphics_application],
+"*.m4v" => &[&T_x_m4v_video],
+"*.erl" => &[&T_x_erlang_text],
+"*.hwpx" => &[&T_hwp_zip_application],
+"*.m4" => &[&T_plain_text],
+"*.dta" => &[&T_x_stata_dta_application],
+"*.mp3" => &[&T_mpeg_audio],
+"*.fbs" => &[&T_vnd_fastbidsheet_image],
+"*.imp" => &[&T_vnd_accpac_simply_imp_application],
+"*.efif" => &[&T_vnd_picsel_application],
+"*.tk" => &[&T_x_tcl_text],
+"*.emma" => &[&T_emma_xml_application],
+"*.cmp" => &[&T_vnd_yellowriver_custom_menu_application],
+"*.xlw" => &[&T_vnd_ms_excel_application],
+"*.au" => &[&T_basic_audio],
+"*.Cbl" => &[&T_x_cobol_text],
+"*.tmx" => &[&T_x_tmx_application],
+"*.cdr" => &[&T_coreldraw_application],
+"*.shf" => &[&T_shf_xml_application],
+"*.do" => &[&T_x_stata_do_application],
+"*.ssml" => &[&T_ssml_xml_application],
+"*.kil" => &[&T_x_killustrator_application],
+"*.silo" => &[&T_mesh_model],
+"*.nnw" => &[&T_vnd_noblenet_web_application],
+"*.mid" => &[&T_midi_audio],
+"*.ace" => &[&T_x_ace_compressed_application],
+"*.ogv" => &[&T_ogg_video],
+"*.cmd" => &[&T_x_bat_application],
+"*.xq" => &[&T_xquery_application],
+"*.pqa" => &[&T_vnd_palm_application],
+"*.dbase3" => &[&T_x_dbf_application],
+"*.sas7baud" => &[&T_x_sas_audit_application],
+"*.fh40" => &[&T_x_freehand_image],
+"*.list" => &[&T_plain_text],
+"*.smi" => &[&T_smil_xml_application],
+"*.HPP" => &[&T_x_c__hdr_text],
+"*.cc" => &[&T_x_c__src_text],
+"*.ini" => &[&T_x_ini_text],
+"*.atomcat" => &[&T_atomcat_xml_application],
+"*.vst" => &[&T_vnd_visio_application],
+"*.pp" => &[&T_x_pascal_text],
+"*.txd" => &[&T_vnd_genomatix_tuxedo_application],
+"*.frame" => &[&T_vnd_framemaker_application],
+"*.xap" => &[&T_x_silverlight_app_application],
+"*.asics" => &[&T_vnd_etsi_asic_s_zip_application],
+"*.wbxml" => &[&T_vnd_wap_wbxml_application],
+"*.sas7bdmd" => &[&T_x_sas_dmdb_application],
+"*.mseed" => &[&T_vnd_fdsn_mseed_application],
+"*.fh9" => &[&T_x_freehand_image],
+"*.otm" => &[&T_vnd_oasis_opendocument_text_master_application],
+"*.avi" => &[&T_x_msvideo_video],
+"*.maker" => &[&T_vnd_framemaker_application],
+"*.vcx" => &[&T_vnd_vcx_application],
+"*.cdx" => &[&T_x_cdx_chemical],
+"*.cod" => &[&T_vnd_rim_cod_application],
+"*.vssm" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
+"*.vor" => &[&T_x_staroffice_template_application],
+"*.psflib" => &[&T_x_psf_audio],
+"*.thmx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
+"*.ai" => &[&T_illustrator_application],
+"*.pat" => &[&T_x_gimp_pat_image],
+"*.scq" => &[&T_scvp_cv_request_application],
+"*.gex" => &[&T_vnd_geometry_explorer_application],
+"*.nar" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
+"*.sas7bpgm" => &[&T_x_sas_program_data_application],
+"*.sas7bndx" => &[&T_x_sas_data_index_application],
+"*.kdc" => &[&T_x_raw_kodak_image],
+"*.cnd" => &[&T_plain_text],
+"*.wsdd" => &[&T_plain_text],
+"*.qxb" => &[&T_vnd_quark_quarkxpress_application],
+"*.wl" => &[&T_vnd_wolfram_wl_application],
+"*.jpgv" => &[&T_jpeg_video],
+"*.lnk" => &[&T_x_ms_shortcut_application],
+"*.rpm" => &[&T_x_rpm_application],
+"*.fh10" => &[&T_x_freehand_image],
+"*.aso" => &[&T_vnd_accpac_simply_aso_application],
+"*.fzs" => &[&T_vnd_fuzzysheet_application],
+"*.orf" => &[&T_x_raw_olympus_image],
+"*.gac" => &[&T_vnd_groove_account_application],
+"*.raf" => &[&T_x_raw_fuji_image],
+"*.boz" => &[&T_x_bzip2_application],
+"*.shp" => &[&T_x_shapefile_application,&T_vnd_shp_application],
+"*.sc7" => &[&T_x_sas_catalog_application],
+"*.dist" => &[&T_octet_stream_application],
+"*.twds" => &[&T_vnd_simtech_mindmapper_application],
+"*.m4s" => &[&T_iso_segment_video],
+"*.mqy" => &[&T_vnd_mobius_mqy_application],
+"*.ac3" => &[&T_ac3_audio],
+"*.tra" => &[&T_vnd_trueapp_application],
+"*.arj" => &[&T_x_arj_application],
+"*.3dml" => &[&T_vnd_in3d_3dml_text],
+"*.mbox" => &[&T_mbox_application],
+"*.cpio" => &[&T_x_cpio_application],
+"*.wmz" => &[&T_x_ms_wmz_application],
+"*.bib" => &[&T_x_bibtex_text_file_application],
+"*.cpt" => &[&T_mac_compactpro_application],
+"*.asm" => &[&T_x_assembly_text],
+"*.odf" => &[&T_vnd_oasis_opendocument_formula_application],
+"*.fg5" => &[&T_vnd_fujitsu_oasysgp_application],
+"*.mka" => &[&T_x_matroska_audio],
+"*.erf" => &[&T_x_raw_epson_image],
+"*.rss" => &[&T_rss_xml_application],
+"*.asciidoc" => &[&T_x_asciidoc_text],
+"*.ppj" => &[&T_vnd_adobe_premiere_image],
+"*.rexx" => &[&T_x_rexx_text],
+"*.ttf" => &[&T_x_font_ttf_application],
+"*.nnd" => &[&T_vnd_noblenet_directory_application],
+"*.webarchive" => &[&T_x_webarchive_application],
+"*.ifm" => &[&T_vnd_shana_informed_formdata_application],
+"*.m14" => &[&T_x_msmediaview_application],
+"*.mpd" => &[&T_dash_xml_application],
+"*.webmanifest" => &[&T_manifest_json_application],
+"*.vssx" => &[&T_vnd_ms_visio_stencil_application],
+"*.wmlc" => &[&T_vnd_wap_wmlc_application],
+"*.zirz" => &[&T_vnd_zul_application],
+"*.sas7bacs" => &[&T_x_sas_access_application],
+"*.fh12" => &[&T_x_freehand_image],
+"*.jam" => &[&T_vnd_jam_application],
+"*.vsd" => &[&T_vnd_visio_application],
+"*.rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
+"*.crx" => &[&T_x_chrome_package_application,&T_x_chrome_extension_application],
+"*.3mf" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
+"*.adf" => &[&T_x_amiga_disk_format_application],
+"*.enw" => &[&T_x_endnote_refer_application],
+"*.sib" => &[&T_x_sibelius_application],
+"*.glb" => &[&T_gltf_binary_model],
+"*.utz" => &[&T_vnd_uiq_theme_application],
+"*.raw" => &[&T_x_raw_panasonic_image],
+"*.so" => &[&T_octet_stream_application],
+"*.ivu" => &[&T_vnd_immervision_ivu_application],
+"*.diff" => &[&T_x_diff_text],
+"*.ac" => &[&T_plain_text],
+"*.xps" => &[&T_vnd_ms_xpsdocument_application],
+"*.woff" => &[&T_woff_font],
+"*.msi" => &[&T_x_ms_installer_application],
+"*.shx" => &[&T_vnd_shx_application],
+"*.otg" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"*.jxr" => &[&T_jxr_image],
+"*.uc2" => &[&T_x_uc2_compressed_application],
+"*.asp" => &[&T_asp_text],
+"*.iif" => &[&T_vnd_shana_informed_interchange_application],
+"*.sh" => &[&T_x_sh_application],
+"*.sr7" => &[&T_x_sas_itemstor_application],
+"*.grb2" => &[&T_x_grib_application],
+"*.pxn" => &[&T_x_raw_logitech_image],
+"*.less" => &[&T_x_less_text],
+"*.pfa" => &[&T_x_font_type1_application],
+"*.exr" => &[&T_aces_image],
+"*.ksp" => &[&T_vnd_kde_kspread_application],
+"*.markdown" => &[&T_x_web_markdown_text],
+"*.spot" => &[&T_vnd_in3d_spot_text],
+"*.3gp" => &[&T_3gpp_video],
+"*.xlz" => &[&T_x_xliff_zip_application],
+"*.oga" => &[&T_ogg_audio],
+"*.lhs" => &[&T_x_haskell_text],
+"*.tmo" => &[&T_vnd_tmobile_livetv_application],
+"*.afm" => &[&T_x_font_adobe_metric_application],
+"*.lzh" => &[&T_octet_stream_application],
+"*.xroles" => &[&T_plain_text],
+"*.grb" => &[&T_x_grib_application],
+"*.sp7" => &[&T_x_sas_putility_application],
+"*.cel" => &[&T_vnd_dgn_image],
+"*.tcsh" => &[&T_x_csh_application],
+"*.txt" => &[&T_plain_text],
+"*.bup" => &[&T_x_dvd_ifo_application],
+"*.nsf" => &[&T_vnd_lotus_notes_application],
+"*.pfx" => &[&T_x_pkcs12_application],
+"*.portpkg" => &[&T_vnd_macports_portpkg_application],
+"*.drf" => &[&T_x_raw_kodak_image],
+"*.fods" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
+"*.cfm" => &[&T_x_coldfusion_text],
+"*.ftc" => &[&T_vnd_fluxtime_clip_application],
+"*.torrent" => &[&T_x_bittorrent_application],
+"*.dfac" => &[&T_vnd_dreamfactory_application],
+"*.kfo" => &[&T_vnd_kde_kformula_application],
+"*.flo" => &[&T_vnd_micrografx_flo_application],
 "*.emf" => &[&T_emf_image],
 "*.c" => &[&T_x_c_text],
-"*.tcx" => &[&T_vnd_garmin_tcx_xml_application],
-"*.rtx" => &[&T_richtext_text],
-"*.aart" => &[&T_plain_text],
-"*.rnx" => &[&T_plain_text],
-"*.mgz" => &[&T_vnd_proteus_magazine_application],
-"*.dis" => &[&T_vnd_mobius_dis_application],
-"*.spp" => &[&T_scvp_vp_response_application],
-"*.mmmp" => &[&T_vnd_mindjet_mindmanager_application],
-"*.cdy" => &[&T_vnd_cinderella_application],
-"*.dts" => &[&T_vnd_dts_audio],
-"*.wm" => &[&T_x_ms_wm_video],
-"*.class" => &[&T_java_vm_application],
-"*.pages" => &[&T_vnd_apple_pages_application],
-"*.sema" => &[&T_vnd_sema_application],
-"*.anpa" => &[&T_vnd_iptc_anpa_text],
-"*.rld" => &[&T_resource_lists_diff_xml_application],
-"*.v" => &[&T_x_verilog_text],
-"*.pcx" => &[&T_vnd_zbrush_pcx_image],
-"*.wma" => &[&T_x_ms_wma_audio],
-"*.ft12" => &[&T_x_freehand_image],
-"*.asp" => &[&T_asp_text],
-"*.r" => &[&T_x_rsrc_text],
-"*.rif" => &[&T_reginfo_xml_application],
-"*.br" => &[&T_x_brotli_application],
-"*.sc7" => &[&T_x_sas_catalog_application],
-"*.tga" => &[&T_x_tga_image],
-"*.jpf" => &[&T_jpx_image],
-"*.wmls" => &[&T_vnd_wap_wmlscript_text],
-"*.musicxml" => &[&T_vnd_recordare_musicxml_xml_application],
-"*.scd" => &[&T_x_msschedule_application],
-"*.in" => &[&T_plain_text],
-"*.qam" => &[&T_vnd_epson_quickanime_application],
-"*.fh12" => &[&T_x_freehand_image],
-"*.list" => &[&T_plain_text],
-"*.tpt" => &[&T_vnd_trid_tpt_application],
-"*.dxr" => &[&T_x_director_application],
-"*.mmas" => &[&T_vnd_mindjet_mindmanager_application],
-"*.odf" => &[&T_vnd_oasis_opendocument_formula_application],
-"*.onepkg" => &[&T_onenote__format_package_application],
-"*.twds" => &[&T_vnd_simtech_mindmapper_application],
-"*.skm" => &[&T_vnd_koan_application],
-"*.mp2" => &[&T_mpeg_audio],
-"*.dng" => &[&T_x_raw_adobe_image],
-"*.ppa" => &[&T_vnd_ms_powerpoint_application],
-"*.epsf" => &[&T_postscript_application],
-"*.cpio" => &[&T_x_cpio_application],
-"*.msp" => &[&T_x_ms_installer_application],
-"*.mbox" => &[&T_mbox_application],
-"*.utz" => &[&T_vnd_uiq_theme_application],
-"*.sdkm" => &[&T_vnd_solent_sdkm_xml_application],
-"*.oa2" => &[&T_vnd_fujitsu_oasys2_application],
-"*.cat" => &[&T_vnd_ms_pki_seccat_application],
-"*.fe_launch" => &[&T_vnd_denovo_fcselayout_link_application],
-"*.uris" => &[&T_uri_list_text],
-"*.mpeg" => &[&T_mpeg_video],
-"*.sgm" => &[&T_sgml_text],
-"*.otc" => &[&T_vnd_oasis_opendocument_chart_template_application],
-"*.pom" => &[&T_plain_text],
-"*.rb" => &[&T_x_ruby_text],
-"*.wk3" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_3_application],
-"*.ifb" => &[&T_calendar_text],
-"*.book" => &[&T_vnd_framemaker_application],
-"*.sse" => &[&T_vnd_kodak_descriptor_application],
-"*.swa" => &[&T_x_director_application],
-"*.smi" => &[&T_smil_xml_application],
-"*.fnc" => &[&T_vnd_frogans_fnc_application],
-"*.fig" => &[&T_x_xfig_application],
-"*.wspolicy" => &[&T_wspolicy_xml_application],
-"INSTALL" => &[&T_plain_text],
-"*.vst" => &[&T_vnd_visio_application],
-"*.iif" => &[&T_vnd_shana_informed_interchange_application],
-"*.sas7bacs" => &[&T_x_sas_access_application],
-"*.cl" => &[&T_x_common_lisp_text],
-"*.for" => &[&T_x_fortran_text],
-"*.ads" => &[&T_x_ada_text],
-"*.opus" => &[&T_opus_audio],
-"*.ufd" => &[&T_vnd_ufdl_application],
-"*.ms" => &[&T_troff_text],
-"*.vhdl" => &[&T_x_vhdl_text],
-"*.wri" => &[&T_x_mswrite_application],
-"*.fodp" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
-"*.m3a" => &[&T_mpeg_audio],
-"*.fh11" => &[&T_x_freehand_image],
-"*.ac" => &[&T_plain_text],
-"*.avi" => &[&T_x_msvideo_video],
-"*.x3d" => &[&T_vnd_hzn_3d_crossword_application],
-"*.dna" => &[&T_vnd_dna_application],
-"*.dbase" => &[&T_x_dbf_application],
-"*.sas7baud" => &[&T_x_sas_audit_application],
-"*.spx" => &[&T_speex_audio],
-"*.caf" => &[&T_x_caf_audio],
-"*.scs" => &[&T_scvp_cv_response_application],
-"*.exr" => &[&T_aces_image],
-"*.rgb" => &[&T_x_rgb_image],
-"*.wtb" => &[&T_vnd_webturbo_application],
-"*.xmap" => &[&T_plain_text],
-"*.xlsx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
-"*.t" => &[&T_troff_text],
-"*.rar" => &[&T_x_rar_compressed_application],
-"*.sv7" => &[&T_x_sas_view_application],
-"*.mag" => &[&T_vnd_ecowin_chart_application],
-"*.flo" => &[&T_vnd_micrografx_flo_application],
-"*.dotx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
-"*.srt" => &[&T_x_subrip_application],
-"*.m4b" => &[&T_mp4_audio],
-"*.pfm" => &[&T_x_font_printer_metric_application],
-"*.mpt" => &[&T_vnd_ms_project_application],
-"*.mobi" => &[&T_x_mobipocket_ebook_application],
-"*.lrm" => &[&T_vnd_ms_lrm_application],
-"*.sxd" => &[&T_vnd_sun_xml_draw_application],
-"*.zst" => &[&T_zstd_application],
-"*.ssf" => &[&T_vnd_epson_ssf_application],
-"*.ac3" => &[&T_ac3_audio],
-"*.sitx" => &[&T_x_stuffitx_application],
-"*.conf" => &[&T_x_config_text],
-"*.diff" => &[&T_x_diff_text],
-"*.fvt" => &[&T_vnd_fvt_video],
-"*.accde" => &[&T_x_msaccess_application],
-"*.xsp" => &[&T_plain_text],
-"*.rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
-"*.idl" => &[&T_x_idl_text],
-"*.cob" => &[&T_x_cobol_text],
-"*.xar" => &[&T_vnd_xara_application,&T_x_xar_application],
-"*.smf" => &[&T_vnd_stardivision_math_application],
-"*.sfs" => &[&T_vnd_spotfire_sfs_application],
-"*.vox" => &[&T_x_authorware_bin_application],
-"*.sas7bbak" => &[&T_x_sas_backup_application],
-"*.zoo" => &[&T_x_zoo_application],
-"*.ss7" => &[&T_x_sas_program_data_application],
-"*.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
-"*.ttc" => &[&T_x_font_ttf_application,&T_collection_font],
-"*.grv" => &[&T_vnd_groove_injector_application],
-"*.roles" => &[&T_plain_text],
-"*.vsdx" => &[&T_vnd_ms_visio_drawing_application],
-"*.pptm" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
-"*.icb" => &[&T_x_tga_image],
-"*.wbmp" => &[&T_vnd_wap_wbmp_image],
-"*.eps" => &[&T_postscript_application],
-"*.bmi" => &[&T_vnd_bmi_application],
-"*.sas7bitm" => &[&T_x_sas_itemstor_application],
-"*.g3" => &[&T_g3fax_image],
-"*.u32" => &[&T_x_authorware_bin_application],
-"*.epsi" => &[&T_postscript_application],
-"*.zipx" => &[&T_zip_application],
-"*.dxf" => &[&T_vnd_dxf_image],
-"*.xsm" => &[&T_vnd_syncml_xml_application],
-"*.dib" => &[&T_bmp_image],
-"*.qxt" => &[&T_vnd_quark_quarkxpress_application],
-"*.msa" => &[&T_vnd_msa_disk_image_application],
-"*.raw" => &[&T_x_raw_panasonic_image],
-"*.tcsh" => &[&T_x_csh_application],
-"*.3dml" => &[&T_vnd_in3d_3dml_text],
-"*.gp4" => &[&T_x_guitar_pro_application],
-"*.hpp" => &[&T_x_c__hdr_text],
-"*.clj" => &[&T_x_clojure_text],
-"*.ape" => &[&T_ape_audio],
-"*.xls" => &[&T_vnd_ms_excel_application],
-"*.asics" => &[&T_vnd_etsi_asic_s_zip_application],
-"abs-menulinks" => &[&T_plain_text],
-"*.mat" => &[&T_x_matlab_data_application],
-"*.pat" => &[&T_x_gimp_pat_image],
-"*.vmdk" => &[&T_x_vmdk_application],
-"*.tsv" => &[&T_tab_separated_values_text],
-"*.wpd" => &[&T_vnd_wordperfect_application],
-"*.cab" => &[&T_vnd_ms_cab_compressed_application],
-"*.bin" => &[&T_octet_stream_application],
-"*.ogg" => &[&T_vorbis_audio],
-"*.dmp" => &[&T_vnd_tcpdump_pcap_application],
-"*.pxn" => &[&T_x_raw_logitech_image],
-"*.m14" => &[&T_x_msmediaview_application],
-"*.handlers" => &[&T_plain_text],
-"*.acc" => &[&T_vnd_americandynamics_acc_application],
-"*.ma" => &[&T_mathematica_application],
-"*.cxt" => &[&T_x_director_application],
-"*.rep" => &[&T_vnd_businessobjects_application],
-"*.idml" => &[&T_vnd_adobe_indesign_idml_package_application],
-"*.pfr" => &[&T_font_tdpfr_application],
-"*.j2c" => &[&T_x_jp2_codestream_image],
-"*.arw" => &[&T_x_raw_sony_image],
-"*.mka" => &[&T_x_matroska_audio],
-"*.bat" => &[&T_x_bat_application],
-"*.bdf" => &[&T_x_font_bdf_application],
-"*.ml" => &[&T_x_ml_text],
-"*.mpg4" => &[&T_mp4_video],
-"*.fit" => &[&T_fits_application],
-"*.cwiki" => &[&T_plain_text],
-"*.fn" => &[&T_plain_text],
-"*.hprof" => &[&T_vnd_java_hprof__application],
-"*.odft" => &[&T_vnd_oasis_opendocument_formula_template_application],
-"*.tmo" => &[&T_vnd_tmobile_livetv_application],
-"*.m3u" => &[&T_x_mpegurl_audio],
-"*.mrw" => &[&T_x_raw_minolta_image],
-"*.wp6" => &[&T_vnd_wordperfect_application],
-"*.jlt" => &[&T_vnd_hp_jlyt_application],
-"*.msg" => &[&T_vnd_ms_outlook_application],
-"*.exe" => &[&T_x_dosexec_application],
-"*.cs" => &[&T_x_csharp_text],
-".htaccess" => &[&T_plain_text],
-"*.sas7bmdb" => &[&T_x_sas_mddb_application],
-"*.xpx" => &[&T_vnd_intercon_formnet_application],
-"*.pef" => &[&T_x_raw_pentax_image],
-"*.qfx" => &[&T_vnd_intu_qfx_application],
-"*.ft7" => &[&T_x_freehand_image],
-"*.mrc" => &[&T_marc_application],
-"*.stc" => &[&T_vnd_sun_xml_calc_template_application],
-"*.ei6" => &[&T_vnd_pg_osasli_application],
-"*.res" => &[&T_x_dtbresource_xml_application],
-"*.mpc" => &[&T_vnd_mophun_certificate_application,&T_musepack_audio],
-"*.dvb" => &[&T_vnd_dvb_file_video],
-"*.sv4cpio" => &[&T_x_sv4cpio_application],
-"*.xslfo" => &[&T_xslfo_xml_application],
-"*.pcurl" => &[&T_vnd_curl_pcurl_application],
-"*.listafp" => &[&T_vnd_ibm_modcap_application],
-"*.oti" => &[&T_vnd_oasis_opendocument_image_template_application],
-"*.inx" => &[&T_x_adobe_indesign_interchange_application],
-"*.dtd" => &[&T_xml_dtd_application],
-"*.msh" => &[&T_mesh_model],
-"*.mmpt" => &[&T_vnd_mindjet_mindmanager_application],
-"*.bz" => &[&T_x_bzip_application],
-"*.pod" => &[&T_plain_text],
-"*.e" => &[&T_x_eiffel_text],
-"*.sfdu" => &[&T_x_sfdu_application],
-"*.svd" => &[&T_vnd_svd_application],
-"*.mg" => &[&T_x_modula_text],
-"*.fgd" => &[&T_x_director_application],
-"*.hpid" => &[&T_vnd_hp_hpid_application],
-"*.fp7" => &[&T_x_filemaker_application],
-"*.hqx" => &[&T_mac_binhex40_application],
-"*.pnm" => &[&T_x_portable_anymap_image],
-"*.dxp" => &[&T_vnd_spotfire_dxp_application],
-"*.spot" => &[&T_vnd_in3d_spot_text],
-"*.sv4crc" => &[&T_x_sv4crc_application],
-"*.jad" => &[&T_vnd_sun_j2me_app_descriptor_text],
-"*.mov" => &[&T_quicktime_video],
-"*.zir" => &[&T_vnd_zul_application],
-"*.pcl" => &[&T_vnd_hp_pcl_application],
-"*.xld" => &[&T_vnd_ms_excel_application],
-"*.rst" => &[&T_x_rst_text],
-"*.odi" => &[&T_vnd_oasis_opendocument_image_application],
-"*.gnucash" => &[&T_x_gnucash_application],
-"*.cfg" => &[&T_x_config_text],
-"*.boz" => &[&T_x_bzip2_application],
-"*.aso" => &[&T_vnd_accpac_simply_aso_application],
+"*.deb" => &[&T_x_debian_package_application],
 "*.cgm" => &[&T_cgm_image],
-"*.stk" => &[&T_hyperstudio_application],
-"*.def" => &[&T_plain_text],
-"*.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
-"*.aam" => &[&T_x_authorware_map_application],
-"*.dta" => &[&T_x_stata_dta_application],
-"*.p7s" => &[&T_pkcs7_signature_application],
-"*.mhtml" => &[&T_related_multipart],
-"*.CLS" => &[&T_x_vbasic_text],
-"*.ad" => &[&T_x_asciidoc_text],
-"*.ppsm" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
-"*.xroles" => &[&T_plain_text],
-"*.ace" => &[&T_x_ace_compressed_application],
-"*.tex" => &[&T_x_tex_application],
-"*.sas7bdmd" => &[&T_x_sas_dmdb_application],
-"*.fts" => &[&T_fits_application],
-"*.fh50" => &[&T_x_freehand_image],
-"*.mkd" => &[&T_x_web_markdown_text],
-"*.cer" => &[&T_pkix_cert_application],
-"*.wp61" => &[&T_vnd_wordperfect_application],
-"*.sgl" => &[&T_vnd_stardivision_writer_global_application],
-"*.p10" => &[&T_pkcs10_application],
-"*.daf" => &[&T_vnd_mobius_daf_application],
-"*.slt" => &[&T_vnd_epson_salt_application],
-"*.a" => &[&T_x_archive_application],
-"*.pdb" => &[&T_x_pdb_chemical],
-"*.otf" => &[&T_x_font_otf_application],
-"*.fh5" => &[&T_x_freehand_image],
-"*.dwf" => &[&T_vnd_dwf_model],
-"KEYS" => &[&T_plain_text],
-"*.hh" => &[&T_x_c__hdr_text],
-"*.rm" => &[&T_vnd_rn_realmedia_application],
-"*.pam" => &[&T_x_portable_arbitrarymap_image],
-"*.xsamples" => &[&T_plain_text],
-"*.bh2" => &[&T_vnd_fujitsu_oasysprs_application],
-"*.sm7" => &[&T_x_sas_mddb_application],
-"*.rs" => &[&T_rls_services_xml_application],
-"*.mcd" => &[&T_vnd_mcd_application],
-"*.md" => &[&T_x_web_markdown_text],
-"*.p7m" => &[&T_pkcs7_mime_application],
-"*.asc" => &[&T_pgp_signature_application],
-"*.ttml" => &[&T_ttml_xml_application],
-"*.lz4" => &[&T_x_lz4_application],
-"*.ai" => &[&T_illustrator_application],
-"*.hvp" => &[&T_vnd_yamaha_hv_voice_application],
-"*.prc" => &[&T_x_mobipocket_ebook_application],
-"*.mqv" => &[&T_quicktime_video],
-"*.arc" => &[&T_x_internet_archive_application],
-"*.atomcat" => &[&T_atomcat_xml_application],
-"*.sas7bput" => &[&T_x_sas_putility_application],
-"*.cmx" => &[&T_x_cmx_image],
-"*.nroff" => &[&T_troff_text],
-"*.fpx" => &[&T_vnd_fpx_image],
-"*.bau" => &[&T_vnd_openofficeorg_autotext_application],
-"*.scurl" => &[&T_vnd_curl_scurl_text],
-"*.csh" => &[&T_x_csh_application],
-"*.spl" => &[&T_x_futuresplash_application],
-"*.ipa" => &[&T_x_itunes_ipa_application],
-"*.rdf" => &[&T_rdf_xml_application],
-"*.mmf" => &[&T_vnd_smaf_application],
-"*.3fr" => &[&T_x_raw_hasselblad_image],
-"*.js" => &[&T_javascript_text],
-"*.wad" => &[&T_x_doom_application],
-"*.nes" => &[&T_x_nesrom_application],
-"*.chat" => &[&T_x_chat_application],
-"*.sql" => &[&T_x_sql_text],
-"*.ram" => &[&T_x_pn_realaudio_audio],
-"*.png" => &[&T_png_image],
-"*.xhtml2" => &[&T_xhtml_xml_application],
-"*.mpy" => &[&T_vnd_ibm_minipay_application],
-"*.k25" => &[&T_x_raw_kodak_image],
+"*.h261" => &[&T_h261_video],
+"*.eol" => &[&T_vnd_digital_winds_audio],
+"*.ipk" => &[&T_vnd_shana_informed_package_application],
+"*.mpg" => &[&T_mpeg_video],
+"*.dir" => &[&T_x_director_application],
+"*.dib" => &[&T_bmp_image],
+"LICENSE" => &[&T_plain_text],
+"*.xlc" => &[&T_vnd_ms_excel_application],
+"*.aif" => &[&T_x_aiff_audio],
+"*.patch" => &[&T_x_diff_text],
+"*.tiff" => &[&T_tiff_image],
+"*.mp4" => &[&T_mp4_video],
+"*.dsw" => &[&T_plain_text],
+"*.ext" => &[&T_vnd_novadigm_ext_application],
+"*.pl" => &[&T_x_perl_text],
+"*.aiff" => &[&T_x_aiff_audio],
+"*.mobi" => &[&T_x_mobipocket_ebook_application],
+"*.see" => &[&T_vnd_seemail_application],
+"*.cml" => &[&T_x_cml_chemical],
 "*.igs" => &[&T_iges_model],
-"*.xwelcome" => &[&T_plain_text],
-"*.3ds" => &[&T_x_3ds_image],
-"*.jx" => &[&T_plain_text],
-"*.dcl" => &[&T_plain_text],
-"*.sap" => &[&T_x_sap_audio],
-"*.f77" => &[&T_x_fortran_text],
-"*.ear" => &[&T_x_tika_java_enterprise_archive_application],
-"*.orf" => &[&T_x_raw_olympus_image],
-"*.pack" => &[&T_x_java_pack200_application],
-"*.cr3" => &[&T_x_canon_cr3_image],
-"*.classpath" => &[&T_plain_text],
-"*.fodt" => &[&T_vnd_oasis_opendocument_flat_text_application],
-"*.otg" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"*.cfg" => &[&T_x_config_text],
+"*.i3" => &[&T_x_modula_text],
+"*.exp" => &[&T_x_expect_text],
+"*.mdtext" => &[&T_x_web_markdown_text],
+"*.tex" => &[&T_x_tex_application],
+"*.der" => &[&T_x_x509_cert_format_der_application],
+"*.kne" => &[&T_vnd_kinar_application],
+"*.wmf" => &[&T_wmf_image],
+"*.in" => &[&T_plain_text],
+"*.slddrw" => &[&T_sldworks_application],
+"*.vsl" => &[&T_plain_text],
+"*.otp" => &[&T_vnd_oasis_opendocument_presentation_template_application],
+"*.skm" => &[&T_vnd_koan_application],
+"*.pgn" => &[&T_x_chess_pgn_application],
+"*.xht" => &[&T_xhtml_xml_application],
+"*.gpx" => &[&T_gpx_xml_application],
+"*.jar" => &[&T_java_archive_application],
 "*.irp" => &[&T_vnd_irepository_package_xml_application],
+"*.fh50" => &[&T_x_freehand_image],
+"*.kia" => &[&T_vnd_kidspiration_application],
+"*.crl" => &[&T_pkix_crl_application],
+"*.dsc" => &[&T_prs_lines_tag_text],
+"*.xport" => &[&T_x_sas_xport_application],
+"*.ent" => &[&T_plain_text],
+"*.gph" => &[&T_vnd_flographit_application],
+"*.tzx" => &[&T_x_spectrum_tzx_application],
+"*.mp4s" => &[&T_mp4_application],
+"*.xlt" => &[&T_vnd_ms_excel_application],
+"*.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
 "*.xfdf" => &[&T_vnd_adobe_xfdf_application],
-"*.dfac" => &[&T_vnd_dreamfactory_application],
-"*.shw" => &[&T_x_corelpresentations_application],
-"*.pps" => &[&T_vnd_ms_powerpoint_application],
-"*.cdbcmsg" => &[&T_vnd_contact_cmsg_application],
-"*.crd" => &[&T_x_mscardfile_application],
-"*.dcx" => &[&T_vnd_zbrush_dcx_image],
-"*.ras" => &[&T_x_cmu_raster_image],
+"*.anpa" => &[&T_vnd_iptc_anpa_text],
+"*.idl" => &[&T_x_idl_text],
+"*.xlog" => &[&T_plain_text],
+"*.crt" => &[&T_x_x509_cert_application],
+"*.pro" => &[&T_x_prolog_text],
+"*.semf" => &[&T_vnd_semf_application],
+"*.sas7bdat" => &[&T_x_sas_data_application],
+"*.cww" => &[&T_prs_cww_application],
+"*.brotli" => &[&T_x_brotli_application],
+"*.xmind" => &[&T_x_xmind_application],
+"*.kwd" => &[&T_vnd_kde_kword_application],
+"*.djv" => &[&T_vnd_djvu_image],
+"*.bay" => &[&T_x_raw_casio_image],
+"*.mts" => &[&T_vnd_mts_model],
+"*.cmc" => &[&T_vnd_cosmocaller_application],
+"*.pwn" => &[&T_vnd_3m_post_it_notes_application],
+"*.azs" => &[&T_vnd_airzip_filesecure_azs_application],
+"*.res" => &[&T_x_dtbresource_xml_application],
+"*.onetoc" => &[&T_onenote_format_onetoc2_application],
+"*.as" => &[&T_x_actionscript_text],
+"*.csv" => &[&T_csv_text],
+"*.vm" => &[&T_plain_text],
+"*.sdd" => &[&T_vnd_stardivision_impress_application],
+"*.f" => &[&T_x_fortran_text],
+"*.cap" => &[&T_vnd_tcpdump_pcap_application],
+"*.xltm" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
+"*.wpt" => &[&T_vnd_wordperfect_application],
+"*.m4a" => &[&T_mp4_audio],
+"*.wcm" => &[&T_vnd_ms_works_application],
+"*.sda" => &[&T_vnd_stardivision_draw_application],
+"*.vstm" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
+"*.opf" => &[&T_oebps_package_xml_application],
+"*.MF" => &[&T_plain_text],
+"*.rst" => &[&T_x_rst_text],
+"*.m1v" => &[&T_mpeg_video],
+"*.btif" => &[&T_prs_btif_image],
+"*.sas7bcat" => &[&T_x_sas_catalog_application],
+"*.mvb" => &[&T_x_msmediaview_application],
+"*.npx" => &[&T_vnd_net_fpx_image],
+"*.srf" => &[&T_x_raw_sony_image],
+"*.mxu" => &[&T_vnd_mpegurl_video],
+"*.qbo" => &[&T_vnd_intu_qbo_application],
+"*.plc" => &[&T_vnd_mobius_plc_application],
+"*.sldx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
+"*.png" => &[&T_png_image],
+"*.cl" => &[&T_x_common_lisp_text],
+"*.xgrm" => &[&T_plain_text],
+"*.asc" => &[&T_pgp_signature_application],
+"*.key" => &[&T_vnd_apple_keynote_application],
+"*.w60" => &[&T_vnd_wordperfect_application],
+"*.dna" => &[&T_vnd_dna_application],
+"*.etx" => &[&T_x_setext_text],
+"*.wps" => &[&T_vnd_ms_works_application],
+"*.lrm" => &[&T_vnd_ms_lrm_application],
+"*.xconf" => &[&T_x_config_text],
+"*.sql" => &[&T_x_sql_text],
+"*.h264" => &[&T_h264_video],
+"*.ogm" => &[&T_x_ogm_video],
+"*.arc" => &[&T_x_internet_archive_application],
+"*.gtar" => &[&T_x_gtar_application],
+"*.osf" => &[&T_vnd_yamaha_openscoreformat_application],
+"*.mpga" => &[&T_mpeg_audio],
+"*.xpm" => &[&T_x_xpixmap_image],
+"*.dcr" => &[&T_x_director_application],
+"*.mb" => &[&T_mathematica_application],
+"*.fsc" => &[&T_vnd_fsc_weblaunch_application],
+"*.wks" => &[&T_vnd_ms_works_application],
+"*.m2a" => &[&T_mpeg_audio],
+"*.apr" => &[&T_vnd_lotus_approach_application],
+"*.std" => &[&T_vnd_sun_xml_draw_template_application],
+"*.mxl" => &[&T_vnd_recordare_musicxml_application],
+"*.zmm" => &[&T_vnd_handheld_entertainment_xml_application],
+"*.mpg4" => &[&T_mp4_video],
+"*.csml" => &[&T_x_csml_chemical],
+"*.cii" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
+"*.roff" => &[&T_troff_text],
+"*.susp" => &[&T_vnd_sus_calendar_application],
+"*.ogx" => &[&T_ogg_application],
+"*.qps" => &[&T_vnd_publishare_delta_tree_application],
+"*.meta" => &[&T_plain_text],
+"*.skp" => &[&T_vnd_koan_application],
+"*.fit" => &[&T_fits_application],
+"*.stw" => &[&T_vnd_sun_xml_writer_template_application],
+"*.frm" => &[&T_x_vbasic_text],
+"*.jnlp" => &[&T_x_java_jnlp_file_application],
+"*.atomsvc" => &[&T_atomsvc_xml_application],
+"*.sml" => &[&T_smil_xml_application],
+"*.sc" => &[&T_vnd_ibm_secure_container_application],
+"*.hpp" => &[&T_x_c__hdr_text],
+"*.Frm" => &[&T_x_vbasic_text],
+"*.pfr" => &[&T_font_tdpfr_application],
+"*.odb" => &[&T_vnd_oasis_opendocument_base_application],
+"*.odp" => &[&T_vnd_oasis_opendocument_presentation_application],
+"*.u32" => &[&T_x_authorware_bin_application],
+"*.srl" => &[&T_sereal_application],
+"*.xpw" => &[&T_vnd_intercon_formnet_application],
+"*.potx" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
+"*.mg" => &[&T_x_modula_text],
+"*.voc" => &[&T_x_unknown_audio],
+"*.hps" => &[&T_vnd_hp_hps_application],
+"*.ez3" => &[&T_vnd_ezpix_package_application],
+"*.mcd" => &[&T_vnd_mcd_application],
+"*.mmpt" => &[&T_vnd_mindjet_mindmanager_application],
+"*.mpt" => &[&T_vnd_ms_project_application],
+"*.wp5" => &[&T_vnd_wordperfect_application],
+"*.flac" => &[&T_x_flac_audio],
+"*.oa3" => &[&T_vnd_fujitsu_oasys3_application],
+"*.pnm" => &[&T_x_portable_anymap_image],
+"*.xz" => &[&T_x_xz_application],
+"*.cr3" => &[&T_x_canon_cr3_image],
+"*.jxs" => &[&T_jxs_image],
+"*.gv" => &[&T_vnd_graphviz_text],
+"*.movie" => &[&T_x_sgi_movie_video],
+"*.aaf" => &[&T_octet_stream_application],
+"*.bpm" => &[&T_bizagi_modeler_application],
+"*.grv" => &[&T_vnd_groove_injector_application],
+"*.wtb" => &[&T_vnd_webturbo_application],
+"*.gdl" => &[&T_vnd_gdl_model],
+"*.nml" => &[&T_vnd_enliven_application],
+"*.mod" => &[&T_x_mod_audio],
+"*.h++" => &[&T_x_c__hdr_text],
+"*.a" => &[&T_x_archive_application],
+"*.cdkey" => &[&T_vnd_mediastation_cdkey_application],
+"*.rnc" => &[&T_relax_ng_compact_syntax_application],
+"*.hh" => &[&T_x_c__hdr_text],
+"*.war" => &[&T_x_tika_java_web_archive_application],
+"*.asx" => &[&T_x_ms_asx_application],
+"*.aspx" => &[&T_aspdotnet_text],
+"*.w3d" => &[&T_x_director_application],
+"*.vcs" => &[&T_x_vcalendar_text],
+"*.xdp" => &[&T_vnd_adobe_xdp_xml_application],
+"*.n-gage" => &[&T_vnd_nokia_n_gage_symbian_install_application],
+"*.otc" => &[&T_vnd_oasis_opendocument_chart_template_application],
+"*.musicxml" => &[&T_vnd_recordare_musicxml_xml_application],
+"*.xhtml" => &[&T_xhtml_xml_application],
+"*.msh" => &[&T_mesh_model],
+"*.woff2" => &[&T_woff2_font],
+"*.gbr" => &[&T_x_gimp_gbr_image],
+"*.c4g" => &[&T_vnd_clonk_c4group_application],
+"*.xtest" => &[&T_plain_text],
+"*.atom" => &[&T_atom_xml_application],
+"*.uue" => &[&T_x_uuencode_text],
+"*.for" => &[&T_x_fortran_text],
+"*.si7" => &[&T_x_sas_data_index_application],
+"*.plb" => &[&T_vnd_3gpp_pic_bw_large_application],
+"*.acu" => &[&T_vnd_acucobol_application],
+"*.wbmp" => &[&T_vnd_wap_wbmp_image],
+"*.vis" => &[&T_vnd_visionary_application],
+"*.smf" => &[&T_vnd_stardivision_math_application],
+"*.xer" => &[&T_patch_ops_error_xml_application],
+"*.4th" => &[&T_x_forth_text],
+"*.edx" => &[&T_vnd_novadigm_edx_application],
+"*.semd" => &[&T_vnd_semd_application],
+"*.dmp" => &[&T_vnd_tcpdump_pcap_application],
+"*.log" => &[&T_x_log_text],
+"*.xlsx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
+"*.les" => &[&T_vnd_hhe_lesson_player_application],
+"*.dgnlib" => &[&T_vnd_dgn_image],
+"*.dbf" => &[&T_x_dbf_application],
+"*.gif" => &[&T_gif_image],
+"*.st" => &[&T_x_stsrc_text],
+"*.xenc" => &[&T_xenc_xml_application],
+"*.aep" => &[&T_vnd_adobe_aftereffects_project_application],
+"*.msa" => &[&T_vnd_msa_disk_image_application],
+"*.apk" => &[&T_vnd_android_package_archive_application],
+"*.vox" => &[&T_x_authorware_bin_application],
+"*.pct" => &[&T_x_pict_image],
+"*.egrm" => &[&T_plain_text],
+"*.ufd" => &[&T_vnd_ufdl_application],
+"*.las" => &[&T_x_asprs_application],
+"*.dms" => &[&T_octet_stream_application],
+"*.azf" => &[&T_vnd_airzip_filesecure_azf_application],
+"*.odt" => &[&T_vnd_oasis_opendocument_text_application],
+"*.dotx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
+"*.warc" => &[&T_warc_application],
+"*.st7" => &[&T_x_sas_audit_application],
+"*.xwelcome" => &[&T_plain_text],
+"*.asf" => &[&T_x_ms_asf_video],
+"^owl$" => &[&T_rdf_xml_application],
+"*.cxt" => &[&T_x_director_application],
+"*.fts" => &[&T_fits_application],
+"*.wq1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application],
+"*.jks" => &[&T_x_java_keystore_application],
+"*.hdr" => &[&T_vnd_radiance_image],
+"*.hprof" => &[&T_vnd_java_hprof__application],
+"*.ad" => &[&T_x_asciidoc_text],
+"*.dex" => &[&T_x_dex_application],
+"*.texinfo" => &[&T_x_texinfo_application],
+"*.h5" => &[&T_x_hdf_application],
+"*.ez2" => &[&T_vnd_ezpix_album_application],
+"*.mpe" => &[&T_mpeg_video],
+"*.vcf" => &[&T_x_vcard_text],
+"*.ntf" => &[&T_nitf_image],
+"*.m13" => &[&T_x_msmediaview_application],
+"*.kwt" => &[&T_vnd_kde_kword_application],
+"*.rq" => &[&T_sparql_query_application],
+"*.wspolicy" => &[&T_wspolicy_xml_application],
+"*.ppam" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
+"*.dgn" => &[&T_vnd_dgn_image],
+"*.dxb" => &[&T_vnd_dxb_image],
+"*.spp" => &[&T_scvp_vp_response_application],
+"*.xpx" => &[&T_vnd_intercon_formnet_application],
+"*.tif" => &[&T_tiff_image],
+"*.minipsf1" => &[&T_x_psf_audio],
+"*.y" => &[&T_x_yacc_text],
+"*.xvml" => &[&T_xv_xml_application],
+"*.mseq" => &[&T_vnd_mseq_application],
+"*.pfm" => &[&T_x_font_printer_metric_application],
+"*.f4v" => &[&T_x_f4v_video],
+"*.ssf" => &[&T_vnd_epson_ssf_application],
+"*.tbz" => &[&T_x_bzip_application],
+"*.p7m" => &[&T_pkcs7_mime_application],
+"*.exe" => &[&T_x_dosexec_application],
+"*.ser" => &[&T_java_serialized_object_application],
+"*.stf" => &[&T_vnd_wt_stf_application],
+"*.wdb" => &[&T_vnd_ms_works_application],
+"*.def" => &[&T_plain_text],
+"*.dcurl" => &[&T_vnd_curl_dcurl_text],
+"*.clkk" => &[&T_vnd_crick_clicker_keyboard_application],
+"*.m2v" => &[&T_mpeg_video],
+"*.sldasm" => &[&T_sldworks_application],
+"*.icb" => &[&T_x_tga_image],
+"*.gz" => &[&T_gzip_application],
+"*.tfm" => &[&T_x_tex_tfm_application],
+"*.vtu" => &[&T_vnd_vtu_model],
+"*.x3f" => &[&T_x_raw_sigma_image],
+"*.pef" => &[&T_x_raw_pentax_image],
+"*.wml" => &[&T_vnd_wap_wml_text],
+"*.pls" => &[&T_pls_xml_application],
+"*.br" => &[&T_x_brotli_application],
+"*.prf" => &[&T_pics_rules_application],
+"*.bau" => &[&T_vnd_openofficeorg_autotext_application],
+"*.3g2" => &[&T_3gpp2_video],
+"*.msg" => &[&T_vnd_ms_outlook_application],
+"*.mmat" => &[&T_vnd_mindjet_mindmanager_application],
+"*.pcl" => &[&T_vnd_hp_pcl_application],
+"*.opus" => &[&T_opus_audio],
+"*.ear" => &[&T_x_tika_java_enterprise_archive_application],
+"*.mmmp" => &[&T_vnd_mindjet_mindmanager_application],
+"*.xld" => &[&T_vnd_ms_excel_application],
+"*.m3" => &[&T_x_modula_text],
+"*.sr2" => &[&T_x_raw_sony_image],
+".htaccess" => &[&T_plain_text],
+"*.ifo" => &[&T_x_dvd_ifo_application],
+"*.jbig2" => &[&T_x_jbig2_image],
+"*.sa7" => &[&T_x_sas_access_application],
+"*.xltx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
+"*.adp" => &[&T_adpcm_audio],
+"*.ppm" => &[&T_x_portable_pixmap_image],
+"*.book" => &[&T_vnd_framemaker_application],
+"*.igl" => &[&T_vnd_igloader_application],
+"*.texi" => &[&T_x_texinfo_application],
+"*.aart" => &[&T_plain_text],
+"*.ig" => &[&T_x_modula_text],
+"*.tao" => &[&T_vnd_tao_intent_module_archive_application],
+"*.vstx" => &[&T_vnd_ms_visio_template_application],
+"*.rsd" => &[&T_rsd_xml_application],
+"*.fpx" => &[&T_vnd_fpx_image],
+"*.mpkg" => &[&T_vnd_apple_installer_xml_application],
+"*.fh11" => &[&T_x_freehand_image],
+"*.dmg" => &[&T_x_apple_diskimage_application],
+"*.p7c" => &[&T_pkcs7_mime_application],
+"*.oas" => &[&T_vnd_fujitsu_oasys_application],
+"*.ott" => &[&T_vnd_oasis_opendocument_text_template_application],
+"*.ppsm" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
+"*.shar" => &[&T_x_shar_application],
+"*.txf" => &[&T_vnd_mobius_txf_application],
+"*.qcp" => &[&T_qcelp_audio],
+"*.ft10" => &[&T_x_freehand_image],
+"*.wmlsc" => &[&T_vnd_wap_wmlscriptc_application],
+"*.s" => &[&T_x_assembly_text],
+"*.mjp2" => &[&T_mj2_video],
+"*.3ds" => &[&T_x_3ds_image],
+"*.ei6" => &[&T_vnd_pg_osasli_application],
+"*.xpi" => &[&T_x_xpinstall_application],
+"*.nrw" => &[&T_x_raw_nikon_image],
+"*.msl" => &[&T_vnd_mobius_msl_application],
+"*.c++" => &[&T_x_c__src_text],
+"*.aac" => &[&T_x_aac_audio],
+"*.oxps" => &[&T_vnd_ms_xpsdocument_application],
+"*.uu" => &[&T_x_uuencode_text],
+"*.dll" => &[&T_x_msdownload_application],
+"*.PAS" => &[&T_x_pascal_text],
+"*.fdf" => &[&T_vnd_fdf_application],
+"*.mlp" => &[&T_vnd_dolby_mlp_application],
+"*.vb" => &[&T_x_vbdotnet_text],
+"*.gpg" => &[&T_pgp_encrypted_application],
+"*.fp7" => &[&T_x_filemaker_application],
+"*.sav" => &[&T_x_spss_sav_application],
+"*.ml" => &[&T_x_ml_text],
+"*.tpt" => &[&T_vnd_trid_tpt_application],
+"*.onetmp" => &[&T_onenote_application],
+"*.nitf" => &[&T_nitf_image],
+"*.sus" => &[&T_vnd_sus_calendar_application],
+"*.sbml" => &[&T_sbml_xml_application],
+"*.jfif" => &[&T_jpeg_image],
+"*.rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
+"*.cfc" => &[&T_x_coldfusion_text],
+"*.sas7bput" => &[&T_x_sas_putility_application],
+"*.jl" => &[&T_x_common_lisp_text],
+"*.sdc" => &[&T_vnd_stardivision_calc_application],
+"*.hprof.txt" => &[&T_vnd_java_hprof_text_application],
+"a_*.txt" => &[&T_x_isatab_assay_application],
+"*.chm" => &[&T_vnd_ms_htmlhelp_application],
+"*.ddd" => &[&T_vnd_fujixerox_ddd_application],
+"*.asnd" => &[&T_vnd_adobe_soundbooth_audio],
+"*.wav" => &[&T_vnd_wave_audio],
+"*.pack" => &[&T_x_java_pack200_application],
+"*.curl" => &[&T_vnd_curl_text],
+"*.drc" => &[&T_x_dirac_video],
+"*.gp4" => &[&T_x_guitar_pro_application],
+"*.fodp" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
+"*.dtshd" => &[&T_vnd_dts_hd_audio],
+"*.zip" => &[&T_zip_application],
+"*.m3a" => &[&T_mpeg_audio],
+"*.bas" => &[&T_x_basic_text],
+"*.xdm" => &[&T_vnd_syncml_dm_xml_application],
+"*.ar" => &[&T_x_archive_application],
+"*.odc" => &[&T_vnd_oasis_opendocument_chart_application],
+"*.jfi" => &[&T_jpeg_image],
+"*.mov" => &[&T_quicktime_video],
 
 };

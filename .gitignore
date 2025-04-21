@@ -131,3 +131,5 @@ Cargo.lock
 *.pdb
 
 # End of https://www.toptal.com/developers/gitignore/api/rust,intellij
+
+.DS_Store

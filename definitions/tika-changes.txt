@@ -1,0 +1,102 @@
+Consolidated duplicate definitions:
+* `application/vnd.mif`
+* `application/vnd.sun.xml.calc`
+* `application/vnd.sun.xml.draw`
+* `application/vnd.sun.xml.impress`
+* `application/vnd.sun.xml.writer`
+* `image/heic`
+* `image/heif`
+* `image/heif-sequence`
+* `image/heic-sequence`
+* `application/x-fossil-checkout`
+
+Added rules or made them more precise for several types from Ruby on Rails' Marcel Library, which is Apache 2.0 licensed.
+* `application/vnd.openxmlformats-officedocument.presentationml.presentation`
+* `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+* `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+* `application/x-msaccess`
+* `image/svg+xml`
+* `video/webm`
+* `application/x-ole-storage`
+* `audio/webm`
+* `font/woff`
+* `font/woff2`
+* `text/x-scss`
+* `text/x-sass`
+
+Added rules or made them more precise for several types from the go-mimetype Library, which is MIT licensed.
+* `application/dicom`
+* `application/msword`
+* `application/octet-stream` (*.aaf)
+* `application/postscript`
+* `application/vnd.rn-realmedia`
+* `application/x-font-otf`
+* `application/x-font-ttf`
+* `application/x-msaccess`
+* `application/x-mspublisher`
+* `application/x-parquet`
+* `application/x-rpm`
+* `application/x-shockwave-flash`
+* `application/x-sqlite3`
+* `audio/amr`
+* `audio/qcelp`
+* `audio/x-mpegurl`
+* `image/avif`
+* `image/heif`
+* `image/heif-sequence`
+* `image/icns`
+* `image/vnd.djvu`
+* `image/vnd.radiance`
+* `image/x-xpixmap`
+* `video/3gpp`
+* `video/3gpp2`
+* `video/quicktime`
+* `application/x-xar`
+* `application/lzip`
+* `application/x-installshield`
+* `application/x-chrome-extension
+* `audio/ape`
+* `audio/musepack`
+* `audio/x-unknown`
+* `application/x-ms-shortcut`
+* `application/x-nesrom`
+* `model/gltf-binary`
+* `application/tzif`
+* `font/collection`
+* `video/vnd.dvb.file`
+* `application/vnd.shp`
+* `application/vnd.shx`
+* `image/vnd.mozilla.apng`
+* `image/bpg`
+* `image/x-gimp-pat`
+* `image/x-gimp-gbr`
+* `image/jxs`
+* `image/jxr`
+* `application/owl+xml`
+* `model/vnd.collada+xml`
+* `application/gml+xml`
+* `application/gpx+xml`
+* `application/vnd.garmin.tcx+xml`
+* `model/x3d+xml`
+* `application/vnd.ms-package.3dmanufacturing-3dmodel+xml`
+* `video/x-ms-asf`
+* `application/x-ms-reader`
+* `video/ogg`
+
+Updated the `application/x-tika-ooxml` rule to detect more valid cases by introducing a search range.
+
+Updated the `text/x-uuencode` rule to detect uu encoded data.
+
+Updated the `audio/mp4` rule to be a direct descendant of `video/quicktime` instead of a second-level descendant. This is to
+avoid situations where the ftyp rule matches for quicktime but not for `video/mp4`.
+
+Combined `model/vnd.gs-gdl` and `model/vnd.gs.gdl` by marking `model/vnd.gs.gdl` as an alias of `model/vnd.gs-gdl`.
+
+Swapped the definitions of `text/x-c` and `text/x-csrc`, because some classes declare themselves as subclasses of `text/c-x`
+and not `text/x-csrc`.
+
+Updated the `video/mp4` rule to include more ftyps from https://ftyps.com.
+
+I also have two changes to better support my personal project's constraints, which I hope are acceptable:
+* Updated the `text/x-matlab` rules to be more specific, so they're less likely to conflict with PDF rules.
+* Bumped the "%PDF-" rule priority to 70.

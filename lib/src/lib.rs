@@ -47,7 +47,8 @@ pub fn match_u8(mimetype: &str, bytes: &[u8]) -> bool {
 }
 
 fn check_recursive(checker: &'static dyn magic::MimeTypeChecker, bytes: &[u8]) -> Option<Mime> {
-    if checker.check(bytes) {
+    let matches = checker.check(bytes);
+    if matches || checker.is_virtual() {
         let children = checker.get_children();
         for child in children {
             if let Some(mime) = check_recursive(*child, bytes) {
@@ -55,9 +56,20 @@ fn check_recursive(checker: &'static dyn magic::MimeTypeChecker, bytes: &[u8]) -
             }
         }
 
-        return Some(checker.get_mime());
+        if matches {
+            return Some(checker.get_mime());
+        }
     }
 
+    None
+}
+
+#[cfg(feature = "open_zips")]
+fn maybe_open_zip(bytes: &[u8]) -> Option<Mime> {
+    crate::magic::ZipSpecialHandler.check(bytes)
+}
+#[cfg(not(feature = "open_zips"))]
+fn maybe_open_zip(_bytes: &[u8]) -> Option<Mime> {
     None
 }
 
@@ -75,6 +87,10 @@ fn check_recursive(checker: &'static dyn magic::MimeTypeChecker, bytes: &[u8]) -
 /// assert_eq!(result, "image/gif");
 /// ```
 pub fn from_u8(bytes: &[u8]) -> Mime {
+    if let Some(mime) = maybe_open_zip(bytes) {
+        return mime;
+    }
+
     for m in PRIORITY_MIME_TYPES {
         if let Some(mime) = check_recursive(*m, bytes) {
             return mime;

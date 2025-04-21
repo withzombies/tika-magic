@@ -295,7 +295,7 @@ fn match_to_rule(mat: &Match) -> MatchRule {
         &"big32" => match (&mat.offset, &mat.value) {
             (Some(Offset::Start(start)), Some(value)) => {
                 let vv = parse_int_auto::<u32>(value).expect("Failed to parse value string");
-                MatchRule::ValueU32(*start, vv.to_le_bytes().to_vec())
+                MatchRule::ValueU32(*start, vv.to_be_bytes().to_vec())
             }
             _ => {
                 panic!("Unhandled big32 rule: {:?}", &mat);

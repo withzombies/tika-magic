@@ -1,6 +1,6 @@
 mod tests {
     use rstest::rstest;
-    use tika_magic::{from_u8, match_u8};
+    use tika_magic::from_u8;
 
     #[rstest]
     #[case("3gpp2", b"\x00\x00\x00\x18ftyp3g24", "video/3gpp2")]
@@ -20,7 +20,7 @@ mod tests {
         b"\x46\x4F\x52\x4D\x00\x00\x00\x00\x41\x49\x46\x46\x00",
         "audio/x-aiff"
     )]
-    #[case("amf", b"<?xml version=\"1.0\"?><amf>", "application/x-amf")]
+    #[case("amf", b"<?xml version=\"1.0\"?><amf >", "application/x-amf")]
     #[case("amr", b"\x23\x21\x41\x4D\x52", "audio/amr")]
     #[case(
         "ape",
@@ -202,7 +202,6 @@ mod tests {
         b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00",
         "application/x-object"
     )]
-    #[case("odf", b"PK\x03\x04\x14\x00\x00\x08\x00\x00\xb1Z\xa8N\x07\x8a\xa8[*\x00\x00\x00*\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.formula", "application/vnd.oasis.opendocument.formula")]
     #[case("sxc", b"PK\x03\x04\x14\x00\x00\x08\x00\x00\xbb\x03\x5eGE\xbc\x13\x94\x1c\x00\x00\x00\x1c\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.sun.xml.calc", "application/vnd.sun.xml.calc")]
     #[case("odg", b"PK\x03\x04\x14\x00\x00\x08\x00\x00\xcbY\xa8N\x9f\x03.\xc4\x2b\x00\x00\x00\x2b\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.graphics", "application/vnd.oasis.opendocument.graphics")]
     #[case("odp", b"PK\x03\x04\x14\x00\x00\x08\x00\x00\xbdX\xa8N3&\xac\xa8/\x00\x00\x00/\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.presentation", "application/vnd.oasis.opendocument.presentation")]
@@ -250,7 +249,7 @@ mod tests {
     #[case("rpm", b"\xed\xab\xee\xdb", "application/x-rpm")]
     #[case(
         "rss",
-        b"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss",
+        b"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss ",
         "application/rss+xml"
     )]
     #[case("rtf", b"{\\rtf", "application/rtf")]

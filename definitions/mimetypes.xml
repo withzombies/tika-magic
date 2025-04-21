@@ -268,6 +268,7 @@
       </match>
     </magic>
     <glob pattern="*.epub"/>
+    <sub-class-of type="application/zip"/>
   </mime-type>
 
   <mime-type type="application/eshop"/>
@@ -852,18 +853,22 @@
       <!-- Higher priority than matlab's priority=20 %% match
       Low priority match for %PDF-#.# near the start of the file -->
       <!-- Can trigger false positives, so set the priority rather low here -->
-      <match value="%%" type="string" offset="0:128">
-            <match value="%PDF-1." type="string" offset="1:512"/>
-      </match>
+      <match value="^[ -~]*%%" type="regex" offset="0:128">
         <match value="%%" type="string" offset="0:128">
-            <match value="%PDF-2." type="string" offset="1:512"/>
+              <match value="%PDF-1." type="string" offset="1:512"/>
         </match>
+          <match value="%%" type="string" offset="0:128">
+              <match value="%PDF-2." type="string" offset="1:512"/>
+          </match>
+      </match>
     </magic>
     <magic priority="20">
       <!-- Low priority match for %PDF-#.# near the start of the file -->
       <!-- Can trigger false positives, so set the priority rather low here -->
-      <match value="%PDF-1." type="string" offset="1:512"/>
-      <match value="%PDF-2." type="string" offset="1:512"/>
+      <match value="^[ -~]*%%" type="regex" offset="0:128">
+        <match value="%PDF-1." type="string" offset="1:512"/>
+        <match value="%PDF-2." type="string" offset="1:512"/>
+      </match>
     </magic>
     <glob pattern="*.pdf"/>
   </mime-type>
@@ -1257,7 +1262,7 @@
   </mime-type>
   <mime-type type="application/vnd.apple.mpegurl">
     <glob pattern="*.m3u8" />
-    <magic>
+    <magic priority="60">
       <match value="#EXTM3U" type="string" offset="0"/>
     </magic>
   </mime-type>
@@ -2409,7 +2414,7 @@
   <mime-type type="application/vnd.oasis.opendocument.chart-template">
     <alias type="application/x-vnd.oasis.opendocument.chart-template"/>
     <_comment>OpenDocument v1.0: Chart document used as template</_comment>
-    <magic>
+    <magic priority="50">
       <match type="string" offset="0" value="PK">
         <match type="string" offset="30"
                value="mimetypeapplication/vnd.oasis.opendocument.chart-template"/>
@@ -2421,16 +2426,23 @@
 
   <mime-type type="application/vnd.oasis.opendocument.base">
     <alias type="application/vnd.oasis.opendocument.database"/>
+    <magic priority="50">
+      <match type="string" offset="0" value="PK">
+        <match type="string" offset="30"
+               value="mimetypeapplication/vnd.oasis.opendocument.base" />
+      </match>
+    </magic>
     <glob pattern="*.odb"/>
+    <sub-class-of type="application/zip"/>
   </mime-type>
 
   <mime-type type="application/vnd.oasis.opendocument.formula">
     <alias type="application/x-vnd.oasis.opendocument.formula"/>
     <_comment>OpenDocument v1.0: Formula document</_comment>
-    <magic>
+    <magic priority="50">
       <match type="string" offset="0" value="PK">
         <match type="string" offset="30"
-               value="mimetypeapplication/vnd.oasis.opendocument.formula" />
+               value="application/vnd.oasis.opendocument.formula" />
       </match>
     </magic>
     <glob pattern="*.odf"/>
@@ -2443,7 +2455,7 @@
     <magic>
       <match type="string" offset="0" value="PK">
         <match type="string" offset="30"
-               value="mimetypeapplication/vnd.oasis.opendocument.formula-template"/>
+               value="application/vnd.oasis.opendocument.formula-template"/>
       </match>
     </magic>
     <glob pattern="*.odft"/>
@@ -2574,31 +2586,41 @@
   <mime-type type="application/vnd.oasis.opendocument.tika.flat.document">
     <_comment>OpenDocument v1.0: Flat Text document</_comment>
     <root-XML namespaceURI="urn:oasis:names:tc:opendocument:xmlns:office:1.0" localName="document"/>
+    <root-XML namespaceURI="http://openoffice.org/2009/office" localName="document"/>
     <sub-class-of type="application/xml"/>
   </mime-type>
 
   <mime-type type="application/vnd.oasis.opendocument.flat.text">
     <_comment>OpenDocument v1.0: Flat Text document</_comment>
     <glob pattern="*.fodt"/>
+    <magic priority="50">
+      <match value="mimetype=&quot;application/vnd.oasis.opendocument.text&quot;" type="string" offset="0:2048"/>
+    </magic>
     <sub-class-of type="application/vnd.oasis.opendocument.tika.flat.document"/>
   </mime-type>
 
   <mime-type type="application/vnd.oasis.opendocument.flat.presentation">
     <_comment>OpenDocument v1.0: Flat Presentation document</_comment>
     <glob pattern="*.fodp"/>
+    <magic priority="50">
+      <match value="mimetype=&quot;application/vnd.oasis.opendocument.presentation&quot;" type="string" offset="0:2048"/>
+    </magic>
     <sub-class-of type="application/vnd.oasis.opendocument.tika.flat.document"/>
   </mime-type>
 
   <mime-type type="application/vnd.oasis.opendocument.flat.spreadsheet">
     <_comment>OpenDocument v1.0: Flat Spreadsheet document</_comment>
     <glob pattern="*.fods"/>
+    <magic priority="50">
+      <match value="mimetype=&quot;application/vnd.oasis.opendocument.spreadsheet&quot;" type="string" offset="0:2048"/>
+    </magic>
     <sub-class-of type="application/vnd.oasis.opendocument.tika.flat.document"/>
   </mime-type>
 
   <mime-type type="application/vnd.oasis.opendocument.text-master">
     <alias type="application/x-vnd.oasis.opendocument.text-master"/>
     <_comment>OpenDocument v1.0: Global Text document</_comment>
-    <magic>
+    <magic priority="50">
       <match type="string" offset="0" value="PK">
         <match type="string" offset="30"
                value="mimetypeapplication/vnd.oasis.opendocument.text-master"/>
@@ -3509,6 +3531,11 @@
   <mime-type type="application/vnd.adobe.indesign-idml-package">
     <sub-class-of type="application/zip"/>
     <_comment>IDML</_comment>
+    <magic priority="50">
+      <match value="PK\003\004" type="string" offset="0">
+        <match value="mimetypeapplication/vnd.adobe.indesign-idml-package" type="string" offset="30"/>
+      </match>
+    </magic>
     <glob pattern="*.idml"/>
   </mime-type>
 
@@ -4220,7 +4247,7 @@
 
   <mime-type type="application/x-foxmail">
     <_comment>Foxmail Email File</_comment>
-    <magic>
+    <magic priority="60">
       <match value="0x1010101010101011111111111153" type="string" offset="0"/>
     </magic>
   </mime-type>
@@ -4363,6 +4390,7 @@
        <match value="filedesc://" type="string" offset="0"/>
     </magic>
     <glob pattern="*.arc"/>
+    <sub-class-of type="application/xml"/>
   </mime-type>
 
   <mime-type type="application/x-isatab-investigation">
@@ -4874,7 +4902,7 @@
     <glob pattern="*.trm"/>
   </mime-type>
   <mime-type type="application/x-mswrite">
-    <magic priority="50">
+    <magic priority="70">
       <match value="0x31be0000" type="big32" offset="0"/>
       <match value="0x32be0000" type="big32" offset="0"/>
     </magic>
@@ -5242,7 +5270,7 @@
   <mime-type type="application/x-snappy-framed">
     <_comment>Snappy Framed</_comment>
     <magic priority="50">
-      <match value="sNaPpY" type="string" offset="0"/>
+      <match value="sNaPpY" type="string" offset="0:16"/>
     </magic>
     <glob pattern="*.sz"/>
   </mime-type>
@@ -5516,17 +5544,6 @@
     <_comment>CompObj OLE2 Embedded Document</_comment>
   </mime-type>
 
-  <mime-type type="application/x-tika-msworks-spreadsheet">
-    <glob pattern="*.xlr"/>
-    <sub-class-of type="application/vnd.ms-excel"/>
-    <!-- this has to be highter than the Excel match -->
-    <magic priority="60">
-      <match value="0xd0cf11e0a1b11ae1" type="string" offset="0:8">
-         <match value="W\x00k\x00s\x00S\x00S\x00W\x00o\x00r\x00k\x00B\x00o\x00o\x00k" type="string" offset="1152:4096" />
-      </match>
-    </magic>
-  </mime-type>
-
   <mime-type type="application/x-tika-old-excel">
     <_comment>Pre-OLE2 (Old) Microsoft Excel Worksheets</_comment>
   </mime-type>
@@ -5759,6 +5776,11 @@
       <!-- UTF-16 LE/BE -->
       <match value="0xFFFE3C003F0078006D006C00" type="string" offset="0"/>
       <match value="0xFEFF003C003F0078006D006C" type="string" offset="0"/>
+
+      <match value="&lt;?xml" type="stringignorecase" offset="0:256">
+        <match value="xmlns=" type="stringignorecase" offset="0:256"/>
+        <match value="xmlns:" type="stringignorecase" offset="0:256"/>
+      </match>
       <!-- TODO: Add matches for the other possible XML encoding schemes -->
     </magic>
     <!-- XML files can start with a comment but then must not contain processing instructions.
@@ -6279,9 +6301,10 @@
     <magic priority="40">
       <!-- With ID3 tags at the start -->
       <match value="ID3" type="string" offset="0">
-         <match type="regex" value="\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)" offset="512:2048" />
+         <match type="regex" value="\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)" offset="256:2048" />
       </match>
     </magic>
+    <sub-class-of type="audio/mpeg"/>
   </mime-type>
 
   <mime-type type="audio/x-adpcm">
@@ -7795,7 +7818,7 @@
     <root-XML localName="FRAMESET"/>
     <root-XML localName="iframe"/>
     <root-XML localName="IFRAME"/>
-    <magic priority="60">
+    <magic priority="49">
       <match value="(?i)&lt;(html|head|body|title|div)[ >]" type="regex" offset="0"/>
       <match value="(?i)&lt;h[123][ >]" type="regex" offset="0"/>
     </magic>
@@ -7858,6 +7881,7 @@
       <match value="0xfffe" type="string" offset="0"/>
       <!-- UTF-8 BOM -->
       <match value="0xefbbbf" type="string" offset="0"/>
+      <match value="^[ -~]{6}[ -~]+" type="regex" offset="0"/>
     </magic>
 
     <glob pattern="*.txt"/>

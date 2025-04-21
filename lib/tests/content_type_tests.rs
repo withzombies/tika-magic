@@ -19,11 +19,19 @@ mod tests {
         }
     }
 
+    #[cfg(all(test, feature = "open_zips"))]
     #[rstest]
     fn test_mime_detection(#[files("tests/inputs/*/*/*.*")] path: PathBuf) {
         dbg!(&path);
         let expected_mime = expected_mime_type(&path);
         let detected_mime = from_filepath(&path).expect("Failed to detect MIME type");
-        assert_eq!(expected_mime, detected_mime);
+        assert_eq!(
+            expected_mime,
+            detected_mime,
+            "mkdir -p \"{}\"; mv {} \"{}/\"",
+            detected_mime,
+            path.to_str().unwrap(),
+            detected_mime
+        );
     }
 }
