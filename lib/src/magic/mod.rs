@@ -5,9 +5,11 @@ use std::cmp::{max, min};
 use std::sync::Arc;
 
 mod generated;
+mod ole;
 mod zip;
 
 pub use generated::{EXT_MAP, MIME_MAP, MIME_TYPES};
+pub use ole::OleSpecialHandler;
 pub use zip::ZipSpecialHandler;
 
 use generated::*;

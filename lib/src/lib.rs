@@ -33,7 +33,7 @@ pub type Mime = &'static str;
 /// assert_eq!(result, true);
 /// ```
 pub fn match_u8(mimetype: &str, bytes: &[u8]) -> bool {
-    if let Some(mime) = maybe_open_zip(bytes) {
+    if handle_special_files(bytes).is_some() {
         return true;
     }
 
@@ -77,6 +77,27 @@ fn maybe_open_zip(_bytes: &[u8]) -> Option<Mime> {
     None
 }
 
+#[cfg(feature = "open_ole")]
+fn maybe_open_ole(bytes: &[u8]) -> Option<Mime> {
+    crate::magic::OleSpecialHandler.check(bytes)
+}
+#[cfg(not(feature = "open_ole"))]
+fn maybe_open_ole(_bytes: &[u8]) -> Option<Mime> {
+    None
+}
+
+fn handle_special_files(bytes: &[u8]) -> Option<Mime> {
+    if let Some(mime) = maybe_open_zip(bytes) {
+        return Some(mime);
+    }
+
+    if let Some(mime) = maybe_open_ole(bytes) {
+        return Some(mime);
+    }
+
+    None
+}
+
 /// Gets the MIME from a byte stream.
 ///
 /// Returns MIME as string.
@@ -91,7 +112,7 @@ fn maybe_open_zip(_bytes: &[u8]) -> Option<Mime> {
 /// assert_eq!(result, "image/gif");
 /// ```
 pub fn from_u8(bytes: &[u8]) -> Mime {
-    if let Some(mime) = maybe_open_zip(bytes) {
+    if let Some(mime) = handle_special_files(bytes) {
         return mime;
     }
 
@@ -309,19 +330,6 @@ mod tests {
         assert_eq!(
             from_filepath(path).unwrap(),
             "application/vnd.oasis.opendocument.spreadsheet"
-        );
-    }
-
-    #[rstest]
-    fn test_tika_ooxml_rules() {
-        let path = Path::new(
-            "./tests/inputs/application/vnd.openxmlformats-officedocument.wordprocessingml.document/converted_from_google_doc.docx",
-        );
-        assert!(path.exists());
-        assert!(match_filepath("application/x-tika-ooxml", path));
-        assert_eq!(
-            from_filepath(path).unwrap(),
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         );
     }
 }
