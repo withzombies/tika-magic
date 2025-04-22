@@ -33,6 +33,10 @@ pub type Mime = &'static str;
 /// assert_eq!(result, true);
 /// ```
 pub fn match_u8(mimetype: &str, bytes: &[u8]) -> bool {
+    if let Some(mime) = maybe_open_zip(bytes) {
+        return true;
+    }
+
     let Some(mm) = MIME_MAP.get(mimetype) else {
         return false;
     };

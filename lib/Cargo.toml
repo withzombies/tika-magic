@@ -17,7 +17,7 @@ exclude = ["tests/*", "benches/*"]
 [dependencies]
 phf = { version = "0.11.3", features = ["macros", "phf_macros"] }
 regex = "1.11.1"
-zip = {version = "2.6.1", optional = true }
+zip = { version = "2.6.1", optional = true }
 
 [dev-dependencies]
 bencher = "0.1.5"

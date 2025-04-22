@@ -2586,6 +2586,7 @@
   <mime-type type="application/vnd.oasis.opendocument.tika.flat.document">
     <_comment>OpenDocument v1.0: Flat Text document</_comment>
     <root-XML namespaceURI="urn:oasis:names:tc:opendocument:xmlns:office:1.0" localName="document"/>
+    <root-XML namespaceURI="http://openoffice.org/2009/office" localName="office"/>
     <root-XML namespaceURI="http://openoffice.org/2009/office" localName="document"/>
     <sub-class-of type="application/xml"/>
   </mime-type>
@@ -2594,7 +2595,7 @@
     <_comment>OpenDocument v1.0: Flat Text document</_comment>
     <glob pattern="*.fodt"/>
     <magic priority="50">
-      <match value="mimetype=&quot;application/vnd.oasis.opendocument.text&quot;" type="string" offset="0:2048"/>
+      <match value="office:mimetype=&quot;application/vnd.oasis.opendocument.text" type="string" offset="0:4096"/>
     </magic>
     <sub-class-of type="application/vnd.oasis.opendocument.tika.flat.document"/>
   </mime-type>
@@ -2603,7 +2604,7 @@
     <_comment>OpenDocument v1.0: Flat Presentation document</_comment>
     <glob pattern="*.fodp"/>
     <magic priority="50">
-      <match value="mimetype=&quot;application/vnd.oasis.opendocument.presentation&quot;" type="string" offset="0:2048"/>
+      <match value="office:mimetype=&quot;application/vnd.oasis.opendocument.presentation" type="string" offset="0:4096"/>
     </magic>
     <sub-class-of type="application/vnd.oasis.opendocument.tika.flat.document"/>
   </mime-type>
@@ -2612,7 +2613,7 @@
     <_comment>OpenDocument v1.0: Flat Spreadsheet document</_comment>
     <glob pattern="*.fods"/>
     <magic priority="50">
-      <match value="mimetype=&quot;application/vnd.oasis.opendocument.spreadsheet&quot;" type="string" offset="0:2048"/>
+      <match value="office:mimetype=&quot;application/vnd.oasis.opendocument.spreadsheet" type="string" offset="0:4096"/>
     </magic>
     <sub-class-of type="application/vnd.oasis.opendocument.tika.flat.document"/>
   </mime-type>
