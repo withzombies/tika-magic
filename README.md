@@ -63,15 +63,21 @@ assert!(is_pdf);
 ```
 ## Installation
 Add tika-magic to your `Cargo.toml`:
-``` toml
-[dependencies]
-tika-magic = "0.1.0"
+```bash
+cargo add tika-magic -F open_zips -F open_ole
 ```
 Then include it in your Rust project:
 ``` rust
 use tika_magic;
 ```
-The library has minimal dependencies and doesn't require any system libraries or external resources to work - all the MIME detection rules are bundled with the crate.
+
+The library has minimal dependencies and doesn't require any system libraries or external resources to work. There are two
+optional features which add the `zip` and `ole` dependencies. If you enable the `open_zips` feature, tika-magic will
+open zip files and try to determine what file type they are. For example, without `open_zips` an Android APK file will
+report as an `application/zip` but with it, it returns `application/vnd.android.package-archive`. By enabling `open_ole`,
+it will differentiate between common OLE formats such as `application/vnd.ms-excel`.
+
+
 ## License
 tika-magic is licensed under the Apache License, Version 2.0. See the LICENSE file for the full license text.
 ``` 
@@ -94,13 +100,16 @@ The MIME type detection rules are derived from the [Apache Tika](http://tika.apa
 
 ## Speed
 
-`tika-magic` is slower than `tree_magic_mini`, as `tree_magic_mini` is specifically optimized for quick parsing.
+`tika-magic` is slower in the general case than `tree_magic_mini`, as `tree_magic_mini` is specifically optimized for 
+quick parsing. Both projects are optimized for a few code paths and have fairly identical results in those paths.
+
+Anything not `application/zip`, `image/gif`, `image/png`, or `application/pdf` will be faster in `tree_magic_mini`.
 
 ```
-test tika-magic::from_u8::application_zip           ... bench:   3,088,086 ns/iter (+/- 340,938)
-test tika-magic::from_u8::image_gif                 ... bench:     441,894 ns/iter (+/- 36,948)
-test tika-magic::from_u8::image_png                 ... bench:     424,299 ns/iter (+/- 26,686)
-test tika-magic::from_u8::text_plain                ... bench:   3,587,062 ns/iter (+/- 535,857)
+test tika-magic::from_u8::application_zip           ... bench:       1,918 ns/iter (+/- 85)
+test tika-magic::from_u8::image_gif                 ... bench:          20 ns/iter (+/- 1)
+test tika-magic::from_u8::image_png                 ... bench:          11 ns/iter (+/- 10)
+test tika-magic::from_u8::text_plain                ... bench:   5,933,460 ns/iter (+/- 269,395)
 test tika-magic::match_u8::application_zip          ... bench:          14 ns/iter (+/- 2)
 test tika-magic::match_u8::image_gif                ... bench:          14 ns/iter (+/- 1)
 test tika-magic::match_u8::image_png                ... bench:          14 ns/iter (+/- 0)
