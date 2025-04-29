@@ -1,0 +1,4 @@
+lib/tests/inputs/** linguist-vendored
+lib/benches/application/** linguist-vendored
+lib/benches/image/** linguist-vendored
+lib/benches/text/** linguist-vendored
