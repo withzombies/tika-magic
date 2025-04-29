@@ -335,7 +335,7 @@ mod tests {
 
     #[rstest]
     fn test_uue_file() {
-        let data = include_bytes!("../tests/inputs/text/x-uu-encoded/sample-data-csv.uue");
+        let data = include_bytes!("../tests/inputs/text/x-uuencode/sample-data-csv.uue");
         assert_eq!(from_u8(data), "text/x-uuencode");
         assert!(match_u8("text/x-uuencode", data));
     }
