@@ -224,7 +224,7 @@ pub(crate) fn unicode_le_range(bytes: &[u8], start: usize, end: usize, needle: &
 
 pub fn file_is_text(bytes: &[u8]) -> bool {
     // Let's check to make sure everything is printable
-    let Some(slice) = bytes.get(0..min(max(4, bytes.len()), 128)) else {
+    let Some(slice) = bytes.get(0..bytes.len().clamp(4, 128)) else {
         return bytes.is_ascii();
     };
 

@@ -120,9 +120,7 @@ mod zip_impl {
 
         pub(crate) fn check(&self, bytes: &[u8]) -> Option<&'static str> {
             // Make sure it's a zip file
-            let Some(magic) = bytes.get(0..2) else {
-                return None;
-            };
+            let magic = bytes.get(0..2)?;
 
             if magic != b"PK" {
                 return None;

@@ -5,7 +5,7 @@ use crate::MatchRule::{And, RootXML};
 use num_traits::Num;
 use regex::bytes::Regex;
 use sailfish::TemplateSimple;
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs::File;
@@ -378,13 +378,11 @@ fn actions_to_rules(mime: &MimeType) -> MatchRule {
         or_rules.extend(rules);
     }
 
-    if or_rules.len() > 1 {
-        return MatchRule::Or(or_rules);
-    } else if or_rules.len() == 1 {
-        return or_rules.pop().unwrap();
+    match or_rules.len().cmp(&1) {
+        Ordering::Less => MatchRule::Empty,
+        Ordering::Equal => or_rules.pop().unwrap(),
+        Ordering::Greater => MatchRule::Or(or_rules),
     }
-
-    MatchRule::Empty
 }
 
 fn rules_to_string(match_rule: &MatchRule) -> String {
@@ -475,9 +473,11 @@ fn rules_to_string(match_rule: &MatchRule) -> String {
     }
 }
 
+type AliasType = (String, String);
+
 fn parse_definition_file(
     xml_path: &str,
-) -> Result<(Vec<OutputMimeType>, Vec<(String, String)>), Box<dyn std::error::Error>> {
+) -> Result<(Vec<OutputMimeType>, Vec<AliasType>), Box<dyn std::error::Error>> {
     let rules = parse_mime_type_xml(xml_path)?;
     let mime_types = rules.mime_types;
 
