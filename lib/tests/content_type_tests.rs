@@ -1,7 +1,7 @@
 #[cfg(all(test, feature = "open_zips"))]
 mod tests {
-    use std::path::{Path, PathBuf};
     use rstest::rstest;
+    use std::path::{Path, PathBuf};
     use tika_magic::from_filepath;
 
     // Helper to extract expected MIME type from the file path

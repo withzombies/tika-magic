@@ -8582,7 +8582,7 @@
   <mime-type type="text/x-uuencode">
     <glob pattern="*.uu"/>
     <glob pattern="*.uue"/>
-    <magic>
+    <magic priority="50">
       <match type="regex" offset="0" value="^begin [0-9]{3} " />
     </magic>
   </mime-type>

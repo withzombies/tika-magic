@@ -332,4 +332,11 @@ mod tests {
             "application/vnd.oasis.opendocument.spreadsheet"
         );
     }
+
+    #[rstest]
+    fn test_uue_file() {
+        let data = include_bytes!("../tests/inputs/text/x-uu-encoded/sample-data-csv.uue");
+        assert_eq!(from_u8(data), "text/x-uuencode");
+        assert!(match_u8("text/x-uuencode", data));
+    }
 }
