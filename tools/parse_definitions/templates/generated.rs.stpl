@@ -27,7 +27,7 @@ impl MimeTypeChecker for <%- t.short_name %> {
         &[<%- t.children.join(",") %>]
     }
     fn is_virtual(&self) -> bool {
-    <%- !t.children.is_empty() && t.match_rules_string.len() > 0 %>
+    <%- !t.children.is_empty() && !t.match_rules_string.is_empty() %>
     }
 }
 <% } %>
