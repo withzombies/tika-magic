@@ -3,6 +3,8 @@
 #![allow(unused)]
 #![allow(clippy::eq_op)]
 
+use std::sync::LazyLock;
+
 use crate::magic::*;
 use regex::bytes::Regex;
 use phf::phf_map;
@@ -10,7 +12,8 @@ use phf::phf_map;
 <% for t in &types { %>
 pub(super) struct <%- t.short_name %>;
 impl MimeTypeChecker for <%- t.short_name %> {
- fn get_mime(&self) -> &'static str {
+
+    fn get_mime(&self) -> &'static str {
         "<%- t.mime_string %>"
     }
     fn get_ext(&self) -> &[&'static str] {
@@ -21,13 +24,15 @@ impl MimeTypeChecker for <%- t.short_name %> {
           %>]
     }
     fn check(&self, bytes: &[u8]) -> bool {
+        <% for (i, pattern) in t.regex_patterns.cloned_iter() { %>static REGEX_PATTERN_<%- i %>: LazyLock<Regex> = LazyLock::new(|| Regex::new("<%- pattern %>").unwrap());
+        <% } %>
         <%- t.match_rules_string %>
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[<%- t.children.join(",") %>]
     }
     fn is_virtual(&self) -> bool {
-    <%- !t.children.is_empty() && !t.match_rules_string.is_empty() %>
+        <%- !t.children.is_empty() && !t.match_rules_string.is_empty() %>
     }
 }
 <% } %>
