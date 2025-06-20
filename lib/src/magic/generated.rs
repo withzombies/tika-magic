@@ -20,7 +20,7 @@ impl MimeTypeChecker for T_x_tga_image {
         &["*.tga","*.icb","*.vda"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new(".*[\\x54\\x52\\x55\\x45\\x56\\x49\\x53\\x49\\x4F\\x4E\\x2D\\x58\\x46\\x49\\x4C\\x45\\x2E\\x00]").unwrap());
         
         ((offset(bytes, 1, &[1, 1, 0, 0]) && regex(bytes, 8, &REGEX_PATTERN_0)) || (offset(bytes, 1, &[0, 2, 0, 0]) && regex(bytes, 8, &REGEX_PATTERN_0)) || (offset(bytes, 1, &[0, 3, 0, 0]) && regex(bytes, 8, &REGEX_PATTERN_0)))
     }
@@ -28,7 +28,7 @@ impl MimeTypeChecker for T_x_tga_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -49,7 +49,7 @@ impl MimeTypeChecker for T_x_tmx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -70,7 +70,7 @@ impl MimeTypeChecker for T_x_endnote_refer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -91,7 +91,7 @@ impl MimeTypeChecker for T_x_dvd_ifo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -112,7 +112,7 @@ impl MimeTypeChecker for T_x_ebu_stl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -133,7 +133,7 @@ impl MimeTypeChecker for T_mbox_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -154,7 +154,7 @@ impl MimeTypeChecker for T_x_emlx_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -168,8 +168,8 @@ impl MimeTypeChecker for T_x_ms_nls_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(?s)^\\x0D.{51}\\x0C\\x00\\x0D\\x00\\x0E").unwrap());
-        static REGEX_PATTERN_1 = LazyLock::new(|| Regex::new("(?s)^\\x44\\x43.\\x01").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?s)^\\x0D.{51}\\x0C\\x00\\x0D\\x00\\x0E").unwrap());
+        static REGEX_PATTERN_1: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?s)^\\x44\\x43.\\x01").unwrap());
         
         (regex(bytes, 0, &REGEX_PATTERN_0) || regex(bytes, 0, &REGEX_PATTERN_1))
     }
@@ -177,7 +177,7 @@ impl MimeTypeChecker for T_x_ms_nls_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -198,7 +198,7 @@ impl MimeTypeChecker for T_x_mswrite_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -212,7 +212,7 @@ impl MimeTypeChecker for T_pdf_application {
         &["*.pdf"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("^[ -~]*%%").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("^[ -~]*%%").unwrap());
         
         (offset(bytes, 0, &[37, 80, 68, 70, 45]) || offset(bytes, 0, &[239, 187, 191, 37, 80, 68, 70, 45]) || (regex_range(bytes, 0, 128, &REGEX_PATTERN_0) && ((offset_range(bytes, 0, 128, &[37, 37]) && offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 49, 46])) || (offset_range(bytes, 0, 128, &[37, 37]) && offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 50, 46])))) || (regex_range(bytes, 0, 128, &REGEX_PATTERN_0) && (offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 49, 46]) || offset_range(bytes, 1, 512, &[37, 80, 68, 70, 45, 50, 46]))))
     }
@@ -220,7 +220,7 @@ impl MimeTypeChecker for T_pdf_application {
         &[&T_illustrator_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -241,7 +241,7 @@ impl MimeTypeChecker for T_x_bplist_application {
         &[&T_x_itunes_bplist_application,&T_x_memgraph_application,&T_x_webarchive_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -262,7 +262,7 @@ impl MimeTypeChecker for T_cbor_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -283,7 +283,7 @@ impl MimeTypeChecker for T_coreldraw_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -297,7 +297,7 @@ impl MimeTypeChecker for T_illustrator_ps_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("[\r\n]%AI5_FileFormat [1-4][\r\n]").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("[\r\n]%AI5_FileFormat [1-4][\r\n]").unwrap());
         
         regex_range(bytes, 0, 8192, &REGEX_PATTERN_0)
     }
@@ -305,7 +305,7 @@ impl MimeTypeChecker for T_illustrator_ps_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -326,7 +326,7 @@ impl MimeTypeChecker for T_vnd_apple_mpegurl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -347,7 +347,7 @@ impl MimeTypeChecker for T_vnd_etsi_asic_e_zip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -368,7 +368,7 @@ impl MimeTypeChecker for T_vnd_etsi_asic_s_zip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -389,7 +389,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -410,7 +410,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_workspace_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -431,7 +431,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -452,7 +452,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_workspace_3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -473,7 +473,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -494,7 +494,7 @@ impl MimeTypeChecker for T_vnd_tcpdump_pcap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -515,7 +515,7 @@ impl MimeTypeChecker for T_vnd_tcpdump_pcapng_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -536,7 +536,7 @@ impl MimeTypeChecker for T_warc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -557,7 +557,7 @@ impl MimeTypeChecker for T_x_activemime_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -578,7 +578,7 @@ impl MimeTypeChecker for T_x_axcrypt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -599,7 +599,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -620,7 +620,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -641,7 +641,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -662,7 +662,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_version_5_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -683,7 +683,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_version_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -704,7 +704,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_version_3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -725,7 +725,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_version_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -746,7 +746,7 @@ impl MimeTypeChecker for T_x_debian_package_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -767,7 +767,7 @@ impl MimeTypeChecker for T_x_font_type1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -788,7 +788,7 @@ impl MimeTypeChecker for T_x_foxmail_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -809,7 +809,7 @@ impl MimeTypeChecker for T_x_internet_archive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -830,7 +830,7 @@ impl MimeTypeChecker for T_x_lz4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -851,7 +851,7 @@ impl MimeTypeChecker for T_x_mobipocket_ebook_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -872,7 +872,7 @@ impl MimeTypeChecker for T_x_msaccess_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -893,7 +893,7 @@ impl MimeTypeChecker for T_x_msdownload_format_pe32_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -914,7 +914,7 @@ impl MimeTypeChecker for T_x_msdownload_format_pe64_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -935,7 +935,7 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_itanium_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -956,7 +956,7 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_armLE_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -977,7 +977,7 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_arm7_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -998,7 +998,7 @@ impl MimeTypeChecker for T_x_msmoney_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1019,7 +1019,7 @@ impl MimeTypeChecker for T_x_rar_compressed_version_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1040,7 +1040,7 @@ impl MimeTypeChecker for T_x_rar_compressed_version_5_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1061,7 +1061,7 @@ impl MimeTypeChecker for T_x_shapefile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1082,7 +1082,7 @@ impl MimeTypeChecker for T_x_geopackage_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1103,7 +1103,7 @@ impl MimeTypeChecker for T_x_geopackage__version_1_1Or1_0_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1124,7 +1124,7 @@ impl MimeTypeChecker for T_x_fossil_checkout_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1145,7 +1145,7 @@ impl MimeTypeChecker for T_x_fossil_global_conf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1166,7 +1166,7 @@ impl MimeTypeChecker for T_x_fossil_repository_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1187,7 +1187,7 @@ impl MimeTypeChecker for T_x_bentley_besqlite_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1208,7 +1208,7 @@ impl MimeTypeChecker for T_x_bentley_localization_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1229,7 +1229,7 @@ impl MimeTypeChecker for T_x_monotone_source_repo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1250,7 +1250,7 @@ impl MimeTypeChecker for T_x_esri_spatially_enabled_db_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1271,7 +1271,7 @@ impl MimeTypeChecker for T_x_mbtiles_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1292,7 +1292,7 @@ impl MimeTypeChecker for T_x_texnicard_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1313,7 +1313,7 @@ impl MimeTypeChecker for T_x_stata_dta_version_14_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1334,7 +1334,7 @@ impl MimeTypeChecker for T_x_stata_dta_version_13_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1355,7 +1355,7 @@ impl MimeTypeChecker for T_x_stata_dta_version_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1376,7 +1376,7 @@ impl MimeTypeChecker for T_x_stata_dta_version_10_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1397,7 +1397,7 @@ impl MimeTypeChecker for T_x_stata_dta_version_8_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1418,7 +1418,7 @@ impl MimeTypeChecker for T_mp4_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1439,7 +1439,7 @@ impl MimeTypeChecker for T_vorbis_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1460,7 +1460,7 @@ impl MimeTypeChecker for T_x_oggflac_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1481,7 +1481,7 @@ impl MimeTypeChecker for T_x_oggpcm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1502,7 +1502,7 @@ impl MimeTypeChecker for T_opus_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1523,7 +1523,7 @@ impl MimeTypeChecker for T_speex_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1544,7 +1544,7 @@ impl MimeTypeChecker for T_x_caf_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1565,7 +1565,7 @@ impl MimeTypeChecker for T_avif_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1586,7 +1586,7 @@ impl MimeTypeChecker for T_heic_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1607,7 +1607,7 @@ impl MimeTypeChecker for T_heic_sequence_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1628,7 +1628,7 @@ impl MimeTypeChecker for T_x_canon_cr2_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1649,7 +1649,7 @@ impl MimeTypeChecker for T_x_canon_cr3_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1670,7 +1670,7 @@ impl MimeTypeChecker for T_news_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1691,7 +1691,7 @@ impl MimeTypeChecker for T_x_httpresponse_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1712,7 +1712,7 @@ impl MimeTypeChecker for T_related_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1733,7 +1733,7 @@ impl MimeTypeChecker for T_e57_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1754,7 +1754,7 @@ impl MimeTypeChecker for T_x_stl_ascii_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1775,7 +1775,7 @@ impl MimeTypeChecker for T_vnd_dwf_version_6_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1796,7 +1796,7 @@ impl MimeTypeChecker for T_vnd_dwf_version_5_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1817,7 +1817,7 @@ impl MimeTypeChecker for T_vnd_dwf_version_2_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1838,7 +1838,7 @@ impl MimeTypeChecker for T_x_php_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1859,7 +1859,7 @@ impl MimeTypeChecker for T_3gpp_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1880,7 +1880,7 @@ impl MimeTypeChecker for T_3gpp2_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1901,7 +1901,7 @@ impl MimeTypeChecker for T_daala_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1922,7 +1922,7 @@ impl MimeTypeChecker for T_theora_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1943,7 +1943,7 @@ impl MimeTypeChecker for T_x_dirac_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1964,7 +1964,7 @@ impl MimeTypeChecker for T_x_ogm_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -1985,7 +1985,7 @@ impl MimeTypeChecker for T_x_ogguvs_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2006,7 +2006,7 @@ impl MimeTypeChecker for T_x_oggyuv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2027,7 +2027,7 @@ impl MimeTypeChecker for T_x_oggrgb_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2048,7 +2048,7 @@ impl MimeTypeChecker for T_x_m4v_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2069,7 +2069,7 @@ impl MimeTypeChecker for T_x_ms_wmv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2090,7 +2090,7 @@ impl MimeTypeChecker for T_x_mach_o_universal_application {
         &[&T_x_java_jnilib_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -2111,7 +2111,7 @@ impl MimeTypeChecker for T_heif_image {
         &[&T_heic_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -2132,7 +2132,7 @@ impl MimeTypeChecker for T_heif_sequence_image {
         &[&T_heic_sequence_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -2153,7 +2153,7 @@ impl MimeTypeChecker for T_mp4_video {
         &[&T_x_m4v_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -2174,7 +2174,7 @@ impl MimeTypeChecker for T_x_robots_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2195,7 +2195,7 @@ impl MimeTypeChecker for T_x_mach_o_object_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2216,7 +2216,7 @@ impl MimeTypeChecker for T_x_mach_o_executable_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2237,7 +2237,7 @@ impl MimeTypeChecker for T_x_mach_o_fvmlib_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2258,7 +2258,7 @@ impl MimeTypeChecker for T_x_mach_o_core_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2279,7 +2279,7 @@ impl MimeTypeChecker for T_x_mach_o_preload_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2300,7 +2300,7 @@ impl MimeTypeChecker for T_x_mach_o_dylib_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2321,7 +2321,7 @@ impl MimeTypeChecker for T_x_mach_o_dylinker_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2342,7 +2342,7 @@ impl MimeTypeChecker for T_x_mach_o_bundle_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2363,7 +2363,7 @@ impl MimeTypeChecker for T_x_mach_o_dylib_stub_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2384,7 +2384,7 @@ impl MimeTypeChecker for T_x_mach_o_dsym_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2405,7 +2405,7 @@ impl MimeTypeChecker for T_x_mach_o_kext_bundle_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2426,7 +2426,7 @@ impl MimeTypeChecker for T_x_msdownload_format_pe_application {
         &[&T_x_msdownload_format_pe32_application,&T_x_msdownload_format_pe64_application,&T_x_msdownload_format_pe_itanium_application,&T_x_msdownload_format_pe_armLE_application,&T_x_msdownload_format_pe_arm7_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -2447,7 +2447,7 @@ impl MimeTypeChecker for T_applefile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2468,7 +2468,7 @@ impl MimeTypeChecker for T_x_bat_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2489,7 +2489,7 @@ impl MimeTypeChecker for T_dicom_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2510,7 +2510,7 @@ impl MimeTypeChecker for T_java_vm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2524,7 +2524,7 @@ impl MimeTypeChecker for T_vnd_java_hprof__application {
         &["*.hprof"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("JAVA PROFILE \\d\\.\\d\\.\\d\\u0000").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("JAVA PROFILE \\d\\.\\d\\.\\d\\u0000").unwrap());
         
         regex(bytes, 0, &REGEX_PATTERN_0)
     }
@@ -2532,7 +2532,7 @@ impl MimeTypeChecker for T_vnd_java_hprof__application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2546,7 +2546,7 @@ impl MimeTypeChecker for T_vnd_java_hprof_text_application {
         &["*.hprof.txt"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("JAVA PROFILE \\d\\.\\d\\.\\d,").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("JAVA PROFILE \\d\\.\\d\\.\\d,").unwrap());
         
         regex(bytes, 0, &REGEX_PATTERN_0)
     }
@@ -2554,7 +2554,7 @@ impl MimeTypeChecker for T_vnd_java_hprof_text_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2575,7 +2575,7 @@ impl MimeTypeChecker for T_mac_binhex40_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2589,12 +2589,12 @@ impl MimeTypeChecker for T_marc_application {
         &["*.mrc"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("[0-9]{5,5}").unwrap());
-        static REGEX_PATTERN_1 = LazyLock::new(|| Regex::new("[acdnp][acdefgijkmoprt][abcdims]").unwrap());
-        static REGEX_PATTERN_2 = LazyLock::new(|| Regex::new("[acdnosx]z").unwrap());
-        static REGEX_PATTERN_3 = LazyLock::new(|| Regex::new("[cdn][uvxy]").unwrap());
-        static REGEX_PATTERN_4 = LazyLock::new(|| Regex::new("[acdn]w").unwrap());
-        static REGEX_PATTERN_5 = LazyLock::new(|| Regex::new("[cdn]q").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("[0-9]{5,5}").unwrap());
+        static REGEX_PATTERN_1: LazyLock<Regex> = LazyLock::new(|| Regex::new("[acdnp][acdefgijkmoprt][abcdims]").unwrap());
+        static REGEX_PATTERN_2: LazyLock<Regex> = LazyLock::new(|| Regex::new("[acdnosx]z").unwrap());
+        static REGEX_PATTERN_3: LazyLock<Regex> = LazyLock::new(|| Regex::new("[cdn][uvxy]").unwrap());
+        static REGEX_PATTERN_4: LazyLock<Regex> = LazyLock::new(|| Regex::new("[acdn]w").unwrap());
+        static REGEX_PATTERN_5: LazyLock<Regex> = LazyLock::new(|| Regex::new("[cdn]q").unwrap());
         
         (regex(bytes, 0, &REGEX_PATTERN_0) && offset(bytes, 20, &[52, 53]) && (regex(bytes, 5, &REGEX_PATTERN_1) || regex(bytes, 5, &REGEX_PATTERN_2) || regex(bytes, 5, &REGEX_PATTERN_3) || regex(bytes, 5, &REGEX_PATTERN_4) || regex(bytes, 5, &REGEX_PATTERN_5)))
     }
@@ -2602,7 +2602,7 @@ impl MimeTypeChecker for T_marc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2623,7 +2623,7 @@ impl MimeTypeChecker for T_vnd_wolfram_wl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2644,7 +2644,7 @@ impl MimeTypeChecker for T_msword_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2665,7 +2665,7 @@ impl MimeTypeChecker for T_msword2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2686,7 +2686,7 @@ impl MimeTypeChecker for T_msword5_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2707,7 +2707,7 @@ impl MimeTypeChecker for T_octet_stream_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2728,7 +2728,7 @@ impl MimeTypeChecker for T_onenote_format_one_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2749,7 +2749,7 @@ impl MimeTypeChecker for T_onenote_format_onetoc2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2770,7 +2770,7 @@ impl MimeTypeChecker for T_pkcs7_signature_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2791,7 +2791,7 @@ impl MimeTypeChecker for T_timestamped_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2812,7 +2812,7 @@ impl MimeTypeChecker for T_rtf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2833,7 +2833,7 @@ impl MimeTypeChecker for T_sereal_version_1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2854,7 +2854,7 @@ impl MimeTypeChecker for T_sereal_version_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2875,7 +2875,7 @@ impl MimeTypeChecker for T_sereal_version_3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2896,7 +2896,7 @@ impl MimeTypeChecker for T_vnd_digilite_prolights_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2917,7 +2917,7 @@ impl MimeTypeChecker for T_vnd_fdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2938,7 +2938,7 @@ impl MimeTypeChecker for T_vnd_iccprofile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2959,7 +2959,7 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -2980,7 +2980,7 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3001,7 +3001,7 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3022,7 +3022,7 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3043,7 +3043,7 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_version_97_9_x_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3064,7 +3064,7 @@ impl MimeTypeChecker for T_vnd_lotus_wordpro_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3085,7 +3085,7 @@ impl MimeTypeChecker for T_vnd_mif_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3106,7 +3106,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3127,7 +3127,7 @@ impl MimeTypeChecker for T_vnd_ms_fontobject_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3148,7 +3148,7 @@ impl MimeTypeChecker for T_vnd_ms_htmlhelp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3169,7 +3169,7 @@ impl MimeTypeChecker for T_vnd_ms_outlook_pst_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3190,7 +3190,7 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3211,7 +3211,7 @@ impl MimeTypeChecker for T_x_project_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3232,7 +3232,7 @@ impl MimeTypeChecker for T_vnd_ms_tnef_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3253,7 +3253,7 @@ impl MimeTypeChecker for T_vnd_ms_works_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3274,7 +3274,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_chart_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3295,7 +3295,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_base_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3316,7 +3316,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_formula_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3337,7 +3337,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_text_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3358,7 +3358,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_presentation_application 
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3379,7 +3379,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_flat_spreadsheet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3400,7 +3400,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_master_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3421,7 +3421,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_pres
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3442,7 +3442,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_spreadsheetml_sheet
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3463,7 +3463,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_wordprocessingml_do
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3484,7 +3484,7 @@ impl MimeTypeChecker for T_vnd_rn_realmedia_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3505,7 +3505,7 @@ impl MimeTypeChecker for T_vnd_stardivision_calc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3526,7 +3526,7 @@ impl MimeTypeChecker for T_vnd_stardivision_draw_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3547,7 +3547,7 @@ impl MimeTypeChecker for T_vnd_stardivision_impress_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3568,7 +3568,7 @@ impl MimeTypeChecker for T_vnd_stardivision_writer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3589,7 +3589,7 @@ impl MimeTypeChecker for T_x_subrip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3610,7 +3610,7 @@ impl MimeTypeChecker for T_vnd_symbian_install_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3631,7 +3631,7 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_4_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3652,7 +3652,7 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_5_0_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3673,7 +3673,7 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_5_1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3694,7 +3694,7 @@ impl MimeTypeChecker for T_vnd_wordperfect_version_6_x_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3715,7 +3715,7 @@ impl MimeTypeChecker for T_vnd_xara_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3736,7 +3736,7 @@ impl MimeTypeChecker for T_wasm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3757,7 +3757,7 @@ impl MimeTypeChecker for T_x_atari_floppy_disk_image_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3778,7 +3778,7 @@ impl MimeTypeChecker for T_x_adobe_indesign_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3792,7 +3792,7 @@ impl MimeTypeChecker for T_vnd_isac_fcs_application {
         &["*.fcs"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("FCS[1-3]\\.[0-9]    ").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("FCS[1-3]\\.[0-9]    ").unwrap());
         
         regex(bytes, 0, &REGEX_PATTERN_0)
     }
@@ -3800,7 +3800,7 @@ impl MimeTypeChecker for T_vnd_isac_fcs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3821,7 +3821,7 @@ impl MimeTypeChecker for T_vnd_adobe_indesign_idml_package_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3842,7 +3842,7 @@ impl MimeTypeChecker for T_x_adobe_indesign_interchange_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3863,7 +3863,7 @@ impl MimeTypeChecker for T_x_arj_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3884,7 +3884,7 @@ impl MimeTypeChecker for T_x_asprs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3905,7 +3905,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_queue_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3926,7 +3926,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_log_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3947,7 +3947,7 @@ impl MimeTypeChecker for T_x_bibtex_text_file_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3968,7 +3968,7 @@ impl MimeTypeChecker for T_x_bittorrent_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -3989,7 +3989,7 @@ impl MimeTypeChecker for T_x_cdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4010,7 +4010,7 @@ impl MimeTypeChecker for T_x_gtar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4031,7 +4031,7 @@ impl MimeTypeChecker for T_x_guitar_pro_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4052,7 +4052,7 @@ impl MimeTypeChecker for T_x_amiga_disk_format_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4073,7 +4073,7 @@ impl MimeTypeChecker for T_x_chrome_package_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4094,7 +4094,7 @@ impl MimeTypeChecker for T_x_compress_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4115,7 +4115,7 @@ impl MimeTypeChecker for T_x_cpio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4136,7 +4136,7 @@ impl MimeTypeChecker for T_x_dex_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4157,7 +4157,7 @@ impl MimeTypeChecker for T_x_dvi_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4178,7 +4178,7 @@ impl MimeTypeChecker for T_x_elc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4199,7 +4199,7 @@ impl MimeTypeChecker for T_x_endnote_style_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4213,7 +4213,7 @@ impl MimeTypeChecker for T_x_fat_diskimage_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(\x01|\x02|\x04|\x08|\x10|\x20\x40|x80)").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(\x01|\x02|\x04|\x08|\x10|\x20\x40|x80)").unwrap());
         
         (offset(bytes, 0, &[235]) && offset(bytes, 2, &[144]) && regex(bytes, 14, &REGEX_PATTERN_0))
     }
@@ -4221,7 +4221,7 @@ impl MimeTypeChecker for T_x_fat_diskimage_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4242,7 +4242,7 @@ impl MimeTypeChecker for T_x_object_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4263,7 +4263,7 @@ impl MimeTypeChecker for T_x_executable_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4284,7 +4284,7 @@ impl MimeTypeChecker for T_x_sharedlib_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4305,7 +4305,7 @@ impl MimeTypeChecker for T_x_coredump_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4326,7 +4326,7 @@ impl MimeTypeChecker for T_x_mmm_digisonde_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4347,7 +4347,7 @@ impl MimeTypeChecker for T_x_erdas_hfa_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4368,7 +4368,7 @@ impl MimeTypeChecker for T_x_filemaker_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4389,7 +4389,7 @@ impl MimeTypeChecker for T_x_gnumeric_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4410,7 +4410,7 @@ impl MimeTypeChecker for T_x_grib_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4431,7 +4431,7 @@ impl MimeTypeChecker for T_zstd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4452,7 +4452,7 @@ impl MimeTypeChecker for T_x_hdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4473,7 +4473,7 @@ impl MimeTypeChecker for T_x_hwp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4494,7 +4494,7 @@ impl MimeTypeChecker for T_x_ibooks_zip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4515,7 +4515,7 @@ impl MimeTypeChecker for T_x_idl_save_file_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4536,7 +4536,7 @@ impl MimeTypeChecker for T_x_isatab_investigation_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4557,7 +4557,7 @@ impl MimeTypeChecker for T_x_isatab_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4578,7 +4578,7 @@ impl MimeTypeChecker for T_x_isatab_assay_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4599,7 +4599,7 @@ impl MimeTypeChecker for T_x_jeol_jdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4620,7 +4620,7 @@ impl MimeTypeChecker for T_x_jigdo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4641,7 +4641,7 @@ impl MimeTypeChecker for T_x_kdelnk_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4662,7 +4662,7 @@ impl MimeTypeChecker for T_x_latex_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4683,7 +4683,7 @@ impl MimeTypeChecker for T_x_lha_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4704,7 +4704,7 @@ impl MimeTypeChecker for T_x_lharc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4725,7 +4725,7 @@ impl MimeTypeChecker for T_x_lzip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4746,7 +4746,7 @@ impl MimeTypeChecker for T_x_mach_o_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4767,7 +4767,7 @@ impl MimeTypeChecker for T_x_ms_compress_szdd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4788,7 +4788,7 @@ impl MimeTypeChecker for T_x_nesrom_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4809,7 +4809,7 @@ impl MimeTypeChecker for T_x_netcdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4830,7 +4830,7 @@ impl MimeTypeChecker for T_x_parquet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4851,7 +4851,7 @@ impl MimeTypeChecker for T_x_prt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4872,7 +4872,7 @@ impl MimeTypeChecker for T_x_quattro_pro_version_1_4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4893,7 +4893,7 @@ impl MimeTypeChecker for T_x_quattro_pro_version_5_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4914,7 +4914,7 @@ impl MimeTypeChecker for T_x_quattro_pro_version_1_5_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4935,7 +4935,7 @@ impl MimeTypeChecker for T_x_quattro_pro_version_6_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4956,7 +4956,7 @@ impl MimeTypeChecker for T_x_rpm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4977,7 +4977,7 @@ impl MimeTypeChecker for T_x_spss_sav_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -4998,7 +4998,7 @@ impl MimeTypeChecker for T_x_sc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5019,7 +5019,7 @@ impl MimeTypeChecker for T_x_shockwave_flash_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5040,7 +5040,7 @@ impl MimeTypeChecker for T_x_sibelius_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5061,7 +5061,7 @@ impl MimeTypeChecker for T_x_snappy_framed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5082,7 +5082,7 @@ impl MimeTypeChecker for T_x_spectrum_tzx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5103,7 +5103,7 @@ impl MimeTypeChecker for T_x_stuffit_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5124,7 +5124,7 @@ impl MimeTypeChecker for T_x_texinfo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5145,7 +5145,7 @@ impl MimeTypeChecker for T_x_tex_virtual_font_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5159,7 +5159,7 @@ impl MimeTypeChecker for T_x_touhou_application {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("[\x72|\x33|\x36|\x35]").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("[\x72|\x33|\x36|\x35]").unwrap());
         
         (offset(bytes, 0, &[116, 49]) && regex(bytes, 3, &REGEX_PATTERN_0) && offset(bytes, 5, &[0, 0, 0, 0, 0, 0, 0]))
     }
@@ -5167,7 +5167,7 @@ impl MimeTypeChecker for T_x_touhou_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5188,7 +5188,7 @@ impl MimeTypeChecker for T_x_uc2_compressed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5209,7 +5209,7 @@ impl MimeTypeChecker for T_x_vhd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5230,7 +5230,7 @@ impl MimeTypeChecker for T_x_x509_cert_format_pem_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5251,7 +5251,7 @@ impl MimeTypeChecker for T_x_x509_cert_format_der_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5272,7 +5272,7 @@ impl MimeTypeChecker for T_x_x509_key_format_pem_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5293,7 +5293,7 @@ impl MimeTypeChecker for T_x_x509_dsa_parameters_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5314,7 +5314,7 @@ impl MimeTypeChecker for T_x_x509_ec_parameters_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5335,7 +5335,7 @@ impl MimeTypeChecker for T_x_java_keystore_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5356,7 +5356,7 @@ impl MimeTypeChecker for T_x_xz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5377,7 +5377,7 @@ impl MimeTypeChecker for T_x_zim_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5398,7 +5398,7 @@ impl MimeTypeChecker for T_x_zoo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5419,7 +5419,7 @@ impl MimeTypeChecker for T_x_7z_compressed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5440,7 +5440,7 @@ impl MimeTypeChecker for T_eac3_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5461,7 +5461,7 @@ impl MimeTypeChecker for T_amr_wb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5482,7 +5482,7 @@ impl MimeTypeChecker for T_x_psf_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5503,7 +5503,7 @@ impl MimeTypeChecker for T_x_sap_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5524,7 +5524,7 @@ impl MimeTypeChecker for T_prs_sid_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5545,7 +5545,7 @@ impl MimeTypeChecker for T_qcelp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5566,7 +5566,7 @@ impl MimeTypeChecker for T_x_flac_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5587,7 +5587,7 @@ impl MimeTypeChecker for T_x_mod_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5608,7 +5608,7 @@ impl MimeTypeChecker for T_x_mpegurl_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5629,7 +5629,7 @@ impl MimeTypeChecker for T_x_ms_wma_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5650,7 +5650,7 @@ impl MimeTypeChecker for T_x_pn_realaudio_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5671,7 +5671,7 @@ impl MimeTypeChecker for T_x_cdx_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5692,7 +5692,7 @@ impl MimeTypeChecker for T_x_3ds_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5713,7 +5713,7 @@ impl MimeTypeChecker for T_aces_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5734,7 +5734,7 @@ impl MimeTypeChecker for T_x_os2_graphics__charset_binary_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5755,7 +5755,7 @@ impl MimeTypeChecker for T_bmp_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5776,7 +5776,7 @@ impl MimeTypeChecker for T_x_bpg_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5797,7 +5797,7 @@ impl MimeTypeChecker for T_cgm_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5818,7 +5818,7 @@ impl MimeTypeChecker for T_x_dpx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5839,7 +5839,7 @@ impl MimeTypeChecker for T_emf_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5860,7 +5860,7 @@ impl MimeTypeChecker for T_fits_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5881,7 +5881,7 @@ impl MimeTypeChecker for T_gif_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5902,7 +5902,7 @@ impl MimeTypeChecker for T_icns_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5923,7 +5923,7 @@ impl MimeTypeChecker for T_jp2_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5944,7 +5944,7 @@ impl MimeTypeChecker for T_jpeg_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5965,7 +5965,7 @@ impl MimeTypeChecker for T_jpm_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -5986,7 +5986,7 @@ impl MimeTypeChecker for T_jpx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6007,7 +6007,7 @@ impl MimeTypeChecker for T_nitf_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6028,7 +6028,7 @@ impl MimeTypeChecker for T_svg_xml_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6049,7 +6049,7 @@ impl MimeTypeChecker for T_vnd_adobe_photoshop_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6070,7 +6070,7 @@ impl MimeTypeChecker for T_vnd_dgn_version_7_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6091,7 +6091,7 @@ impl MimeTypeChecker for T_vnd_djvu_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6112,7 +6112,7 @@ impl MimeTypeChecker for T_vnd_dwg_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6133,7 +6133,7 @@ impl MimeTypeChecker for T_vnd_dxb_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6154,7 +6154,7 @@ impl MimeTypeChecker for T_vnd_dxf_format_binary_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6168,8 +6168,8 @@ impl MimeTypeChecker for T_vnd_dxf_format_ascii_image {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(999\r?\n[^\r\n]{0,64}\\s+)?0\r?\nSECTION\r?\n").unwrap());
-        static REGEX_PATTERN_1 = LazyLock::new(|| Regex::new("2\r?\n(?:HEADER|ENTITIES)\r?\n").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(999\r?\n[^\r\n]{0,64}\\s+)?0\r?\nSECTION\r?\n").unwrap());
+        static REGEX_PATTERN_1: LazyLock<Regex> = LazyLock::new(|| Regex::new("2\r?\n(?:HEADER|ENTITIES)\r?\n").unwrap());
         
         (regex_range(bytes, 0, 32, &REGEX_PATTERN_0) && regex_range(bytes, 12, 60, &REGEX_PATTERN_1))
     }
@@ -6177,7 +6177,7 @@ impl MimeTypeChecker for T_vnd_dxf_format_ascii_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6198,7 +6198,7 @@ impl MimeTypeChecker for T_vnd_microsoft_icon_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6219,7 +6219,7 @@ impl MimeTypeChecker for T_vnd_ms_modi_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6240,7 +6240,7 @@ impl MimeTypeChecker for T_vnd_radiance_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6261,7 +6261,7 @@ impl MimeTypeChecker for T_vnd_zbrush_dcx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6282,7 +6282,7 @@ impl MimeTypeChecker for T_webp_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6303,7 +6303,7 @@ impl MimeTypeChecker for T_wmf_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6324,7 +6324,7 @@ impl MimeTypeChecker for T_x_freehand_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6345,7 +6345,7 @@ impl MimeTypeChecker for T_x_jbig2_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6366,7 +6366,7 @@ impl MimeTypeChecker for T_jxl_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6387,7 +6387,7 @@ impl MimeTypeChecker for T_x_niff_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6408,7 +6408,7 @@ impl MimeTypeChecker for T_x_pict_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6422,7 +6422,7 @@ impl MimeTypeChecker for T_x_portable_bitmap_image {
         &["*.pbm"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("P4").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("P4").unwrap());
         
         ((offset(bytes, 0, &[80, 49]) && (offset(bytes, 2, &[10]) || offset(bytes, 2, &[13]) || offset(bytes, 2, &[32]))) || (regex(bytes, 0, &REGEX_PATTERN_0) && (offset(bytes, 2, &[10]) || offset(bytes, 2, &[13]) || offset(bytes, 2, &[32]))))
     }
@@ -6430,7 +6430,7 @@ impl MimeTypeChecker for T_x_portable_bitmap_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6444,7 +6444,7 @@ impl MimeTypeChecker for T_x_portable_graymap_image {
         &["*.pgm"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("P5").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("P5").unwrap());
         
         ((offset(bytes, 0, &[80, 50]) && (offset(bytes, 2, &[10]) || offset(bytes, 2, &[13]) || offset(bytes, 2, &[32]))) || (regex(bytes, 0, &REGEX_PATTERN_0) && (offset(bytes, 2, &[10]) || offset(bytes, 2, &[13]) || offset(bytes, 2, &[32]))))
     }
@@ -6452,7 +6452,7 @@ impl MimeTypeChecker for T_x_portable_graymap_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6466,7 +6466,7 @@ impl MimeTypeChecker for T_x_portable_pixmap_image {
         &["*.ppm"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("P6").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("P6").unwrap());
         
         ((offset(bytes, 0, &[80, 51]) && (offset(bytes, 2, &[10]) || offset(bytes, 2, &[13]) || offset(bytes, 2, &[32]))) || (regex(bytes, 0, &REGEX_PATTERN_0) && (offset(bytes, 2, &[10]) || offset(bytes, 2, &[13]) || offset(bytes, 2, &[32]))))
     }
@@ -6474,7 +6474,7 @@ impl MimeTypeChecker for T_x_portable_pixmap_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6495,7 +6495,7 @@ impl MimeTypeChecker for T_x_portable_arbitrarymap_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6516,7 +6516,7 @@ impl MimeTypeChecker for T_x_raw_canon_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6537,7 +6537,7 @@ impl MimeTypeChecker for T_x_raw_olympus_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6558,7 +6558,7 @@ impl MimeTypeChecker for T_x_rgb_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6579,7 +6579,7 @@ impl MimeTypeChecker for T_x_xcf_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6600,7 +6600,7 @@ impl MimeTypeChecker for T_x_xpixmap_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6621,7 +6621,7 @@ impl MimeTypeChecker for T_appledouble_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6642,7 +6642,7 @@ impl MimeTypeChecker for T_calendar_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6663,7 +6663,7 @@ impl MimeTypeChecker for T_troff_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6677,9 +6677,9 @@ impl MimeTypeChecker for T_vnd_graphviz_text {
         &["*.gv"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(?s)^\\s*(?:strict\\s+)?(?:di)?graph\\b").unwrap());
-        static REGEX_PATTERN_1 = LazyLock::new(|| Regex::new("(?s)^(?:\\s*//[^\\n]*\n){1,10}\\s*(?:strict\\s+)?(?:di)?graph\\b").unwrap());
-        static REGEX_PATTERN_2 = LazyLock::new(|| Regex::new("(?s)^\\s*/\\*.{0,1024}?\\*/\\s*(?:strict\\s+)?(?:di)?graph\\b").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?s)^\\s*(?:strict\\s+)?(?:di)?graph\\b").unwrap());
+        static REGEX_PATTERN_1: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?s)^(?:\\s*//[^\\n]*\n){1,10}\\s*(?:strict\\s+)?(?:di)?graph\\b").unwrap());
+        static REGEX_PATTERN_2: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?s)^\\s*/\\*.{0,1024}?\\*/\\s*(?:strict\\s+)?(?:di)?graph\\b").unwrap());
         
         (regex(bytes, 0, &REGEX_PATTERN_0) || regex(bytes, 0, &REGEX_PATTERN_1) || regex(bytes, 0, &REGEX_PATTERN_2))
     }
@@ -6687,7 +6687,7 @@ impl MimeTypeChecker for T_vnd_graphviz_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6708,7 +6708,7 @@ impl MimeTypeChecker for T_vnd_iptc_anpa_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6729,7 +6729,7 @@ impl MimeTypeChecker for T_x_awk_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6750,7 +6750,7 @@ impl MimeTypeChecker for T_x_diff_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6771,7 +6771,7 @@ impl MimeTypeChecker for T_x_jsp_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6792,7 +6792,7 @@ impl MimeTypeChecker for T_x_lua_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6806,11 +6806,11 @@ impl MimeTypeChecker for T_x_matlab_text {
         &[]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("function [a-zA-Z][A-Za-z0-9_]{0,62}\\s*=").unwrap());
-        static REGEX_PATTERN_1 = LazyLock::new(|| Regex::new("function [a-zA-Z][A-Za-z0-9_]{0,62}[\\r\\n]").unwrap());
-        static REGEX_PATTERN_2 = LazyLock::new(|| Regex::new("^%[ -~]+\n%").unwrap());
-        static REGEX_PATTERN_3 = LazyLock::new(|| Regex::new("^%[ -~]+\r%").unwrap());
-        static REGEX_PATTERN_4 = LazyLock::new(|| Regex::new("^%%[ -~]+$").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("function [a-zA-Z][A-Za-z0-9_]{0,62}\\s*=").unwrap());
+        static REGEX_PATTERN_1: LazyLock<Regex> = LazyLock::new(|| Regex::new("function [a-zA-Z][A-Za-z0-9_]{0,62}[\\r\\n]").unwrap());
+        static REGEX_PATTERN_2: LazyLock<Regex> = LazyLock::new(|| Regex::new("^%[ -~]+\n%").unwrap());
+        static REGEX_PATTERN_3: LazyLock<Regex> = LazyLock::new(|| Regex::new("^%[ -~]+\r%").unwrap());
+        static REGEX_PATTERN_4: LazyLock<Regex> = LazyLock::new(|| Regex::new("^%%[ -~]+$").unwrap());
         
         (offset(bytes, 0, &[102, 117, 110, 99, 116, 105, 111, 110, 32, 91]) || regex(bytes, 0, &REGEX_PATTERN_0) || regex(bytes, 0, &REGEX_PATTERN_1) || regex_range(bytes, 0, 120, &REGEX_PATTERN_2) || regex_range(bytes, 0, 120, &REGEX_PATTERN_3) || regex_range(bytes, 0, 120, &REGEX_PATTERN_4) || offset(bytes, 0, &[37, 123, 10]))
     }
@@ -6818,7 +6818,7 @@ impl MimeTypeChecker for T_x_matlab_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6839,7 +6839,7 @@ impl MimeTypeChecker for T_x_matlab_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6860,7 +6860,7 @@ impl MimeTypeChecker for T_x_perl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6881,7 +6881,7 @@ impl MimeTypeChecker for T_x_python_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6902,7 +6902,7 @@ impl MimeTypeChecker for T_x_tcl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6916,7 +6916,7 @@ impl MimeTypeChecker for T_x_uuencode_text {
         &["*.uu","*.uue"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("^begin [0-9]{3} ").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("^begin [0-9]{3} ").unwrap());
         
         regex(bytes, 0, &REGEX_PATTERN_0)
     }
@@ -6924,7 +6924,7 @@ impl MimeTypeChecker for T_x_uuencode_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6945,7 +6945,7 @@ impl MimeTypeChecker for T_x_vcalendar_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6966,7 +6966,7 @@ impl MimeTypeChecker for T_x_vcard_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -6987,7 +6987,7 @@ impl MimeTypeChecker for T_mj2_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7008,7 +7008,7 @@ impl MimeTypeChecker for T_mpeg_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7029,7 +7029,7 @@ impl MimeTypeChecker for T_x_flv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7050,7 +7050,7 @@ impl MimeTypeChecker for T_x_jng_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7071,7 +7071,7 @@ impl MimeTypeChecker for T_x_mng_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7092,7 +7092,7 @@ impl MimeTypeChecker for T_x_msvideo_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7113,7 +7113,7 @@ impl MimeTypeChecker for T_x_sgi_movie_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7134,7 +7134,7 @@ impl MimeTypeChecker for T_x_matroska_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7155,7 +7155,7 @@ impl MimeTypeChecker for T_webm_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7176,7 +7176,7 @@ impl MimeTypeChecker for T_x_ole_storage_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7197,7 +7197,7 @@ impl MimeTypeChecker for T_webm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7218,7 +7218,7 @@ impl MimeTypeChecker for T_woff_font {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7239,7 +7239,7 @@ impl MimeTypeChecker for T_woff2_font {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7260,7 +7260,7 @@ impl MimeTypeChecker for T_x_xar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7281,7 +7281,7 @@ impl MimeTypeChecker for T_lzip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7302,7 +7302,7 @@ impl MimeTypeChecker for T_x_installshield_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7323,7 +7323,7 @@ impl MimeTypeChecker for T_x_chrome_extension_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7344,7 +7344,7 @@ impl MimeTypeChecker for T_ape_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7365,7 +7365,7 @@ impl MimeTypeChecker for T_musepack_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7386,7 +7386,7 @@ impl MimeTypeChecker for T_x_unknown_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7407,7 +7407,7 @@ impl MimeTypeChecker for T_x_ms_shortcut_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7428,7 +7428,7 @@ impl MimeTypeChecker for T_gltf_binary_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7449,7 +7449,7 @@ impl MimeTypeChecker for T_tzif_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7470,7 +7470,7 @@ impl MimeTypeChecker for T_collection_font {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7491,7 +7491,7 @@ impl MimeTypeChecker for T_vnd_dvb_file_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7512,7 +7512,7 @@ impl MimeTypeChecker for T_vnd_mozilla_apng_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7533,7 +7533,7 @@ impl MimeTypeChecker for T_bpg_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7554,7 +7554,7 @@ impl MimeTypeChecker for T_jxs_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7575,7 +7575,7 @@ impl MimeTypeChecker for T_jxr_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7596,7 +7596,7 @@ impl MimeTypeChecker for T_x_ms_reader_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -7617,7 +7617,7 @@ impl MimeTypeChecker for T_epub_zip_application {
         &[&T_x_ibooks_zip_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7638,7 +7638,7 @@ impl MimeTypeChecker for T_fits_application {
         &[&T_fits_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7659,7 +7659,7 @@ impl MimeTypeChecker for T_javascript_text {
         &[&T_json_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7680,7 +7680,7 @@ impl MimeTypeChecker for T_mathematica_application {
         &[&T_vnd_wolfram_wl_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7701,7 +7701,7 @@ impl MimeTypeChecker for T_postscript_application {
         &[&T_illustrator_ps_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7722,7 +7722,7 @@ impl MimeTypeChecker for T_vnd_ms_cab_compressed_application {
         &[&T_onenote__format_package_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7743,7 +7743,7 @@ impl MimeTypeChecker for T_x_archive_application {
         &[&T_x_debian_package_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7764,7 +7764,7 @@ impl MimeTypeChecker for T_x_iso9660_image_application {
         &[&T_x_roxio_toast_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7785,7 +7785,7 @@ impl MimeTypeChecker for T_x_tex_application {
         &[&T_x_latex_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7806,7 +7806,7 @@ impl MimeTypeChecker for T_ac3_audio {
         &[&T_eac3_audio]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7827,7 +7827,7 @@ impl MimeTypeChecker for T_png_image {
         &[&T_vnd_mozilla_apng_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7848,7 +7848,7 @@ impl MimeTypeChecker for T_tiff_image {
         &[&T_x_canon_cr2_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7869,7 +7869,7 @@ impl MimeTypeChecker for T_x_xbitmap_image {
         &[&T_x_xpixmap_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7883,7 +7883,7 @@ impl MimeTypeChecker for T_rfc822_message {
         &["*.eml","*.mime"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(X|DKIM|ARC)-").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(X|DKIM|ARC)-").unwrap());
         
         (offset_case_insensitive(bytes, 0, &[82, 101, 108, 97, 121, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset(bytes, 0, &[35, 33, 32, 114, 110, 101, 119, 115]) || offset(bytes, 0, &[78, 35, 33, 32, 114, 110, 101, 119, 115]) || offset(bytes, 0, &[70, 111, 114, 119, 97, 114, 100, 32, 116, 111]) || offset(bytes, 0, &[80, 105, 112, 101, 32, 116, 111]) || offset_case_insensitive(bytes, 0, &[82, 101, 116, 117, 114, 110, 45, 80, 97, 116, 104, 58]) || offset_case_insensitive(bytes, 0, &[77, 101, 115, 115, 97, 103, 101, 45, 73, 68, 58]) || offset(bytes, 0, &[88, 45, 77, 97, 105, 108, 101, 114, 58]) || (offset(bytes, 0, &[88, 45, 78, 111, 116, 101, 115, 45, 73, 116, 101, 109, 58]) && offset_range(bytes, 0, 8192, &[77, 101, 115, 115, 97, 103, 101, 45, 73, 68, 58])) || (regex(bytes, 0, &REGEX_PATTERN_0) && (offset_range_case_insensitive(bytes, 0, 8192, &[10, 68, 97, 116, 101, 58]) || offset_range(bytes, 0, 8192, &[10, 68, 101, 108, 105, 118, 101, 114, 101, 100, 45, 84, 111, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 70, 114, 111, 109, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 77, 101, 115, 115, 97, 103, 101, 45, 73, 68, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 77, 73, 77, 69, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 82, 101, 99, 101, 105, 118, 101, 100, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 82, 101, 108, 97, 121, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 82, 101, 116, 117, 114, 110, 45, 80, 97, 116, 104, 58]) || offset_range(bytes, 0, 8192, &[10, 83, 116, 97, 116, 117, 115, 58]) || offset_range(bytes, 0, 8192, &[10, 85, 115, 101, 114, 45, 65, 103, 101, 110, 116, 58]) || offset_range(bytes, 0, 8192, &[10, 88, 45, 77, 97, 105, 108, 101, 114, 58]) || offset_range_case_insensitive(bytes, 0, 8192, &[10, 88, 45, 79, 114, 105, 103, 105, 110, 97, 116, 105, 110, 103, 45, 73, 80, 58]))) || (false && ((false && (offset_case_insensitive(bytes, 0, &[67, 111, 110, 116, 101, 110, 116, 45, 73, 68, 58]) || offset_case_insensitive(bytes, 0, &[67, 111, 110, 116, 101, 110, 116, 45, 76, 111, 99, 97, 116, 105, 111, 110, 58]) || offset_case_insensitive(bytes, 0, &[67, 111, 110, 116, 101, 110, 116, 45, 84, 114, 97, 110, 115, 102, 101, 114, 45, 69, 110, 99, 111, 100, 105, 110, 103, 58]) || offset_case_insensitive(bytes, 0, &[67, 111, 110, 116, 101, 110, 116, 45, 84, 121, 112, 101, 58]) || offset_case_insensitive(bytes, 0, &[68, 97, 116, 101, 58]) || offset(bytes, 0, &[68, 101, 108, 105, 118, 101, 114, 101, 100, 45, 84, 111, 58]) || offset_case_insensitive(bytes, 0, &[70, 114, 111, 109, 58]) || offset_case_insensitive(bytes, 0, &[77, 101, 115, 115, 97, 103, 101, 45, 73, 68, 58]) || offset_case_insensitive(bytes, 0, &[77, 73, 77, 69, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_case_insensitive(bytes, 0, &[82, 101, 99, 101, 105, 118, 101, 100, 58]) || offset_case_insensitive(bytes, 0, &[82, 101, 108, 97, 121, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_case_insensitive(bytes, 0, &[82, 101, 116, 117, 114, 110, 45, 80, 97, 116, 104, 58]) || offset(bytes, 0, &[83, 101, 110, 116, 58]) || offset(bytes, 0, &[83, 116, 97, 116, 117, 115, 58]) || offset(bytes, 0, &[83, 117, 98, 106, 101, 99, 116, 58]) || offset(bytes, 0, &[84, 111, 58]) || offset(bytes, 0, &[85, 115, 101, 114, 45, 65, 103, 101, 110, 116, 58]) || offset(bytes, 0, &[88, 45, 77, 97, 105, 108, 101, 114, 58]) || offset_case_insensitive(bytes, 0, &[88, 45, 79, 114, 105, 103, 105, 110, 97, 116, 105, 110, 103, 45, 73, 80, 58]) || (offset(bytes, 0, &[239, 187, 191]) && (offset_case_insensitive(bytes, 3, &[67, 111, 110, 116, 101, 110, 116, 45, 73, 68, 58]) || offset_case_insensitive(bytes, 3, &[67, 111, 110, 116, 101, 110, 116, 45, 76, 111, 99, 97, 116, 105, 111, 110, 58]) || offset_case_insensitive(bytes, 3, &[67, 111, 110, 116, 101, 110, 116, 45, 84, 114, 97, 110, 115, 102, 101, 114, 45, 69, 110, 99, 111, 100, 105, 110, 103, 58]) || offset_case_insensitive(bytes, 3, &[67, 111, 110, 116, 101, 110, 116, 45, 84, 121, 112, 101, 58]) || offset_case_insensitive(bytes, 3, &[68, 97, 116, 101, 58]) || offset(bytes, 3, &[68, 101, 108, 105, 118, 101, 114, 101, 100, 45, 84, 111, 58]) || offset_case_insensitive(bytes, 3, &[70, 114, 111, 109, 58]) || offset_case_insensitive(bytes, 3, &[77, 101, 115, 115, 97, 103, 101, 45, 73, 68, 58]) || offset_case_insensitive(bytes, 3, &[77, 73, 77, 69, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_case_insensitive(bytes, 3, &[82, 101, 99, 101, 105, 118, 101, 100, 58]) || offset_case_insensitive(bytes, 3, &[82, 101, 108, 97, 121, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_case_insensitive(bytes, 3, &[82, 101, 116, 117, 114, 110, 45, 80, 97, 116, 104, 58]) || offset(bytes, 3, &[83, 101, 110, 116, 58]) || offset(bytes, 3, &[83, 116, 97, 116, 117, 115, 58]) || offset(bytes, 3, &[83, 117, 98, 106, 101, 99, 116, 58]) || offset(bytes, 3, &[84, 111, 58]) || offset(bytes, 3, &[85, 115, 101, 114, 45, 65, 103, 101, 110, 116, 58]) || offset(bytes, 3, &[88, 45, 77, 97, 105, 108, 101, 114, 58]) || offset_case_insensitive(bytes, 3, &[88, 45, 79, 114, 105, 103, 105, 110, 97, 116, 105, 110, 103, 45, 73, 80, 58]))))) || (false && (offset_range_case_insensitive(bytes, 0, 1024, &[10, 67, 111, 110, 116, 101, 110, 116, 45, 73, 68, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 67, 111, 110, 116, 101, 110, 116, 45, 76, 111, 99, 97, 116, 105, 111, 110, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 67, 111, 110, 116, 101, 110, 116, 45, 84, 114, 97, 110, 115, 102, 101, 114, 45, 69, 110, 99, 111, 100, 105, 110, 103, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 67, 111, 110, 116, 101, 110, 116, 45, 84, 121, 112, 101, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 68, 97, 116, 101, 58]) || offset_range(bytes, 0, 1024, &[10, 68, 101, 108, 105, 118, 101, 114, 101, 100, 45, 84, 111, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 70, 114, 111, 109, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 77, 73, 77, 69, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 82, 101, 99, 101, 105, 118, 101, 100, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 82, 101, 108, 97, 121, 45, 86, 101, 114, 115, 105, 111, 110, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 82, 101, 116, 117, 114, 110, 45, 80, 97, 116, 104, 58]) || offset_range(bytes, 0, 1024, &[10, 83, 101, 110, 116, 58]) || offset_range(bytes, 0, 1024, &[10, 83, 116, 97, 116, 117, 115, 58]) || offset_range(bytes, 0, 1024, &[10, 83, 117, 98, 106, 101, 99, 116, 58]) || offset_range(bytes, 0, 1024, &[10, 84, 111, 58]) || offset_range(bytes, 0, 1024, &[10, 85, 115, 101, 114, 45, 65, 103, 101, 110, 116, 58]) || offset_range(bytes, 0, 1024, &[10, 88, 45, 77, 97, 105, 108, 101, 114, 58]) || offset_range_case_insensitive(bytes, 0, 1024, &[10, 88, 45, 79, 114, 105, 103, 105, 110, 97, 116, 105, 110, 103, 45, 73, 80, 58]) || offset_range(bytes, 0, 1024, &[10, 68, 75, 73, 77, 45]) || offset_range(bytes, 0, 1024, &[10, 65, 82, 67, 45]))))) || offset_range_case_insensitive(bytes, 0, 1000, &[10, 77, 101, 115, 115, 97, 103, 101, 45, 73, 68, 58]))
     }
@@ -7891,7 +7891,7 @@ impl MimeTypeChecker for T_rfc822_message {
         &[&T_related_multipart]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7912,7 +7912,7 @@ impl MimeTypeChecker for T_vnd_dwf_model {
         &[&T_vnd_dwf_version_6_model]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7933,7 +7933,7 @@ impl MimeTypeChecker for T_x_msdownload_application {
         &[&T_x_dosexec_application,&T_x_msdownload_format_pe_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7954,7 +7954,7 @@ impl MimeTypeChecker for T_x_rar_compressed_application {
         &[&T_x_rar_compressed_version_4_application,&T_x_rar_compressed_version_5_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7975,7 +7975,7 @@ impl MimeTypeChecker for T_ogg_application {
         &[&T_kate_application,&T_ogg_audio,&T_ogg_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -7996,7 +7996,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_btree_application {
         &[&T_x_berkeley_db_format_btree_version_2_application,&T_x_berkeley_db_format_btree_version_3_application,&T_x_berkeley_db_format_btree_version_4_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8017,7 +8017,7 @@ impl MimeTypeChecker for T_x_sh_application {
         &[&T_javascript_text,&T_x_lua_text,&T_x_tcl_text]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8038,7 +8038,7 @@ impl MimeTypeChecker for T_vnd_wordperfect_application {
         &[&T_vnd_wordperfect_version_4_2_application,&T_vnd_wordperfect_version_5_0_application,&T_vnd_wordperfect_version_5_1_application,&T_vnd_wordperfect_version_6_x_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8059,7 +8059,7 @@ impl MimeTypeChecker for T_x_berkeley_db_format_hash_application {
         &[&T_x_berkeley_db_format_hash_version_2_application,&T_x_berkeley_db_format_hash_version_3_application,&T_x_berkeley_db_format_hash_version_4_application,&T_x_berkeley_db_format_hash_version_5_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8080,7 +8080,7 @@ impl MimeTypeChecker for T_x_elf_application {
         &[&T_x_object_application,&T_x_executable_application,&T_x_sharedlib_application,&T_x_coredump_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8101,7 +8101,7 @@ impl MimeTypeChecker for T_x_jp2_container_image {
         &[&T_jp2_image,&T_jpm_image,&T_jpx_image,&T_mj2_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8122,7 +8122,7 @@ impl MimeTypeChecker for T_x_stata_dta_application {
         &[&T_x_stata_dta_version_14_application,&T_x_stata_dta_version_13_application,&T_x_stata_dta_version_12_application,&T_x_stata_dta_version_10_application,&T_x_stata_dta_version_8_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8143,7 +8143,7 @@ impl MimeTypeChecker for T_quicktime_video {
         &[&T_mp4_audio,&T_heif_image,&T_heif_sequence_image,&T_x_canon_cr3_image,&T_iso_segment_video,&T_mp4_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8164,7 +8164,7 @@ impl MimeTypeChecker for T_ogg_video {
         &[&T_daala_video,&T_theora_video,&T_x_dirac_video,&T_x_ogm_video,&T_x_ogguvs_video,&T_x_oggyuv_video,&T_x_oggrgb_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8185,7 +8185,7 @@ impl MimeTypeChecker for T_x_sqlite3_application {
         &[&T_x_geopackage_application,&T_x_geopackage__version_1_1Or1_0_application,&T_x_fossil_checkout_application,&T_x_fossil_global_conf_application,&T_x_fossil_repository_application,&T_x_bentley_besqlite_application,&T_x_bentley_localization_application,&T_x_monotone_source_repo_application,&T_x_esri_spatially_enabled_db_application,&T_x_mbtiles_application,&T_x_texnicard_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8206,7 +8206,7 @@ impl MimeTypeChecker for T_x_tika_ooxml_application {
         &[&T_vnd_ms_excel_addin_macroenabled_12_application,&T_vnd_ms_excel_sheet_macroenabled_12_application,&T_vnd_ms_excel_sheet_binary_macroenabled_12_application,&T_vnd_ms_powerpoint_addin_macroenabled_12_application,&T_vnd_ms_powerpoint_presentation_macroenabled_12_application,&T_vnd_ms_powerpoint_slide_macroenabled_12_application,&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application,&T_vnd_ms_powerpoint_template_macroenabled_12_application,&T_vnd_ms_word_document_macroenabled_12_application,&T_vnd_ms_word_template_macroenabled_12_application,&T_vnd_ms_xpsdocument_application,&T_vnd_openxmlformats_officedocument_presentationml_presentation_application,&T_vnd_openxmlformats_officedocument_presentationml_slide_application,&T_vnd_openxmlformats_officedocument_presentationml_template_application,&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application,&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application,&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application,&T_vnd_ms_excel_template_macroenabled_12_application,&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application,&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application,&T_x_tika_visio_ooxml_application,&T_vnd_dwfx_xps_model]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8227,7 +8227,7 @@ impl MimeTypeChecker for T_zip_application {
         &[&T_bizagi_modeler_application,&T_epub_zip_application,&T_java_archive_application,&T_vnd_apple_unknown_13_application,&T_vnd_apple_iwork_application,&T_x_vnd_datapackage_zip_application,&T_vnd_etsi_asic_e_zip_application,&T_vnd_etsi_asic_s_zip_application,&T_vnd_google_earth_kmz_application,&T_vnd_mindjet_mindmanager_application,&T_vnd_oasis_opendocument_chart_application,&T_vnd_oasis_opendocument_chart_template_application,&T_vnd_oasis_opendocument_base_application,&T_vnd_oasis_opendocument_formula_application,&T_vnd_oasis_opendocument_formula_template_application,&T_vnd_oasis_opendocument_graphics_application,&T_vnd_oasis_opendocument_image_application,&T_vnd_oasis_opendocument_presentation_application,&T_vnd_oasis_opendocument_spreadsheet_application,&T_vnd_oasis_opendocument_text_application,&T_vnd_openofficeorg_extension_application,&T_vnd_openofficeorg_autotext_application,&T_vnd_sun_xml_calc_application,&T_vnd_sun_xml_draw_application,&T_vnd_sun_xml_impress_application,&T_vnd_adobe_indesign_idml_package_application,&T_hwp_zip_application,&T_x_itunes_ipa_application,&T_x_tika_ooxml_application,&T_x_xmind_application,&T_x_xliff_zip_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8248,7 +8248,7 @@ impl MimeTypeChecker for T_xml_application {
         &[&T_iso19139_xml_text,&T_atom_xml_application,&T_dash_xml_application,&T_dita_xml_application,&T_vnd_ms_spreadsheetml_application,&T_vnd_ms_wordml_application,&T_vnd_ms_word2006ml_application,&T_rdf_xml_application,&T_rss_xml_application,&T_smil_xml_application,&T_vnd_adobe_xdp_xml_application,&T_vnd_adobe_xfdf_application,&T_vnd_google_earth_kml_xml_application,&T_vnd_iptc_g2_newsmessage_xml_application,&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application,&T_vnd_oasis_opendocument_tika_flat_document_application,&T_x_tmx_application,&T_ttml_xml_application,&T_x_amf_application,&T_x_adobe_indesign_interchange_application,&T_x_plist_application,&T_x_internet_archive_application,&T_svg_xml_image,&T_svg_xml_image,&T_vnd_adobe_premiere_image,&T_dif_xml_application,&T_onix_message_xml_application,&T_onix_message_short_xml_application,&T_x_ms_asx_application,&T_x_fictionbook_xml_application,&T_x_xliff_xml_application,&T_owl_xml_application,&T_vnd_collada_xml_model,&T_gml_xml_application,&T_gpx_xml_application,&T_vnd_garmin_tcx_xml_application,&T_x3d_xml_model]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8262,8 +8262,8 @@ impl MimeTypeChecker for T_html_text {
         &["*.html","*.htm"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(?i)<(html|head|body|title|div)[ >]").unwrap());
-        static REGEX_PATTERN_1 = LazyLock::new(|| Regex::new("(?i)<h[123][ >]").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?i)<(html|head|body|title|div)[ >]").unwrap());
+        static REGEX_PATTERN_1: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?i)<h[123][ >]").unwrap());
         
         (rootxml_local(bytes, "html") || rootxml_local(bytes, "HTML") || rootxml_local(bytes, "link") || rootxml_local(bytes, "LINK") || rootxml_local(bytes, "body") || rootxml_local(bytes, "BODY") || rootxml_local(bytes, "p") || rootxml_local(bytes, "P") || rootxml_local(bytes, "script") || rootxml_local(bytes, "SCRIPT") || rootxml_local(bytes, "frameset") || rootxml_local(bytes, "FRAMESET") || rootxml_local(bytes, "iframe") || rootxml_local(bytes, "IFRAME") || regex(bytes, 0, &REGEX_PATTERN_0) || regex(bytes, 0, &REGEX_PATTERN_1) || offset_range(bytes, 0, 64, &[60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 72, 84, 77, 76]) || offset_range(bytes, 0, 64, &[60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 104, 116, 109, 108]) || offset_range(bytes, 0, 64, &[60, 33, 100, 111, 99, 116, 121, 112, 101, 32, 72, 84, 77, 76]) || offset_range(bytes, 0, 64, &[60, 33, 100, 111, 99, 116, 121, 112, 101, 32, 104, 116, 109, 108]) || offset_range(bytes, 0, 64, &[60, 72, 69, 65, 68]) || offset_range(bytes, 0, 64, &[60, 104, 101, 97, 100]) || offset_range(bytes, 0, 64, &[60, 84, 73, 84, 76, 69]) || offset_range(bytes, 0, 64, &[60, 116, 105, 116, 108, 101]) || offset_range(bytes, 0, 64, &[60, 72, 84, 77, 76]) || offset_range(bytes, 0, 128, &[60, 104, 116, 109, 108]) || offset_range(bytes, 128, 8192, &[60, 104, 116, 109, 108]))
     }
@@ -8271,7 +8271,7 @@ impl MimeTypeChecker for T_html_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8292,7 +8292,7 @@ impl MimeTypeChecker for T_zlib_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8313,7 +8313,7 @@ impl MimeTypeChecker for T_gzip_application {
         &[&T_x_vnd_datapackage_gz_application,&T_x_ms_wmz_application,&T_x_emf_compressed_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8334,7 +8334,7 @@ impl MimeTypeChecker for T_x_dbf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8348,7 +8348,7 @@ impl MimeTypeChecker for T_x_bzip2_application {
         &["*.bz2","*.tbz2","*.boz"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("BZh[1-9]").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("BZh[1-9]").unwrap());
         
         regex(bytes, 0, &REGEX_PATTERN_0)
     }
@@ -8356,7 +8356,7 @@ impl MimeTypeChecker for T_x_bzip2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8377,7 +8377,7 @@ impl MimeTypeChecker for T_x_font_otf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8398,7 +8398,7 @@ impl MimeTypeChecker for T_x_font_ttf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8419,7 +8419,7 @@ impl MimeTypeChecker for T_x_font_adobe_metric_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8440,7 +8440,7 @@ impl MimeTypeChecker for T_x_font_printer_metric_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8461,7 +8461,7 @@ impl MimeTypeChecker for T_x_mysql_table_definition_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8482,7 +8482,7 @@ impl MimeTypeChecker for T_x_mysql_misam_index_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8503,7 +8503,7 @@ impl MimeTypeChecker for T_x_mysql_misam_compressed_index_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8524,7 +8524,7 @@ impl MimeTypeChecker for T_x_sas_data_v6_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8545,7 +8545,7 @@ impl MimeTypeChecker for T_x_sas_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8566,7 +8566,7 @@ impl MimeTypeChecker for T_x_sas_xport_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8587,7 +8587,7 @@ impl MimeTypeChecker for T_x_x509_key_format_der_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8608,7 +8608,7 @@ impl MimeTypeChecker for T_xhtml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8622,7 +8622,7 @@ impl MimeTypeChecker for T_x_aac_audio {
         &["*.aac"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("\\xFF(\\xF0|\\xF1|\\xF8|\\xF9)(\\x40|\\x41|\\x44|\\x45|\\x48|\\x49|\\x4C|\\x4D|\\x50|\\x51|\\x54|\\x55|\\x58|\\x59|\\x5C|\\x5D|\\x60|\\x61|\\x64|\\x65|\\x68|\\x69|\\x6C|\\x6D|\\x70|\\x71|\\x80|\\x81|\\x84|\\x85|\\x88|\\x89|\\x8C|\\x8D|\\x90|\\x91|\\x94|\\x95|\\x98|\\x99|\\x9C|\\x9D|\\xA0|\\xA1|\\xA4|\\xA5|\\xA8|\\xA9|\\xAC|\\xAD|\\xB0|\\xB1)(\\x00|\\x01|\\x20|\\x40|\\x41|\\x60|\\x80|\\x81|\\x60|\\xA0|\\xC0|\\xC1|\\xE0)").unwrap());
         
         (offset(bytes, 0, &[255, 249]) || offset(bytes, 0, &[255, 241]) || regex(bytes, 0, &REGEX_PATTERN_0) || (offset(bytes, 0, &[73, 68, 51]) && regex_range(bytes, 256, 2048, &REGEX_PATTERN_0)))
     }
@@ -8630,7 +8630,7 @@ impl MimeTypeChecker for T_x_aac_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8651,7 +8651,7 @@ impl MimeTypeChecker for T_vnd_zbrush_pcx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8672,7 +8672,7 @@ impl MimeTypeChecker for T_vtt_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8693,7 +8693,7 @@ impl MimeTypeChecker for T_x_bzip_application {
         &[&T_x_bzip2_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8714,7 +8714,7 @@ impl MimeTypeChecker for T_x_tar_application {
         &[&T_x_gtar_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8735,7 +8735,7 @@ impl MimeTypeChecker for T_amr_audio {
         &[&T_amr_wb_audio,&T_amr_wb__audio]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8756,7 +8756,7 @@ impl MimeTypeChecker for T_x_matroska_application {
         &[&T_x_matroska_video,&T_x_matroska_audio,&T_webm_video,&T_webm_audio]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8777,7 +8777,7 @@ impl MimeTypeChecker for T_x_tika_msoffice_application {
         &[&T_msword_application,&T_sldworks_application,&T_vnd_ms_excel_application,&T_vnd_ms_outlook_application,&T_vnd_ms_powerpoint_application,&T_vnd_ms_project_application,&T_vnd_ms_works_application,&T_vnd_visio_application,&T_x_corelpresentations_application,&T_x_esri_layer_application,&T_x_hwp_v5_application,&T_x_ms_installer_application,&T_x_mspublisher_application,&T_x_quattro_pro_application,&T_x_tika_msoffice_embedded_application,&T_x_tika_ooxml_protected_application,&T_x_tika_staroffice_application,&T_vnd_dgn_version_8_image,&T_x_ole_storage_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8798,7 +8798,7 @@ impl MimeTypeChecker for T_inf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8819,7 +8819,7 @@ impl MimeTypeChecker for T_x_chdr_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8840,7 +8840,7 @@ impl MimeTypeChecker for T_x_gimp_pat_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8861,7 +8861,7 @@ impl MimeTypeChecker for T_x_gimp_gbr_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8882,7 +8882,7 @@ impl MimeTypeChecker for T_x_c_text {
         &[&T_x_xbitmap_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -8903,7 +8903,7 @@ impl MimeTypeChecker for T_x_jp2_codestream_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8924,7 +8924,7 @@ impl MimeTypeChecker for T_vnd_msa_disk_image_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8945,7 +8945,7 @@ impl MimeTypeChecker for T_basic_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8966,7 +8966,7 @@ impl MimeTypeChecker for T_midi_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -8987,7 +8987,7 @@ impl MimeTypeChecker for T_x_adpcm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9008,7 +9008,7 @@ impl MimeTypeChecker for T_x_aiff_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9029,7 +9029,7 @@ impl MimeTypeChecker for T_x_dec_basic_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9050,7 +9050,7 @@ impl MimeTypeChecker for T_x_dec_adpcm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9071,7 +9071,7 @@ impl MimeTypeChecker for T_vnd_wave_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9092,7 +9092,7 @@ impl MimeTypeChecker for T_x_makefile_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9106,7 +9106,7 @@ impl MimeTypeChecker for T_mpeg_audio {
         &["*.mpga","*.mp2","*.mp2a","*.mp3","*.m2a","*.m3a"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("(?:\\x0D\\x0A|\\x00{1,1024})(?:\\xff[\\xe3\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff]|ID3)").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("(?:\\x0D\\x0A|\\x00{1,1024})(?:\\xff[\\xe3\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff]|ID3)").unwrap());
         
         (offset(bytes, 0, &[255, 242]) || offset(bytes, 0, &[255, 243]) || offset(bytes, 0, &[255, 244]) || offset(bytes, 0, &[255, 245]) || offset(bytes, 0, &[255, 246]) || offset(bytes, 0, &[255, 247]) || offset(bytes, 0, &[255, 250]) || offset(bytes, 0, &[255, 251]) || offset(bytes, 0, &[255, 252]) || offset(bytes, 0, &[255, 253]) || offset(bytes, 0, &[255, 227]) || offset(bytes, 0, &[255, 255]) || offset(bytes, 0, &[73, 68, 51]) || regex(bytes, 0, &REGEX_PATTERN_0))
     }
@@ -9114,7 +9114,7 @@ impl MimeTypeChecker for T_mpeg_audio {
         &[&T_x_aac_audio]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -9128,7 +9128,7 @@ impl MimeTypeChecker for T_plain_text {
         &["*.txt","*.text","*.def","*.list","*.in","INSTALL","KEYS","LICENSE","NOTICE","README","abs-linkmap","abs-menulinks","*.aart","*.ac","*.am","*.apt","*.bsh","*.classpath","*.cnd","*.cwiki","*.data","*.dcl","*.dsp","*.dsw","*.egrm","*.ent","*.ft","*.fn","*.fv","*.grm","*.g",".htaccess","*.handlers","*.htc","*.ihtml","*.jmx","*.junit","*.jx","*.manifest","*.m4","*.mf","*.MF","*.meta","*.mdo","*.n3","*.pen","*.pod","*.pom","*.project","*.rng","*.rnx","*.roles","*.schemas","*.tld","*.types","*.vm","*.vsl","*.wsdd","*.xargs","*.xcat","*.xegrm","*.xgrm","*.xlex","*.xlog","*.xmap","*.xroles","*.xsamples","*.xsp","*.xtest","*.xweb","*.xwelcome"]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        static REGEX_PATTERN_0 = LazyLock::new(|| Regex::new("^[ -~]{6}[ -~]+").unwrap());
+        static REGEX_PATTERN_0: LazyLock<Regex> = LazyLock::new(|| Regex::new("^[ -~]{6}[ -~]+").unwrap());
         
         (offset(bytes, 0, &[84, 104, 105, 115, 32, 105, 115, 32, 84, 101, 88, 44]) || offset(bytes, 0, &[84, 104, 105, 115, 32, 105, 115, 32, 77, 69, 84, 65, 70, 79, 78, 84, 44]) || offset(bytes, 0, &[47, 42]) || offset(bytes, 0, &[47, 47]) || offset(bytes, 0, &[59, 59]) || offset(bytes, 0, &[254, 255]) || offset(bytes, 0, &[255, 254]) || offset(bytes, 0, &[239, 187, 191]) || regex(bytes, 0, &REGEX_PATTERN_0))
     }
@@ -9136,7 +9136,7 @@ impl MimeTypeChecker for T_plain_text {
         &[&T_x_bat_application,&T_inf_application,&T_javascript_text,&T_vnd_java_hprof_text_application,&T_mathematica_application,&T_relax_ng_compact_syntax_application,&T_rtf_application,&T_x_project_application,&T_x_robots_text,&T_x_subrip_application,&T_x_bibtex_text_file_application,&T_x_openscad_application,&T_xquery_application,&T_x_sas_application,&T_x_sh_application,&T_x_sfdu_application,&T_x_tex_application,&T_xml_application,&T_xml_dtd_application,&T_x_actionscript_text,&T_x_ada_text,&T_x_applescript_text,&T_asp_text,&T_aspdotnet_text,&T_x_aspectj_text,&T_x_assembly_text,&T_calendar_text,&T_x_config_text,&T_css_text,&T_csv_text,&T_x_makefile_text,&T_vnd_graphviz_text,&T_vtt_text,&T_x_awk_text,&T_x_basic_text,&T_x_c__hdr_text,&T_x_c__src_text,&T_x_cgi_text,&T_x_chdr_text,&T_x_clojure_text,&T_x_coffeescript_text,&T_x_c_text,&T_x_csharp_text,&T_x_cobol_text,&T_x_coldfusion_text,&T_x_common_lisp_text,&T_x_diff_text,&T_x_eiffel_text,&T_x_emacs_lisp_text,&T_x_erlang_text,&T_x_expect_text,&T_x_forth_text,&T_x_fortran_text,&T_x_go_text,&T_x_groovy_text,&T_x_haskell_text,&T_x_idl_text,&T_x_ini_text,&T_x_java_source_text,&T_x_java_properties_text,&T_x_jsp_text,&T_x_less_text,&T_x_lex_text,&T_x_log_text,&T_x_ml_text,&T_x_matlab_text,&T_x_modula_text,&T_x_objcsrc_text,&T_x_ocaml_text,&T_x_pascal_text,&T_x_perl_text,&T_x_php_text,&T_x_prolog_text,&T_x_python_text,&T_x_rst_text,&T_x_rexx_text,&T_x_ruby_text,&T_x_scala_text,&T_x_scheme_text,&T_x_sed_text,&T_x_sql_text,&T_x_setext_text,&T_x_stsrc_text,&T_x_vcalendar_text,&T_x_vcard_text,&T_x_verilog_text,&T_x_vhdl_text,&T_x_web_markdown_text,&T_x_yacc_text,&T_x_yaml_text,&T_x_asciidoc_text,&T_x_d_text,&T_x_haml_text,&T_x_haxe_text,&T_x_rsrc_text,&T_x_scss_text,&T_x_sass_text]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -9157,7 +9157,7 @@ impl MimeTypeChecker for T_activemessage_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9178,7 +9178,7 @@ impl MimeTypeChecker for T_andrew_inset_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9199,7 +9199,7 @@ impl MimeTypeChecker for T_applixware_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9220,7 +9220,7 @@ impl MimeTypeChecker for T_iso19139_xml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9241,7 +9241,7 @@ impl MimeTypeChecker for T_atom_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9262,7 +9262,7 @@ impl MimeTypeChecker for T_atomcat_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9283,7 +9283,7 @@ impl MimeTypeChecker for T_atomicmail_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9304,7 +9304,7 @@ impl MimeTypeChecker for T_atomsvc_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9325,7 +9325,7 @@ impl MimeTypeChecker for T_auth_policy_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9346,7 +9346,7 @@ impl MimeTypeChecker for T_batch_smtp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9367,7 +9367,7 @@ impl MimeTypeChecker for T_beep_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9388,7 +9388,7 @@ impl MimeTypeChecker for T_bizagi_modeler_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9409,7 +9409,7 @@ impl MimeTypeChecker for T_cals_1840_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9430,7 +9430,7 @@ impl MimeTypeChecker for T_ccxml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9451,7 +9451,7 @@ impl MimeTypeChecker for T_cea_2018_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9472,7 +9472,7 @@ impl MimeTypeChecker for T_cellml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9493,7 +9493,7 @@ impl MimeTypeChecker for T_cnrp_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9514,7 +9514,7 @@ impl MimeTypeChecker for T_commonground_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9535,7 +9535,7 @@ impl MimeTypeChecker for T_conference_info_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9556,7 +9556,7 @@ impl MimeTypeChecker for T_cpl_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9577,7 +9577,7 @@ impl MimeTypeChecker for T_csta_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9598,7 +9598,7 @@ impl MimeTypeChecker for T_cstadata_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9619,7 +9619,7 @@ impl MimeTypeChecker for T_cu_seeme_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9640,7 +9640,7 @@ impl MimeTypeChecker for T_cybercash_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9661,7 +9661,7 @@ impl MimeTypeChecker for T_dash_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9682,7 +9682,7 @@ impl MimeTypeChecker for T_davmount_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9703,7 +9703,7 @@ impl MimeTypeChecker for T_dca_rft_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9724,7 +9724,7 @@ impl MimeTypeChecker for T_dec_dx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9745,7 +9745,7 @@ impl MimeTypeChecker for T_dialog_info_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9766,7 +9766,7 @@ impl MimeTypeChecker for T_dita_xml_format_map_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9787,7 +9787,7 @@ impl MimeTypeChecker for T_dita_xml_format_task_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9808,7 +9808,7 @@ impl MimeTypeChecker for T_dita_xml_format_concept_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9829,7 +9829,7 @@ impl MimeTypeChecker for T_dita_xml_format_val_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9850,7 +9850,7 @@ impl MimeTypeChecker for T_dns_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9871,7 +9871,7 @@ impl MimeTypeChecker for T_dvcs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9892,7 +9892,7 @@ impl MimeTypeChecker for T_ecmascript_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9913,7 +9913,7 @@ impl MimeTypeChecker for T_edi_consent_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9934,7 +9934,7 @@ impl MimeTypeChecker for T_edi_x12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9955,7 +9955,7 @@ impl MimeTypeChecker for T_edifact_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9976,7 +9976,7 @@ impl MimeTypeChecker for T_emma_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -9997,7 +9997,7 @@ impl MimeTypeChecker for T_envi_hdr_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10018,7 +10018,7 @@ impl MimeTypeChecker for T_epp_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10039,7 +10039,7 @@ impl MimeTypeChecker for T_eshop_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10060,7 +10060,7 @@ impl MimeTypeChecker for T_example_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10081,7 +10081,7 @@ impl MimeTypeChecker for T_fastinfoset_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10102,7 +10102,7 @@ impl MimeTypeChecker for T_fastsoap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10123,7 +10123,7 @@ impl MimeTypeChecker for T_font_tdpfr_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10144,7 +10144,7 @@ impl MimeTypeChecker for T_h224_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10165,7 +10165,7 @@ impl MimeTypeChecker for T_http_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10186,7 +10186,7 @@ impl MimeTypeChecker for T_hyperstudio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10207,7 +10207,7 @@ impl MimeTypeChecker for T_ibe_key_request_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10228,7 +10228,7 @@ impl MimeTypeChecker for T_ibe_pkg_reply_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10249,7 +10249,7 @@ impl MimeTypeChecker for T_ibe_pp_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10270,7 +10270,7 @@ impl MimeTypeChecker for T_iges_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10291,7 +10291,7 @@ impl MimeTypeChecker for T_illustrator_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10312,7 +10312,7 @@ impl MimeTypeChecker for T_im_iscomposing_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10333,7 +10333,7 @@ impl MimeTypeChecker for T_index_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10354,7 +10354,7 @@ impl MimeTypeChecker for T_index_cmd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10375,7 +10375,7 @@ impl MimeTypeChecker for T_index_obj_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10396,7 +10396,7 @@ impl MimeTypeChecker for T_index_response_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10417,7 +10417,7 @@ impl MimeTypeChecker for T_index_vnd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10438,7 +10438,7 @@ impl MimeTypeChecker for T_iotp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10459,7 +10459,7 @@ impl MimeTypeChecker for T_ipp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10480,7 +10480,7 @@ impl MimeTypeChecker for T_isup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10501,7 +10501,7 @@ impl MimeTypeChecker for T_vnd_android_package_archive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10522,7 +10522,7 @@ impl MimeTypeChecker for T_x_tika_java_enterprise_archive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10543,7 +10543,7 @@ impl MimeTypeChecker for T_x_tika_java_web_archive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10564,7 +10564,7 @@ impl MimeTypeChecker for T_x_tika_unix_dump_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10585,7 +10585,7 @@ impl MimeTypeChecker for T_java_serialized_object_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10606,7 +10606,7 @@ impl MimeTypeChecker for T_manifest_json_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10627,7 +10627,7 @@ impl MimeTypeChecker for T_x_java_jnilib_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10648,7 +10648,7 @@ impl MimeTypeChecker for T_kpml_request_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10669,7 +10669,7 @@ impl MimeTypeChecker for T_kpml_response_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10690,7 +10690,7 @@ impl MimeTypeChecker for T_lost_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10711,7 +10711,7 @@ impl MimeTypeChecker for T_mac_compactpro_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10732,7 +10732,7 @@ impl MimeTypeChecker for T_macwriteii_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10753,7 +10753,7 @@ impl MimeTypeChecker for T_mathml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10774,7 +10774,7 @@ impl MimeTypeChecker for T_mbms_associated_procedure_description_xml_application
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10795,7 +10795,7 @@ impl MimeTypeChecker for T_mbms_deregister_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10816,7 +10816,7 @@ impl MimeTypeChecker for T_mbms_envelope_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10837,7 +10837,7 @@ impl MimeTypeChecker for T_mbms_msk_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10858,7 +10858,7 @@ impl MimeTypeChecker for T_mbms_msk_response_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10879,7 +10879,7 @@ impl MimeTypeChecker for T_mbms_protection_description_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10900,7 +10900,7 @@ impl MimeTypeChecker for T_mbms_reception_report_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10921,7 +10921,7 @@ impl MimeTypeChecker for T_mbms_register_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10942,7 +10942,7 @@ impl MimeTypeChecker for T_mbms_register_response_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10963,7 +10963,7 @@ impl MimeTypeChecker for T_mbms_user_service_description_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -10984,7 +10984,7 @@ impl MimeTypeChecker for T_media_control_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11005,7 +11005,7 @@ impl MimeTypeChecker for T_mediaservercontrol_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11026,7 +11026,7 @@ impl MimeTypeChecker for T_mikey_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11047,7 +11047,7 @@ impl MimeTypeChecker for T_moss_keys_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11068,7 +11068,7 @@ impl MimeTypeChecker for T_moss_signature_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11089,7 +11089,7 @@ impl MimeTypeChecker for T_mosskey_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11110,7 +11110,7 @@ impl MimeTypeChecker for T_mosskey_request_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11131,7 +11131,7 @@ impl MimeTypeChecker for T_mp4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11152,7 +11152,7 @@ impl MimeTypeChecker for T_mpeg4_generic_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11173,7 +11173,7 @@ impl MimeTypeChecker for T_mpeg4_iod_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11194,7 +11194,7 @@ impl MimeTypeChecker for T_mpeg4_iod_xmt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11215,7 +11215,7 @@ impl MimeTypeChecker for T_mxf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11236,7 +11236,7 @@ impl MimeTypeChecker for T_nasdata_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11257,7 +11257,7 @@ impl MimeTypeChecker for T_news_checkgroups_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11278,7 +11278,7 @@ impl MimeTypeChecker for T_news_groupinfo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11299,7 +11299,7 @@ impl MimeTypeChecker for T_news_transmission_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11320,7 +11320,7 @@ impl MimeTypeChecker for T_nss_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11341,7 +11341,7 @@ impl MimeTypeChecker for T_ocsp_request_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11362,7 +11362,7 @@ impl MimeTypeChecker for T_ocsp_response_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11383,7 +11383,7 @@ impl MimeTypeChecker for T_oda_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11404,7 +11404,7 @@ impl MimeTypeChecker for T_oebps_package_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11425,7 +11425,7 @@ impl MimeTypeChecker for T_kate_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11446,7 +11446,7 @@ impl MimeTypeChecker for T_onenote__format_package_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11467,7 +11467,7 @@ impl MimeTypeChecker for T_parityfec_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11488,7 +11488,7 @@ impl MimeTypeChecker for T_patch_ops_error_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11509,7 +11509,7 @@ impl MimeTypeChecker for T_pgp_encrypted_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11530,7 +11530,7 @@ impl MimeTypeChecker for T_pgp_keys_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11551,7 +11551,7 @@ impl MimeTypeChecker for T_pgp_signature_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11572,7 +11572,7 @@ impl MimeTypeChecker for T_pics_rules_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11593,7 +11593,7 @@ impl MimeTypeChecker for T_pidf_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11614,7 +11614,7 @@ impl MimeTypeChecker for T_pidf_diff_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11635,7 +11635,7 @@ impl MimeTypeChecker for T_pkcs10_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11656,7 +11656,7 @@ impl MimeTypeChecker for T_pkcs7_mime_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11677,7 +11677,7 @@ impl MimeTypeChecker for T_pkix_cert_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11698,7 +11698,7 @@ impl MimeTypeChecker for T_pkix_crl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11719,7 +11719,7 @@ impl MimeTypeChecker for T_pkix_pkipath_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11740,7 +11740,7 @@ impl MimeTypeChecker for T_pkixcmp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11761,7 +11761,7 @@ impl MimeTypeChecker for T_pls_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11782,7 +11782,7 @@ impl MimeTypeChecker for T_poc_settings_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11803,7 +11803,7 @@ impl MimeTypeChecker for T_prs_alvestrand_titrax_sheet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11824,7 +11824,7 @@ impl MimeTypeChecker for T_prs_cww_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11845,7 +11845,7 @@ impl MimeTypeChecker for T_prs_nprend_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11866,7 +11866,7 @@ impl MimeTypeChecker for T_prs_plucker_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11887,7 +11887,7 @@ impl MimeTypeChecker for T_qsig_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11908,7 +11908,7 @@ impl MimeTypeChecker for T_vnd_ms_spreadsheetml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11929,7 +11929,7 @@ impl MimeTypeChecker for T_vnd_ms_wordml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11950,7 +11950,7 @@ impl MimeTypeChecker for T_vnd_ms_word2006ml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11971,7 +11971,7 @@ impl MimeTypeChecker for T_rdf_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -11992,7 +11992,7 @@ impl MimeTypeChecker for T_reginfo_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12013,7 +12013,7 @@ impl MimeTypeChecker for T_relax_ng_compact_syntax_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12034,7 +12034,7 @@ impl MimeTypeChecker for T_remote_printing_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12055,7 +12055,7 @@ impl MimeTypeChecker for T_resource_lists_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12076,7 +12076,7 @@ impl MimeTypeChecker for T_resource_lists_diff_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12097,7 +12097,7 @@ impl MimeTypeChecker for T_riscos_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12118,7 +12118,7 @@ impl MimeTypeChecker for T_rlmi_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12139,7 +12139,7 @@ impl MimeTypeChecker for T_rls_services_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12160,7 +12160,7 @@ impl MimeTypeChecker for T_rsd_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12181,7 +12181,7 @@ impl MimeTypeChecker for T_rss_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12202,7 +12202,7 @@ impl MimeTypeChecker for T_rtx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12223,7 +12223,7 @@ impl MimeTypeChecker for T_samlassertion_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12244,7 +12244,7 @@ impl MimeTypeChecker for T_samlmetadata_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12265,7 +12265,7 @@ impl MimeTypeChecker for T_sbml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12286,7 +12286,7 @@ impl MimeTypeChecker for T_scvp_cv_request_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12307,7 +12307,7 @@ impl MimeTypeChecker for T_scvp_cv_response_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12328,7 +12328,7 @@ impl MimeTypeChecker for T_scvp_vp_request_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12349,7 +12349,7 @@ impl MimeTypeChecker for T_scvp_vp_response_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12370,7 +12370,7 @@ impl MimeTypeChecker for T_sdp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12391,7 +12391,7 @@ impl MimeTypeChecker for T_set_payment_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12412,7 +12412,7 @@ impl MimeTypeChecker for T_set_payment_initiation_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12433,7 +12433,7 @@ impl MimeTypeChecker for T_set_registration_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12454,7 +12454,7 @@ impl MimeTypeChecker for T_set_registration_initiation_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12475,7 +12475,7 @@ impl MimeTypeChecker for T_sgml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12496,7 +12496,7 @@ impl MimeTypeChecker for T_sgml_open_catalog_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12517,7 +12517,7 @@ impl MimeTypeChecker for T_shf_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12538,7 +12538,7 @@ impl MimeTypeChecker for T_sieve_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12559,7 +12559,7 @@ impl MimeTypeChecker for T_simple_filter_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12580,7 +12580,7 @@ impl MimeTypeChecker for T_simple_message_summary_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12601,7 +12601,7 @@ impl MimeTypeChecker for T_simplesymbolcontainer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12622,7 +12622,7 @@ impl MimeTypeChecker for T_slate_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12643,7 +12643,7 @@ impl MimeTypeChecker for T_smil_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12664,7 +12664,7 @@ impl MimeTypeChecker for T_soap_fastinfoset_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12685,7 +12685,7 @@ impl MimeTypeChecker for T_soap_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12706,7 +12706,7 @@ impl MimeTypeChecker for T_sldworks_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12727,7 +12727,7 @@ impl MimeTypeChecker for T_sparql_query_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12748,7 +12748,7 @@ impl MimeTypeChecker for T_sparql_results_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12769,7 +12769,7 @@ impl MimeTypeChecker for T_spirits_event_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12790,7 +12790,7 @@ impl MimeTypeChecker for T_srgs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12811,7 +12811,7 @@ impl MimeTypeChecker for T_srgs_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12832,7 +12832,7 @@ impl MimeTypeChecker for T_ssml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12853,7 +12853,7 @@ impl MimeTypeChecker for T_timestamp_query_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12874,7 +12874,7 @@ impl MimeTypeChecker for T_timestamp_reply_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12895,7 +12895,7 @@ impl MimeTypeChecker for T_tve_trigger_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12916,7 +12916,7 @@ impl MimeTypeChecker for T_ulpfec_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12937,7 +12937,7 @@ impl MimeTypeChecker for T_vemmi_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12958,7 +12958,7 @@ impl MimeTypeChecker for T_vividence_scriptfile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -12979,7 +12979,7 @@ impl MimeTypeChecker for T_vnd_3gpp_bsf_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13000,7 +13000,7 @@ impl MimeTypeChecker for T_vnd_3gpp_pic_bw_large_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13021,7 +13021,7 @@ impl MimeTypeChecker for T_vnd_3gpp_pic_bw_small_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13042,7 +13042,7 @@ impl MimeTypeChecker for T_vnd_3gpp_pic_bw_var_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13063,7 +13063,7 @@ impl MimeTypeChecker for T_vnd_3gpp_sms_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13084,7 +13084,7 @@ impl MimeTypeChecker for T_vnd_3gpp2_bcmcsinfo_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13105,7 +13105,7 @@ impl MimeTypeChecker for T_vnd_3gpp2_sms_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13126,7 +13126,7 @@ impl MimeTypeChecker for T_vnd_3gpp2_tcap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13147,7 +13147,7 @@ impl MimeTypeChecker for T_vnd_3m_post_it_notes_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13168,7 +13168,7 @@ impl MimeTypeChecker for T_vnd_accpac_simply_aso_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13189,7 +13189,7 @@ impl MimeTypeChecker for T_vnd_accpac_simply_imp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13210,7 +13210,7 @@ impl MimeTypeChecker for T_vnd_acucobol_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13231,7 +13231,7 @@ impl MimeTypeChecker for T_vnd_acucorp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13252,7 +13252,7 @@ impl MimeTypeChecker for T_vnd_adobe_air_application_installer_package_zip_appli
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13273,7 +13273,7 @@ impl MimeTypeChecker for T_vnd_adobe_aftereffects_project_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13294,7 +13294,7 @@ impl MimeTypeChecker for T_vnd_adobe_aftereffects_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13315,7 +13315,7 @@ impl MimeTypeChecker for T_vnd_adobe_xdp_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13336,7 +13336,7 @@ impl MimeTypeChecker for T_vnd_adobe_xfdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13357,7 +13357,7 @@ impl MimeTypeChecker for T_vnd_aether_imp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13378,7 +13378,7 @@ impl MimeTypeChecker for T_vnd_airzip_filesecure_azf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13399,7 +13399,7 @@ impl MimeTypeChecker for T_vnd_airzip_filesecure_azs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13420,7 +13420,7 @@ impl MimeTypeChecker for T_vnd_amazon_ebook_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13441,7 +13441,7 @@ impl MimeTypeChecker for T_vnd_americandynamics_acc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13462,7 +13462,7 @@ impl MimeTypeChecker for T_vnd_amiga_ami_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13483,7 +13483,7 @@ impl MimeTypeChecker for T_vnd_anser_web_certificate_issue_initiation_applicatio
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13504,7 +13504,7 @@ impl MimeTypeChecker for T_vnd_anser_web_funds_transfer_initiation_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13525,7 +13525,7 @@ impl MimeTypeChecker for T_vnd_antix_game_component_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13546,7 +13546,7 @@ impl MimeTypeChecker for T_vnd_apple_installer_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13567,7 +13567,7 @@ impl MimeTypeChecker for T_vnd_apple_unknown_13_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13588,7 +13588,7 @@ impl MimeTypeChecker for T_vnd_apple_keynote_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13609,7 +13609,7 @@ impl MimeTypeChecker for T_vnd_apple_pages_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13630,7 +13630,7 @@ impl MimeTypeChecker for T_vnd_apple_numbers_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13651,7 +13651,7 @@ impl MimeTypeChecker for T_x_tika_iworks_protected_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13672,7 +13672,7 @@ impl MimeTypeChecker for T_vnd_arastra_swi_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13693,7 +13693,7 @@ impl MimeTypeChecker for T_vnd_audiograph_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13714,7 +13714,7 @@ impl MimeTypeChecker for T_vnd_autopackage_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13735,7 +13735,7 @@ impl MimeTypeChecker for T_vnd_avistar_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13756,7 +13756,7 @@ impl MimeTypeChecker for T_vnd_blueice_multipass_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13777,7 +13777,7 @@ impl MimeTypeChecker for T_vnd_bluetooth_ep_oob_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13798,7 +13798,7 @@ impl MimeTypeChecker for T_vnd_bmi_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13819,7 +13819,7 @@ impl MimeTypeChecker for T_vnd_businessobjects_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13840,7 +13840,7 @@ impl MimeTypeChecker for T_vnd_cab_jscript_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13861,7 +13861,7 @@ impl MimeTypeChecker for T_vnd_canon_cpdl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13882,7 +13882,7 @@ impl MimeTypeChecker for T_vnd_canon_lips_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13903,7 +13903,7 @@ impl MimeTypeChecker for T_vnd_cendio_thinlinc_clientconf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13924,7 +13924,7 @@ impl MimeTypeChecker for T_vnd_chemdraw_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13945,7 +13945,7 @@ impl MimeTypeChecker for T_vnd_chipnuts_karaoke_mmd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13966,7 +13966,7 @@ impl MimeTypeChecker for T_vnd_cinderella_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -13987,7 +13987,7 @@ impl MimeTypeChecker for T_vnd_cirpack_isdn_ext_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14008,7 +14008,7 @@ impl MimeTypeChecker for T_vnd_claymore_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14029,7 +14029,7 @@ impl MimeTypeChecker for T_vnd_clonk_c4group_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14050,7 +14050,7 @@ impl MimeTypeChecker for T_vnd_commerce_battelle_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14071,7 +14071,7 @@ impl MimeTypeChecker for T_vnd_commonspace_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14092,7 +14092,7 @@ impl MimeTypeChecker for T_vnd_contact_cmsg_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14113,7 +14113,7 @@ impl MimeTypeChecker for T_vnd_cosmocaller_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14134,7 +14134,7 @@ impl MimeTypeChecker for T_vnd_crick_clicker_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14155,7 +14155,7 @@ impl MimeTypeChecker for T_vnd_crick_clicker_keyboard_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14176,7 +14176,7 @@ impl MimeTypeChecker for T_vnd_crick_clicker_palette_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14197,7 +14197,7 @@ impl MimeTypeChecker for T_vnd_crick_clicker_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14218,7 +14218,7 @@ impl MimeTypeChecker for T_vnd_crick_clicker_wordbank_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14239,7 +14239,7 @@ impl MimeTypeChecker for T_vnd_criticaltools_wbs_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14260,7 +14260,7 @@ impl MimeTypeChecker for T_vnd_ctc_posml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14281,7 +14281,7 @@ impl MimeTypeChecker for T_vnd_ctct_ws_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14302,7 +14302,7 @@ impl MimeTypeChecker for T_vnd_cups_pdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14323,7 +14323,7 @@ impl MimeTypeChecker for T_vnd_cups_postscript_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14344,7 +14344,7 @@ impl MimeTypeChecker for T_vnd_cups_ppd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14365,7 +14365,7 @@ impl MimeTypeChecker for T_vnd_cups_raster_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14386,7 +14386,7 @@ impl MimeTypeChecker for T_vnd_cups_raw_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14407,7 +14407,7 @@ impl MimeTypeChecker for T_vnd_curl_car_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14428,7 +14428,7 @@ impl MimeTypeChecker for T_vnd_curl_pcurl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14449,7 +14449,7 @@ impl MimeTypeChecker for T_vnd_cybank_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14470,7 +14470,7 @@ impl MimeTypeChecker for T_x_wacz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14491,7 +14491,7 @@ impl MimeTypeChecker for T_x_vnd_datapackage_json_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14512,7 +14512,7 @@ impl MimeTypeChecker for T_x_vnd_datapackage_gz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14533,7 +14533,7 @@ impl MimeTypeChecker for T_vnd_data_vision_rdz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14554,7 +14554,7 @@ impl MimeTypeChecker for T_vnd_denovo_fcselayout_link_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14575,7 +14575,7 @@ impl MimeTypeChecker for T_vnd_dir_bi_plate_dl_nosuffix_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14596,7 +14596,7 @@ impl MimeTypeChecker for T_vnd_dna_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14617,7 +14617,7 @@ impl MimeTypeChecker for T_vnd_dolby_mlp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14638,7 +14638,7 @@ impl MimeTypeChecker for T_vnd_dolby_mobile_1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14659,7 +14659,7 @@ impl MimeTypeChecker for T_vnd_dolby_mobile_2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14680,7 +14680,7 @@ impl MimeTypeChecker for T_vnd_dpgraph_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14701,7 +14701,7 @@ impl MimeTypeChecker for T_vnd_dreamfactory_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14722,7 +14722,7 @@ impl MimeTypeChecker for T_vnd_dvb_esgcontainer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14743,7 +14743,7 @@ impl MimeTypeChecker for T_vnd_dvb_ipdcdftnotifaccess_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14764,7 +14764,7 @@ impl MimeTypeChecker for T_vnd_dvb_ipdcesgaccess_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14785,7 +14785,7 @@ impl MimeTypeChecker for T_vnd_dvb_ipdcroaming_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14806,7 +14806,7 @@ impl MimeTypeChecker for T_vnd_dvb_iptv_alfec_base_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14827,7 +14827,7 @@ impl MimeTypeChecker for T_vnd_dvb_iptv_alfec_enhancement_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14848,7 +14848,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_aggregate_root_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14869,7 +14869,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_container_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14890,7 +14890,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_generic_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14911,7 +14911,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_ia_msglist_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14932,7 +14932,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_ia_registration_request_xml_application
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14953,7 +14953,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_ia_registration_response_xml_applicatio
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14974,7 +14974,7 @@ impl MimeTypeChecker for T_vnd_dvb_notif_init_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -14995,7 +14995,7 @@ impl MimeTypeChecker for T_vnd_dxr_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15016,7 +15016,7 @@ impl MimeTypeChecker for T_vnd_dynageo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15037,7 +15037,7 @@ impl MimeTypeChecker for T_vnd_ecdis_update_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15058,7 +15058,7 @@ impl MimeTypeChecker for T_vnd_ecowin_chart_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15079,7 +15079,7 @@ impl MimeTypeChecker for T_vnd_ecowin_filerequest_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15100,7 +15100,7 @@ impl MimeTypeChecker for T_vnd_ecowin_fileupdate_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15121,7 +15121,7 @@ impl MimeTypeChecker for T_vnd_ecowin_series_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15142,7 +15142,7 @@ impl MimeTypeChecker for T_vnd_ecowin_seriesrequest_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15163,7 +15163,7 @@ impl MimeTypeChecker for T_vnd_ecowin_seriesupdate_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15184,7 +15184,7 @@ impl MimeTypeChecker for T_vnd_emclient_accessrequest_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15205,7 +15205,7 @@ impl MimeTypeChecker for T_vnd_enliven_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15226,7 +15226,7 @@ impl MimeTypeChecker for T_vnd_epson_esf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15247,7 +15247,7 @@ impl MimeTypeChecker for T_vnd_epson_msf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15268,7 +15268,7 @@ impl MimeTypeChecker for T_vnd_epson_quickanime_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15289,7 +15289,7 @@ impl MimeTypeChecker for T_vnd_epson_salt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15310,7 +15310,7 @@ impl MimeTypeChecker for T_vnd_epson_ssf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15331,7 +15331,7 @@ impl MimeTypeChecker for T_vnd_ericsson_quickcall_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15352,7 +15352,7 @@ impl MimeTypeChecker for T_vnd_eszigno3_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15373,7 +15373,7 @@ impl MimeTypeChecker for T_vnd_etsi_aoc_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15394,7 +15394,7 @@ impl MimeTypeChecker for T_vnd_etsi_cug_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15415,7 +15415,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvcommand_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15436,7 +15436,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvdiscovery_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15457,7 +15457,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvprofile_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15478,7 +15478,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvsad_bc_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15499,7 +15499,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvsad_cod_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15520,7 +15520,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvsad_npvr_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15541,7 +15541,7 @@ impl MimeTypeChecker for T_vnd_etsi_iptvueprofile_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15562,7 +15562,7 @@ impl MimeTypeChecker for T_vnd_etsi_mcid_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15583,7 +15583,7 @@ impl MimeTypeChecker for T_vnd_etsi_sci_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15604,7 +15604,7 @@ impl MimeTypeChecker for T_vnd_etsi_simservs_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15625,7 +15625,7 @@ impl MimeTypeChecker for T_vnd_eudora_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15646,7 +15646,7 @@ impl MimeTypeChecker for T_vnd_ezpix_album_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15667,7 +15667,7 @@ impl MimeTypeChecker for T_vnd_ezpix_package_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15688,7 +15688,7 @@ impl MimeTypeChecker for T_vnd_f_secure_mobile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15709,7 +15709,7 @@ impl MimeTypeChecker for T_vnd_fdsn_mseed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15730,7 +15730,7 @@ impl MimeTypeChecker for T_vnd_fdsn_seed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15751,7 +15751,7 @@ impl MimeTypeChecker for T_vnd_ffsns_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15772,7 +15772,7 @@ impl MimeTypeChecker for T_vnd_fints_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15793,7 +15793,7 @@ impl MimeTypeChecker for T_vnd_flographit_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15814,7 +15814,7 @@ impl MimeTypeChecker for T_vnd_fluxtime_clip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15835,7 +15835,7 @@ impl MimeTypeChecker for T_vnd_font_fontforge_sfd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15856,7 +15856,7 @@ impl MimeTypeChecker for T_vnd_framemaker_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15877,7 +15877,7 @@ impl MimeTypeChecker for T_vnd_frogans_fnc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15898,7 +15898,7 @@ impl MimeTypeChecker for T_vnd_frogans_ltf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15919,7 +15919,7 @@ impl MimeTypeChecker for T_vnd_fsc_weblaunch_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15940,7 +15940,7 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasys_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15961,7 +15961,7 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasys2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -15982,7 +15982,7 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasys3_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16003,7 +16003,7 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasysgp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16024,7 +16024,7 @@ impl MimeTypeChecker for T_vnd_fujitsu_oasysprs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16045,7 +16045,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_art_ex_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16066,7 +16066,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_art4_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16087,7 +16087,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_hbpl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16108,7 +16108,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_ddd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16129,7 +16129,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_docuworks_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16150,7 +16150,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_docuworks_binder_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16171,7 +16171,7 @@ impl MimeTypeChecker for T_vnd_fut_misnet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16192,7 +16192,7 @@ impl MimeTypeChecker for T_vnd_fuzzysheet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16213,7 +16213,7 @@ impl MimeTypeChecker for T_vnd_genomatix_tuxedo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16234,7 +16234,7 @@ impl MimeTypeChecker for T_vnd_geogebra_file_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16255,7 +16255,7 @@ impl MimeTypeChecker for T_vnd_geogebra_tool_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16276,7 +16276,7 @@ impl MimeTypeChecker for T_vnd_geometry_explorer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16297,7 +16297,7 @@ impl MimeTypeChecker for T_vnd_gmx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16318,7 +16318,7 @@ impl MimeTypeChecker for T_vnd_google_earth_kml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16339,7 +16339,7 @@ impl MimeTypeChecker for T_vnd_google_earth_kmz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16360,7 +16360,7 @@ impl MimeTypeChecker for T_vnd_grafeq_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16381,7 +16381,7 @@ impl MimeTypeChecker for T_vnd_gridmp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16402,7 +16402,7 @@ impl MimeTypeChecker for T_vnd_groove_account_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16423,7 +16423,7 @@ impl MimeTypeChecker for T_vnd_groove_help_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16444,7 +16444,7 @@ impl MimeTypeChecker for T_vnd_groove_identity_message_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16465,7 +16465,7 @@ impl MimeTypeChecker for T_vnd_groove_injector_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16486,7 +16486,7 @@ impl MimeTypeChecker for T_vnd_groove_tool_message_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16507,7 +16507,7 @@ impl MimeTypeChecker for T_vnd_groove_tool_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16528,7 +16528,7 @@ impl MimeTypeChecker for T_vnd_groove_vcard_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16549,7 +16549,7 @@ impl MimeTypeChecker for T_vnd_handheld_entertainment_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16570,7 +16570,7 @@ impl MimeTypeChecker for T_vnd_hbci_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16591,7 +16591,7 @@ impl MimeTypeChecker for T_vnd_hcl_bireports_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16612,7 +16612,7 @@ impl MimeTypeChecker for T_vnd_hhe_lesson_player_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16633,7 +16633,7 @@ impl MimeTypeChecker for T_vnd_hp_hpgl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16654,7 +16654,7 @@ impl MimeTypeChecker for T_vnd_hp_hpid_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16675,7 +16675,7 @@ impl MimeTypeChecker for T_vnd_hp_hps_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16696,7 +16696,7 @@ impl MimeTypeChecker for T_vnd_hp_jlyt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16717,7 +16717,7 @@ impl MimeTypeChecker for T_vnd_hp_pcl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16738,7 +16738,7 @@ impl MimeTypeChecker for T_vnd_hp_pclxl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16759,7 +16759,7 @@ impl MimeTypeChecker for T_vnd_httphone_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16780,7 +16780,7 @@ impl MimeTypeChecker for T_vnd_hydrostatix_sof_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16801,7 +16801,7 @@ impl MimeTypeChecker for T_vnd_hzn_3d_crossword_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16822,7 +16822,7 @@ impl MimeTypeChecker for T_vnd_ibm_afplinedata_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16843,7 +16843,7 @@ impl MimeTypeChecker for T_vnd_ibm_electronic_media_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16864,7 +16864,7 @@ impl MimeTypeChecker for T_vnd_ibm_minipay_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16885,7 +16885,7 @@ impl MimeTypeChecker for T_vnd_ibm_modcap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16906,7 +16906,7 @@ impl MimeTypeChecker for T_vnd_ibm_rights_management_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16927,7 +16927,7 @@ impl MimeTypeChecker for T_vnd_ibm_secure_container_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16948,7 +16948,7 @@ impl MimeTypeChecker for T_vnd_igloader_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16969,7 +16969,7 @@ impl MimeTypeChecker for T_vnd_immervision_ivp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -16990,7 +16990,7 @@ impl MimeTypeChecker for T_vnd_immervision_ivu_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17011,7 +17011,7 @@ impl MimeTypeChecker for T_vnd_informedcontrol_rms_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17032,7 +17032,7 @@ impl MimeTypeChecker for T_vnd_informix_visionary_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17053,7 +17053,7 @@ impl MimeTypeChecker for T_vnd_intercon_formnet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17074,7 +17074,7 @@ impl MimeTypeChecker for T_vnd_intertrust_digibox_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17095,7 +17095,7 @@ impl MimeTypeChecker for T_vnd_intertrust_nncp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17116,7 +17116,7 @@ impl MimeTypeChecker for T_vnd_intu_qbo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17137,7 +17137,7 @@ impl MimeTypeChecker for T_vnd_intu_qfx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17158,7 +17158,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_catalogitem_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17179,7 +17179,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_conceptitem_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17200,7 +17200,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_knowledgeitem_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17221,7 +17221,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_newsitem_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17242,7 +17242,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_newsmessage_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17263,7 +17263,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_packageitem_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17284,7 +17284,7 @@ impl MimeTypeChecker for T_vnd_iptc_g2_planningitem_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17305,7 +17305,7 @@ impl MimeTypeChecker for T_vnd_ipunplugged_rcprofile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17326,7 +17326,7 @@ impl MimeTypeChecker for T_vnd_irepository_package_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17347,7 +17347,7 @@ impl MimeTypeChecker for T_vnd_is_xpr_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17368,7 +17368,7 @@ impl MimeTypeChecker for T_vnd_jam_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17389,7 +17389,7 @@ impl MimeTypeChecker for T_vnd_japannet_directory_service_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17410,7 +17410,7 @@ impl MimeTypeChecker for T_vnd_japannet_jpnstore_wakeup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17431,7 +17431,7 @@ impl MimeTypeChecker for T_vnd_japannet_payment_wakeup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17452,7 +17452,7 @@ impl MimeTypeChecker for T_vnd_japannet_registration_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17473,7 +17473,7 @@ impl MimeTypeChecker for T_vnd_japannet_registration_wakeup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17494,7 +17494,7 @@ impl MimeTypeChecker for T_vnd_japannet_setstore_wakeup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17515,7 +17515,7 @@ impl MimeTypeChecker for T_vnd_japannet_verification_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17536,7 +17536,7 @@ impl MimeTypeChecker for T_vnd_japannet_verification_wakeup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17557,7 +17557,7 @@ impl MimeTypeChecker for T_vnd_jcp_javame_midlet_rms_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17578,7 +17578,7 @@ impl MimeTypeChecker for T_vnd_jisp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17599,7 +17599,7 @@ impl MimeTypeChecker for T_vnd_joost_joda_archive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17620,7 +17620,7 @@ impl MimeTypeChecker for T_vnd_kahootz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17641,7 +17641,7 @@ impl MimeTypeChecker for T_vnd_kde_karbon_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17662,7 +17662,7 @@ impl MimeTypeChecker for T_vnd_kde_kchart_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17683,7 +17683,7 @@ impl MimeTypeChecker for T_vnd_kde_kformula_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17704,7 +17704,7 @@ impl MimeTypeChecker for T_vnd_kde_kivio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17725,7 +17725,7 @@ impl MimeTypeChecker for T_vnd_kde_kontour_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17746,7 +17746,7 @@ impl MimeTypeChecker for T_vnd_kde_kpresenter_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17767,7 +17767,7 @@ impl MimeTypeChecker for T_vnd_kde_kspread_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17788,7 +17788,7 @@ impl MimeTypeChecker for T_vnd_kde_kword_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17809,7 +17809,7 @@ impl MimeTypeChecker for T_vnd_kenameaapp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17830,7 +17830,7 @@ impl MimeTypeChecker for T_vnd_kidspiration_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17851,7 +17851,7 @@ impl MimeTypeChecker for T_vnd_kinar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17872,7 +17872,7 @@ impl MimeTypeChecker for T_vnd_koan_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17893,7 +17893,7 @@ impl MimeTypeChecker for T_vnd_kodak_descriptor_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17914,7 +17914,7 @@ impl MimeTypeChecker for T_vnd_liberty_request_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17935,7 +17935,7 @@ impl MimeTypeChecker for T_vnd_llamagraphics_life_balance_desktop_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17956,7 +17956,7 @@ impl MimeTypeChecker for T_vnd_llamagraphics_life_balance_exchange_xml_applicati
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17977,7 +17977,7 @@ impl MimeTypeChecker for T_vnd_lotus_approach_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -17998,7 +17998,7 @@ impl MimeTypeChecker for T_vnd_lotus_freelance_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18019,7 +18019,7 @@ impl MimeTypeChecker for T_vnd_lotus_notes_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18040,7 +18040,7 @@ impl MimeTypeChecker for T_vnd_lotus_organizer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18061,7 +18061,7 @@ impl MimeTypeChecker for T_vnd_lotus_screencam_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18082,7 +18082,7 @@ impl MimeTypeChecker for T_vnd_macports_portpkg_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18103,7 +18103,7 @@ impl MimeTypeChecker for T_vnd_marlin_drm_actiontoken_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18124,7 +18124,7 @@ impl MimeTypeChecker for T_vnd_marlin_drm_conftoken_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18145,7 +18145,7 @@ impl MimeTypeChecker for T_vnd_marlin_drm_license_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18166,7 +18166,7 @@ impl MimeTypeChecker for T_vnd_marlin_drm_mdcf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18187,7 +18187,7 @@ impl MimeTypeChecker for T_vnd_mcd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18208,7 +18208,7 @@ impl MimeTypeChecker for T_vnd_medcalcdata_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18229,7 +18229,7 @@ impl MimeTypeChecker for T_vnd_mediastation_cdkey_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18250,7 +18250,7 @@ impl MimeTypeChecker for T_vnd_meridian_slingshot_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18271,7 +18271,7 @@ impl MimeTypeChecker for T_vnd_mfer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18292,7 +18292,7 @@ impl MimeTypeChecker for T_vnd_mfmp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18313,7 +18313,7 @@ impl MimeTypeChecker for T_vnd_micrografx_flo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18334,7 +18334,7 @@ impl MimeTypeChecker for T_vnd_micrografx_igx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18355,7 +18355,7 @@ impl MimeTypeChecker for T_vnd_mindjet_mindmanager_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18376,7 +18376,7 @@ impl MimeTypeChecker for T_vnd_minisoft_hp3000_save_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18397,7 +18397,7 @@ impl MimeTypeChecker for T_vnd_mitsubishi_misty_guard_trustweb_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18418,7 +18418,7 @@ impl MimeTypeChecker for T_vnd_mobius_daf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18439,7 +18439,7 @@ impl MimeTypeChecker for T_vnd_mobius_dis_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18460,7 +18460,7 @@ impl MimeTypeChecker for T_vnd_mobius_mbk_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18481,7 +18481,7 @@ impl MimeTypeChecker for T_vnd_mobius_mqy_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18502,7 +18502,7 @@ impl MimeTypeChecker for T_vnd_mobius_msl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18523,7 +18523,7 @@ impl MimeTypeChecker for T_vnd_mobius_plc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18544,7 +18544,7 @@ impl MimeTypeChecker for T_vnd_mobius_txf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18565,7 +18565,7 @@ impl MimeTypeChecker for T_vnd_mophun_application_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18586,7 +18586,7 @@ impl MimeTypeChecker for T_vnd_mophun_certificate_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18607,7 +18607,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18628,7 +18628,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_adsi_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18649,7 +18649,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_fis_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18670,7 +18670,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_gotap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18691,7 +18691,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_kmr_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18712,7 +18712,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_ttc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18733,7 +18733,7 @@ impl MimeTypeChecker for T_vnd_motorola_flexsuite_wem_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18754,7 +18754,7 @@ impl MimeTypeChecker for T_vnd_motorola_iprm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18775,7 +18775,7 @@ impl MimeTypeChecker for T_vnd_mozilla_xul_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18796,7 +18796,7 @@ impl MimeTypeChecker for T_vnd_ms_artgalry_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18817,7 +18817,7 @@ impl MimeTypeChecker for T_vnd_ms_asf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18838,7 +18838,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_addin_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18859,7 +18859,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18880,7 +18880,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_sheet_binary_macroenabled_12_application
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18901,7 +18901,7 @@ impl MimeTypeChecker for T_vnd_ms_ims_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18922,7 +18922,7 @@ impl MimeTypeChecker for T_vnd_ms_lrm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18943,7 +18943,7 @@ impl MimeTypeChecker for T_vnd_ms_outlook_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18964,7 +18964,7 @@ impl MimeTypeChecker for T_vnd_ms_package_3dmanufacturing_3dmodel_xml_applicatio
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -18985,7 +18985,7 @@ impl MimeTypeChecker for T_vnd_ms_pki_seccat_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19006,7 +19006,7 @@ impl MimeTypeChecker for T_vnd_ms_pki_stl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19027,7 +19027,7 @@ impl MimeTypeChecker for T_vnd_ms_playready_initiator_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19048,7 +19048,7 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_addin_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19069,7 +19069,7 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_presentation_macroenabled_12_applic
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19090,7 +19090,7 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_slide_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19111,7 +19111,7 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_slideshow_macroenabled_12_applicati
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19132,7 +19132,7 @@ impl MimeTypeChecker for T_vnd_ms_powerpoint_template_macroenabled_12_applicatio
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19153,7 +19153,7 @@ impl MimeTypeChecker for T_vnd_ms_project_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19174,7 +19174,7 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_lic_chlg_req_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19195,7 +19195,7 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_lic_resp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19216,7 +19216,7 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_meter_chlg_req_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19237,7 +19237,7 @@ impl MimeTypeChecker for T_vnd_ms_wmdrm_meter_resp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19258,7 +19258,7 @@ impl MimeTypeChecker for T_vnd_ms_word_document_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19279,7 +19279,7 @@ impl MimeTypeChecker for T_vnd_ms_word_template_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19300,7 +19300,7 @@ impl MimeTypeChecker for T_vnd_ms_wpl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19321,7 +19321,7 @@ impl MimeTypeChecker for T_vnd_ms_xpsdocument_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19342,7 +19342,7 @@ impl MimeTypeChecker for T_vnd_mseq_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19363,7 +19363,7 @@ impl MimeTypeChecker for T_vnd_msign_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19384,7 +19384,7 @@ impl MimeTypeChecker for T_vnd_multiad_creator_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19405,7 +19405,7 @@ impl MimeTypeChecker for T_vnd_multiad_creator_cif_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19426,7 +19426,7 @@ impl MimeTypeChecker for T_vnd_music_niff_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19447,7 +19447,7 @@ impl MimeTypeChecker for T_vnd_musician_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19468,7 +19468,7 @@ impl MimeTypeChecker for T_vnd_muvee_style_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19489,7 +19489,7 @@ impl MimeTypeChecker for T_vnd_ncd_control_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19510,7 +19510,7 @@ impl MimeTypeChecker for T_vnd_ncd_reference_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19531,7 +19531,7 @@ impl MimeTypeChecker for T_vnd_nervana_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19552,7 +19552,7 @@ impl MimeTypeChecker for T_vnd_netfpx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19573,7 +19573,7 @@ impl MimeTypeChecker for T_vnd_neurolanguage_nlu_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19594,7 +19594,7 @@ impl MimeTypeChecker for T_vnd_noblenet_directory_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19615,7 +19615,7 @@ impl MimeTypeChecker for T_vnd_noblenet_sealer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19636,7 +19636,7 @@ impl MimeTypeChecker for T_vnd_noblenet_web_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19657,7 +19657,7 @@ impl MimeTypeChecker for T_vnd_nokia_catalogs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19678,7 +19678,7 @@ impl MimeTypeChecker for T_vnd_nokia_conml_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19699,7 +19699,7 @@ impl MimeTypeChecker for T_vnd_nokia_conml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19720,7 +19720,7 @@ impl MimeTypeChecker for T_vnd_nokia_isds_radio_presets_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19741,7 +19741,7 @@ impl MimeTypeChecker for T_vnd_nokia_iptv_config_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19762,7 +19762,7 @@ impl MimeTypeChecker for T_vnd_nokia_landmark_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19783,7 +19783,7 @@ impl MimeTypeChecker for T_vnd_nokia_landmark_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19804,7 +19804,7 @@ impl MimeTypeChecker for T_vnd_nokia_landmarkcollection_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19825,7 +19825,7 @@ impl MimeTypeChecker for T_vnd_nokia_n_gage_ac_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19846,7 +19846,7 @@ impl MimeTypeChecker for T_vnd_nokia_n_gage_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19867,7 +19867,7 @@ impl MimeTypeChecker for T_vnd_nokia_n_gage_symbian_install_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19888,7 +19888,7 @@ impl MimeTypeChecker for T_vnd_nokia_ncd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19909,7 +19909,7 @@ impl MimeTypeChecker for T_vnd_nokia_pcd_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19930,7 +19930,7 @@ impl MimeTypeChecker for T_vnd_nokia_pcd_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19951,7 +19951,7 @@ impl MimeTypeChecker for T_vnd_nokia_radio_preset_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19972,7 +19972,7 @@ impl MimeTypeChecker for T_vnd_nokia_radio_presets_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -19993,7 +19993,7 @@ impl MimeTypeChecker for T_vnd_novadigm_edm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20014,7 +20014,7 @@ impl MimeTypeChecker for T_vnd_novadigm_edx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20035,7 +20035,7 @@ impl MimeTypeChecker for T_vnd_novadigm_ext_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20056,7 +20056,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_chart_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20077,7 +20077,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_formula_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20098,7 +20098,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_graphics_template_application 
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20119,7 +20119,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_image_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20140,7 +20140,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_presentation_template_applicat
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20161,7 +20161,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_spreadsheet_template_applicati
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20182,7 +20182,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20203,7 +20203,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_web_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20224,7 +20224,7 @@ impl MimeTypeChecker for T_vnd_obn_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20245,7 +20245,7 @@ impl MimeTypeChecker for T_vnd_olpc_sugar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20266,7 +20266,7 @@ impl MimeTypeChecker for T_vnd_oma_scws_config_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20287,7 +20287,7 @@ impl MimeTypeChecker for T_vnd_oma_scws_http_request_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20308,7 +20308,7 @@ impl MimeTypeChecker for T_vnd_oma_scws_http_response_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20329,7 +20329,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_associated_procedure_parameter_xml_appl
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20350,7 +20350,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_drm_trigger_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20371,7 +20371,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_imd_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20392,7 +20392,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_ltkm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20413,7 +20413,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_notification_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20434,7 +20434,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_provisioningtrigger_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20455,7 +20455,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sgboot_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20476,7 +20476,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sgdd_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20497,7 +20497,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sgdu_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20518,7 +20518,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_simple_symbol_container_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20539,7 +20539,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_smartcard_trigger_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20560,7 +20560,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_sprov_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20581,7 +20581,7 @@ impl MimeTypeChecker for T_vnd_oma_bcast_stkm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20602,7 +20602,7 @@ impl MimeTypeChecker for T_vnd_oma_dcd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20623,7 +20623,7 @@ impl MimeTypeChecker for T_vnd_oma_dcdc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20644,7 +20644,7 @@ impl MimeTypeChecker for T_vnd_oma_dd2_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20665,7 +20665,7 @@ impl MimeTypeChecker for T_vnd_oma_drm_risd_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20686,7 +20686,7 @@ impl MimeTypeChecker for T_vnd_oma_group_usage_list_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20707,7 +20707,7 @@ impl MimeTypeChecker for T_vnd_oma_poc_detailed_progress_report_xml_application 
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20728,7 +20728,7 @@ impl MimeTypeChecker for T_vnd_oma_poc_final_report_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20749,7 +20749,7 @@ impl MimeTypeChecker for T_vnd_oma_poc_groups_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20770,7 +20770,7 @@ impl MimeTypeChecker for T_vnd_oma_poc_invocation_descriptor_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20791,7 +20791,7 @@ impl MimeTypeChecker for T_vnd_oma_poc_optimized_progress_report_xml_application
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20812,7 +20812,7 @@ impl MimeTypeChecker for T_vnd_oma_xcap_directory_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20833,7 +20833,7 @@ impl MimeTypeChecker for T_vnd_omads_email_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20854,7 +20854,7 @@ impl MimeTypeChecker for T_vnd_omads_file_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20875,7 +20875,7 @@ impl MimeTypeChecker for T_vnd_omads_folder_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20896,7 +20896,7 @@ impl MimeTypeChecker for T_vnd_omaloc_supl_init_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20917,7 +20917,7 @@ impl MimeTypeChecker for T_vnd_openofficeorg_extension_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20938,7 +20938,7 @@ impl MimeTypeChecker for T_vnd_openofficeorg_autotext_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20959,7 +20959,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_slid
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -20980,7 +20980,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_temp
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21001,7 +21001,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_presentationml_slid
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21022,7 +21022,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_spreadsheetml_templ
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21043,7 +21043,7 @@ impl MimeTypeChecker for T_vnd_ms_excel_template_macroenabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21064,7 +21064,7 @@ impl MimeTypeChecker for T_vnd_openxmlformats_officedocument_wordprocessingml_te
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21085,7 +21085,7 @@ impl MimeTypeChecker for T_vnd_osa_netdeploy_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21106,7 +21106,7 @@ impl MimeTypeChecker for T_vnd_osgi_bundle_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21127,7 +21127,7 @@ impl MimeTypeChecker for T_vnd_osgi_dp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21148,7 +21148,7 @@ impl MimeTypeChecker for T_vnd_otps_ct_kip_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21169,7 +21169,7 @@ impl MimeTypeChecker for T_vnd_palm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21190,7 +21190,7 @@ impl MimeTypeChecker for T_vnd_paos_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21211,7 +21211,7 @@ impl MimeTypeChecker for T_vnd_pg_format_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21232,7 +21232,7 @@ impl MimeTypeChecker for T_vnd_pg_osasli_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21253,7 +21253,7 @@ impl MimeTypeChecker for T_vnd_piaccess_application_licence_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21274,7 +21274,7 @@ impl MimeTypeChecker for T_vnd_picsel_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21295,7 +21295,7 @@ impl MimeTypeChecker for T_vnd_poc_group_advertisement_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21316,7 +21316,7 @@ impl MimeTypeChecker for T_vnd_pocketlearn_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21337,7 +21337,7 @@ impl MimeTypeChecker for T_vnd_powerbuilder6_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21358,7 +21358,7 @@ impl MimeTypeChecker for T_vnd_powerbuilder6_s_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21379,7 +21379,7 @@ impl MimeTypeChecker for T_vnd_powerbuilder7_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21400,7 +21400,7 @@ impl MimeTypeChecker for T_vnd_powerbuilder7_s_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21421,7 +21421,7 @@ impl MimeTypeChecker for T_vnd_powerbuilder75_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21442,7 +21442,7 @@ impl MimeTypeChecker for T_vnd_powerbuilder75_s_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21463,7 +21463,7 @@ impl MimeTypeChecker for T_vnd_preminet_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21484,7 +21484,7 @@ impl MimeTypeChecker for T_vnd_previewsystems_box_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21505,7 +21505,7 @@ impl MimeTypeChecker for T_vnd_proteus_magazine_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21526,7 +21526,7 @@ impl MimeTypeChecker for T_vnd_publishare_delta_tree_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21547,7 +21547,7 @@ impl MimeTypeChecker for T_vnd_pvi_ptid1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21568,7 +21568,7 @@ impl MimeTypeChecker for T_vnd_pwg_multiplexed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21589,7 +21589,7 @@ impl MimeTypeChecker for T_vnd_pwg_xhtml_print_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21610,7 +21610,7 @@ impl MimeTypeChecker for T_vnd_qualcomm_brew_app_res_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21631,7 +21631,7 @@ impl MimeTypeChecker for T_vnd_quark_quarkxpress_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21652,7 +21652,7 @@ impl MimeTypeChecker for T_vnd_rapid_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21673,7 +21673,7 @@ impl MimeTypeChecker for T_vnd_recordare_musicxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21694,7 +21694,7 @@ impl MimeTypeChecker for T_vnd_recordare_musicxml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21715,7 +21715,7 @@ impl MimeTypeChecker for T_vnd_renlearn_rlprint_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21736,7 +21736,7 @@ impl MimeTypeChecker for T_vnd_rim_cod_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21757,7 +21757,7 @@ impl MimeTypeChecker for T_vnd_route66_link66_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21778,7 +21778,7 @@ impl MimeTypeChecker for T_vnd_ruckus_download_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21799,7 +21799,7 @@ impl MimeTypeChecker for T_vnd_s3sms_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21820,7 +21820,7 @@ impl MimeTypeChecker for T_vnd_sbm_cid_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21841,7 +21841,7 @@ impl MimeTypeChecker for T_vnd_sbm_mid2_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21862,7 +21862,7 @@ impl MimeTypeChecker for T_vnd_scribus_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21883,7 +21883,7 @@ impl MimeTypeChecker for T_vnd_sealed_3df_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21904,7 +21904,7 @@ impl MimeTypeChecker for T_vnd_sealed_csf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21925,7 +21925,7 @@ impl MimeTypeChecker for T_vnd_sealed_doc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21946,7 +21946,7 @@ impl MimeTypeChecker for T_vnd_sealed_eml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21967,7 +21967,7 @@ impl MimeTypeChecker for T_vnd_sealed_mht_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -21988,7 +21988,7 @@ impl MimeTypeChecker for T_vnd_sealed_net_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22009,7 +22009,7 @@ impl MimeTypeChecker for T_vnd_sealed_ppt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22030,7 +22030,7 @@ impl MimeTypeChecker for T_vnd_sealed_tiff_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22051,7 +22051,7 @@ impl MimeTypeChecker for T_vnd_sealed_xls_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22072,7 +22072,7 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_html_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22093,7 +22093,7 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_pdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22114,7 +22114,7 @@ impl MimeTypeChecker for T_vnd_seemail_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22135,7 +22135,7 @@ impl MimeTypeChecker for T_vnd_sema_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22156,7 +22156,7 @@ impl MimeTypeChecker for T_vnd_semd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22177,7 +22177,7 @@ impl MimeTypeChecker for T_vnd_semf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22198,7 +22198,7 @@ impl MimeTypeChecker for T_vnd_shana_informed_formdata_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22219,7 +22219,7 @@ impl MimeTypeChecker for T_vnd_shana_informed_formtemplate_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22240,7 +22240,7 @@ impl MimeTypeChecker for T_vnd_shana_informed_interchange_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22261,7 +22261,7 @@ impl MimeTypeChecker for T_vnd_shana_informed_package_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22282,7 +22282,7 @@ impl MimeTypeChecker for T_vnd_simtech_mindmapper_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22303,7 +22303,7 @@ impl MimeTypeChecker for T_vnd_smaf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22324,7 +22324,7 @@ impl MimeTypeChecker for T_vnd_smart_teacher_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22345,7 +22345,7 @@ impl MimeTypeChecker for T_vnd_software602_filler_form_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22366,7 +22366,7 @@ impl MimeTypeChecker for T_vnd_software602_filler_form_xml_zip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22387,7 +22387,7 @@ impl MimeTypeChecker for T_vnd_solent_sdkm_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22408,7 +22408,7 @@ impl MimeTypeChecker for T_vnd_spotfire_dxp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22429,7 +22429,7 @@ impl MimeTypeChecker for T_vnd_spotfire_sfs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22450,7 +22450,7 @@ impl MimeTypeChecker for T_vnd_sss_cod_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22471,7 +22471,7 @@ impl MimeTypeChecker for T_vnd_sss_dtf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22492,7 +22492,7 @@ impl MimeTypeChecker for T_vnd_sss_ntf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22513,7 +22513,7 @@ impl MimeTypeChecker for T_vnd_stardivision_math_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22534,7 +22534,7 @@ impl MimeTypeChecker for T_x_staroffice_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22555,7 +22555,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_writer_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22576,7 +22576,7 @@ impl MimeTypeChecker for T_vnd_stardivision_writer_global_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22597,7 +22597,7 @@ impl MimeTypeChecker for T_vnd_street_stream_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22618,7 +22618,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_calc_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22639,7 +22639,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_draw_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22660,7 +22660,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_impress_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22681,7 +22681,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_math_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22702,7 +22702,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_writer_global_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22723,7 +22723,7 @@ impl MimeTypeChecker for T_vnd_sun_wadl_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22744,7 +22744,7 @@ impl MimeTypeChecker for T_vnd_sus_calendar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22765,7 +22765,7 @@ impl MimeTypeChecker for T_vnd_svd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22786,7 +22786,7 @@ impl MimeTypeChecker for T_vnd_swiftview_ics_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22807,7 +22807,7 @@ impl MimeTypeChecker for T_vnd_syncml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22828,7 +22828,7 @@ impl MimeTypeChecker for T_vnd_syncml_dm_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22849,7 +22849,7 @@ impl MimeTypeChecker for T_vnd_syncml_dm_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22870,7 +22870,7 @@ impl MimeTypeChecker for T_vnd_syncml_dm_notification_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22891,7 +22891,7 @@ impl MimeTypeChecker for T_vnd_syncml_ds_notification_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22912,7 +22912,7 @@ impl MimeTypeChecker for T_vnd_tao_intent_module_archive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22933,7 +22933,7 @@ impl MimeTypeChecker for T_vnd_tmobile_livetv_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22954,7 +22954,7 @@ impl MimeTypeChecker for T_vnd_trid_tpt_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22975,7 +22975,7 @@ impl MimeTypeChecker for T_vnd_triscape_mxs_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -22996,7 +22996,7 @@ impl MimeTypeChecker for T_vnd_trueapp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23017,7 +23017,7 @@ impl MimeTypeChecker for T_vnd_truedoc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23038,7 +23038,7 @@ impl MimeTypeChecker for T_vnd_ufdl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23059,7 +23059,7 @@ impl MimeTypeChecker for T_ttml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23080,7 +23080,7 @@ impl MimeTypeChecker for T_vnd_uiq_theme_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23101,7 +23101,7 @@ impl MimeTypeChecker for T_vnd_umajin_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23122,7 +23122,7 @@ impl MimeTypeChecker for T_vnd_unity_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23143,7 +23143,7 @@ impl MimeTypeChecker for T_vnd_uoml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23164,7 +23164,7 @@ impl MimeTypeChecker for T_vnd_uplanet_alert_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23185,7 +23185,7 @@ impl MimeTypeChecker for T_vnd_uplanet_alert_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23206,7 +23206,7 @@ impl MimeTypeChecker for T_vnd_uplanet_bearer_choice_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23227,7 +23227,7 @@ impl MimeTypeChecker for T_vnd_uplanet_bearer_choice_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23248,7 +23248,7 @@ impl MimeTypeChecker for T_vnd_uplanet_cacheop_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23269,7 +23269,7 @@ impl MimeTypeChecker for T_vnd_uplanet_cacheop_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23290,7 +23290,7 @@ impl MimeTypeChecker for T_vnd_uplanet_channel_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23311,7 +23311,7 @@ impl MimeTypeChecker for T_vnd_uplanet_channel_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23332,7 +23332,7 @@ impl MimeTypeChecker for T_vnd_uplanet_list_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23353,7 +23353,7 @@ impl MimeTypeChecker for T_vnd_uplanet_list_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23374,7 +23374,7 @@ impl MimeTypeChecker for T_vnd_uplanet_listcmd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23395,7 +23395,7 @@ impl MimeTypeChecker for T_vnd_uplanet_listcmd_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23416,7 +23416,7 @@ impl MimeTypeChecker for T_vnd_uplanet_signal_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23437,7 +23437,7 @@ impl MimeTypeChecker for T_vnd_vcx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23458,7 +23458,7 @@ impl MimeTypeChecker for T_vnd_vd_study_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23479,7 +23479,7 @@ impl MimeTypeChecker for T_vnd_vectorworks_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23500,7 +23500,7 @@ impl MimeTypeChecker for T_vnd_vidsoft_vidconference_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23521,7 +23521,7 @@ impl MimeTypeChecker for T_vnd_visio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23542,7 +23542,7 @@ impl MimeTypeChecker for T_vnd_ms_visio_drawing_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23563,7 +23563,7 @@ impl MimeTypeChecker for T_vnd_ms_visio_template_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23584,7 +23584,7 @@ impl MimeTypeChecker for T_vnd_ms_visio_stencil_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23605,7 +23605,7 @@ impl MimeTypeChecker for T_vnd_ms_visio_drawing_macroEnabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23626,7 +23626,7 @@ impl MimeTypeChecker for T_vnd_ms_visio_template_macroEnabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23647,7 +23647,7 @@ impl MimeTypeChecker for T_vnd_ms_visio_stencil_macroEnabled_12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23668,7 +23668,7 @@ impl MimeTypeChecker for T_vnd_visionary_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23689,7 +23689,7 @@ impl MimeTypeChecker for T_vnd_vividence_scriptfile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23710,7 +23710,7 @@ impl MimeTypeChecker for T_vnd_vsf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23731,7 +23731,7 @@ impl MimeTypeChecker for T_vnd_wap_sic_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23752,7 +23752,7 @@ impl MimeTypeChecker for T_vnd_wap_slc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23773,7 +23773,7 @@ impl MimeTypeChecker for T_vnd_wap_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23794,7 +23794,7 @@ impl MimeTypeChecker for T_vnd_wap_wmlc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23815,7 +23815,7 @@ impl MimeTypeChecker for T_vnd_wap_wmlscriptc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23836,7 +23836,7 @@ impl MimeTypeChecker for T_vnd_webturbo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23857,7 +23857,7 @@ impl MimeTypeChecker for T_vnd_wfa_wsc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23878,7 +23878,7 @@ impl MimeTypeChecker for T_vnd_wmc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23899,7 +23899,7 @@ impl MimeTypeChecker for T_vnd_wmf_bootstrap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23920,7 +23920,7 @@ impl MimeTypeChecker for T_vnd_wqd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23941,7 +23941,7 @@ impl MimeTypeChecker for T_vnd_wrq_hp3000_labelled_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23962,7 +23962,7 @@ impl MimeTypeChecker for T_vnd_wt_stf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -23983,7 +23983,7 @@ impl MimeTypeChecker for T_vnd_wv_csp_wbxml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24004,7 +24004,7 @@ impl MimeTypeChecker for T_vnd_wv_csp_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24025,7 +24025,7 @@ impl MimeTypeChecker for T_vnd_wv_ssp_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24046,7 +24046,7 @@ impl MimeTypeChecker for T_vnd_xfdl_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24067,7 +24067,7 @@ impl MimeTypeChecker for T_vnd_xfdl_webform_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24088,7 +24088,7 @@ impl MimeTypeChecker for T_vnd_xmi_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24109,7 +24109,7 @@ impl MimeTypeChecker for T_vnd_xmpie_cpkg_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24130,7 +24130,7 @@ impl MimeTypeChecker for T_vnd_xmpie_dpkg_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24151,7 +24151,7 @@ impl MimeTypeChecker for T_vnd_xmpie_plan_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24172,7 +24172,7 @@ impl MimeTypeChecker for T_vnd_xmpie_ppkg_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24193,7 +24193,7 @@ impl MimeTypeChecker for T_vnd_xmpie_xlim_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24214,7 +24214,7 @@ impl MimeTypeChecker for T_vnd_yamaha_hv_dic_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24235,7 +24235,7 @@ impl MimeTypeChecker for T_vnd_yamaha_hv_script_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24256,7 +24256,7 @@ impl MimeTypeChecker for T_vnd_yamaha_hv_voice_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24277,7 +24277,7 @@ impl MimeTypeChecker for T_vnd_yamaha_openscoreformat_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24298,7 +24298,7 @@ impl MimeTypeChecker for T_vnd_yamaha_openscoreformat_osfpvg_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24319,7 +24319,7 @@ impl MimeTypeChecker for T_vnd_yamaha_smaf_audio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24340,7 +24340,7 @@ impl MimeTypeChecker for T_vnd_yamaha_smaf_phrase_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24361,7 +24361,7 @@ impl MimeTypeChecker for T_vnd_yellowriver_custom_menu_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24382,7 +24382,7 @@ impl MimeTypeChecker for T_vnd_zul_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24403,7 +24403,7 @@ impl MimeTypeChecker for T_vnd_zzazz_deck_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24424,7 +24424,7 @@ impl MimeTypeChecker for T_voicexml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24445,7 +24445,7 @@ impl MimeTypeChecker for T_warc_gz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24466,7 +24466,7 @@ impl MimeTypeChecker for T_watcherinfo_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24487,7 +24487,7 @@ impl MimeTypeChecker for T_whoispp_query_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24508,7 +24508,7 @@ impl MimeTypeChecker for T_whoispp_response_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24529,7 +24529,7 @@ impl MimeTypeChecker for T_winhlp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24550,7 +24550,7 @@ impl MimeTypeChecker for T_wita_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24571,7 +24571,7 @@ impl MimeTypeChecker for T_wordperfect5_1_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24592,7 +24592,7 @@ impl MimeTypeChecker for T_wsdl_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24613,7 +24613,7 @@ impl MimeTypeChecker for T_wspolicy_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24634,7 +24634,7 @@ impl MimeTypeChecker for T_x_abiword_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24655,7 +24655,7 @@ impl MimeTypeChecker for T_x_ace_compressed_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24676,7 +24676,7 @@ impl MimeTypeChecker for T_x_amf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24697,7 +24697,7 @@ impl MimeTypeChecker for T_x_apple_diskimage_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24718,7 +24718,7 @@ impl MimeTypeChecker for T_x_appleworks_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24739,7 +24739,7 @@ impl MimeTypeChecker for T_x_authorware_bin_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24760,7 +24760,7 @@ impl MimeTypeChecker for T_x_authorware_map_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24781,7 +24781,7 @@ impl MimeTypeChecker for T_x_authorware_seg_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24802,7 +24802,7 @@ impl MimeTypeChecker for T_x_bcpio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24823,7 +24823,7 @@ impl MimeTypeChecker for T_x_plist_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24844,7 +24844,7 @@ impl MimeTypeChecker for T_x_brotli_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24865,7 +24865,7 @@ impl MimeTypeChecker for T_x_cdlink_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24886,7 +24886,7 @@ impl MimeTypeChecker for T_x_chat_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24907,7 +24907,7 @@ impl MimeTypeChecker for T_x_chess_pgn_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24928,7 +24928,7 @@ impl MimeTypeChecker for T_x_corelpresentations_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24949,7 +24949,7 @@ impl MimeTypeChecker for T_x_csh_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24970,7 +24970,7 @@ impl MimeTypeChecker for T_x_director_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -24991,7 +24991,7 @@ impl MimeTypeChecker for T_x_doom_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25012,7 +25012,7 @@ impl MimeTypeChecker for T_x_dtbncx_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25033,7 +25033,7 @@ impl MimeTypeChecker for T_x_dtbook_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25054,7 +25054,7 @@ impl MimeTypeChecker for T_x_dtbresource_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25075,7 +25075,7 @@ impl MimeTypeChecker for T_x_killustrator_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25096,7 +25096,7 @@ impl MimeTypeChecker for T_x_openscad_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25117,7 +25117,7 @@ impl MimeTypeChecker for T_x_dosexec_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25138,7 +25138,7 @@ impl MimeTypeChecker for T_x_font_bdf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25159,7 +25159,7 @@ impl MimeTypeChecker for T_x_font_dos_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25180,7 +25180,7 @@ impl MimeTypeChecker for T_x_font_framemaker_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25201,7 +25201,7 @@ impl MimeTypeChecker for T_x_font_ghostscript_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25222,7 +25222,7 @@ impl MimeTypeChecker for T_x_font_libgrx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25243,7 +25243,7 @@ impl MimeTypeChecker for T_x_font_linux_psf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25264,7 +25264,7 @@ impl MimeTypeChecker for T_x_font_pcf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25285,7 +25285,7 @@ impl MimeTypeChecker for T_x_font_snf_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25306,7 +25306,7 @@ impl MimeTypeChecker for T_x_font_speedo_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25327,7 +25327,7 @@ impl MimeTypeChecker for T_x_font_sunos_news_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25348,7 +25348,7 @@ impl MimeTypeChecker for T_x_font_vfont_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25369,7 +25369,7 @@ impl MimeTypeChecker for T_x_futuresplash_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25390,7 +25390,7 @@ impl MimeTypeChecker for T_x_gnucash_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25411,7 +25411,7 @@ impl MimeTypeChecker for T_x_esri_layer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25432,7 +25432,7 @@ impl MimeTypeChecker for T_x_hwp_v5_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25453,7 +25453,7 @@ impl MimeTypeChecker for T_hwp_zip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25474,7 +25474,7 @@ impl MimeTypeChecker for T_x_itunes_bplist_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25495,7 +25495,7 @@ impl MimeTypeChecker for T_x_itunes_ipa_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25516,7 +25516,7 @@ impl MimeTypeChecker for T_x_java_jnlp_file_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25537,7 +25537,7 @@ impl MimeTypeChecker for T_x_java_pack200_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25558,7 +25558,7 @@ impl MimeTypeChecker for T_x_lzma_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25579,7 +25579,7 @@ impl MimeTypeChecker for T_x_memgraph_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25600,7 +25600,7 @@ impl MimeTypeChecker for T_x_ms_application_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25621,7 +25621,7 @@ impl MimeTypeChecker for T_x_ms_wmd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25642,7 +25642,7 @@ impl MimeTypeChecker for T_x_ms_wmz_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25663,7 +25663,7 @@ impl MimeTypeChecker for T_x_ms_xbap_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25684,7 +25684,7 @@ impl MimeTypeChecker for T_x_msbinder_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25705,7 +25705,7 @@ impl MimeTypeChecker for T_x_mscardfile_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25726,7 +25726,7 @@ impl MimeTypeChecker for T_x_msclip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25747,7 +25747,7 @@ impl MimeTypeChecker for T_x_ms_installer_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25768,7 +25768,7 @@ impl MimeTypeChecker for T_x_msmediaview_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25789,7 +25789,7 @@ impl MimeTypeChecker for T_x_mspublisher_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25810,7 +25810,7 @@ impl MimeTypeChecker for T_x_msschedule_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25831,7 +25831,7 @@ impl MimeTypeChecker for T_x_msterminal_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25852,7 +25852,7 @@ impl MimeTypeChecker for T_x_mysql_misam_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25873,7 +25873,7 @@ impl MimeTypeChecker for T_x_pds_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25894,7 +25894,7 @@ impl MimeTypeChecker for T_x_pkcs12_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25915,7 +25915,7 @@ impl MimeTypeChecker for T_x_pkcs7_certificates_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25936,7 +25936,7 @@ impl MimeTypeChecker for T_x_pkcs7_certreqresp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25957,7 +25957,7 @@ impl MimeTypeChecker for T_xquery_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25978,7 +25978,7 @@ impl MimeTypeChecker for T_x_roxio_toast_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -25999,7 +25999,7 @@ impl MimeTypeChecker for T_x_sas_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26020,7 +26020,7 @@ impl MimeTypeChecker for T_x_sas_program_data_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26041,7 +26041,7 @@ impl MimeTypeChecker for T_x_sas_audit_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26062,7 +26062,7 @@ impl MimeTypeChecker for T_x_sas_view_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26083,7 +26083,7 @@ impl MimeTypeChecker for T_x_sas_data_index_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26104,7 +26104,7 @@ impl MimeTypeChecker for T_x_sas_catalog_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26125,7 +26125,7 @@ impl MimeTypeChecker for T_x_sas_access_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26146,7 +26146,7 @@ impl MimeTypeChecker for T_x_sas_fdb_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26167,7 +26167,7 @@ impl MimeTypeChecker for T_x_sas_mddb_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26188,7 +26188,7 @@ impl MimeTypeChecker for T_x_sas_dmdb_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26209,7 +26209,7 @@ impl MimeTypeChecker for T_x_sas_itemstor_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26230,7 +26230,7 @@ impl MimeTypeChecker for T_x_sas_utility_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26251,7 +26251,7 @@ impl MimeTypeChecker for T_x_sas_putility_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26272,7 +26272,7 @@ impl MimeTypeChecker for T_x_sas_transport_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26293,7 +26293,7 @@ impl MimeTypeChecker for T_x_sas_backup_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26314,7 +26314,7 @@ impl MimeTypeChecker for T_x_shar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26335,7 +26335,7 @@ impl MimeTypeChecker for T_x_silverlight_app_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26356,7 +26356,7 @@ impl MimeTypeChecker for T_x_sfdu_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26377,7 +26377,7 @@ impl MimeTypeChecker for T_x_stata_do_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26398,7 +26398,7 @@ impl MimeTypeChecker for T_x_stuffitx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26419,7 +26419,7 @@ impl MimeTypeChecker for T_x_sv4cpio_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26440,7 +26440,7 @@ impl MimeTypeChecker for T_x_sv4crc_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26461,7 +26461,7 @@ impl MimeTypeChecker for T_x_tex_tfm_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26482,7 +26482,7 @@ impl MimeTypeChecker for T_x_tika_msoffice_embedded_format_ole10_native_applicat
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26503,7 +26503,7 @@ impl MimeTypeChecker for T_x_tika_msoffice_embedded_format_comp_obj_application 
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26524,7 +26524,7 @@ impl MimeTypeChecker for T_x_tika_ooxml_protected_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26545,7 +26545,7 @@ impl MimeTypeChecker for T_x_ustar_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26566,7 +26566,7 @@ impl MimeTypeChecker for T_x_vmdk_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26587,7 +26587,7 @@ impl MimeTypeChecker for T_x_wais_source_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26608,7 +26608,7 @@ impl MimeTypeChecker for T_x_webarchive_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26629,7 +26629,7 @@ impl MimeTypeChecker for T_x_xfig_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26650,7 +26650,7 @@ impl MimeTypeChecker for T_x_xpinstall_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26671,7 +26671,7 @@ impl MimeTypeChecker for T_x_xmind_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26692,7 +26692,7 @@ impl MimeTypeChecker for T_x400_bp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26713,7 +26713,7 @@ impl MimeTypeChecker for T_xcap_att_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26734,7 +26734,7 @@ impl MimeTypeChecker for T_xcap_caps_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26755,7 +26755,7 @@ impl MimeTypeChecker for T_xcap_el_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26776,7 +26776,7 @@ impl MimeTypeChecker for T_xcap_error_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26797,7 +26797,7 @@ impl MimeTypeChecker for T_xcap_ns_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26818,7 +26818,7 @@ impl MimeTypeChecker for T_xcon_conference_info_diff_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26839,7 +26839,7 @@ impl MimeTypeChecker for T_xcon_conference_info_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26860,7 +26860,7 @@ impl MimeTypeChecker for T_xenc_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26881,7 +26881,7 @@ impl MimeTypeChecker for T_xhtml_voice_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26902,7 +26902,7 @@ impl MimeTypeChecker for T_xml_dtd_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26923,7 +26923,7 @@ impl MimeTypeChecker for T_xml_external_parsed_entity_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26944,7 +26944,7 @@ impl MimeTypeChecker for T_xmpp_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26965,7 +26965,7 @@ impl MimeTypeChecker for T_xop_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -26986,7 +26986,7 @@ impl MimeTypeChecker for T_xslfo_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27007,7 +27007,7 @@ impl MimeTypeChecker for T_xslt_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27028,7 +27028,7 @@ impl MimeTypeChecker for T_xspf_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27049,7 +27049,7 @@ impl MimeTypeChecker for T_xv_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27070,7 +27070,7 @@ impl MimeTypeChecker for T_32kadpcm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27091,7 +27091,7 @@ impl MimeTypeChecker for T_adpcm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27112,7 +27112,7 @@ impl MimeTypeChecker for T_amr_wb__audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27133,7 +27133,7 @@ impl MimeTypeChecker for T_asc_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27154,7 +27154,7 @@ impl MimeTypeChecker for T_bv16_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27175,7 +27175,7 @@ impl MimeTypeChecker for T_bv32_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27196,7 +27196,7 @@ impl MimeTypeChecker for T_clearmode_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27217,7 +27217,7 @@ impl MimeTypeChecker for T_cn_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27238,7 +27238,7 @@ impl MimeTypeChecker for T_dat12_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27259,7 +27259,7 @@ impl MimeTypeChecker for T_dls_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27280,7 +27280,7 @@ impl MimeTypeChecker for T_dsr_es201108_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27301,7 +27301,7 @@ impl MimeTypeChecker for T_dsr_es202050_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27322,7 +27322,7 @@ impl MimeTypeChecker for T_dsr_es202211_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27343,7 +27343,7 @@ impl MimeTypeChecker for T_dsr_es202212_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27364,7 +27364,7 @@ impl MimeTypeChecker for T_dvi4_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27385,7 +27385,7 @@ impl MimeTypeChecker for T_evrc_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27406,7 +27406,7 @@ impl MimeTypeChecker for T_evrc_qcp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27427,7 +27427,7 @@ impl MimeTypeChecker for T_evrc0_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27448,7 +27448,7 @@ impl MimeTypeChecker for T_evrc1_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27469,7 +27469,7 @@ impl MimeTypeChecker for T_evrcb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27490,7 +27490,7 @@ impl MimeTypeChecker for T_evrcb0_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27511,7 +27511,7 @@ impl MimeTypeChecker for T_evrcb1_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27532,7 +27532,7 @@ impl MimeTypeChecker for T_evrcwb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27553,7 +27553,7 @@ impl MimeTypeChecker for T_evrcwb0_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27574,7 +27574,7 @@ impl MimeTypeChecker for T_evrcwb1_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27595,7 +27595,7 @@ impl MimeTypeChecker for T_example_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27616,7 +27616,7 @@ impl MimeTypeChecker for T_g719_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27637,7 +27637,7 @@ impl MimeTypeChecker for T_g722_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27658,7 +27658,7 @@ impl MimeTypeChecker for T_g7221_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27679,7 +27679,7 @@ impl MimeTypeChecker for T_g723_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27700,7 +27700,7 @@ impl MimeTypeChecker for T_g726_16_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27721,7 +27721,7 @@ impl MimeTypeChecker for T_g726_24_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27742,7 +27742,7 @@ impl MimeTypeChecker for T_g726_32_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27763,7 +27763,7 @@ impl MimeTypeChecker for T_g726_40_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27784,7 +27784,7 @@ impl MimeTypeChecker for T_g728_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27805,7 +27805,7 @@ impl MimeTypeChecker for T_g729_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27826,7 +27826,7 @@ impl MimeTypeChecker for T_g7291_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27847,7 +27847,7 @@ impl MimeTypeChecker for T_g729d_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27868,7 +27868,7 @@ impl MimeTypeChecker for T_g729e_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27889,7 +27889,7 @@ impl MimeTypeChecker for T_gsm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27910,7 +27910,7 @@ impl MimeTypeChecker for T_gsm_efr_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27931,7 +27931,7 @@ impl MimeTypeChecker for T_ilbc_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27952,7 +27952,7 @@ impl MimeTypeChecker for T_l16_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27973,7 +27973,7 @@ impl MimeTypeChecker for T_l20_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -27994,7 +27994,7 @@ impl MimeTypeChecker for T_l24_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28015,7 +28015,7 @@ impl MimeTypeChecker for T_l8_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28036,7 +28036,7 @@ impl MimeTypeChecker for T_lpc_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28057,7 +28057,7 @@ impl MimeTypeChecker for T_mobile_xmf_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28078,7 +28078,7 @@ impl MimeTypeChecker for T_mp4a_latm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28099,7 +28099,7 @@ impl MimeTypeChecker for T_mpa_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28120,7 +28120,7 @@ impl MimeTypeChecker for T_mpa_robust_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28141,7 +28141,7 @@ impl MimeTypeChecker for T_mpeg4_generic_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28162,7 +28162,7 @@ impl MimeTypeChecker for T_parityfec_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28183,7 +28183,7 @@ impl MimeTypeChecker for T_pcma_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28204,7 +28204,7 @@ impl MimeTypeChecker for T_pcma_wb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28225,7 +28225,7 @@ impl MimeTypeChecker for T_pcmu_wb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28246,7 +28246,7 @@ impl MimeTypeChecker for T_pcmu_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28267,7 +28267,7 @@ impl MimeTypeChecker for T_red_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28288,7 +28288,7 @@ impl MimeTypeChecker for T_rtp_enc_aescm128_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28309,7 +28309,7 @@ impl MimeTypeChecker for T_rtp_midi_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28330,7 +28330,7 @@ impl MimeTypeChecker for T_rtx_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28351,7 +28351,7 @@ impl MimeTypeChecker for T_smv_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28372,7 +28372,7 @@ impl MimeTypeChecker for T_smv0_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28393,7 +28393,7 @@ impl MimeTypeChecker for T_smv_qcp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28414,7 +28414,7 @@ impl MimeTypeChecker for T_sp_midi_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28435,7 +28435,7 @@ impl MimeTypeChecker for T_t140c_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28456,7 +28456,7 @@ impl MimeTypeChecker for T_t38_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28477,7 +28477,7 @@ impl MimeTypeChecker for T_telephone_event_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28498,7 +28498,7 @@ impl MimeTypeChecker for T_tone_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28519,7 +28519,7 @@ impl MimeTypeChecker for T_ulpfec_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28540,7 +28540,7 @@ impl MimeTypeChecker for T_vdvi_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28561,7 +28561,7 @@ impl MimeTypeChecker for T_vmr_wb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28582,7 +28582,7 @@ impl MimeTypeChecker for T_vnd_3gpp_iufp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28603,7 +28603,7 @@ impl MimeTypeChecker for T_vnd_4sb_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28624,7 +28624,7 @@ impl MimeTypeChecker for T_vnd_audiokoz_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28645,7 +28645,7 @@ impl MimeTypeChecker for T_vnd_adobe_soundbooth_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28666,7 +28666,7 @@ impl MimeTypeChecker for T_vnd_celp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28687,7 +28687,7 @@ impl MimeTypeChecker for T_vnd_cisco_nse_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28708,7 +28708,7 @@ impl MimeTypeChecker for T_vnd_cmles_radio_events_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28729,7 +28729,7 @@ impl MimeTypeChecker for T_vnd_cns_anp1_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28750,7 +28750,7 @@ impl MimeTypeChecker for T_vnd_cns_inf1_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28771,7 +28771,7 @@ impl MimeTypeChecker for T_vnd_digital_winds_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28792,7 +28792,7 @@ impl MimeTypeChecker for T_vnd_dlna_adts_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28813,7 +28813,7 @@ impl MimeTypeChecker for T_vnd_dolby_heaac_1_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28834,7 +28834,7 @@ impl MimeTypeChecker for T_vnd_dolby_heaac_2_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28855,7 +28855,7 @@ impl MimeTypeChecker for T_vnd_dolby_mlp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28876,7 +28876,7 @@ impl MimeTypeChecker for T_vnd_dolby_mps_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28897,7 +28897,7 @@ impl MimeTypeChecker for T_vnd_dolby_pl2_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28918,7 +28918,7 @@ impl MimeTypeChecker for T_vnd_dolby_pl2x_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28939,7 +28939,7 @@ impl MimeTypeChecker for T_vnd_dolby_pl2z_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28960,7 +28960,7 @@ impl MimeTypeChecker for T_vnd_dts_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -28981,7 +28981,7 @@ impl MimeTypeChecker for T_vnd_dts_hd_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29002,7 +29002,7 @@ impl MimeTypeChecker for T_vnd_everad_plj_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29023,7 +29023,7 @@ impl MimeTypeChecker for T_vnd_hns_audio_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29044,7 +29044,7 @@ impl MimeTypeChecker for T_vnd_lucent_voice_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29065,7 +29065,7 @@ impl MimeTypeChecker for T_vnd_ms_playready_media_pya_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29086,7 +29086,7 @@ impl MimeTypeChecker for T_vnd_nokia_mobile_xmf_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29107,7 +29107,7 @@ impl MimeTypeChecker for T_vnd_nortel_vbk_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29128,7 +29128,7 @@ impl MimeTypeChecker for T_vnd_nuera_ecelp4800_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29149,7 +29149,7 @@ impl MimeTypeChecker for T_vnd_nuera_ecelp7470_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29170,7 +29170,7 @@ impl MimeTypeChecker for T_vnd_nuera_ecelp9600_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29191,7 +29191,7 @@ impl MimeTypeChecker for T_vnd_octel_sbc_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29212,7 +29212,7 @@ impl MimeTypeChecker for T_vnd_qcelp_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29233,7 +29233,7 @@ impl MimeTypeChecker for T_vnd_rhetorex_32kadpcm_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29254,7 +29254,7 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_mpeg_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29275,7 +29275,7 @@ impl MimeTypeChecker for T_vnd_vmx_cvsd_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29296,7 +29296,7 @@ impl MimeTypeChecker for T_vorbis_config_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29317,7 +29317,7 @@ impl MimeTypeChecker for T_x_ms_wax_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29338,7 +29338,7 @@ impl MimeTypeChecker for T_x_pn_realaudio_plugin_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29359,7 +29359,7 @@ impl MimeTypeChecker for T_x_cif_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29380,7 +29380,7 @@ impl MimeTypeChecker for T_x_cmdf_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29401,7 +29401,7 @@ impl MimeTypeChecker for T_x_cml_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29422,7 +29422,7 @@ impl MimeTypeChecker for T_x_csml_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29443,7 +29443,7 @@ impl MimeTypeChecker for T_x_pdb_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29464,7 +29464,7 @@ impl MimeTypeChecker for T_x_xyz_chemical {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29485,7 +29485,7 @@ impl MimeTypeChecker for T_x_emf_compressed_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29506,7 +29506,7 @@ impl MimeTypeChecker for T_example_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29527,7 +29527,7 @@ impl MimeTypeChecker for T_g3fax_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29548,7 +29548,7 @@ impl MimeTypeChecker for T_ief_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29569,7 +29569,7 @@ impl MimeTypeChecker for T_naplps_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29590,7 +29590,7 @@ impl MimeTypeChecker for T_prs_btif_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29611,7 +29611,7 @@ impl MimeTypeChecker for T_prs_pti_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29632,7 +29632,7 @@ impl MimeTypeChecker for T_t38_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29653,7 +29653,7 @@ impl MimeTypeChecker for T_tiff_fx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29674,7 +29674,7 @@ impl MimeTypeChecker for T_vnd_adobe_premiere_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29695,7 +29695,7 @@ impl MimeTypeChecker for T_vnd_cns_inf2_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29716,7 +29716,7 @@ impl MimeTypeChecker for T_vnd_dgn_version_8_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29737,7 +29737,7 @@ impl MimeTypeChecker for T_vnd_fastbidsheet_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29758,7 +29758,7 @@ impl MimeTypeChecker for T_vnd_fpx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29779,7 +29779,7 @@ impl MimeTypeChecker for T_vnd_fst_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29800,7 +29800,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_edmics_mmr_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29821,7 +29821,7 @@ impl MimeTypeChecker for T_vnd_fujixerox_edmics_rlc_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29842,7 +29842,7 @@ impl MimeTypeChecker for T_vnd_globalgraphics_pgb_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29863,7 +29863,7 @@ impl MimeTypeChecker for T_vnd_mix_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29884,7 +29884,7 @@ impl MimeTypeChecker for T_vnd_net_fpx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29905,7 +29905,7 @@ impl MimeTypeChecker for T_vnd_sealed_png_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29926,7 +29926,7 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_gif_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29947,7 +29947,7 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_jpg_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29968,7 +29968,7 @@ impl MimeTypeChecker for T_vnd_svf_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -29989,7 +29989,7 @@ impl MimeTypeChecker for T_vnd_wap_wbmp_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30010,7 +30010,7 @@ impl MimeTypeChecker for T_vnd_xiff_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30031,7 +30031,7 @@ impl MimeTypeChecker for T_x_cmu_raster_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30052,7 +30052,7 @@ impl MimeTypeChecker for T_x_cmx_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30073,7 +30073,7 @@ impl MimeTypeChecker for T_x_raw_adobe_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30094,7 +30094,7 @@ impl MimeTypeChecker for T_x_raw_hasselblad_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30115,7 +30115,7 @@ impl MimeTypeChecker for T_x_raw_fuji_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30136,7 +30136,7 @@ impl MimeTypeChecker for T_x_raw_kodak_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30157,7 +30157,7 @@ impl MimeTypeChecker for T_x_raw_minolta_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30178,7 +30178,7 @@ impl MimeTypeChecker for T_x_raw_nikon_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30199,7 +30199,7 @@ impl MimeTypeChecker for T_x_raw_pentax_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30220,7 +30220,7 @@ impl MimeTypeChecker for T_x_raw_sony_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30241,7 +30241,7 @@ impl MimeTypeChecker for T_x_raw_sigma_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30262,7 +30262,7 @@ impl MimeTypeChecker for T_x_raw_epson_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30283,7 +30283,7 @@ impl MimeTypeChecker for T_x_raw_mamiya_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30304,7 +30304,7 @@ impl MimeTypeChecker for T_x_raw_leaf_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30325,7 +30325,7 @@ impl MimeTypeChecker for T_x_raw_panasonic_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30346,7 +30346,7 @@ impl MimeTypeChecker for T_x_raw_phaseone_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30367,7 +30367,7 @@ impl MimeTypeChecker for T_x_raw_red_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30388,7 +30388,7 @@ impl MimeTypeChecker for T_x_raw_imacon_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30409,7 +30409,7 @@ impl MimeTypeChecker for T_x_raw_logitech_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30430,7 +30430,7 @@ impl MimeTypeChecker for T_x_raw_casio_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30451,7 +30451,7 @@ impl MimeTypeChecker for T_x_raw_rawzor_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30472,7 +30472,7 @@ impl MimeTypeChecker for T_x_xwindowdump_image {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30493,7 +30493,7 @@ impl MimeTypeChecker for T_cpim_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30514,7 +30514,7 @@ impl MimeTypeChecker for T_delivery_status_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30535,7 +30535,7 @@ impl MimeTypeChecker for T_disposition_notification_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30556,7 +30556,7 @@ impl MimeTypeChecker for T_example_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30577,7 +30577,7 @@ impl MimeTypeChecker for T_external_body_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30598,7 +30598,7 @@ impl MimeTypeChecker for T_global_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30619,7 +30619,7 @@ impl MimeTypeChecker for T_global_delivery_status_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30640,7 +30640,7 @@ impl MimeTypeChecker for T_global_disposition_notification_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30661,7 +30661,7 @@ impl MimeTypeChecker for T_global_headers_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30682,7 +30682,7 @@ impl MimeTypeChecker for T_http_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30703,7 +30703,7 @@ impl MimeTypeChecker for T_imdn_xml_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30724,7 +30724,7 @@ impl MimeTypeChecker for T_partial_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30745,7 +30745,7 @@ impl MimeTypeChecker for T_s_http_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30766,7 +30766,7 @@ impl MimeTypeChecker for T_sip_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30787,7 +30787,7 @@ impl MimeTypeChecker for T_sipfrag_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30808,7 +30808,7 @@ impl MimeTypeChecker for T_tracking_status_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30829,7 +30829,7 @@ impl MimeTypeChecker for T_vnd_si_simp_message {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30850,7 +30850,7 @@ impl MimeTypeChecker for T_example_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30871,7 +30871,7 @@ impl MimeTypeChecker for T_iges_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30892,7 +30892,7 @@ impl MimeTypeChecker for T_mesh_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30913,7 +30913,7 @@ impl MimeTypeChecker for T_x_stl_binary_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30934,7 +30934,7 @@ impl MimeTypeChecker for T_vnd_dwfx_xps_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30955,7 +30955,7 @@ impl MimeTypeChecker for T_vnd_flatland_3dml_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30976,7 +30976,7 @@ impl MimeTypeChecker for T_vnd_gdl_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -30997,7 +30997,7 @@ impl MimeTypeChecker for T_vnd_gs_gdl_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31018,7 +31018,7 @@ impl MimeTypeChecker for T_vnd_gtw_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31039,7 +31039,7 @@ impl MimeTypeChecker for T_vnd_moml_xml_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31060,7 +31060,7 @@ impl MimeTypeChecker for T_vnd_mts_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31081,7 +31081,7 @@ impl MimeTypeChecker for T_vnd_parasolid_transmit_binary_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31102,7 +31102,7 @@ impl MimeTypeChecker for T_vnd_parasolid_transmit_text_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31123,7 +31123,7 @@ impl MimeTypeChecker for T_vnd_vtu_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31144,7 +31144,7 @@ impl MimeTypeChecker for T_vrml_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31165,7 +31165,7 @@ impl MimeTypeChecker for T_alternative_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31186,7 +31186,7 @@ impl MimeTypeChecker for T_byteranges_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31207,7 +31207,7 @@ impl MimeTypeChecker for T_digest_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31228,7 +31228,7 @@ impl MimeTypeChecker for T_encrypted_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31249,7 +31249,7 @@ impl MimeTypeChecker for T_example_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31270,7 +31270,7 @@ impl MimeTypeChecker for T_form_data_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31291,7 +31291,7 @@ impl MimeTypeChecker for T_header_set_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31312,7 +31312,7 @@ impl MimeTypeChecker for T_mixed_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31333,7 +31333,7 @@ impl MimeTypeChecker for T_parallel_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31354,7 +31354,7 @@ impl MimeTypeChecker for T_report_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31375,7 +31375,7 @@ impl MimeTypeChecker for T_signed_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31396,7 +31396,7 @@ impl MimeTypeChecker for T_voice_message_multipart {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31417,7 +31417,7 @@ impl MimeTypeChecker for T_dif_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31438,7 +31438,7 @@ impl MimeTypeChecker for T_onix_message_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31459,7 +31459,7 @@ impl MimeTypeChecker for T_onix_message_short_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31480,7 +31480,7 @@ impl MimeTypeChecker for T_x_actionscript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31501,7 +31501,7 @@ impl MimeTypeChecker for T_x_ada_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31522,7 +31522,7 @@ impl MimeTypeChecker for T_x_applescript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31543,7 +31543,7 @@ impl MimeTypeChecker for T_asp_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31564,7 +31564,7 @@ impl MimeTypeChecker for T_aspdotnet_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31585,7 +31585,7 @@ impl MimeTypeChecker for T_x_aspectj_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31606,7 +31606,7 @@ impl MimeTypeChecker for T_x_assembly_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31627,7 +31627,7 @@ impl MimeTypeChecker for T_x_config_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31648,7 +31648,7 @@ impl MimeTypeChecker for T_css_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31669,7 +31669,7 @@ impl MimeTypeChecker for T_csv_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31690,7 +31690,7 @@ impl MimeTypeChecker for T_directory_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31711,7 +31711,7 @@ impl MimeTypeChecker for T_dns_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31732,7 +31732,7 @@ impl MimeTypeChecker for T_ecmascript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31753,7 +31753,7 @@ impl MimeTypeChecker for T_enriched_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31774,7 +31774,7 @@ impl MimeTypeChecker for T_example_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31795,7 +31795,7 @@ impl MimeTypeChecker for T_parityfec_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31816,7 +31816,7 @@ impl MimeTypeChecker for T_prs_fallenstein_rst_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31837,7 +31837,7 @@ impl MimeTypeChecker for T_prs_lines_tag_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31858,7 +31858,7 @@ impl MimeTypeChecker for T_red_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31879,7 +31879,7 @@ impl MimeTypeChecker for T_rfc822_headers_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31900,7 +31900,7 @@ impl MimeTypeChecker for T_richtext_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31921,7 +31921,7 @@ impl MimeTypeChecker for T_rtp_enc_aescm128_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31942,7 +31942,7 @@ impl MimeTypeChecker for T_rtx_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31963,7 +31963,7 @@ impl MimeTypeChecker for T_sgml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -31984,7 +31984,7 @@ impl MimeTypeChecker for T_t140_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32005,7 +32005,7 @@ impl MimeTypeChecker for T_tab_separated_values_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32026,7 +32026,7 @@ impl MimeTypeChecker for T_ulpfec_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32047,7 +32047,7 @@ impl MimeTypeChecker for T_uri_list_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32068,7 +32068,7 @@ impl MimeTypeChecker for T_vnd_abc_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32089,7 +32089,7 @@ impl MimeTypeChecker for T_vnd_curl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32110,7 +32110,7 @@ impl MimeTypeChecker for T_vnd_curl_dcurl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32131,7 +32131,7 @@ impl MimeTypeChecker for T_vnd_curl_scurl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32152,7 +32152,7 @@ impl MimeTypeChecker for T_vnd_curl_mcurl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32173,7 +32173,7 @@ impl MimeTypeChecker for T_vnd_dmclientscript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32194,7 +32194,7 @@ impl MimeTypeChecker for T_vnd_esmertec_theme_descriptor_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32215,7 +32215,7 @@ impl MimeTypeChecker for T_vnd_fly_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32236,7 +32236,7 @@ impl MimeTypeChecker for T_vnd_fmi_flexstor_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32257,7 +32257,7 @@ impl MimeTypeChecker for T_vnd_in3d_3dml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32278,7 +32278,7 @@ impl MimeTypeChecker for T_vnd_in3d_spot_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32299,7 +32299,7 @@ impl MimeTypeChecker for T_vnd_iptc_newsml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32320,7 +32320,7 @@ impl MimeTypeChecker for T_vnd_iptc_nitf_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32341,7 +32341,7 @@ impl MimeTypeChecker for T_vnd_latex_z_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32362,7 +32362,7 @@ impl MimeTypeChecker for T_vnd_motorola_reflex_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32383,7 +32383,7 @@ impl MimeTypeChecker for T_vnd_ms_mediapackage_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32404,7 +32404,7 @@ impl MimeTypeChecker for T_vnd_net2phone_commcenter_command_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32425,7 +32425,7 @@ impl MimeTypeChecker for T_vnd_si_uricatalogue_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32446,7 +32446,7 @@ impl MimeTypeChecker for T_vnd_sun_j2me_app_descriptor_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32467,7 +32467,7 @@ impl MimeTypeChecker for T_vnd_trolltech_linguist_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32488,7 +32488,7 @@ impl MimeTypeChecker for T_vnd_wap_si_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32509,7 +32509,7 @@ impl MimeTypeChecker for T_vnd_wap_sl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32530,7 +32530,7 @@ impl MimeTypeChecker for T_vnd_wap_wml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32551,7 +32551,7 @@ impl MimeTypeChecker for T_vnd_wap_wmlscript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32572,7 +32572,7 @@ impl MimeTypeChecker for T_x_c__hdr_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32593,7 +32593,7 @@ impl MimeTypeChecker for T_x_c__src_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32614,7 +32614,7 @@ impl MimeTypeChecker for T_x_cgi_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32635,7 +32635,7 @@ impl MimeTypeChecker for T_x_clojure_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32656,7 +32656,7 @@ impl MimeTypeChecker for T_x_coffeescript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32677,7 +32677,7 @@ impl MimeTypeChecker for T_x_csharp_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32698,7 +32698,7 @@ impl MimeTypeChecker for T_x_cobol_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32719,7 +32719,7 @@ impl MimeTypeChecker for T_x_coldfusion_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32740,7 +32740,7 @@ impl MimeTypeChecker for T_x_common_lisp_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32761,7 +32761,7 @@ impl MimeTypeChecker for T_x_eiffel_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32782,7 +32782,7 @@ impl MimeTypeChecker for T_x_emacs_lisp_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32803,7 +32803,7 @@ impl MimeTypeChecker for T_x_erlang_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32824,7 +32824,7 @@ impl MimeTypeChecker for T_x_expect_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32845,7 +32845,7 @@ impl MimeTypeChecker for T_x_forth_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32866,7 +32866,7 @@ impl MimeTypeChecker for T_x_fortran_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32887,7 +32887,7 @@ impl MimeTypeChecker for T_x_go_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32908,7 +32908,7 @@ impl MimeTypeChecker for T_x_groovy_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32929,7 +32929,7 @@ impl MimeTypeChecker for T_x_haskell_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32950,7 +32950,7 @@ impl MimeTypeChecker for T_x_idl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32971,7 +32971,7 @@ impl MimeTypeChecker for T_x_ini_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -32992,7 +32992,7 @@ impl MimeTypeChecker for T_x_java_source_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33013,7 +33013,7 @@ impl MimeTypeChecker for T_x_java_properties_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33034,7 +33034,7 @@ impl MimeTypeChecker for T_x_less_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33055,7 +33055,7 @@ impl MimeTypeChecker for T_x_lex_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33076,7 +33076,7 @@ impl MimeTypeChecker for T_x_log_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33097,7 +33097,7 @@ impl MimeTypeChecker for T_x_ml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33118,7 +33118,7 @@ impl MimeTypeChecker for T_x_modula_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33139,7 +33139,7 @@ impl MimeTypeChecker for T_x_objcsrc_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33160,7 +33160,7 @@ impl MimeTypeChecker for T_x_ocaml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33181,7 +33181,7 @@ impl MimeTypeChecker for T_x_pascal_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33202,7 +33202,7 @@ impl MimeTypeChecker for T_x_prolog_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33223,7 +33223,7 @@ impl MimeTypeChecker for T_x_rst_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33244,7 +33244,7 @@ impl MimeTypeChecker for T_x_rexx_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33265,7 +33265,7 @@ impl MimeTypeChecker for T_x_ruby_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33286,7 +33286,7 @@ impl MimeTypeChecker for T_x_scala_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33307,7 +33307,7 @@ impl MimeTypeChecker for T_x_scheme_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33328,7 +33328,7 @@ impl MimeTypeChecker for T_x_sed_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33349,7 +33349,7 @@ impl MimeTypeChecker for T_x_sql_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33370,7 +33370,7 @@ impl MimeTypeChecker for T_x_setext_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33391,7 +33391,7 @@ impl MimeTypeChecker for T_x_stsrc_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33412,7 +33412,7 @@ impl MimeTypeChecker for T_x_vbdotnet_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33433,7 +33433,7 @@ impl MimeTypeChecker for T_x_vbscript_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33454,7 +33454,7 @@ impl MimeTypeChecker for T_x_verilog_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33475,7 +33475,7 @@ impl MimeTypeChecker for T_x_vhdl_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33496,7 +33496,7 @@ impl MimeTypeChecker for T_x_web_markdown_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33517,7 +33517,7 @@ impl MimeTypeChecker for T_x_yacc_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33538,7 +33538,7 @@ impl MimeTypeChecker for T_x_yaml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33559,7 +33559,7 @@ impl MimeTypeChecker for T_3gpp_tt_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33580,7 +33580,7 @@ impl MimeTypeChecker for T_bmpeg_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33601,7 +33601,7 @@ impl MimeTypeChecker for T_bt656_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33622,7 +33622,7 @@ impl MimeTypeChecker for T_celb_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33643,7 +33643,7 @@ impl MimeTypeChecker for T_dv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33664,7 +33664,7 @@ impl MimeTypeChecker for T_example_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33685,7 +33685,7 @@ impl MimeTypeChecker for T_h261_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33706,7 +33706,7 @@ impl MimeTypeChecker for T_h263_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33727,7 +33727,7 @@ impl MimeTypeChecker for T_h263_1998_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33748,7 +33748,7 @@ impl MimeTypeChecker for T_h263_2000_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33769,7 +33769,7 @@ impl MimeTypeChecker for T_h264_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33790,7 +33790,7 @@ impl MimeTypeChecker for T_iso_segment_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33811,7 +33811,7 @@ impl MimeTypeChecker for T_jpeg_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33832,7 +33832,7 @@ impl MimeTypeChecker for T_jpeg2000_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33853,7 +33853,7 @@ impl MimeTypeChecker for T_mp1s_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33874,7 +33874,7 @@ impl MimeTypeChecker for T_mp2p_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33895,7 +33895,7 @@ impl MimeTypeChecker for T_mp2t_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33916,7 +33916,7 @@ impl MimeTypeChecker for T_mp4v_es_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33937,7 +33937,7 @@ impl MimeTypeChecker for T_mpeg4_generic_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33958,7 +33958,7 @@ impl MimeTypeChecker for T_mpv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -33979,7 +33979,7 @@ impl MimeTypeChecker for T_nv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34000,7 +34000,7 @@ impl MimeTypeChecker for T_parityfec_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34021,7 +34021,7 @@ impl MimeTypeChecker for T_pointer_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34042,7 +34042,7 @@ impl MimeTypeChecker for T_raw_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34063,7 +34063,7 @@ impl MimeTypeChecker for T_rtp_enc_aescm128_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34084,7 +34084,7 @@ impl MimeTypeChecker for T_rtx_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34105,7 +34105,7 @@ impl MimeTypeChecker for T_smpte292m_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34126,7 +34126,7 @@ impl MimeTypeChecker for T_ulpfec_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34147,7 +34147,7 @@ impl MimeTypeChecker for T_vc1_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34168,7 +34168,7 @@ impl MimeTypeChecker for T_vnd_cctv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34189,7 +34189,7 @@ impl MimeTypeChecker for T_vnd_dlna_mpeg_tts_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34210,7 +34210,7 @@ impl MimeTypeChecker for T_vnd_fvt_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34231,7 +34231,7 @@ impl MimeTypeChecker for T_vnd_hns_video_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34252,7 +34252,7 @@ impl MimeTypeChecker for T_vnd_iptvforum_1dparityfec_1010_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34273,7 +34273,7 @@ impl MimeTypeChecker for T_vnd_iptvforum_1dparityfec_2005_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34294,7 +34294,7 @@ impl MimeTypeChecker for T_vnd_iptvforum_2dparityfec_1010_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34315,7 +34315,7 @@ impl MimeTypeChecker for T_vnd_iptvforum_2dparityfec_2005_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34336,7 +34336,7 @@ impl MimeTypeChecker for T_vnd_iptvforum_ttsavc_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34357,7 +34357,7 @@ impl MimeTypeChecker for T_vnd_iptvforum_ttsmpeg2_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34378,7 +34378,7 @@ impl MimeTypeChecker for T_vnd_motorola_video_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34399,7 +34399,7 @@ impl MimeTypeChecker for T_vnd_motorola_videop_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34420,7 +34420,7 @@ impl MimeTypeChecker for T_vnd_mpegurl_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34441,7 +34441,7 @@ impl MimeTypeChecker for T_vnd_ms_playready_media_pyv_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34462,7 +34462,7 @@ impl MimeTypeChecker for T_vnd_nokia_interleaved_multimedia_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34483,7 +34483,7 @@ impl MimeTypeChecker for T_vnd_nokia_videovoip_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34504,7 +34504,7 @@ impl MimeTypeChecker for T_vnd_objectvideo_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34525,7 +34525,7 @@ impl MimeTypeChecker for T_vnd_sealed_mpeg1_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34546,7 +34546,7 @@ impl MimeTypeChecker for T_vnd_sealed_mpeg4_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34567,7 +34567,7 @@ impl MimeTypeChecker for T_vnd_sealed_swf_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34588,7 +34588,7 @@ impl MimeTypeChecker for T_vnd_sealedmedia_softseal_mov_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34609,7 +34609,7 @@ impl MimeTypeChecker for T_vnd_vivo_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34630,7 +34630,7 @@ impl MimeTypeChecker for T_x_f4v_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34651,7 +34651,7 @@ impl MimeTypeChecker for T_x_flc_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34672,7 +34672,7 @@ impl MimeTypeChecker for T_x_fli_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34693,7 +34693,7 @@ impl MimeTypeChecker for T_x_ms_asx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34714,7 +34714,7 @@ impl MimeTypeChecker for T_x_ms_wm_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34735,7 +34735,7 @@ impl MimeTypeChecker for T_x_ms_wmx_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34756,7 +34756,7 @@ impl MimeTypeChecker for T_x_ms_wvx_video {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34777,7 +34777,7 @@ impl MimeTypeChecker for T_x_matroska_audio {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34798,7 +34798,7 @@ impl MimeTypeChecker for T_x_cooltalk_x_conference {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34819,7 +34819,7 @@ impl MimeTypeChecker for T_x_fictionbook_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34840,7 +34840,7 @@ impl MimeTypeChecker for T_x_asciidoc_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34861,7 +34861,7 @@ impl MimeTypeChecker for T_x_d_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34882,7 +34882,7 @@ impl MimeTypeChecker for T_x_haml_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34903,7 +34903,7 @@ impl MimeTypeChecker for T_x_haxe_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34924,7 +34924,7 @@ impl MimeTypeChecker for T_x_xliff_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34945,7 +34945,7 @@ impl MimeTypeChecker for T_x_xliff_zip_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34966,7 +34966,7 @@ impl MimeTypeChecker for T_x_rsrc_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -34987,7 +34987,7 @@ impl MimeTypeChecker for T_x_scss_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35008,7 +35008,7 @@ impl MimeTypeChecker for T_x_sass_text {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35029,7 +35029,7 @@ impl MimeTypeChecker for T_vnd_shp_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35050,7 +35050,7 @@ impl MimeTypeChecker for T_vnd_shx_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35071,7 +35071,7 @@ impl MimeTypeChecker for T_owl_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35092,7 +35092,7 @@ impl MimeTypeChecker for T_vnd_collada_xml_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35113,7 +35113,7 @@ impl MimeTypeChecker for T_gml_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35134,7 +35134,7 @@ impl MimeTypeChecker for T_gpx_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35155,7 +35155,7 @@ impl MimeTypeChecker for T_vnd_garmin_tcx_xml_application {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35176,7 +35176,7 @@ impl MimeTypeChecker for T_x3d_xml_model {
         &[]
     }
     fn is_virtual(&self) -> bool {
-    false
+        false
     }
 }
 
@@ -35197,7 +35197,7 @@ impl MimeTypeChecker for T_dita_xml_format_topic_application {
         &[&T_dita_xml_format_concept_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35218,7 +35218,7 @@ impl MimeTypeChecker for T_x_vnd_datapackage_zip_application {
         &[&T_x_wacz_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35239,7 +35239,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_graphics_application {
         &[&T_vnd_oasis_opendocument_graphics_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35260,7 +35260,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_image_application {
         &[&T_vnd_oasis_opendocument_image_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35281,7 +35281,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_presentation_application {
         &[&T_vnd_oasis_opendocument_presentation_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35302,7 +35302,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_spreadsheet_application {
         &[&T_vnd_oasis_opendocument_spreadsheet_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35323,7 +35323,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_calc_application {
         &[&T_vnd_sun_xml_calc_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35344,7 +35344,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_draw_application {
         &[&T_vnd_sun_xml_draw_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35365,7 +35365,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_impress_application {
         &[&T_vnd_sun_xml_impress_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35386,7 +35386,7 @@ impl MimeTypeChecker for T_vnd_sun_xml_writer_application {
         &[&T_vnd_sun_xml_writer_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35407,7 +35407,7 @@ impl MimeTypeChecker for T_vnd_dgn_image {
         &[&T_vnd_dgn_version_7_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35428,7 +35428,7 @@ impl MimeTypeChecker for T_x_basic_text {
         &[&T_x_vbasic_text]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35449,7 +35449,7 @@ impl MimeTypeChecker for T_json_application {
         &[&T_manifest_json_application,&T_x_vnd_datapackage_json_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35470,7 +35470,7 @@ impl MimeTypeChecker for T_quicktime_application {
         &[&T_mp4_application,&T_quicktime_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35491,7 +35491,7 @@ impl MimeTypeChecker for T_onenote_application {
         &[&T_onenote_format_one_application,&T_onenote_format_onetoc2_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35512,7 +35512,7 @@ impl MimeTypeChecker for T_x_tika_msoffice_embedded_application {
         &[&T_x_tika_msoffice_embedded_format_ole10_native_application,&T_x_tika_msoffice_embedded_format_comp_obj_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35533,7 +35533,7 @@ impl MimeTypeChecker for T_x_x509_cert_application {
         &[&T_x_x509_cert_format_pem_application,&T_x_x509_cert_format_der_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35554,7 +35554,7 @@ impl MimeTypeChecker for T_x_x509_key_application {
         &[&T_x_x509_key_format_pem_application,&T_x_x509_key_format_der_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35575,7 +35575,7 @@ impl MimeTypeChecker for T_vnd_dxf_image {
         &[&T_vnd_dxf_format_binary_image,&T_vnd_dxf_format_ascii_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35596,7 +35596,7 @@ impl MimeTypeChecker for T_x_vbasic_text {
         &[&T_x_vbdotnet_text,&T_x_vbscript_text]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35617,7 +35617,7 @@ impl MimeTypeChecker for T_x_ms_asf_video {
         &[&T_x_ms_wma_audio,&T_x_ms_wmv_video]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35638,7 +35638,7 @@ impl MimeTypeChecker for T_java_archive_application {
         &[&T_vnd_android_package_archive_application,&T_x_tika_java_enterprise_archive_application,&T_x_tika_java_web_archive_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35659,7 +35659,7 @@ impl MimeTypeChecker for T_sereal_application {
         &[&T_sereal_version_1_application,&T_sereal_version_2_application,&T_sereal_version_3_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35680,7 +35680,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_text_application {
         &[&T_vnd_oasis_opendocument_text_master_application,&T_vnd_oasis_opendocument_text_template_application,&T_vnd_oasis_opendocument_text_web_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35701,7 +35701,7 @@ impl MimeTypeChecker for T_vnd_oasis_opendocument_tika_flat_document_application
         &[&T_vnd_oasis_opendocument_flat_text_application,&T_vnd_oasis_opendocument_flat_presentation_application,&T_vnd_oasis_opendocument_flat_spreadsheet_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35722,7 +35722,7 @@ impl MimeTypeChecker for T_dita_xml_application {
         &[&T_dita_xml_format_map_application,&T_dita_xml_format_topic_application,&T_dita_xml_format_task_application,&T_dita_xml_format_val_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35743,7 +35743,7 @@ impl MimeTypeChecker for T_vnd_apple_iwork_application {
         &[&T_vnd_apple_keynote_application,&T_vnd_apple_pages_application,&T_vnd_apple_numbers_application,&T_x_tika_iworks_protected_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35764,7 +35764,7 @@ impl MimeTypeChecker for T_x_berkeley_db_application {
         &[&T_x_berkeley_db_format_hash_application,&T_x_berkeley_db_format_btree_application,&T_x_berkeley_db_format_queue_application,&T_x_berkeley_db_format_log_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35785,7 +35785,7 @@ impl MimeTypeChecker for T_x_mysql_db_application {
         &[&T_x_mysql_table_definition_application,&T_x_mysql_misam_index_application,&T_x_mysql_misam_compressed_index_application,&T_x_mysql_misam_data_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35806,7 +35806,7 @@ impl MimeTypeChecker for T_x_quattro_pro_application {
         &[&T_x_quattro_pro_version_1_4_application,&T_x_quattro_pro_version_5_application,&T_x_quattro_pro_version_1_5_application,&T_x_quattro_pro_version_6_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35827,7 +35827,7 @@ impl MimeTypeChecker for T_x_portable_anymap_image {
         &[&T_x_portable_bitmap_image,&T_x_portable_graymap_image,&T_x_portable_pixmap_image,&T_x_portable_arbitrarymap_image]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35848,7 +35848,7 @@ impl MimeTypeChecker for T_x_tika_text_based_message_text {
         &[&T_mbox_application,&T_x_emlx_message,&T_news_message,&T_rfc822_message]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35869,7 +35869,7 @@ impl MimeTypeChecker for T_vnd_lotus_1_2_3_application {
         &[&T_vnd_lotus_1_2_3_version_1_application,&T_vnd_lotus_1_2_3_version_2_application,&T_vnd_lotus_1_2_3_version_3_application,&T_vnd_lotus_1_2_3_version_4_application,&T_vnd_lotus_1_2_3_version_97_9_x_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35890,7 +35890,7 @@ impl MimeTypeChecker for T_x_tika_old_excel_application {
         &[&T_vnd_ms_excel_sheet_4_application,&T_vnd_ms_excel_workspace_4_application,&T_vnd_ms_excel_sheet_3_application,&T_vnd_ms_excel_workspace_3_application,&T_vnd_ms_excel_sheet_2_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35911,7 +35911,7 @@ impl MimeTypeChecker for T_x_tika_staroffice_application {
         &[&T_vnd_stardivision_calc_application,&T_vnd_stardivision_draw_application,&T_vnd_stardivision_impress_application,&T_vnd_stardivision_writer_application,&T_x_staroffice_template_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35932,7 +35932,7 @@ impl MimeTypeChecker for T_ogg_audio {
         &[&T_vorbis_audio,&T_x_oggflac_audio,&T_x_oggpcm_audio,&T_opus_audio,&T_speex_audio]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -35953,7 +35953,7 @@ impl MimeTypeChecker for T_x_tika_visio_ooxml_application {
         &[&T_vnd_ms_visio_drawing_application,&T_vnd_ms_visio_template_application,&T_vnd_ms_visio_stencil_application,&T_vnd_ms_visio_drawing_macroEnabled_12_application,&T_vnd_ms_visio_template_macroEnabled_12_application,&T_vnd_ms_visio_stencil_macroEnabled_12_application]
     }
     fn is_virtual(&self) -> bool {
-    true
+        true
     }
 }
 
@@ -37673,3241 +37673,3241 @@ pub static MIME_TYPES: &[&'static dyn MimeTypeChecker] = &[
 ];
 
 pub static MIME_MAP: phf::Map<&'static str,  &[&'static dyn MimeTypeChecker]> = phf_map! {
-"application/x-tex" => &[&T_x_tex_application],
-"video/h263-1998" => &[&T_h263_1998_video],
-"application/vnd.scribus" => &[&T_vnd_scribus_application],
-"application/x-guitar-pro" => &[&T_x_guitar_pro_application],
-"application/vnd.sss-dtf" => &[&T_vnd_sss_dtf_application],
-"audio/vnd.hns.audio" => &[&T_vnd_hns_audio_audio],
-"application/rlmi+xml" => &[&T_rlmi_xml_application],
-"application/vnd.cosmocaller" => &[&T_vnd_cosmocaller_application],
-"application/vnd.semd" => &[&T_vnd_semd_application],
-"audio/x-psf" => &[&T_x_psf_audio],
-"application/vnd.airzip.filesecure.azs" => &[&T_vnd_airzip_filesecure_azs_application],
-"image/x-niff" => &[&T_x_niff_image],
-"application/x-dbm" => &[&T_x_berkeley_db_application],
-"image/jp2" => &[&T_jp2_image],
-"text/x-robots" => &[&T_x_robots_text],
-"application/x-mimearchive" => &[&T_related_multipart],
-"application/vnd.epson.ssf" => &[&T_vnd_epson_ssf_application],
-"application/x-rar-compressed;version=4" => &[&T_x_rar_compressed_version_4_application],
-"application/smil" => &[&T_smil_xml_application],
-"application/cbor" => &[&T_cbor_application],
-"application/vnd.lotus-1-2-3;version=97+9.x" => &[&T_vnd_lotus_1_2_3_version_97_9_x_application],
-"application/vnd.omaloc-supl-init" => &[&T_vnd_omaloc_supl_init_application],
-"text/x-ada" => &[&T_x_ada_text],
-"video/vnd.cctv" => &[&T_vnd_cctv_video],
-"application/vnd.cups-pdf" => &[&T_vnd_cups_pdf_application],
-"text/x-scala" => &[&T_x_scala_text],
-"video/jpeg" => &[&T_jpeg_video],
-"audio/vnd.dolby.pl2" => &[&T_vnd_dolby_pl2_audio],
-"application/x-font-ghostscript" => &[&T_x_font_ghostscript_application],
-"application/x-rpm" => &[&T_x_rpm_application],
-"application/onenote;format=one" => &[&T_onenote_format_one_application],
-"image/ief" => &[&T_ief_image],
-"application/vnd.f-secure.mobile" => &[&T_vnd_f_secure_mobile_application],
-"text/x-python" => &[&T_x_python_text],
-"application/vnd.etsi.asic-s+zip" => &[&T_vnd_etsi_asic_s_zip_application],
-"application/mpeg4-iod-xmt" => &[&T_mpeg4_iod_xmt_application],
-"application/x-rar" => &[&T_x_rar_compressed_application],
-"text/vnd.graphviz" => &[&T_vnd_graphviz_text],
-"application/vnd.ecowin.fileupdate" => &[&T_vnd_ecowin_fileupdate_application],
-"text/javascript" => &[&T_javascript_text],
-"message/global-disposition-notification" => &[&T_global_disposition_notification_message],
-"application/vnd.uiq.theme" => &[&T_vnd_uiq_theme_application],
-"application/vnd.ms-powerpoint.presentation.macroenabled.12" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
-"text/x-go" => &[&T_x_go_text],
-"application/x-fossil-checkout" => &[&T_x_fossil_checkout_application],
-"application/vnd.vcx" => &[&T_vnd_vcx_application],
-"application/owl+xml" => &[&T_owl_xml_application],
-"application/vnd.wfa.wsc" => &[&T_vnd_wfa_wsc_application],
-"application/vnd.uplanet.channel" => &[&T_vnd_uplanet_channel_application],
-"application/vnd.motorola.flexsuite.fis" => &[&T_vnd_motorola_flexsuite_fis_application],
-"application/simple-filter+xml" => &[&T_simple_filter_xml_application],
-"application/vnd.is-xpr" => &[&T_vnd_is_xpr_application],
-"video/x-dirac" => &[&T_x_dirac_video],
-"application/x-mach-o-executable" => &[&T_x_mach_o_executable_application],
-"application/prs.nprend" => &[&T_prs_nprend_application],
-"application/x-mysql-misam-compressed-index" => &[&T_x_mysql_misam_compressed_index_application],
-"text/directory" => &[&T_directory_text],
-"application/x-dex" => &[&T_x_dex_application],
-"application/vnd.crick.clicker.keyboard" => &[&T_vnd_crick_clicker_keyboard_application],
-"application/vnd.antix.game-component" => &[&T_vnd_antix_game_component_application],
-"application/oxps" => &[&T_vnd_ms_xpsdocument_application],
-"application/vnd.hbci" => &[&T_vnd_hbci_application],
-"image/vnd.fastbidsheet" => &[&T_vnd_fastbidsheet_image],
-"application/dif+xml" => &[&T_dif_xml_application],
-"application/vnd.kahootz" => &[&T_vnd_kahootz_application],
-"multipart/example" => &[&T_example_multipart],
-"application/vnd.openofficeorg.extension" => &[&T_vnd_openofficeorg_extension_application],
-"application/x-ms-application" => &[&T_x_ms_application_application],
-"application/mspowerpoint" => &[&T_vnd_ms_powerpoint_application],
-"application/vnd.immervision-ivp" => &[&T_vnd_immervision_ivp_application],
-"audio/vnd.dolby.pl2x" => &[&T_vnd_dolby_pl2x_audio],
-"application/vnd.shx" => &[&T_vnd_shx_application],
-"text/prs.fallenstein.rst" => &[&T_prs_fallenstein_rst_text],
-"text/x-basic" => &[&T_x_basic_text],
-"application/vnd.olpc-sugar" => &[&T_vnd_olpc_sugar_application],
-"image/vnd.dgn;version=8" => &[&T_vnd_dgn_version_8_image],
-"application/msexcel" => &[&T_vnd_ms_excel_application],
-"audio/telephone-event" => &[&T_telephone_event_audio],
-"application/x-font-dos" => &[&T_x_font_dos_application],
-"audio/vdvi" => &[&T_vdvi_audio],
-"image/prs.btif" => &[&T_prs_btif_image],
-"audio/dls" => &[&T_dls_audio],
-"text/x-coldfusion" => &[&T_x_coldfusion_text],
-"text/x-uuencode" => &[&T_x_uuencode_text],
-"application/vnd.3gpp.pic-bw-var" => &[&T_vnd_3gpp_pic_bw_var_application],
-"application/fits" => &[&T_fits_application],
-"application/vnd.ctc-posml" => &[&T_vnd_ctc_posml_application],
-"audio/vnd.rhetorex.32kadpcm" => &[&T_vnd_rhetorex_32kadpcm_audio],
-"audio/x-pn-realaudio" => &[&T_x_pn_realaudio_audio],
-"application/edifact" => &[&T_edifact_application],
-"application/vnd.apple.iwork" => &[&T_vnd_apple_iwork_application],
-"application/vnd.nokia.conml+wbxml" => &[&T_vnd_nokia_conml_wbxml_application],
-"text/vnd.fly" => &[&T_vnd_fly_text],
-"application/vnd.ecowin.seriesupdate" => &[&T_vnd_ecowin_seriesupdate_application],
-"text/iso19139+xml" => &[&T_iso19139_xml_text],
-"audio/vnd.vmx.cvsd" => &[&T_vnd_vmx_cvsd_audio],
-"audio/vnd.sealedmedia.softseal.mpeg" => &[&T_vnd_sealedmedia_softseal_mpeg_audio],
-"application/x-axcrypt" => &[&T_x_axcrypt_application],
-"application/x-vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
-"audio/x-mp4a" => &[&T_mp4_audio],
-"application/vnd.ezpix-package" => &[&T_vnd_ezpix_package_application],
-"application/msword2" => &[&T_msword2_application],
-"application/vnd.kde.kpresenter" => &[&T_vnd_kde_kpresenter_application],
-"application/mediaservercontrol+xml" => &[&T_mediaservercontrol_xml_application],
-"application/vnd.ms-excel.workspace.3" => &[&T_vnd_ms_excel_workspace_3_application],
-"application/x-sas-catalog" => &[&T_x_sas_catalog_application],
-"application/vnd.ms-visio.stencil" => &[&T_vnd_ms_visio_stencil_application],
-"application/x-authorware-bin" => &[&T_x_authorware_bin_application],
-"application/vnd.fujixerox.art-ex" => &[&T_vnd_fujixerox_art_ex_application],
-"application/vnd.nokia.iptv.config+xml" => &[&T_vnd_nokia_iptv_config_xml_application],
-"application/x-tar" => &[&T_x_tar_application],
-"application/xop+xml" => &[&T_xop_xml_application],
-"application/vnd.ezpix-album" => &[&T_vnd_ezpix_album_application],
-"application/vnd.stardivision.draw" => &[&T_vnd_stardivision_draw_application],
-"application/rsd+xml" => &[&T_rsd_xml_application],
-"audio/g726-24" => &[&T_g726_24_audio],
-"application/vnd.vsf" => &[&T_vnd_vsf_application],
-"audio/ogg" => &[&T_ogg_audio],
-"application/vnd.semf" => &[&T_vnd_semf_application],
-"image/x-raw-canon" => &[&T_x_raw_canon_image],
-"application/x-sv4crc" => &[&T_x_sv4crc_application],
-"model/x.stl-binary" => &[&T_x_stl_binary_model],
-"text/x-vbasic" => &[&T_x_vbasic_text],
-"application/x-doom" => &[&T_x_doom_application],
-"audio/x-mod" => &[&T_x_mod_audio],
-"application/vnd.wv.csp+xml" => &[&T_vnd_wv_csp_xml_application],
-"application/vnd.wordperfect" => &[&T_vnd_wordperfect_application],
-"application/vnd.music-niff" => &[&T_vnd_music_niff_application],
-"multipart/byteranges" => &[&T_byteranges_multipart],
-"video/vnd.sealedmedia.softseal.mov" => &[&T_vnd_sealedmedia_softseal_mov_video],
-"application/smil+xml" => &[&T_smil_xml_application],
-"audio/g722" => &[&T_g722_audio],
-"application/xcap-ns+xml" => &[&T_xcap_ns_xml_application],
-"text/x-csrc" => &[&T_x_c_text],
-"application/bizagi-modeler" => &[&T_bizagi_modeler_application],
-"application/vnd.contact.cmsg" => &[&T_vnd_contact_cmsg_application],
-"application/sieve" => &[&T_sieve_application],
-"application/x-msterminal" => &[&T_x_msterminal_application],
-"application/vnd.fujixerox.docuworks.binder" => &[&T_vnd_fujixerox_docuworks_binder_application],
-"application/x-tika-ooxml" => &[&T_x_tika_ooxml_application],
-"audio/x-matroska" => &[&T_x_matroska_audio],
-"application/vnd.iccprofile" => &[&T_vnd_iccprofile_application],
-"application/index.obj" => &[&T_index_obj_application],
-"application/x-monotone-source-repo" => &[&T_x_monotone_source_repo_application],
-"application/x-vmdk" => &[&T_x_vmdk_application],
-"application/x-mach-o-dylinker" => &[&T_x_mach_o_dylinker_application],
-"audio/vnd.cmles.radio-events" => &[&T_vnd_cmles_radio_events_audio],
-"application/vnd.koan" => &[&T_vnd_koan_application],
-"audio/mobile-xmf" => &[&T_mobile_xmf_audio],
-"application/vnd.dvb.notif-aggregate-root+xml" => &[&T_vnd_dvb_notif_aggregate_root_xml_application],
-"message/rfc2557" => &[&T_related_multipart],
-"application/ccxml+xml" => &[&T_ccxml_xml_application],
-"application/vnd.powerbuilder75-s" => &[&T_vnd_powerbuilder75_s_application],
-"application/vnd.ms-project" => &[&T_vnd_ms_project_application],
-"audio/pcmu" => &[&T_pcmu_audio],
-"application/x-bplist" => &[&T_x_bplist_application],
-"application/x-java" => &[&T_java_vm_application],
-"video/3g2" => &[&T_3gpp2_video],
-"video/msvideo" => &[&T_x_msvideo_video],
-"application/fastsoap" => &[&T_fastsoap_application],
-"image/cgm" => &[&T_cgm_image],
-"application/vnd.sbm.cid" => &[&T_vnd_sbm_cid_application],
-"application/x-vnd.datapackage+zip" => &[&T_x_vnd_datapackage_zip_application],
-"application/vnd.sss-cod" => &[&T_vnd_sss_cod_application],
-"x-conference/x-cooltalk" => &[&T_x_cooltalk_x_conference],
-"application/x-unix-archive" => &[&T_x_archive_application],
-"text/x-chdr" => &[&T_x_chdr_text],
-"application/x-javascript" => &[&T_javascript_text],
-"application/x-sas-data-v6" => &[&T_x_sas_data_v6_application],
-"image/x-gimp-pat" => &[&T_x_gimp_pat_image],
-"application/marc" => &[&T_marc_application],
-"application/x-dwg" => &[&T_vnd_dwg_image],
-"application/vnd.wordperfect;version=5.1" => &[&T_vnd_wordperfect_version_5_1_application],
-"application/vnd.xara" => &[&T_vnd_xara_application],
-"model/vnd.gs.gdl" => &[&T_vnd_gs_gdl_model],
-"application/x-font-type1" => &[&T_x_font_type1_application],
-"application/vnd.cirpack.isdn-ext" => &[&T_vnd_cirpack_isdn_ext_application],
-"application/vnd.claymore" => &[&T_vnd_claymore_application],
-"application/vnd.uplanet.bearer-choice" => &[&T_vnd_uplanet_bearer_choice_application],
-"application/example" => &[&T_example_application],
-"model/vnd.dwf;version=2" => &[&T_vnd_dwf_version_2_model],
-"application/vnd.minisoft-hp3000-save" => &[&T_vnd_minisoft_hp3000_save_application],
-"audio/ulpfec" => &[&T_ulpfec_audio],
-"application/vnd.fujitsu.oasys2" => &[&T_vnd_fujitsu_oasys2_application],
-"application/warc+gz" => &[&T_warc_gz_application],
-"application/vnd.3gpp.pic-bw-large" => &[&T_vnd_3gpp_pic_bw_large_application],
-"application/sereal" => &[&T_sereal_application],
-"application/vnd.solent.sdkm+xml" => &[&T_vnd_solent_sdkm_xml_application],
-"application/x-snappy-framed" => &[&T_x_snappy_framed_application],
-"application/x-cdf" => &[&T_x_cdf_application],
-"application/rtx" => &[&T_rtx_application],
-"application/x-pkcs7-certificates" => &[&T_x_pkcs7_certificates_application],
-"text/x-vhdl" => &[&T_x_vhdl_text],
-"application/vnd.shp" => &[&T_vnd_shp_application],
-"application/vnd.adobe.air-application-installer-package+zip" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
-"application/x-foxmail" => &[&T_x_foxmail_application],
-"video/x-msvideo" => &[&T_x_msvideo_video],
-"application/bat" => &[&T_x_bat_application],
-"text/x-cobol" => &[&T_x_cobol_text],
-"application/x-ebu-stl" => &[&T_x_ebu_stl_application],
-"application/vnd.ms-word.template.macroenabled.12" => &[&T_vnd_ms_word_template_macroenabled_12_application],
-"application/vnd.mindjet.mindmanager" => &[&T_vnd_mindjet_mindmanager_application],
-"application/mbms-msk+xml" => &[&T_mbms_msk_xml_application],
-"application/vnd.java.hprof.text" => &[&T_vnd_java_hprof_text_application],
-"application/vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
-"application/vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
-"application/x-texinfo" => &[&T_x_texinfo_application],
-"audio/vnd.lucent.voice" => &[&T_vnd_lucent_voice_audio],
-"application/x-gunzip" => &[&T_gzip_application],
-"image/gif" => &[&T_gif_image],
-"video/vnd.iptvforum.ttsmpeg2" => &[&T_vnd_iptvforum_ttsmpeg2_video],
-"audio/lpc" => &[&T_lpc_audio],
-"application/x-bittorrent" => &[&T_x_bittorrent_application],
-"application/vnd.sbm.mid2" => &[&T_vnd_sbm_mid2_application],
-"application/epp+xml" => &[&T_epp_xml_application],
-"video/vnd.fvt" => &[&T_vnd_fvt_video],
-"application/vnd.liberty-request+xml" => &[&T_vnd_liberty_request_xml_application],
-"application/vnd.fujixerox.hbpl" => &[&T_vnd_fujixerox_hbpl_application],
-"application/vnd.openxmlformats-officedocument.spreadsheetml.template" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
-"application/vnd.intercon.formnet" => &[&T_vnd_intercon_formnet_application],
-"text/x-fortran" => &[&T_x_fortran_text],
-"application/x-sharedlib" => &[&T_x_sharedlib_application],
-"video/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_video],
-"application/x-isatab-assay" => &[&T_x_isatab_assay_application],
-"application/x-font-adobe-metric" => &[&T_x_font_adobe_metric_application],
-"video/h261" => &[&T_h261_video],
-"audio/prs.sid" => &[&T_prs_sid_audio],
-"audio/example" => &[&T_example_audio],
-"application/x-msmediaview" => &[&T_x_msmediaview_application],
-"application/vnd.dpgraph" => &[&T_vnd_dpgraph_application],
-"application/x-vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
-"video/3gp" => &[&T_3gpp_video],
-"application/x-tika-msoffice" => &[&T_x_tika_msoffice_application],
-"application/sgml-open-catalog" => &[&T_sgml_open_catalog_application],
-"application/vnd.etsi.iptvdiscovery+xml" => &[&T_vnd_etsi_iptvdiscovery_xml_application],
-"application/vnd.iptc.g2.planningitem+xml" => &[&T_vnd_iptc_g2_planningitem_xml_application],
-"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
-"application/vnd.isac.fcs" => &[&T_vnd_isac_fcs_application],
-"application/x-csh" => &[&T_x_csh_application],
-"application/x-mysql-table-definition" => &[&T_x_mysql_table_definition_application],
-"application/vnd.omads-file+xml" => &[&T_vnd_omads_file_xml_application],
-"audio/x-aiff" => &[&T_x_aiff_audio],
-"video/rtx" => &[&T_rtx_video],
-"application/x-vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
-"application/vnd.uplanet.signal" => &[&T_vnd_uplanet_signal_application],
-"model/vnd.flatland.3dml" => &[&T_vnd_flatland_3dml_model],
-"application/atomicmail" => &[&T_atomicmail_application],
-"application/vnd.accpac.simply.imp" => &[&T_vnd_accpac_simply_imp_application],
-"text/example" => &[&T_example_text],
-"model/vnd.parasolid.transmit.binary" => &[&T_vnd_parasolid_transmit_binary_model],
-"application/vnd.httphone" => &[&T_vnd_httphone_application],
-"audio/x-oggflac" => &[&T_x_oggflac_audio],
-"application/vnd.dvb.notif-init+xml" => &[&T_vnd_dvb_notif_init_xml_application],
-"application/x-zim" => &[&T_x_zim_application],
-"font/woff2" => &[&T_woff2_font],
-"image/vnd.cns.inf2" => &[&T_vnd_cns_inf2_image],
-"application/x-tika-old-excel" => &[&T_x_tika_old_excel_application],
-"application/resource-lists-diff+xml" => &[&T_resource_lists_diff_xml_application],
-"text/vnd.in3d.spot" => &[&T_vnd_in3d_spot_text],
-"application/kpml-response+xml" => &[&T_kpml_response_xml_application],
-"application/xenc+xml" => &[&T_xenc_xml_application],
-"application/x-autocad" => &[&T_vnd_dwg_image],
-"video/x-matroska" => &[&T_x_matroska_video],
-"audio/opus" => &[&T_opus_audio],
-"audio/vnd.nuera.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
-"message/x-emlx" => &[&T_x_emlx_message],
-"text/xml" => &[&T_xml_application],
-"application/vnd.noblenet-web" => &[&T_vnd_noblenet_web_application],
-"image/jxr" => &[&T_jxr_image],
-"application/vnd.oasis.opendocument.flat.presentation" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
-"text/vnd.net2phone.commcenter.command" => &[&T_vnd_net2phone_commcenter_command_text],
-"message/sipfrag" => &[&T_sipfrag_message],
-"application/vnd.ms-visio.template" => &[&T_vnd_ms_visio_template_application],
-"application/x-object" => &[&T_x_object_application],
-"application/pgp-signature" => &[&T_pgp_signature_application],
-"application/vnd.xfdl.webform" => &[&T_vnd_xfdl_webform_application],
-"application/vnd.adobe.aftereffects.project" => &[&T_vnd_adobe_aftereffects_project_application],
-"application/vnd.sealed.net" => &[&T_vnd_sealed_net_application],
-"application/vnd.oma.bcast.sgdu" => &[&T_vnd_oma_bcast_sgdu_application],
-"application/ipp" => &[&T_ipp_application],
-"application/vnd.groove-identity-message" => &[&T_vnd_groove_identity_message_application],
-"application/vnd.3gpp.pic-bw-small" => &[&T_vnd_3gpp_pic_bw_small_application],
-"application/x-esri-spatially-enabled-db" => &[&T_x_esri_spatially_enabled_db_application],
-"text/vnd.iptc.anpa" => &[&T_vnd_iptc_anpa_text],
-"model/vnd.gtw" => &[&T_vnd_gtw_model],
-"application/vnd.informix-visionary" => &[&T_vnd_informix_visionary_application],
-"application/vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
-"application/x-font-linux-psf" => &[&T_x_font_linux_psf_application],
-"text/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
-"application/vnd.adobe.xdp+xml" => &[&T_vnd_adobe_xdp_xml_application],
-"application/kate" => &[&T_kate_application],
-"application/vnd.mfer" => &[&T_vnd_mfer_application],
-"audio/amr-wb" => &[&T_amr_wb_audio],
-"audio/t140c" => &[&T_t140c_audio],
-"application/font-tdpfr" => &[&T_font_tdpfr_application],
-"application/hwp+zip" => &[&T_hwp_zip_application],
-"application/fastinfoset" => &[&T_fastinfoset_application],
-"application/scvp-cv-request" => &[&T_scvp_cv_request_application],
-"application/vnd.ms-excel.addin.macroenabled.12" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
-"video/vnd.nokia.videovoip" => &[&T_vnd_nokia_videovoip_video],
-"application/xml-dtd" => &[&T_xml_dtd_application],
-"audio/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_audio],
-"application/x-x509-key;format=der" => &[&T_x_x509_key_format_der_application],
-"application/vnd.garmin.tcx+xml" => &[&T_vnd_garmin_tcx_xml_application],
-"application/x-mach-o-fvmlib" => &[&T_x_mach_o_fvmlib_application],
-"video/vnd.sealed.mpeg4" => &[&T_vnd_sealed_mpeg4_video],
-"application/x-sas-xport" => &[&T_x_sas_xport_application],
-"application/x-msdownload;format=pe64" => &[&T_x_msdownload_format_pe64_application],
-"application/vnd.mobius.mbk" => &[&T_vnd_mobius_mbk_application],
-"image/heic-sequence" => &[&T_heic_sequence_image],
-"application/vnd.intu.qbo" => &[&T_vnd_intu_qbo_application],
-"application/vnd.oma.bcast.notification+xml" => &[&T_vnd_oma_bcast_notification_xml_application],
-"text/vnd.si.uricatalogue" => &[&T_vnd_si_uricatalogue_text],
-"application/vnd.ms-pki.stl" => &[&T_vnd_ms_pki_stl_application],
-"application/vnd.etsi.sci+xml" => &[&T_vnd_etsi_sci_xml_application],
-"application/vnd.iptc.g2.newsitem+xml" => &[&T_vnd_iptc_g2_newsitem_xml_application],
-"application/pkix-cert" => &[&T_pkix_cert_application],
-"application/vnd.sun.xml.calc" => &[&T_vnd_sun_xml_calc_application],
-"application/vnd.ms-wmdrm.lic-resp" => &[&T_vnd_ms_wmdrm_lic_resp_application],
-"audio/bv32" => &[&T_bv32_audio],
-"application/andrew-inset" => &[&T_andrew_inset_application],
-"audio/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_audio],
-"application/vnd.apple.installer+xml" => &[&T_vnd_apple_installer_xml_application],
-"application/vnd.hcl-bireports" => &[&T_vnd_hcl_bireports_application],
-"application/vnd.fujitsu.oasys3" => &[&T_vnd_fujitsu_oasys3_application],
-"application/x-berkeley-db;format=btree;version=2" => &[&T_x_berkeley_db_format_btree_version_2_application],
-"audio/qcelp" => &[&T_qcelp_audio],
-"application/vnd.syncml.dm+xml" => &[&T_vnd_syncml_dm_xml_application],
-"application/vnd.apache.parquet" => &[&T_x_parquet_application],
-"text/x-vbscript" => &[&T_x_vbscript_text],
-"application/scvp-vp-request" => &[&T_scvp_vp_request_application],
-"application/pgp-encrypted" => &[&T_pgp_encrypted_application],
-"application/x-hwp-v5" => &[&T_x_hwp_v5_application],
-"application/x-kchart" => &[&T_vnd_kde_kchart_application],
-"application/vnd.fujixerox.docuworks" => &[&T_vnd_fujixerox_docuworks_application],
-"image/tiff-fx" => &[&T_tiff_fx_image],
-"model/mesh" => &[&T_mesh_model],
-"application/edi-x12" => &[&T_edi_x12_application],
-"application/vnd.amiga.ami" => &[&T_vnd_amiga_ami_application],
-"application/x-ole-storage" => &[&T_x_ole_storage_application],
-"application/vnd.dvb.notif-ia-msglist+xml" => &[&T_vnd_dvb_notif_ia_msglist_xml_application],
-"application/vnd.fujixerox.ddd" => &[&T_vnd_fujixerox_ddd_application],
-"application/vnd.geometry-explorer" => &[&T_vnd_geometry_explorer_application],
-"application/vnd.macports.portpkg" => &[&T_vnd_macports_portpkg_application],
-"application/x-dtbresource+xml" => &[&T_x_dtbresource_xml_application],
-"application/lzip" => &[&T_lzip_application],
-"application/mosskey-request" => &[&T_mosskey_request_application],
-"application/vnd.rapid" => &[&T_vnd_rapid_application],
-"video/mpeg" => &[&T_mpeg_video],
-"application/x-sqlite3" => &[&T_x_sqlite3_application],
-"image/x-wmf" => &[&T_wmf_image],
-"application/vnd.yamaha.hv-voice" => &[&T_vnd_yamaha_hv_voice_application],
-"application/prs.plucker" => &[&T_prs_plucker_application],
-"application/x-sas-transport" => &[&T_x_sas_transport_application],
-"application/x-msdownload;format=pe-armLE" => &[&T_x_msdownload_format_pe_armLE_application],
-"application/x-debian-package" => &[&T_x_debian_package_application],
-"application/vnd.oma.dd2+xml" => &[&T_vnd_oma_dd2_xml_application],
-"application/x-vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
-"video/x-f4v" => &[&T_x_f4v_video],
-"application/x-stuffit" => &[&T_x_stuffit_application],
-"application/mac-binhex" => &[&T_mac_binhex40_application],
-"video/x-sgi-movie" => &[&T_x_sgi_movie_video],
-"image/nitf" => &[&T_nitf_image],
-"application/vnd.3gpp2.sms" => &[&T_vnd_3gpp2_sms_application],
-"application/vnd.fujitsu.oasysgp" => &[&T_vnd_fujitsu_oasysgp_application],
-"application/vnd.irepository.package+xml" => &[&T_vnd_irepository_package_xml_application],
-"application/vnd.sun.xml.impress.template" => &[&T_vnd_sun_xml_impress_template_application],
-"application/x-silverlight-app" => &[&T_x_silverlight_app_application],
-"text/x-c" => &[&T_x_c_text],
-"application/x-prt" => &[&T_x_prt_application],
-"application/vnd.ibm.electronic-media" => &[&T_vnd_ibm_electronic_media_application],
-"application/x-acad" => &[&T_vnd_dwg_image],
-"application/x-x509-key;format=pem" => &[&T_x_x509_key_format_pem_application],
-"application/winhlp" => &[&T_winhlp_application],
-"audio/vnd.octel.sbc" => &[&T_vnd_octel_sbc_audio],
-"application/prs.cww" => &[&T_prs_cww_application],
-"text/vnd.wap.wml" => &[&T_vnd_wap_wml_text],
-"video/mp2p" => &[&T_mp2p_video],
-"application/vnd.debian.binary-package" => &[&T_x_debian_package_application],
-"drawing/x-dwf" => &[&T_vnd_dwf_model],
-"application/x-troff-man" => &[&T_troff_text],
-"application/vnd.etsi.iptvprofile+xml" => &[&T_vnd_etsi_iptvprofile_xml_application],
-"multipart/form-data" => &[&T_form_data_multipart],
-"application/x-ms-wmz" => &[&T_x_ms_wmz_application],
-"application/x-geopackage" => &[&T_x_geopackage_application],
-"text/x-lex" => &[&T_x_lex_text],
-"application/x-xliff+zip" => &[&T_x_xliff_zip_application],
-"application/x-endnote-refer" => &[&T_x_endnote_refer_application],
-"application/vnd.wmc" => &[&T_vnd_wmc_application],
-"application/illustrator" => &[&T_illustrator_application],
-"application/vnd.lotus-1-2-3;version=3" => &[&T_vnd_lotus_1_2_3_version_3_application],
-"image/x-jb2" => &[&T_x_jbig2_image],
-"application/vnd.picsel" => &[&T_vnd_picsel_application],
-"application/vnd.lotus-1-2-3" => &[&T_vnd_lotus_1_2_3_application],
-"application/x-java-pack200" => &[&T_x_java_pack200_application],
-"application/vnd.genomatix.tuxedo" => &[&T_vnd_genomatix_tuxedo_application],
-"application/vnd.ms-artgalry" => &[&T_vnd_ms_artgalry_application],
-"application/vnd.mobius.txf" => &[&T_vnd_mobius_txf_application],
-"application/vnd.wap.sic" => &[&T_vnd_wap_sic_application],
-"text/x-emacs-lisp" => &[&T_x_emacs_lisp_text],
-"application/x-sas-access" => &[&T_x_sas_access_application],
-"application/vnd.oma.group-usage-list+xml" => &[&T_vnd_oma_group_usage_list_xml_application],
-"image/x-os2-graphics; charset=binary" => &[&T_x_os2_graphics__charset_binary_image],
-"application/vnd.quark.quarkxpress" => &[&T_vnd_quark_quarkxpress_application],
-"text/x-objcsrc" => &[&T_x_objcsrc_text],
-"application/x-mbtiles" => &[&T_x_mbtiles_application],
-"audio/evrcwb0" => &[&T_evrcwb0_audio],
-"application/x-font-ttf" => &[&T_x_font_ttf_application],
-"application/vnd.powerbuilder7-s" => &[&T_vnd_powerbuilder7_s_application],
-"application/x-sh" => &[&T_x_sh_application],
-"application/vnd.amazon.ebook" => &[&T_vnd_amazon_ebook_application],
-"application/x-bentley-besqlite" => &[&T_x_bentley_besqlite_application],
-"application/vnd.fsc.weblaunch" => &[&T_vnd_fsc_weblaunch_application],
-"application/vnd.intu.qfx" => &[&T_vnd_intu_qfx_application],
-"application/x-staroffice-template" => &[&T_x_staroffice_template_application],
-"application/x-activemime" => &[&T_x_activemime_application],
-"image/x-jbig2" => &[&T_x_jbig2_image],
-"application/vnd.dvb.ipdcdftnotifaccess" => &[&T_vnd_dvb_ipdcdftnotifaccess_application],
-"application/vividence.scriptfile" => &[&T_vividence_scriptfile_application],
-"application/vnd.motorola.flexsuite" => &[&T_vnd_motorola_flexsuite_application],
-"application/vnd.ms-wmdrm.meter-chlg-req" => &[&T_vnd_ms_wmdrm_meter_chlg_req_application],
-"application/x-java-jnlp-file" => &[&T_x_java_jnlp_file_application],
-"video/iso.segment" => &[&T_iso_segment_video],
-"audio/g7291" => &[&T_g7291_audio],
-"text/x-c++src" => &[&T_x_c__src_text],
-"image/x-ms-bmp" => &[&T_bmp_image],
-"application/x-webarchive" => &[&T_x_webarchive_application],
-"application/x-tcl" => &[&T_x_tcl_text],
-"application/gzip" => &[&T_gzip_application],
-"image/vnd.zbrush.dcx" => &[&T_vnd_zbrush_dcx_image],
-"application/parityfec" => &[&T_parityfec_application],
-"application/index.response" => &[&T_index_response_application],
-"audio/x-ogg-flac" => &[&T_x_oggflac_audio],
-"application/vnd.ms-asf" => &[&T_vnd_ms_asf_application],
-"application/vnd.epson.salt" => &[&T_vnd_epson_salt_application],
-"application/vnd.mseq" => &[&T_vnd_mseq_application],
-"application/x-lzma" => &[&T_x_lzma_application],
-"application/x-fat-diskimage" => &[&T_x_fat_diskimage_application],
-"application/x-gzip" => &[&T_gzip_application],
-"image/x-icns" => &[&T_icns_image],
-"application/x-ms-installer" => &[&T_x_ms_installer_application],
-"application/iotp" => &[&T_iotp_application],
-"video/x-ms-asf" => &[&T_x_ms_asf_video],
-"image/x-raw-nikon" => &[&T_x_raw_nikon_image],
-"application/x-endnote-style" => &[&T_x_endnote_style_application],
-"audio/vnd.nortel.vbk" => &[&T_vnd_nortel_vbk_audio],
-"application/x-berkeley-db;format=hash;version=3" => &[&T_x_berkeley_db_format_hash_version_3_application],
-"application/x-elf" => &[&T_x_elf_application],
-"application/wsdl+xml" => &[&T_wsdl_xml_application],
-"application/news-transmission" => &[&T_news_transmission_application],
-"text/calendar" => &[&T_calendar_text],
-"chemical/x-xyz" => &[&T_x_xyz_chemical],
-"audio/x-wav" => &[&T_vnd_wave_audio],
-"application/emma+xml" => &[&T_emma_xml_application],
-"image/x-pc-paintbrush" => &[&T_vnd_zbrush_pcx_image],
-"application/vnd.smart.teacher" => &[&T_vnd_smart_teacher_application],
-"application/vnd.hp-hpgl" => &[&T_vnd_hp_hpgl_application],
-"application/vnd.shana.informed.interchange" => &[&T_vnd_shana_informed_interchange_application],
-"audio/clearmode" => &[&T_clearmode_audio],
-"application/vnd.marlin.drm.actiontoken+xml" => &[&T_vnd_marlin_drm_actiontoken_xml_application],
-"application/vnd.mitsubishi.misty-guard.trustweb" => &[&T_vnd_mitsubishi_misty_guard_trustweb_application],
-"audio/ac3" => &[&T_ac3_audio],
-"application/x-deflate" => &[&T_zlib_application],
-"application/x-vhd" => &[&T_x_vhd_application],
-"application/activemessage" => &[&T_activemessage_application],
-"application/dec-dx" => &[&T_dec_dx_application],
-"application/cybercash" => &[&T_cybercash_application],
-"audio/vnd.audiokoz" => &[&T_vnd_audiokoz_audio],
-"application/dita+xml;format=topic" => &[&T_dita_xml_format_topic_application],
-"application/vnd.dvb.ipdcesgaccess" => &[&T_vnd_dvb_ipdcesgaccess_application],
-"application/tzif" => &[&T_tzif_application],
-"application/quicktime" => &[&T_quicktime_application],
-"message/external-body" => &[&T_external_body_message],
-"audio/aiff" => &[&T_x_aiff_audio],
-"application/x-bentley-localization" => &[&T_x_bentley_localization_application],
-"application/vnd.nokia.landmark+xml" => &[&T_vnd_nokia_landmark_xml_application],
-"application/commonground" => &[&T_commonground_application],
-"application/x-font-otf" => &[&T_x_font_otf_application],
-"application/x-bibtex-text-file" => &[&T_x_bibtex_text_file_application],
-"application/cals-1840" => &[&T_cals_1840_application],
-"application/vnd.openxmlformats-officedocument.presentationml.template" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
-"image/vnd.dwg" => &[&T_vnd_dwg_image],
-"application/simple-message-summary" => &[&T_simple_message_summary_application],
-"application/dita+xml;format=val" => &[&T_dita_xml_format_val_application],
-"application/vnd.motorola.flexsuite.kmr" => &[&T_vnd_motorola_flexsuite_kmr_application],
-"application/nss" => &[&T_nss_application],
-"audio/evrc" => &[&T_evrc_audio],
-"application/dash+xml" => &[&T_dash_xml_application],
-"application/vnd.google-earth.kmz" => &[&T_vnd_google_earth_kmz_application],
-"application/vnd.ipunplugged.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
-"video/webm" => &[&T_webm_video],
-"image/vnd.globalgraphics.pgb" => &[&T_vnd_globalgraphics_pgb_image],
-"application/set-payment" => &[&T_set_payment_application],
-"application/vnd.xfdl" => &[&T_vnd_xfdl_application],
-"video/avi" => &[&T_x_msvideo_video],
-"application/vnd.nokia.isds-radio-presets" => &[&T_vnd_nokia_isds_radio_presets_application],
-"application/msword5" => &[&T_msword5_application],
-"application/vnd.oma.poc.invocation-descriptor+xml" => &[&T_vnd_oma_poc_invocation_descriptor_xml_application],
-"audio/g726-32" => &[&T_g726_32_audio],
-"text/x-asciidoc" => &[&T_x_asciidoc_text],
-"application/vnd.apple.mpegurl" => &[&T_vnd_apple_mpegurl_application],
-"application/vnd.lotus-1-2-3;version=4" => &[&T_vnd_lotus_1_2_3_version_4_application],
-"application/vnd.lotus-notes" => &[&T_vnd_lotus_notes_application],
-"application/vnd.ms-outlook" => &[&T_vnd_ms_outlook_application],
-"application/vnd.wordperfect;version=4.2" => &[&T_vnd_wordperfect_version_4_2_application],
-"application/vnd.groove-help" => &[&T_vnd_groove_help_application],
-"application/vnd.cups-ppd" => &[&T_vnd_cups_ppd_application],
-"application/x-xz" => &[&T_x_xz_application],
-"application/atomsvc+xml" => &[&T_atomsvc_xml_application],
-"application/vnd.mobius.plc" => &[&T_vnd_mobius_plc_application],
-"application/x-ms-compress-szdd" => &[&T_x_ms_compress_szdd_application],
-"application/vnd.iptc.g2.newsmessage+xml" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
-"application/vnd.3m.post-it-notes" => &[&T_vnd_3m_post_it_notes_application],
-"audio/wav" => &[&T_vnd_wave_audio],
-"text/x-cgi" => &[&T_x_cgi_text],
-"application/x-stata-dta;version=14" => &[&T_x_stata_dta_version_14_application],
-"multipart/encrypted" => &[&T_encrypted_multipart],
-"application/vnd.dvb.iptv.alfec-base" => &[&T_vnd_dvb_iptv_alfec_base_application],
-"application/srgs" => &[&T_srgs_application],
-"image/vnd.svf" => &[&T_vnd_svf_image],
-"image/g3fax" => &[&T_g3fax_image],
-"application/x-x509-user-cert" => &[&T_x_x509_cert_application],
-"text/x-rexx" => &[&T_x_rexx_text],
-"text/x-stsrc" => &[&T_x_stsrc_text],
-"application/qsig" => &[&T_qsig_application],
-"application/x-openscad" => &[&T_x_openscad_application],
-"application/x-chat" => &[&T_x_chat_application],
-"application/x-lha" => &[&T_x_lha_application],
-"application/vnd.trid.tpt" => &[&T_vnd_trid_tpt_application],
-"text/x-ini" => &[&T_x_ini_text],
-"application/vnd.ibm.rights-management" => &[&T_vnd_ibm_rights_management_application],
-"audio/basic" => &[&T_basic_audio],
-"application/vnd.pvi.ptid1" => &[&T_vnd_pvi_ptid1_application],
-"application/moss-keys" => &[&T_moss_keys_application],
-"application/x-stata-dta;version=12" => &[&T_x_stata_dta_version_12_application],
-"image/x-jp2-codestream" => &[&T_x_jp2_codestream_image],
-"application/x-sas" => &[&T_x_sas_application],
-"image/x-portable-bitmap" => &[&T_x_portable_bitmap_image],
-"application/vnd.yamaha.openscoreformat.osfpvg+xml" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
-"application/wspolicy+xml" => &[&T_wspolicy_xml_application],
-"application/illustrator+ps" => &[&T_illustrator_ps_application],
-"application/vnd.pg.osasli" => &[&T_vnd_pg_osasli_application],
-"message/partial" => &[&T_partial_message],
-"application/vnd.oma.poc.optimized-progress-report+xml" => &[&T_vnd_oma_poc_optimized_progress_report_xml_application],
-"application/vnd.nokia.n-gage.data" => &[&T_vnd_nokia_n_gage_data_application],
-"text/x-properties" => &[&T_x_java_properties_text],
-"application/vnd.wap.wmlc" => &[&T_vnd_wap_wmlc_application],
-"application/vnd.sun.wadl+xml" => &[&T_vnd_sun_wadl_xml_application],
-"application/vnd.mcd" => &[&T_vnd_mcd_application],
-"video/mp4v-es" => &[&T_mp4v_es_video],
-"application/vnd.iptc.g2.conceptitem+xml" => &[&T_vnd_iptc_g2_conceptitem_xml_application],
-"application/x-tika-java-enterprise-archive" => &[&T_x_tika_java_enterprise_archive_application],
-"application/x-sv4cpio" => &[&T_x_sv4cpio_application],
-"application/vnd.visionary" => &[&T_vnd_visionary_application],
-"application/x-berkeley-db;format=hash" => &[&T_x_berkeley_db_format_hash_application],
-"application/vnd.ms-htmlhelp" => &[&T_vnd_ms_htmlhelp_application],
-"text/richtext" => &[&T_richtext_text],
-"application/vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
-"chemical/x-csml" => &[&T_x_csml_chemical],
-"image/x-bmp" => &[&T_bmp_image],
-"text/x-yml" => &[&T_x_yaml_text],
-"application/x-msdownload;format=pe" => &[&T_x_msdownload_format_pe_application],
-"application/vnd.cybank" => &[&T_vnd_cybank_application],
-"application/sparql-results+xml" => &[&T_sparql_results_xml_application],
-"application/vnd.dvb.ipdcroaming" => &[&T_vnd_dvb_ipdcroaming_application],
-"application/vnd.muvee.style" => &[&T_vnd_muvee_style_application],
-"application/vnd.spotfire.sfs" => &[&T_vnd_spotfire_sfs_application],
-"image/x-raw-casio" => &[&T_x_raw_casio_image],
-"application/x-zip-compressed" => &[&T_zip_application],
-"application/x-quattro-pro;version=1+5" => &[&T_x_quattro_pro_version_1_5_application],
-"application/mbms-user-service-description+xml" => &[&T_mbms_user_service_description_xml_application],
-"application/vnd.java.hprof " => &[&T_vnd_java_hprof__application],
-"video/x-ogg-uvs" => &[&T_x_ogguvs_video],
-"application/vnd.xmpie.dpkg" => &[&T_vnd_xmpie_dpkg_application],
-"audio/vnd.wave" => &[&T_vnd_wave_audio],
-"audio/x-mpeg" => &[&T_mpeg_audio],
-"multipart/alternative" => &[&T_alternative_multipart],
-"audio/x-ms-wma" => &[&T_x_ms_wma_audio],
-"application/x-roxio-toast" => &[&T_x_roxio_toast_application],
-"application/vnd.lotus-1-2-3;version=1" => &[&T_vnd_lotus_1_2_3_version_1_application],
-"application/vnd.oma.bcast.simple-symbol-container" => &[&T_vnd_oma_bcast_simple_symbol_container_application],
-"application/vnd.marlin.drm.conftoken+xml" => &[&T_vnd_marlin_drm_conftoken_xml_application],
-"message/delivery-status" => &[&T_delivery_status_message],
-"audio/evrcb1" => &[&T_evrcb1_audio],
-"application/vnd.cups-raster" => &[&T_vnd_cups_raster_application],
-"application/inf" => &[&T_inf_application],
-"application/vnd.tao.intent-module-archive" => &[&T_vnd_tao_intent_module_archive_application],
-"model/x3d+xml" => &[&T_x3d_xml_model],
-"application/x-mach-o-dylib-stub" => &[&T_x_mach_o_dylib_stub_application],
-"application/vnd.unity" => &[&T_vnd_unity_application],
-"video/vnd.hns.video" => &[&T_vnd_hns_video_video],
-"application/x-matroska" => &[&T_x_matroska_application],
-"audio/musepack" => &[&T_musepack_audio],
-"audio/mpeg4-generic" => &[&T_mpeg4_generic_audio],
-"font/woff" => &[&T_woff_font],
-"application/vnd.yamaha.smaf-audio" => &[&T_vnd_yamaha_smaf_audio_application],
-"audio/vnd.dts.hd" => &[&T_vnd_dts_hd_audio],
-"application/vnd.meridian-slingshot" => &[&T_vnd_meridian_slingshot_application],
-"application/x-x509-dsa-parameters" => &[&T_x_x509_dsa_parameters_application],
-"application/x-pkcs12" => &[&T_x_pkcs12_application],
-"application/vnd.criticaltools.wbs+xml" => &[&T_vnd_criticaltools_wbs_xml_application],
-"multipart/related" => &[&T_related_multipart],
-"application/cpl+xml" => &[&T_cpl_xml_application],
-"application/vnd.accpac.simply.aso" => &[&T_vnd_accpac_simply_aso_application],
-"application/x-tika-visio-ooxml" => &[&T_x_tika_visio_ooxml_application],
-"image/x-portable-pixmap" => &[&T_x_portable_pixmap_image],
-"application/vnd.groove-vcard" => &[&T_vnd_groove_vcard_application],
-"application/vnd.igloader" => &[&T_vnd_igloader_application],
-"application/timestamped-data" => &[&T_timestamped_data_application],
-"application/vnd.wap.wbxml" => &[&T_vnd_wap_wbxml_application],
-"video/vnd.objectvideo" => &[&T_vnd_objectvideo_video],
-"audio/rtp-midi" => &[&T_rtp_midi_audio],
-"application/x-ace-compressed" => &[&T_x_ace_compressed_application],
-"application/vnd.oma.drm.risd+xml" => &[&T_vnd_oma_drm_risd_xml_application],
-"application/vnd.informedcontrol.rms+xml" => &[&T_vnd_informedcontrol_rms_xml_application],
-"application/dita+xml" => &[&T_dita_xml_application],
-"application/cnrp+xml" => &[&T_cnrp_xml_application],
-"application/rtf" => &[&T_rtf_application],
-"application/watcherinfo+xml" => &[&T_watcherinfo_xml_application],
-"application/pkixcmp" => &[&T_pkixcmp_application],
-"application/vnd.etsi.iptvsad-cod+xml" => &[&T_vnd_etsi_iptvsad_cod_xml_application],
-"application/vnd.apple.keynote" => &[&T_vnd_apple_keynote_application],
-"application/vnd.ms-powerpoint" => &[&T_vnd_ms_powerpoint_application],
-"application/vnd.uplanet.cacheop" => &[&T_vnd_uplanet_cacheop_application],
-"image/vnd.radiance" => &[&T_vnd_radiance_image],
-"text/vnd.ms-mediapackage" => &[&T_vnd_ms_mediapackage_text],
-"application/x-msaccess" => &[&T_x_msaccess_application],
-"application/x-uc2-compressed" => &[&T_x_uc2_compressed_application],
-"application/vnd.medcalcdata" => &[&T_vnd_medcalcdata_application],
-"application/vnd.omads-folder+xml" => &[&T_vnd_omads_folder_xml_application],
-"text/x-d" => &[&T_x_d_text],
-"application/vnd.openxmlformats-officedocument.wordprocessingml.template" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
-"text/aspdotnet" => &[&T_aspdotnet_text],
-"text/rfc822-headers" => &[&T_rfc822_headers_text],
-"application/vnd.lotus-1-2-3;version=2" => &[&T_vnd_lotus_1_2_3_version_2_application],
-"audio/vmr-wb" => &[&T_vmr_wb_audio],
-"application/vnd.oma.bcast.imd+xml" => &[&T_vnd_oma_bcast_imd_xml_application],
-"message/global" => &[&T_global_message],
-"image/x-emf" => &[&T_emf_image],
-"model/vnd.collada+xml" => &[&T_vnd_collada_xml_model],
-"audio/g719" => &[&T_g719_audio],
-"video/mp2t" => &[&T_mp2t_video],
-"video/smpte292m" => &[&T_smpte292m_video],
-"application/x-fictionbook+xml" => &[&T_x_fictionbook_xml_application],
-"application/vnd.publishare-delta-tree" => &[&T_vnd_publishare_delta_tree_application],
-"application/x-mach-o" => &[&T_x_mach_o_application],
-"application/vnd.ecowin.chart" => &[&T_vnd_ecowin_chart_application],
-"image/x-canon-cr3" => &[&T_x_canon_cr3_image],
-"application/x-x509-ec-parameters" => &[&T_x_x509_ec_parameters_application],
-"image/vnd.djvu" => &[&T_vnd_djvu_image],
-"application/vnd.lotus-freelance" => &[&T_vnd_lotus_freelance_application],
-"image/x-raw-hasselblad" => &[&T_x_raw_hasselblad_image],
-"application/vnd.emclient.accessrequest+xml" => &[&T_vnd_emclient_accessrequest_xml_application],
-"application/x-ms-xbap" => &[&T_x_ms_xbap_application],
-"audio/mpa" => &[&T_mpa_audio],
-"application/vnd.sun.xml.calc.template" => &[&T_vnd_sun_xml_calc_template_application],
-"application/vnd.wolfram.wl" => &[&T_vnd_wolfram_wl_application],
-"application/vnd.wv.csp+wbxml" => &[&T_vnd_wv_csp_wbxml_application],
-"application/vnd.umajin" => &[&T_vnd_umajin_application],
-"text/x-haskell" => &[&T_x_haskell_text],
-"application/epub+zip" => &[&T_epub_zip_application],
-"application/vnd.3gpp.sms" => &[&T_vnd_3gpp_sms_application],
-"application/zstd" => &[&T_zstd_application],
-"application/vnd.crick.clicker.palette" => &[&T_vnd_crick_clicker_palette_application],
-"application/x-erdas-hfa" => &[&T_x_erdas_hfa_application],
-"video/x-ms-wvx" => &[&T_x_ms_wvx_video],
-"application/vnd.dvb.notif-ia-registration-response+xml" => &[&T_vnd_dvb_notif_ia_registration_response_xml_application],
-"audio/x-mpegurl" => &[&T_x_mpegurl_audio],
-"application/vnd.uplanet.alert" => &[&T_vnd_uplanet_alert_application],
-"application/edi-consent" => &[&T_edi_consent_application],
-"application/vnd.gmx" => &[&T_vnd_gmx_application],
-"application/vnd.kinar" => &[&T_vnd_kinar_application],
-"application/x-troff-ms" => &[&T_troff_text],
-"image/vnd.dgn;ver=8" => &[&T_vnd_dgn_version_8_image],
-"image/bmp" => &[&T_bmp_image],
-"video/x-theora" => &[&T_theora_video],
-"application/vnd.ms-xpsdocument" => &[&T_vnd_ms_xpsdocument_application],
-"application/vnd.msa-disk-image" => &[&T_vnd_msa_disk_image_application],
-"message/example" => &[&T_example_message],
-"application/vnd.kde.kword" => &[&T_vnd_kde_kword_application],
-"application/x-java-keystore" => &[&T_x_java_keystore_application],
-"application/vnd.ms-tnef" => &[&T_vnd_ms_tnef_application],
-"application/x-idl-save-file" => &[&T_x_idl_save_file_application],
-"application/x-sas-utility" => &[&T_x_sas_utility_application],
-"text/x-yacc" => &[&T_x_yacc_text],
-"application/vnd.kde.kontour" => &[&T_vnd_kde_kontour_application],
-"application/vnd.software602.filler.form+xml" => &[&T_vnd_software602_filler_form_xml_application],
-"application/x-plist" => &[&T_x_plist_application],
-"application/x-lz4" => &[&T_x_lz4_application],
-"model/vnd.dwfx+xps" => &[&T_vnd_dwfx_xps_model],
-"application/vnd.ms-excel.workspace.4" => &[&T_vnd_ms_excel_workspace_4_application],
-"text/parityfec" => &[&T_parityfec_text],
-"model/vnd.dwf" => &[&T_vnd_dwf_model],
-"application/x-kspread" => &[&T_vnd_kde_kspread_application],
-"application/vnd.hp-hpid" => &[&T_vnd_hp_hpid_application],
-"application/vnd.ms-excel.template.macroenabled.12" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
-"image/x-raw-logitech" => &[&T_x_raw_logitech_image],
-"application/x-pds" => &[&T_x_pds_application],
-"video/x-ogg-yuv" => &[&T_x_oggyuv_video],
-"application/pkix-crl" => &[&T_pkix_crl_application],
-"application/vnd.dxr" => &[&T_vnd_dxr_application],
-"application/scvp-vp-response" => &[&T_scvp_vp_response_application],
-"application/scvp-cv-response" => &[&T_scvp_cv_response_application],
-"audio/vnd.everad.plj" => &[&T_vnd_everad_plj_audio],
-"audio/x-ms-wax" => &[&T_x_ms_wax_audio],
-"image/vnd.microsoft.icon" => &[&T_vnd_microsoft_icon_image],
-"image/vnd.fujixerox.edmics-mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
-"application/x-msi" => &[&T_x_ms_installer_application],
-"application/vnd.ibm.minipay" => &[&T_vnd_ibm_minipay_application],
-"application/vnd.mobius.daf" => &[&T_vnd_mobius_daf_application],
-"application/x-bat" => &[&T_x_bat_application],
-"text/x-prolog" => &[&T_x_prolog_text],
-"text/x-forth" => &[&T_x_forth_text],
-"application/x-tmx" => &[&T_x_tmx_application],
-"application/vnd.sealed.mht" => &[&T_vnd_sealed_mht_application],
-"audio/g729e" => &[&T_g729e_audio],
-"application/vnd.fut-misnet" => &[&T_vnd_fut_misnet_application],
-"message/global-headers" => &[&T_global_headers_message],
-"application/vnd.micrografx.flo" => &[&T_vnd_micrografx_flo_application],
-"application/vnd.pg.format" => &[&T_vnd_pg_format_application],
-"audio/amr-nb" => &[&T_amr_audio],
-"application/vnd.apple.numbers" => &[&T_vnd_apple_numbers_application],
-"application/vnd.lotus-wordpro" => &[&T_vnd_lotus_wordpro_application],
-"application/x-x509-key" => &[&T_x_x509_key_application],
-"application/vnd.qualcomm.brew-app-res" => &[&T_vnd_qualcomm_brew_app_res_application],
-"audio/vnd.dolby.pl2z" => &[&T_vnd_dolby_pl2z_audio],
-"application/vnd.font-fontforge-sfd" => &[&T_vnd_font_fontforge_sfd_application],
-"application/vnd.yamaha.hv-dic" => &[&T_vnd_yamaha_hv_dic_application],
-"video/mp4" => &[&T_mp4_video],
-"text/x-sed" => &[&T_x_sed_text],
-"application/x-httpresponse" => &[&T_x_httpresponse_application],
-"audio/smv" => &[&T_smv_audio],
-"audio/3gpp" => &[&T_3gpp_video],
-"application/sgml" => &[&T_sgml_application],
-"application/vnd.hydrostatix.sof-data" => &[&T_vnd_hydrostatix_sof_data_application],
-"application/vnd.ms-wmdrm.lic-chlg-req" => &[&T_vnd_ms_wmdrm_lic_chlg_req_application],
-"application/x-font-pcf" => &[&T_x_font_pcf_application],
-"application/x-msclip" => &[&T_x_msclip_application],
-"model/example" => &[&T_example_model],
-"model/vnd.parasolid.transmit.text" => &[&T_vnd_parasolid_transmit_text_model],
-"application/x-stata-dta;version=13" => &[&T_x_stata_dta_version_13_application],
-"image/cdr" => &[&T_coreldraw_application],
-"text/x-tex" => &[&T_x_tex_application],
-"application/x-cdr" => &[&T_coreldraw_application],
-"application/rls-services+xml" => &[&T_rls_services_xml_application],
-"application/x-elc" => &[&T_x_elc_application],
-"application/pgp-keys" => &[&T_pgp_keys_application],
-"application/soap+xml" => &[&T_soap_xml_application],
-"application/vnd.s3sms" => &[&T_vnd_s3sms_application],
-"text/vnd.wap.si" => &[&T_vnd_wap_si_text],
-"application/set-payment-initiation" => &[&T_set_payment_initiation_application],
-"application/vnd.pocketlearn" => &[&T_vnd_pocketlearn_application],
-"application/vnd.ms-word" => &[&T_msword_application],
-"application/vnd.commonspace" => &[&T_vnd_commonspace_application],
-"application/vnd.fujixerox.art4" => &[&T_vnd_fujixerox_art4_application],
-"audio/x-aac" => &[&T_x_aac_audio],
-"audio/evrcb0" => &[&T_evrcb0_audio],
-"application/x-sas-data" => &[&T_x_sas_data_application],
-"application/pidf-diff+xml" => &[&T_pidf_diff_xml_application],
-"application/oebps-package+xml" => &[&T_oebps_package_xml_application],
-"application/batch-smtp" => &[&T_batch_smtp_application],
-"application/sereal;version=1" => &[&T_sereal_version_1_application],
-"application/vnd.pwg-multiplexed" => &[&T_vnd_pwg_multiplexed_application],
-"application/vnd.recordare.musicxml" => &[&T_vnd_recordare_musicxml_application],
-"application/gml+xml" => &[&T_gml_xml_application],
-"audio/mp4a-latm" => &[&T_mp4a_latm_audio],
-"audio/vnd.nuera.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
-"application/vnd.clonk.c4group" => &[&T_vnd_clonk_c4group_application],
-"application/vnd.ms-lrm" => &[&T_vnd_ms_lrm_application],
-"application/x-gtar" => &[&T_x_gtar_application],
-"application/x-mspublisher" => &[&T_x_mspublisher_application],
-"application/vnd.syncml.dm.notification" => &[&T_vnd_syncml_dm_notification_application],
-"audio/x-pn-realaudio-plugin" => &[&T_x_pn_realaudio_plugin_audio],
-"application/mbms-register-response+xml" => &[&T_mbms_register_response_xml_application],
-"application/vnd.sealed.tiff" => &[&T_vnd_sealed_tiff_application],
-"application/vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
-"application/x-kword" => &[&T_vnd_kde_kword_application],
-"text/x-modula" => &[&T_x_modula_text],
-"application/vnd.multiad.creator" => &[&T_vnd_multiad_creator_application],
-"application/vnd.dvb.notif-generic+xml" => &[&T_vnd_dvb_notif_generic_xml_application],
-"application/poc-settings+xml" => &[&T_poc_settings_xml_application],
-"text/x-php" => &[&T_x_php_text],
-"text/x-ruby" => &[&T_x_ruby_text],
-"application/vnd.osgi.dp" => &[&T_vnd_osgi_dp_application],
-"application/vnd.palm" => &[&T_vnd_palm_application],
-"application/vnd.smaf" => &[&T_vnd_smaf_application],
-"application/vnd.sealed.csf" => &[&T_vnd_sealed_csf_application],
-"application/vnd.fluxtime.clip" => &[&T_vnd_fluxtime_clip_application],
-"image/x-dpx" => &[&T_x_dpx_image],
-"image/x-raw-sigma" => &[&T_x_raw_sigma_image],
-"application/nasdata" => &[&T_nasdata_application],
-"multipart/parallel" => &[&T_parallel_multipart],
-"application/mac-compactpro" => &[&T_mac_compactpro_application],
-"image/jxl" => &[&T_jxl_image],
-"image/vnd.dxb" => &[&T_vnd_dxb_image],
-"image/x-targa" => &[&T_x_tga_image],
-"application/x-berkeley-db;format=queue" => &[&T_x_berkeley_db_format_queue_application],
-"application/vnd.xmpie.cpkg" => &[&T_vnd_xmpie_cpkg_application],
-"application/vnd.uplanet.bearer-choice-wbxml" => &[&T_vnd_uplanet_bearer_choice_wbxml_application],
-"audio/vnd.cns.inf1" => &[&T_vnd_cns_inf1_audio],
-"text/rss" => &[&T_rss_xml_application],
-"application/vnd.mophun.application" => &[&T_vnd_mophun_application_application],
-"application/x-berkeley-db;format=btree;version=4" => &[&T_x_berkeley_db_format_btree_version_4_application],
-"text/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_text],
-"application/x-appleworks" => &[&T_x_appleworks_application],
-"application/x-hdf" => &[&T_x_hdf_application],
-"application/news-checkgroups" => &[&T_news_checkgroups_application],
-"audio/vnd.cisco.nse" => &[&T_vnd_cisco_nse_audio],
-"text/x-vcard" => &[&T_x_vcard_text],
-"font/ttf" => &[&T_x_font_ttf_application],
-"application/voicexml+xml" => &[&T_voicexml_xml_application],
-"video/h264" => &[&T_h264_video],
-"message/rfc822" => &[&T_rfc822_message],
-"application/x-brotli" => &[&T_x_brotli_application],
-"audio/x-m4a" => &[&T_mp4_audio],
-"application/postscript" => &[&T_postscript_application],
-"application/x-tika-unix-dump" => &[&T_x_tika_unix_dump_application],
-"audio/dsr-es202211" => &[&T_dsr_es202211_audio],
-"audio/vnd.3gpp.iufp" => &[&T_vnd_3gpp_iufp_audio],
-"video/x-oggyuv" => &[&T_x_oggyuv_video],
-"application/kpml-request+xml" => &[&T_kpml_request_xml_application],
-"application/beep+xml" => &[&T_beep_xml_application],
-"application/onenote" => &[&T_onenote_application],
-"application/vnd.multiad.creator.cif" => &[&T_vnd_multiad_creator_cif_application],
-"application/vnd.etsi.iptvsad-bc+xml" => &[&T_vnd_etsi_iptvsad_bc_xml_application],
-"image/vnd.wap.wbmp" => &[&T_vnd_wap_wbmp_image],
-"application/mbms-deregister+xml" => &[&T_mbms_deregister_xml_application],
-"application/mbms-envelope+xml" => &[&T_mbms_envelope_xml_application],
-"application/x-jigdo" => &[&T_x_jigdo_application],
-"application/isup" => &[&T_isup_application],
-"text/html" => &[&T_html_text],
-"application/xv+xml" => &[&T_xv_xml_application],
-"chemical/x-cif" => &[&T_x_cif_chemical],
-"image/x-raw-sony" => &[&T_x_raw_sony_image],
-"text/x-scheme" => &[&T_x_scheme_text],
-"application/dca-rft" => &[&T_dca_rft_application],
-"audio/vnd.celp" => &[&T_vnd_celp_audio],
-"chemical/x-cml" => &[&T_x_cml_chemical],
-"image/avif" => &[&T_avif_image],
-"application/msonenote" => &[&T_onenote_application],
-"model/iges" => &[&T_iges_model],
-"application/sparql-query" => &[&T_sparql_query_application],
-"image/vnd.xiff" => &[&T_vnd_xiff_image],
-"application/vnd.fints" => &[&T_vnd_fints_application],
-"multipart/header-set" => &[&T_header_set_multipart],
-"video/jpm" => &[&T_jpm_image],
-"application/x-xpinstall" => &[&T_x_xpinstall_application],
-"text/ecmascript" => &[&T_ecmascript_text],
-"application/vnd.novadigm.edx" => &[&T_vnd_novadigm_edx_application],
-"video/h263" => &[&T_h263_video],
-"image/x-cdr" => &[&T_coreldraw_application],
-"application/vnd.wordperfect;version=6.x" => &[&T_vnd_wordperfect_version_6_x_application],
-"application/vnd.netfpx" => &[&T_vnd_netfpx_application],
-"application/vnd.ms-word.document.macroenabled.12" => &[&T_vnd_ms_word_document_macroenabled_12_application],
-"application/x-arj-compressed" => &[&T_x_arj_application],
-"application/xslt+xml" => &[&T_xslt_xml_application],
-"text/x-actionscript" => &[&T_x_actionscript_text],
-"application/xcap-caps+xml" => &[&T_xcap_caps_xml_application],
-"application/oda" => &[&T_oda_application],
-"image/jpm" => &[&T_jpm_image],
-"application/x-dvi" => &[&T_x_dvi_application],
-"application/x-vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
-"video/vnd.dlna.mpeg-tts" => &[&T_vnd_dlna_mpeg_tts_video],
-"application/ogg" => &[&T_ogg_application],
-"application/x-dtbncx+xml" => &[&T_x_dtbncx_xml_application],
-"application/timestamp-reply" => &[&T_timestamp_reply_application],
-"application/x-jeol-jdf" => &[&T_x_jeol_jdf_application],
-"image/x-dcx" => &[&T_vnd_zbrush_dcx_image],
-"audio/ape" => &[&T_ape_audio],
-"application/x-stata-dta;version=8" => &[&T_x_stata_dta_version_8_application],
-"application/ecmascript" => &[&T_ecmascript_application],
-"text/x-aspectj" => &[&T_x_aspectj_text],
-"audio/tone" => &[&T_tone_audio],
-"application/riscos" => &[&T_riscos_application],
-"application/vnd.stardivision.math" => &[&T_vnd_stardivision_math_application],
-"application/vnd.renlearn.rlprint" => &[&T_vnd_renlearn_rlprint_application],
-"application/x-internet-archive" => &[&T_x_internet_archive_application],
-"application/h224" => &[&T_h224_application],
-"application/vnd.oma.bcast.ltkm" => &[&T_vnd_oma_bcast_ltkm_application],
-"audio/amr-wb+" => &[&T_amr_wb__audio],
-"application/x-amiga-disk-format" => &[&T_x_amiga_disk_format_application],
-"audio/vnd.nokia.mobile-xmf" => &[&T_vnd_nokia_mobile_xmf_audio],
-"audio/smv-qcp" => &[&T_smv_qcp_audio],
-"application/vnd.uoml+xml" => &[&T_vnd_uoml_xml_application],
-"application/x-grib" => &[&T_x_grib_application],
-"application/x-xmind" => &[&T_x_xmind_application],
-"application/vnd.mfmp" => &[&T_vnd_mfmp_application],
-"application/vnd.ms-excel.sheet.macroenabled.12" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
-"application/x-project" => &[&T_x_project_application],
-"application/x-adobe-indesign-interchange" => &[&T_x_adobe_indesign_interchange_application],
-"audio/gsm-efr" => &[&T_gsm_efr_audio],
-"application/x-msdownload;format=pe-itanium" => &[&T_x_msdownload_format_pe_itanium_application],
-"text/enriched" => &[&T_enriched_text],
-"application/vnd.dolby.mobile.2" => &[&T_vnd_dolby_mobile_2_application],
-"video/bt656" => &[&T_bt656_video],
-"application/vnd.hzn-3d-crossword" => &[&T_vnd_hzn_3d_crossword_application],
-"application/x-xml" => &[&T_xml_application],
-"application/vnd.bluetooth.ep.oob" => &[&T_vnd_bluetooth_ep_oob_application],
-"text/uri-list" => &[&T_uri_list_text],
-"application/vnd.msign" => &[&T_vnd_msign_application],
-"application/wita" => &[&T_wita_application],
-"application/x-ms-wmd" => &[&T_x_ms_wmd_application],
-"application/x-texnicard" => &[&T_x_texnicard_application],
-"application/vnd.adobe.aftereffects.template" => &[&T_vnd_adobe_aftereffects_template_application],
-"application/vnd.shana.informed.formdata" => &[&T_vnd_shana_informed_formdata_application],
-"application/vnd.kde.kformula" => &[&T_vnd_kde_kformula_application],
-"application/vnd.mozilla.xul+xml" => &[&T_vnd_mozilla_xul_xml_application],
-"image/x-xcf" => &[&T_x_xcf_image],
-"application/x-sfdu" => &[&T_x_sfdu_application],
-"application/vnd.powerbuilder6" => &[&T_vnd_powerbuilder6_application],
-"audio/x-sap" => &[&T_x_sap_audio],
-"audio/parityfec" => &[&T_parityfec_audio],
-"image/x-jp2-container" => &[&T_x_jp2_container_image],
-"image/x-xpixmap" => &[&T_x_xpixmap_image],
-"application/vnd.oma-scws-http-response" => &[&T_vnd_oma_scws_http_response_application],
-"application/x-director" => &[&T_x_director_application],
-"image/x-canon-cr2" => &[&T_x_canon_cr2_image],
-"model/vnd.gdl" => &[&T_vnd_gdl_model],
-"text/vnd.yaml" => &[&T_x_yaml_text],
-"audio/vnd.dolby.heaac.1" => &[&T_vnd_dolby_heaac_1_audio],
-"text/x-groovy" => &[&T_x_groovy_text],
-"image/x-psd" => &[&T_vnd_adobe_photoshop_image],
-"application/mp4" => &[&T_mp4_application],
-"application/pics-rules" => &[&T_pics_rules_application],
-"application/vnd.oma.bcast.smartcard-trigger+xml" => &[&T_vnd_oma_bcast_smartcard_trigger_xml_application],
-"application/x-tex-tfm" => &[&T_x_tex_tfm_application],
-"text/x-web-markdown" => &[&T_x_web_markdown_text],
-"text/x-vcalendar" => &[&T_x_vcalendar_text],
-"application/vnd.nokia.landmarkcollection+xml" => &[&T_vnd_nokia_landmarkcollection_xml_application],
-"audio/x-flac" => &[&T_x_flac_audio],
-"text/x-idl" => &[&T_x_idl_text],
-"application/vnd.ms-visio.stencil.macroEnabled.12" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
-"application/mac-binhex40" => &[&T_mac_binhex40_application],
-"video/x-flv" => &[&T_x_flv_video],
-"application/pkcs7-mime" => &[&T_pkcs7_mime_application],
-"application/vnd.software602.filler.form-xml-zip" => &[&T_vnd_software602_filler_form_xml_zip_application],
-"application/vnd.kde.karbon" => &[&T_vnd_kde_karbon_application],
-"text/x-texinfo" => &[&T_x_texinfo_application],
-"application/vnd.canon-cpdl" => &[&T_vnd_canon_cpdl_application],
-"application/vnd.ms-word2006ml" => &[&T_vnd_ms_word2006ml_application],
-"application/sdp" => &[&T_sdp_application],
-"application/ibe-key-request+xml" => &[&T_ibe_key_request_xml_application],
-"application/vnd.ms-excel.sheet.2" => &[&T_vnd_ms_excel_sheet_2_application],
-"application/x-asprs" => &[&T_x_asprs_application],
-"application/x-iso9660-image" => &[&T_x_iso9660_image_application],
-"application/vnd.fujitsu.oasys" => &[&T_vnd_fujitsu_oasys_application],
-"application/x-tika-msoffice-embedded" => &[&T_x_tika_msoffice_embedded_application],
-"application/java-serialized-object" => &[&T_java_serialized_object_application],
-"application/x-quattro-pro" => &[&T_x_quattro_pro_application],
-"text/x-pascal" => &[&T_x_pascal_text],
-"application/x-x509-cert;format=pem" => &[&T_x_x509_cert_format_pem_application],
-"application/mbms-protection-description+xml" => &[&T_mbms_protection_description_xml_application],
-"application/rdf+xml" => &[&T_rdf_xml_application],
-"text/css" => &[&T_css_text],
-"text/vnd.dmclientscript" => &[&T_vnd_dmclientscript_text],
-"text/x-sass" => &[&T_x_sass_text],
-"application/vnd.oma.bcast.drm-trigger+xml" => &[&T_vnd_oma_bcast_drm_trigger_xml_application],
-"application/vnd.wap.slc" => &[&T_vnd_wap_slc_application],
-"application/onix-message-short+xml" => &[&T_onix_message_short_xml_application],
-"application/vnd.google-earth.kml+xml" => &[&T_vnd_google_earth_kml_xml_application],
-"application/vnd.syncml.dm+wbxml" => &[&T_vnd_syncml_dm_wbxml_application],
-"model/vnd.vtu" => &[&T_vnd_vtu_model],
-"text/vnd.curl" => &[&T_vnd_curl_text],
-"application/x-adobe-indesign" => &[&T_x_adobe_indesign_application],
-"image/x-dwg" => &[&T_vnd_dwg_image],
-"application/vemmi" => &[&T_vemmi_application],
-"application/vnd.yellowriver-custom-menu" => &[&T_vnd_yellowriver_custom_menu_application],
-"image/hevc-sequence" => &[&T_heic_sequence_image],
-"application/applixware" => &[&T_applixware_application],
-"application/mpeg4-generic" => &[&T_mpeg4_generic_application],
-"text/vnd.wap.sl" => &[&T_vnd_wap_sl_text],
-"audio/32kadpcm" => &[&T_32kadpcm_audio],
-"application/x-berkeley-db;format=log" => &[&T_x_berkeley_db_format_log_application],
-"application/x-httpd-jsp" => &[&T_x_jsp_text],
-"text/x-setext" => &[&T_x_setext_text],
-"application/matlab-mat" => &[&T_x_matlab_data_application],
-"application/vnd.syncml.ds.notification" => &[&T_vnd_syncml_ds_notification_application],
-"video/x-ms-wmv" => &[&T_x_ms_wmv_video],
-"application/vnd.handheld-entertainment+xml" => &[&T_vnd_handheld_entertainment_xml_application],
-"application/x-chrome-extension" => &[&T_x_chrome_extension_application],
-"application/x-filemaker" => &[&T_x_filemaker_application],
-"video/ogg" => &[&T_ogg_video],
-"application/vnd.intertrust.digibox" => &[&T_vnd_intertrust_digibox_application],
-"application/x-lharc" => &[&T_x_lharc_application],
-"model/e57" => &[&T_e57_model],
-"application/vnd.enliven" => &[&T_vnd_enliven_application],
-"image/tiff" => &[&T_tiff_image],
-"application/vnd.nokia.landmark+wbxml" => &[&T_vnd_nokia_landmark_wbxml_application],
-"application/vnd.epson.quickanime" => &[&T_vnd_epson_quickanime_application],
-"application/vnd.etsi.iptvsad-npvr+xml" => &[&T_vnd_etsi_iptvsad_npvr_xml_application],
-"application/ssml+xml" => &[&T_ssml_xml_application],
-"video/vnd.dvb.file" => &[&T_vnd_dvb_file_video],
-"application/vnd.ms-visio" => &[&T_vnd_visio_application],
-"application/atomcat+xml" => &[&T_atomcat_xml_application],
-"application/vnd.zul" => &[&T_vnd_zul_application],
-"image/vnd.fujixerox.edmics-rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
-"audio/x-oggpcm" => &[&T_x_oggpcm_audio],
-"application/x-mysql-db" => &[&T_x_mysql_db_application],
-"audio/x-adpcm" => &[&T_x_adpcm_audio],
-"application/vnd.airzip.filesecure.azf" => &[&T_vnd_airzip_filesecure_azf_application],
-"application/vnd.openofficeorg.autotext" => &[&T_vnd_openofficeorg_autotext_application],
-"application/x-java-jnilib" => &[&T_x_java_jnilib_application],
-"application/vnd.fdf" => &[&T_vnd_fdf_application],
-"application/javascript" => &[&T_javascript_text],
-"application/vnd.ms-package.3dmanufacturing-3dmodel+xml" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
-"audio/g729d" => &[&T_g729d_audio],
-"image/vnd.fpx" => &[&T_vnd_fpx_image],
-"application/vnd.groove-tool-template" => &[&T_vnd_groove_tool_template_application],
-"audio/dsr-es201108" => &[&T_dsr_es201108_audio],
-"application/x-vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
-"application/x-vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
-"application/vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
-"application/vnd.crick.clicker" => &[&T_vnd_crick_clicker_application],
-"application/vnd.ms-outlook-pst" => &[&T_vnd_ms_outlook_pst_application],
-"application/vnd.ms-ims" => &[&T_vnd_ms_ims_application],
-"application/vnd.etsi.cug+xml" => &[&T_vnd_etsi_cug_xml_application],
-"application/x-tika-staroffice" => &[&T_x_tika_staroffice_application],
-"application/x-zoo" => &[&T_x_zoo_application],
-"application/x-berkeley-db" => &[&T_x_berkeley_db_application],
-"audio/speex" => &[&T_speex_audio],
-"application/vnd.oasis.opendocument.flat.spreadsheet" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
-"image/x-raw-minolta" => &[&T_x_raw_minolta_image],
-"audio/l8" => &[&T_l8_audio],
-"application/vnd.wt.stf" => &[&T_vnd_wt_stf_application],
-"image/x-raw-epson" => &[&T_x_raw_epson_image],
-"video/h263-2000" => &[&T_h263_2000_video],
-"video/vnd.sealed.mpeg1" => &[&T_vnd_sealed_mpeg1_video],
-"video/3gpp2" => &[&T_3gpp2_video],
-"application/x-bzip2" => &[&T_x_bzip2_application],
-"application/vnd.musician" => &[&T_vnd_musician_application],
-"audio/rtx" => &[&T_rtx_audio],
-"image/heic" => &[&T_heic_image],
-"text/x-tcl" => &[&T_x_tcl_text],
-"application/x-executable" => &[&T_x_executable_application],
-"audio/x-ogg-pcm" => &[&T_x_oggpcm_audio],
-"application/x-killustrator" => &[&T_x_killustrator_application],
-"text/prs.lines.tag" => &[&T_prs_lines_tag_text],
-"application/vnd.etsi.aoc+xml" => &[&T_vnd_etsi_aoc_xml_application],
-"message/imdn+xml" => &[&T_imdn_xml_message],
-"application/vnd.3gpp2.tcap" => &[&T_vnd_3gpp2_tcap_application],
-"text/x-rst" => &[&T_x_rst_text],
-"application/x-authorware-map" => &[&T_x_authorware_map_application],
-"text/troff" => &[&T_troff_text],
-"application/vnd.iptc.g2.catalogitem+xml" => &[&T_vnd_iptc_g2_catalogitem_xml_application],
-"text/x-ml" => &[&T_x_ml_text],
-"application/vnd.sun.xml.math" => &[&T_vnd_sun_xml_math_application],
-"application/x-spss-sav" => &[&T_x_spss_sav_application],
-"application/x-msdownload" => &[&T_x_msdownload_application],
-"application/xhtml+xml" => &[&T_xhtml_xml_application],
-"application/x-rar-compressed" => &[&T_x_rar_compressed_application],
-"application/vnd.ms-excel.sheet.3" => &[&T_vnd_ms_excel_sheet_3_application],
-"application/vnd.sealed.xls" => &[&T_vnd_sealed_xls_application],
-"application/x-amf" => &[&T_x_amf_application],
-"application/x-mach-o-core" => &[&T_x_mach_o_core_application],
-"application/x-touhou" => &[&T_x_touhou_application],
-"application/pkix-pkipath" => &[&T_pkix_pkipath_application],
-"video/parityfec" => &[&T_parityfec_video],
-"application/mpeg4-iod" => &[&T_mpeg4_iod_application],
-"application/x-x509-cert" => &[&T_x_x509_cert_application],
-"application/vnd.sealed.ppt" => &[&T_vnd_sealed_ppt_application],
-"application/vnd.oma-scws-http-request" => &[&T_vnd_oma_scws_http_request_application],
-"application/x-stata-dta" => &[&T_x_stata_dta_application],
-"application/vnd.jcp.javame.midlet-rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
-"application/vnd.triscape.mxs" => &[&T_vnd_triscape_mxs_application],
-"image/webp" => &[&T_webp_image],
-"application/x-vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
-"text/x-csharp" => &[&T_x_csharp_text],
-"application/csta+xml" => &[&T_csta_xml_application],
-"application/vnd.otps.ct-kip+xml" => &[&T_vnd_otps_ct_kip_xml_application],
-"application/vnd.japannet-directory-service" => &[&T_vnd_japannet_directory_service_application],
-"audio/vnd.4sb" => &[&T_vnd_4sb_audio],
-"application/vnd.denovo.fcselayout-link" => &[&T_vnd_denovo_fcselayout_link_application],
-"application/vnd.arastra.swi" => &[&T_vnd_arastra_swi_application],
-"message/cpim" => &[&T_cpim_message],
-"audio/g729" => &[&T_g729_audio],
-"application/srgs+xml" => &[&T_srgs_xml_application],
-"image/png" => &[&T_png_image],
-"text/x-assembly" => &[&T_x_assembly_text],
-"application/vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
-"application/vnd.tmobile-livetv" => &[&T_vnd_tmobile_livetv_application],
-"audio/g726-16" => &[&T_g726_16_audio],
-"application/gpx+xml" => &[&T_gpx_xml_application],
-"image/x-3ds" => &[&T_x_3ds_image],
-"application/vnd.wmf.bootstrap" => &[&T_vnd_wmf_bootstrap_application],
-"application/vnd.llamagraphics.life-balance.desktop" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
-"application/x-vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
-"text/vnd.iptc.newsml" => &[&T_vnd_iptc_newsml_text],
-"model/gltf-binary" => &[&T_gltf_binary_model],
-"application/vnd.kde.kspread" => &[&T_vnd_kde_kspread_application],
-"application/vnd.adobe.indesign-idml-package" => &[&T_vnd_adobe_indesign_idml_package_application],
-"application/java-vm" => &[&T_java_vm_application],
-"application/x-vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
-"application/x-ogg" => &[&T_ogg_application,&T_vorbis_audio],
-"image/x-icon" => &[&T_vnd_microsoft_icon_image],
-"application/x-vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
-"application/x-sas-view" => &[&T_x_sas_view_application],
-"application/vnd.sealed.eml" => &[&T_vnd_sealed_eml_application],
-"application/index.vnd" => &[&T_index_vnd_application],
-"video/3gpp" => &[&T_3gpp_video],
-"application/reginfo+xml" => &[&T_reginfo_xml_application],
-"application/vnd.vectorworks" => &[&T_vnd_vectorworks_application],
-"image/x-emf-compressed" => &[&T_x_emf_compressed_image],
-"application/x-berkeley-db;format=btree" => &[&T_x_berkeley_db_format_btree_application],
-"application/x-emf" => &[&T_emf_image],
-"application/x-pdf" => &[&T_pdf_application],
-"application/vnd.japannet-verification" => &[&T_vnd_japannet_verification_application],
-"application/vnd.dvb.iptv.alfec-enhancement" => &[&T_vnd_dvb_iptv_alfec_enhancement_application],
-"text/vnd.fmi.flexstor" => &[&T_vnd_fmi_flexstor_text],
-"message/vnd.si.simp" => &[&T_vnd_si_simp_message],
-"image/x-raw-panasonic" => &[&T_x_raw_panasonic_image],
-"application/x-vnd.datapackage+json" => &[&T_x_vnd_datapackage_json_application],
-"application/vnd.3gpp.bsf+xml" => &[&T_vnd_3gpp_bsf_xml_application],
-"application/x-sas-mddb" => &[&T_x_sas_mddb_application],
-"text/dns" => &[&T_dns_text],
-"text/rtx" => &[&T_rtx_text],
-"application/applefile" => &[&T_applefile_application],
-"application/timestamp-query" => &[&T_timestamp_query_application],
-"application/vnd.zzazz.deck+xml" => &[&T_vnd_zzazz_deck_xml_application],
-"audio/dvi4" => &[&T_dvi4_audio],
-"image/x-cmx" => &[&T_x_cmx_image],
-"application/vnd.noblenet-directory" => &[&T_vnd_noblenet_directory_application],
-"application/vnd.route66.link66+xml" => &[&T_vnd_route66_link66_xml_application],
-"application/vnd.kde.kivio" => &[&T_vnd_kde_kivio_application],
-"text/x-dtd" => &[&T_xml_dtd_application],
-"video/vnd.mpegurl" => &[&T_vnd_mpegurl_video],
-"application/x-mscardfile" => &[&T_x_mscardfile_application],
-"application/x-sas-program-data" => &[&T_x_sas_program_data_application],
-"application/vnd.sealedmedia.softseal.pdf" => &[&T_vnd_sealedmedia_softseal_pdf_application],
-"application/vnd.oma.poc.final-report+xml" => &[&T_vnd_oma_poc_final_report_xml_application],
-"application/vnd.openxmlformats-officedocument.wordprocessingml.document" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
-"application/vnd.ms-wpl" => &[&T_vnd_ms_wpl_application],
-"application/zlib" => &[&T_zlib_application],
-"application/x-msmoney" => &[&T_x_msmoney_application],
-"application/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
-"text/xsl" => &[&T_xslfo_xml_application,&T_xslt_xml_application],
-"application/x-troff-me" => &[&T_troff_text],
-"application/vnd.lotus-screencam" => &[&T_vnd_lotus_screencam_application],
-"application/x-kdelnk" => &[&T_x_kdelnk_application],
-"application/vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
-"image/x-raw-pentax" => &[&T_x_raw_pentax_image],
-"application/x-font-snf" => &[&T_x_font_snf_application],
-"application/vnd.framemaker" => &[&T_vnd_framemaker_application],
-"multipart/digest" => &[&T_digest_multipart],
-"application/vnd.ms-spreadsheetml" => &[&T_vnd_ms_spreadsheetml_application],
-"image/x-gimp-gbr" => &[&T_x_gimp_gbr_image],
-"application/x-vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
-"application/mbms-reception-report+xml" => &[&T_mbms_reception_report_xml_application],
-"application/x-mach-o-object" => &[&T_x_mach_o_object_application],
-"application/x-quattro-pro;version=5" => &[&T_x_quattro_pro_version_5_application],
-"text/x-eiffel" => &[&T_x_eiffel_text],
-"application/ttml+xml" => &[&T_ttml_xml_application],
-"application/vnd.uplanet.alert-wbxml" => &[&T_vnd_uplanet_alert_wbxml_application],
-"application/vnd.truedoc" => &[&T_vnd_truedoc_application],
-"application/vnd.uplanet.listcmd-wbxml" => &[&T_vnd_uplanet_listcmd_wbxml_application],
-"application/mathematica" => &[&T_mathematica_application],
-"application/x-msschedule" => &[&T_x_msschedule_application],
-"application/vnd.fdsn.mseed" => &[&T_vnd_fdsn_mseed_application],
-"application/vnd.powerbuilder7" => &[&T_vnd_powerbuilder7_application],
-"audio/pcmu-wb" => &[&T_pcmu_wb_audio],
-"video/mp1s" => &[&T_mp1s_video],
-"application/im-iscomposing+xml" => &[&T_im_iscomposing_xml_application],
-"application/vnd.ecowin.seriesrequest" => &[&T_vnd_ecowin_seriesrequest_application],
-"application/vnd.ecowin.filerequest" => &[&T_vnd_ecowin_filerequest_application],
-"text/x-coffeescript" => &[&T_x_coffeescript_text],
-"audio/dat12" => &[&T_dat12_audio],
-"application/vnd.iptc.g2.knowledgeitem+xml" => &[&T_vnd_iptc_g2_knowledgeitem_xml_application],
-"application/vnd.trueapp" => &[&T_vnd_trueapp_application],
-"application/vnd.poc.group-advertisement+xml" => &[&T_vnd_poc_group_advertisement_xml_application],
-"application/json" => &[&T_json_application],
-"application/vnd.mediastation.cdkey" => &[&T_vnd_mediastation_cdkey_application],
-"application/x-font-framemaker" => &[&T_x_font_framemaker_application],
-"text/vnd.latex-z" => &[&T_vnd_latex_z_text],
-"application/xquery" => &[&T_xquery_application],
-"application/x-coreldraw" => &[&T_coreldraw_application],
-"application/vnd.avistar+xml" => &[&T_vnd_avistar_xml_application],
-"application/x-isatab-investigation" => &[&T_x_isatab_investigation_application],
-"text/vnd.iptc.nitf" => &[&T_vnd_iptc_nitf_text],
-"application/pidf+xml" => &[&T_pidf_xml_application],
-"application/x-sc" => &[&T_x_sc_application],
-"message/news" => &[&T_news_message],
-"text/x-lua" => &[&T_x_lua_text],
-"application/vnd.ms-excel.sheet.4" => &[&T_vnd_ms_excel_sheet_4_application],
-"application/vnd.commerce-battelle" => &[&T_vnd_commerce_battelle_application],
-"application/binhex" => &[&T_mac_binhex40_application],
-"application/x-wacz" => &[&T_x_wacz_application],
-"application/vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
-"application/vnd.groove-tool-message" => &[&T_vnd_groove_tool_message_application],
-"application/vnd.ericsson.quickcall" => &[&T_vnd_ericsson_quickcall_application],
-"video/vnd.nokia.interleaved-multimedia" => &[&T_vnd_nokia_interleaved_multimedia_video],
-"application/vnd.tcpdump.pcap" => &[&T_vnd_tcpdump_pcap_application],
-"application/x-dtbook+xml" => &[&T_x_dtbook_xml_application],
-"application/vnd.lotus-approach" => &[&T_vnd_lotus_approach_application],
-"application/vnd.ms-powerpoint.slide.macroenabled.12" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
-"application/http" => &[&T_http_application],
-"application/vnd.street-stream" => &[&T_vnd_street_stream_application],
-"application/vnd.oasis.opendocument.flat.text" => &[&T_vnd_oasis_opendocument_flat_text_application],
-"image/icns" => &[&T_icns_image],
-"application/x-mobipocket-ebook" => &[&T_x_mobipocket_ebook_application],
-"application/pkcs7-signature" => &[&T_pkcs7_signature_application],
-"image/vnd.mix" => &[&T_vnd_mix_image],
-"application/vnd.groove-account" => &[&T_vnd_groove_account_application],
-"image/x-raw-leaf" => &[&T_x_raw_leaf_image],
-"image/x-raw-olympus" => &[&T_x_raw_olympus_image],
-"image/x-raw-red" => &[&T_x_raw_red_image],
-"application/vnd.chemdraw+xml" => &[&T_vnd_chemdraw_xml_application],
-"application/simplesymbolcontainer" => &[&T_simplesymbolcontainer_application],
-"image/jpeg" => &[&T_jpeg_image],
-"image/x-raw-fuji" => &[&T_x_raw_fuji_image],
-"chemical/x-cmdf" => &[&T_x_cmdf_chemical],
-"application/mbms-associated-procedure-description+xml" => &[&T_mbms_associated_procedure_description_xml_application],
-"application/vnd.syncml+xml" => &[&T_vnd_syncml_xml_application],
-"text/x-ocaml" => &[&T_x_ocaml_text],
-"image/bpg" => &[&T_bpg_image],
-"application/mosskey-data" => &[&T_mosskey_data_application],
-"application/samlassertion+xml" => &[&T_samlassertion_xml_application],
-"application/x-123" => &[&T_vnd_lotus_1_2_3_application],
-"audio/vnd.qcelp" => &[&T_vnd_qcelp_audio],
-"application/x-tika-ooxml-protected" => &[&T_x_tika_ooxml_protected_application],
-"audio/cn" => &[&T_cn_audio],
-"application/vnd.powerbuilder6-s" => &[&T_vnd_powerbuilder6_s_application],
-"application/x-kpresenter" => &[&T_vnd_kde_kpresenter_application],
-"application/x-msdownload;format=pe-arm7" => &[&T_x_msdownload_format_pe_arm7_application],
-"application/x-stata-dta;version=10" => &[&T_x_stata_dta_version_10_application],
-"application/vnd.ecdis-update" => &[&T_vnd_ecdis_update_application],
-"application/resource-lists+xml" => &[&T_resource_lists_xml_application],
-"audio/evrcwb1" => &[&T_evrcwb1_audio],
-"application/vnd.acucobol" => &[&T_vnd_acucobol_application],
-"image/t38" => &[&T_t38_image],
-"audio/sp-midi" => &[&T_sp_midi_audio],
-"multipart/report" => &[&T_report_multipart],
-"application/x-tika-msoffice-embedded;format=comp_obj" => &[&T_x_tika_msoffice_embedded_format_comp_obj_application],
-"application/x-gzip-compressed" => &[&T_gzip_application],
-"video/x-fli" => &[&T_x_fli_video],
-"application/vnd.autopackage" => &[&T_vnd_autopackage_application],
-"application/x-shapefile" => &[&T_x_shapefile_application],
-"text/vnd.curl.mcurl" => &[&T_vnd_curl_mcurl_text],
-"audio/l20" => &[&T_l20_audio],
-"application/vnd.curl.pcurl" => &[&T_vnd_curl_pcurl_application],
-"application/x-font-printer-metric" => &[&T_x_font_printer_metric_application],
-"application/vnd.motorola.flexsuite.ttc" => &[&T_vnd_motorola_flexsuite_ttc_application],
-"application/manifest+json" => &[&T_manifest_json_application],
-"application/ibe-pp-data" => &[&T_ibe_pp_data_application],
-"image/x-raw-adobe" => &[&T_x_raw_adobe_image],
-"text/x-diff" => &[&T_x_diff_text],
-"application/x-mysql-misam-index" => &[&T_x_mysql_misam_index_application],
-"application/vnd.etsi.iptvcommand+xml" => &[&T_vnd_etsi_iptvcommand_xml_application],
-"application/vnd.oma.poc.detailed-progress-report+xml" => &[&T_vnd_oma_poc_detailed_progress_report_xml_application],
-"image/ntf" => &[&T_nitf_image],
-"image/vnd.adobe.premiere" => &[&T_vnd_adobe_premiere_image],
-"chemical/x-pdb" => &[&T_x_pdb_chemical],
-"text/x-config" => &[&T_x_config_text],
-"video/vnd.iptvforum.1dparityfec-1010" => &[&T_vnd_iptvforum_1dparityfec_1010_video],
-"application/cellml+xml" => &[&T_cellml_xml_application],
-"text/rtf" => &[&T_rtf_application],
-"image/vnd.dgn" => &[&T_vnd_dgn_image],
-"application/vnd.rim.cod" => &[&T_vnd_rim_cod_application],
-"audio/asc" => &[&T_asc_audio],
-"application/vnd.dvb.notif-ia-registration-request+xml" => &[&T_vnd_dvb_notif_ia_registration_request_xml_application],
-"application/photoshop" => &[&T_vnd_adobe_photoshop_image],
-"application/vnd.spotfire.dxp" => &[&T_vnd_spotfire_dxp_application],
-"application/wasm" => &[&T_wasm_application],
-"drawing/dwg" => &[&T_vnd_dwg_image],
-"application/vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
-"application/vnd.recordare.musicxml+xml" => &[&T_vnd_recordare_musicxml_xml_application],
-"application/vnd.chipnuts.karaoke-mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
-"application/vnd.micrografx.igx" => &[&T_vnd_micrografx_igx_application],
-"image/vnd.sealedmedia.softseal.gif" => &[&T_vnd_sealedmedia_softseal_gif_image],
-"application/vnd.dna" => &[&T_vnd_dna_application],
-"text/vnd.sun.j2me.app-descriptor" => &[&T_vnd_sun_j2me_app_descriptor_text],
-"application/vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
-"application/vnd.oasis.opendocument.base" => &[&T_vnd_oasis_opendocument_base_application],
-"application/x-yml" => &[&T_x_yaml_text],
-"text/x-rsrc" => &[&T_x_rsrc_text],
-"application/vnd.dolby.mobile.1" => &[&T_vnd_dolby_mobile_1_application],
-"model/vnd.mts" => &[&T_vnd_mts_model],
-"application/x-subrip" => &[&T_x_subrip_application],
-"text/red" => &[&T_red_text],
-"video/pointer" => &[&T_pointer_video],
-"audio/flac" => &[&T_x_flac_audio],
-"audio/x-unknown" => &[&T_x_unknown_audio],
-"application/x-ms-nls" => &[&T_x_ms_nls_application],
-"application/vnd.dynageo" => &[&T_vnd_dynageo_application],
-"application/x-installshield" => &[&T_x_installshield_application],
-"text/x-perl" => &[&T_x_perl_text],
-"application/wordperfect5.1" => &[&T_wordperfect5_1_application],
-"video/vnd.motorola.videop" => &[&T_vnd_motorola_videop_video],
-"text/x-common-lisp" => &[&T_x_common_lisp_text],
-"application/vnd.uplanet.channel-wbxml" => &[&T_vnd_uplanet_channel_wbxml_application],
-"application/x-compress" => &[&T_x_compress_application],
-"model/vnd.dwf;version=5" => &[&T_vnd_dwf_version_5_model],
-"application/vnd.acucorp" => &[&T_vnd_acucorp_application],
-"application/vnd.oma.bcast.stkm" => &[&T_vnd_oma_bcast_stkm_application],
-"application/x-hwp" => &[&T_x_hwp_application],
-"video/3gpp-tt" => &[&T_3gpp_tt_video],
-"application/x-Gnumeric-spreadsheet" => &[&T_x_gnumeric_application],
-"application/vnd.svd" => &[&T_vnd_svd_application],
-"application/vnd.stardivision.writer-global" => &[&T_vnd_stardivision_writer_global_application],
-"application/dwg" => &[&T_vnd_dwg_image],
-"application/hyperstudio" => &[&T_hyperstudio_application],
-"application/conference-info+xml" => &[&T_conference_info_xml_application],
-"application/shf+xml" => &[&T_shf_xml_application],
-"application/vnd.cups-postscript" => &[&T_vnd_cups_postscript_application],
-"video/x-ogguvs" => &[&T_x_ogguvs_video],
-"application/vnd.sus-calendar" => &[&T_vnd_sus_calendar_application],
-"application/pgp" => &[&T_pgp_encrypted_application],
-"application/ms-tnef" => &[&T_vnd_ms_tnef_application],
-"application/x-mach-o-bundle" => &[&T_x_mach_o_bundle_application],
-"application/samlmetadata+xml" => &[&T_samlmetadata_xml_application],
-"message/tracking-status" => &[&T_tracking_status_message],
-"application/vnd.etsi.iptvueprofile+xml" => &[&T_vnd_etsi_iptvueprofile_xml_application],
-"message/disposition-notification" => &[&T_disposition_notification_message],
-"text/x-erlang" => &[&T_x_erlang_text],
-"application/vnd.ms-wordml" => &[&T_vnd_ms_wordml_application],
-"application/ibe-pkg-reply+xml" => &[&T_ibe_pkg_reply_xml_application],
-"application/vnd.dir-bi.plate-dl-nosuffix" => &[&T_vnd_dir_bi_plate_dl_nosuffix_application],
-"audio/3gpp2" => &[&T_3gpp2_video],
-"video/x-m4v" => &[&T_x_m4v_video],
-"video/x-jng" => &[&T_x_jng_video],
-"message/http" => &[&T_http_message],
-"image/vnd.mozilla.apng" => &[&T_vnd_mozilla_apng_image],
-"image/x-xbitmap" => &[&T_x_xbitmap_image],
-"application/vnd.epson.msf" => &[&T_vnd_epson_msf_application],
-"application/vnd.frogans.fnc" => &[&T_vnd_frogans_fnc_application],
-"application/vnd.sss-ntf" => &[&T_vnd_sss_ntf_application],
-"text/x-haxe" => &[&T_x_haxe_text],
-"application/vnd.sun.xml.impress" => &[&T_vnd_sun_xml_impress_application],
-"application/vnd.sealed.3df" => &[&T_vnd_sealed_3df_application],
-"application/acad" => &[&T_vnd_dwg_image],
-"text/x-clojure" => &[&T_x_clojure_text],
-"application/vnd.sealedmedia.softseal.html" => &[&T_vnd_sealedmedia_softseal_html_application],
-"application/x-sas-backup" => &[&T_x_sas_backup_application],
-"application/vnd.groove-injector" => &[&T_vnd_groove_injector_application],
-"audio/g726-40" => &[&T_g726_40_audio],
-"application/vnd.ibm.secure-container" => &[&T_vnd_ibm_secure_container_application],
-"application/rss+xml" => &[&T_rss_xml_application],
-"application/vnd.ms-excel" => &[&T_vnd_ms_excel_application],
-"application/vnd.ms-opentype" => &[&T_x_font_otf_application],
-"application/font-woff" => &[&T_woff_font],
-"application/vnd.preminet" => &[&T_vnd_preminet_application],
-"application/x-speex" => &[&T_speex_audio],
-"application/vnd.jam" => &[&T_vnd_jam_application],
-"application/x-berkeley-db;format=btree;version=3" => &[&T_x_berkeley_db_format_btree_version_3_application],
-"application/vnd.previewsystems.box" => &[&T_vnd_previewsystems_box_application],
-"image/heif" => &[&T_heif_image],
-"video/x-ms-wmx" => &[&T_x_ms_wmx_video],
-"text/vnd.wap.wmlscript" => &[&T_vnd_wap_wmlscript_text],
-"application/vnd.tcpdump.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
-"application/x-archive" => &[&T_x_archive_application],
-"audio/vnd.ms-playready.media.pya" => &[&T_vnd_ms_playready_media_pya_audio],
-"font/sfnt" => &[&T_x_font_ttf_application],
-"application/vnd.japannet-jpnstore-wakeup" => &[&T_vnd_japannet_jpnstore_wakeup_application],
-"application/vnd.japannet-payment-wakeup" => &[&T_vnd_japannet_payment_wakeup_application],
-"application/x-mach-o-kext-bundle" => &[&T_x_mach_o_kext_bundle_application],
-"audio/x-dec-basic" => &[&T_x_dec_basic_audio],
-"application/pls+xml" => &[&T_pls_xml_application],
-"application/vnd.shana.informed.formtemplate" => &[&T_vnd_shana_informed_formtemplate_application],
-"video/raw" => &[&T_raw_video],
-"application/vnd.stardivision.writer" => &[&T_vnd_stardivision_writer_application],
-"application/x-berkeley-db;format=hash;version=5" => &[&T_x_berkeley_db_format_hash_version_5_application],
-"image/vnd.zbrush.pcx" => &[&T_vnd_zbrush_pcx_image],
-"audio/x-dec-adpcm" => &[&T_x_dec_adpcm_audio],
-"application/x-lzip" => &[&T_x_lzip_application,&T_lzip_application],
-"application/x-font-sunos-news" => &[&T_x_font_sunos_news_application],
-"application/x-vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
-"text/ulpfec" => &[&T_ulpfec_text],
-"video/vc1" => &[&T_vc1_video],
-"application/x-msdownload;format=pe32" => &[&T_x_msdownload_format_pe32_application],
-"audio/vnd.dolby.heaac.2" => &[&T_vnd_dolby_heaac_2_audio],
-"application/x-wais-source" => &[&T_x_wais_source_application],
-"application/mbms-register+xml" => &[&T_mbms_register_xml_application],
-"application/vnd.ms-powerpoint.template.macroenabled.12" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
-"image/aces" => &[&T_aces_image],
-"application/vnd.oma.bcast.associated-procedure-parameter+xml" => &[&T_vnd_oma_bcast_associated_procedure_parameter_xml_application],
-"text/x-asm" => &[&T_x_assembly_text],
-"application/mbox" => &[&T_mbox_application],
-"application/news-groupinfo" => &[&T_news_groupinfo_application],
-"text/vnd.curl.scurl" => &[&T_vnd_curl_scurl_text],
-"application/x-x509-ca-cert" => &[&T_x_x509_cert_application],
-"text/x-less" => &[&T_x_less_text],
-"video/vnd.iptvforum.1dparityfec-2005" => &[&T_vnd_iptvforum_1dparityfec_2005_video],
-"video/ulpfec" => &[&T_ulpfec_video],
-"application/x-netcdf" => &[&T_x_netcdf_application],
-"application/x-xliff+xml" => &[&T_x_xliff_xml_application],
-"audio/dsr-es202212" => &[&T_dsr_es202212_audio],
-"audio/wave" => &[&T_vnd_wave_audio],
-"text/vnd.in3d.3dml" => &[&T_vnd_in3d_3dml_text],
-"application/x-nesrom" => &[&T_x_nesrom_application],
-"application/x-spectrum-tzx" => &[&T_x_spectrum_tzx_application],
-"application/vnd.oma.bcast.sprov+xml" => &[&T_vnd_oma_bcast_sprov_xml_application],
-"application/vnd.crick.clicker.template" => &[&T_vnd_crick_clicker_template_application],
-"application/x400-bp" => &[&T_x400_bp_application],
-"application/zip" => &[&T_zip_application],
-"application/vnd.nokia.radio-presets" => &[&T_vnd_nokia_radio_presets_application],
-"application/vnd.sun.xml.draw.template" => &[&T_vnd_sun_xml_draw_template_application],
-"text/vnd.motorola.reflex" => &[&T_vnd_motorola_reflex_text],
-"application/x-sibelius" => &[&T_x_sibelius_application],
-"application/vnd.xmpie.plan" => &[&T_vnd_xmpie_plan_application],
-"message/sip" => &[&T_sip_message],
-"text/t140" => &[&T_t140_text],
-"video/example" => &[&T_example_video],
-"text/x-tika-text-based-message" => &[&T_x_tika_text_based_message_text],
-"video/daala" => &[&T_daala_video],
-"application/x-memgraph" => &[&T_x_memgraph_application],
-"application/vnd.hp-jlyt" => &[&T_vnd_hp_jlyt_application],
-"application/xslfo+xml" => &[&T_xslfo_xml_application],
-"text/vnd.curl.dcurl" => &[&T_vnd_curl_dcurl_text],
-"application/yaml" => &[&T_x_yaml_text],
-"application/vnd.cab-jscript" => &[&T_vnd_cab_jscript_application],
-"application/x-mswrite" => &[&T_x_mswrite_application],
-"image/x-rgb" => &[&T_x_rgb_image],
-"application/tve-trigger" => &[&T_tve_trigger_application],
-"application/x-frame" => &[&T_vnd_mif_application],
-"application/vnd.mif" => &[&T_vnd_mif_application],
-"application/x-berkeley-db;format=hash;version=2" => &[&T_x_berkeley_db_format_hash_version_2_application],
-"application/vnd.xmi+xml" => &[&T_vnd_xmi_xml_application],
-"video/mpv" => &[&T_mpv_video],
-"application/vnd.paos.xml" => &[&T_vnd_paos_xml_application],
-"application/vnd.ms-visio.template.macroEnabled.12" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
-"application/vnd.lotus-organizer" => &[&T_vnd_lotus_organizer_application],
-"application/x-7z-compressed" => &[&T_x_7z_compressed_application],
-"application/mbms-msk-response+xml" => &[&T_mbms_msk_response_xml_application],
-"application/prs.alvestrand.titrax-sheet" => &[&T_prs_alvestrand_titrax_sheet_application],
-"application/x-x509-cert;format=der" => &[&T_x_x509_cert_format_der_application],
-"application/vnd.stardivision.impress" => &[&T_vnd_stardivision_impress_application],
-"application/vnd.oasis.opendocument.database" => &[&T_vnd_oasis_opendocument_base_application],
-"application/x-chrome-package" => &[&T_x_chrome_package_application],
-"application/vnd.japannet-registration" => &[&T_vnd_japannet_registration_application],
-"application/vnd.curl.car" => &[&T_vnd_curl_car_application],
-"video/vnd.iptvforum.2dparityfec-1010" => &[&T_vnd_iptvforum_2dparityfec_1010_video],
-"application/x-corelpresentations" => &[&T_x_corelpresentations_application],
-"application/envi.hdr" => &[&T_envi_hdr_application],
-"audio/l24" => &[&T_l24_audio],
-"application/vnd.audiograph" => &[&T_vnd_audiograph_application],
-"application/autocad_dwg" => &[&T_vnd_dwg_image],
-"application/vnd.hp-hps" => &[&T_vnd_hp_hps_application],
-"application/sldworks" => &[&T_sldworks_application],
-"application/vnd.mobius.mqy" => &[&T_vnd_mobius_mqy_application],
-"application/dicom" => &[&T_dicom_application],
-"application/vnd.pwg-xhtml-print+xml" => &[&T_vnd_pwg_xhtml_print_xml_application],
-"application/x-geopackage; version=1.1Or1.0" => &[&T_x_geopackage__version_1_1Or1_0_application],
-"application/vnd.oma.poc.groups+xml" => &[&T_vnd_oma_poc_groups_xml_application],
-"application/vnd.omads-email+xml" => &[&T_vnd_omads_email_xml_application],
-"application/x-chess-pgn" => &[&T_x_chess_pgn_application],
-"application/vnd.kidspiration" => &[&T_vnd_kidspiration_application],
-"application/x-authorware-seg" => &[&T_x_authorware_seg_application],
-"image/vnd.ms-modi" => &[&T_vnd_ms_modi_image],
-"application/x-msbinder" => &[&T_x_msbinder_application],
-"application/vnd.dvb.notif-container+xml" => &[&T_vnd_dvb_notif_container_xml_application],
-"application/xcon-conference-info-diff+xml" => &[&T_xcon_conference_info_diff_xml_application],
-"audio/evrc0" => &[&T_evrc0_audio],
-"application/x-ms-emz" => &[&T_x_emf_compressed_image],
-"application/vnd.anser-web-funds-transfer-initiation" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
-"application/onenote; format=package" => &[&T_onenote__format_package_application],
-"text/x-jsp" => &[&T_x_jsp_text],
-"application/gzip-compressed" => &[&T_gzip_application],
-"application/mxf" => &[&T_mxf_application],
-"application/vnd.ms-works" => &[&T_vnd_ms_works_application],
-"application/vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
-"image/x-bpg" => &[&T_x_bpg_image],
-"application/x-vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
-"application/vnd.ms-excel.sheet.binary.macroenabled.12" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
-"application/pdf" => &[&T_pdf_application],
-"application/vnd.fujitsu.oasysprs" => &[&T_vnd_fujitsu_oasysprs_application],
-"application/vnd.ctct.ws+xml" => &[&T_vnd_ctct_ws_xml_application],
-"application/coreldraw" => &[&T_coreldraw_application],
-"application/x-mach-o-dsym" => &[&T_x_mach_o_dsym_application],
-"audio/vnd.dts" => &[&T_vnd_dts_audio],
-"application/vnd.openxmlformats-officedocument.presentationml.slide" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
-"audio/red" => &[&T_red_audio],
-"application/vnd.swiftview-ics" => &[&T_vnd_swiftview_ics_application],
-"application/java-archive" => &[&T_java_archive_application],
-"application/vnd.marlin.drm.mdcf" => &[&T_vnd_marlin_drm_mdcf_application],
-"text/x-haml" => &[&T_x_haml_text],
-"application/x-tika-msoffice-embedded;format=ole10_native" => &[&T_x_tika_msoffice_embedded_format_ole10_native_application],
-"application/vnd.motorola.flexsuite.adsi" => &[&T_vnd_motorola_flexsuite_adsi_application],
-"application/vnd.ufdl" => &[&T_vnd_ufdl_application],
-"application/vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
-"application/vnd.adobe.xfdf" => &[&T_vnd_adobe_xfdf_application],
-"application/vnd.rn-realmedia" => &[&T_vnd_rn_realmedia_application],
-"application/vnd.kodak-descriptor" => &[&T_vnd_kodak_descriptor_application],
-"audio/vnd.dlna.adts" => &[&T_vnd_dlna_adts_audio],
-"image/vnd.dxf;format=binary" => &[&T_vnd_dxf_format_binary_image],
-"image/x-pcx" => &[&T_vnd_zbrush_pcx_image],
-"application/x-sas-audit" => &[&T_x_sas_audit_application],
-"application/font-woff2" => &[&T_woff2_font],
-"application/vnd.ncd.control" => &[&T_vnd_ncd_control_application],
-"application/vnd.webturbo" => &[&T_vnd_webturbo_application],
-"application/eshop" => &[&T_eshop_application],
-"image/x-tga" => &[&T_x_tga_image],
-"text/x-scss" => &[&T_x_scss_text],
-"application/x-rar-compressed;version=5" => &[&T_x_rar_compressed_version_5_application],
-"application/vnd.openxmlformats-officedocument.presentationml.presentation" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
-"application/vnd.ms-powerpoint.slideshow.macroenabled.12" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
-"application/auth-policy+xml" => &[&T_auth_policy_xml_application],
-"application/vnd.oasis.opendocument.tika.flat.document" => &[&T_vnd_oasis_opendocument_tika_flat_document_application],
-"application/vnd.sealed.doc" => &[&T_vnd_sealed_doc_application],
-"application/x-ms-asx" => &[&T_x_ms_asx_application],
-"application/x-sas-putility" => &[&T_x_sas_putility_application],
-"application/x-dvd-ifo" => &[&T_x_dvd_ifo_application],
-"application/x-gnucash" => &[&T_x_gnucash_application],
-"application/sbml+xml" => &[&T_sbml_xml_application],
-"audio/mpegurl" => &[&T_x_mpegurl_audio],
-"application/vnd.noblenet-sealer" => &[&T_vnd_noblenet_sealer_application],
-"image/jpx" => &[&T_jpx_image],
-"application/iges" => &[&T_iges_application],
-"application/x-latex" => &[&T_x_latex_application],
-"application/msword" => &[&T_msword_application],
-"video/vnd.sealed.swf" => &[&T_vnd_sealed_swf_video],
-"application/vnd.vividence.scriptfile" => &[&T_vnd_vividence_scriptfile_application],
-"audio/evrc1" => &[&T_evrc1_audio],
-"image/example" => &[&T_example_image],
-"model/vnd.gs-gdl" => &[&T_vnd_gs_gdl_model],
-"application/vnd.osa.netdeploy" => &[&T_vnd_osa_netdeploy_application],
-"application/x-cdlink" => &[&T_x_cdlink_application],
-"application/vnd.apple.pages" => &[&T_vnd_apple_pages_application],
-"audio/aac" => &[&T_x_aac_audio],
-"application/vnd.ruckus.download" => &[&T_vnd_ruckus_download_application],
-"image/vnd.dxf" => &[&T_vnd_dxf_image],
-"image/vnd.dxf;format=ascii" => &[&T_vnd_dxf_format_ascii_image],
-"application/mikey" => &[&T_mikey_application],
-"application/vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
-"application/vnd.hp-pclxl" => &[&T_vnd_hp_pclxl_application],
-"audio/evrc-qcp" => &[&T_evrc_qcp_audio],
-"application/cdr" => &[&T_coreldraw_application],
-"application/sereal;version=2" => &[&T_sereal_version_2_application],
-"video/x-daala" => &[&T_daala_video],
-"application/x-sas-data-index" => &[&T_x_sas_data_index_application],
-"image/vnd.adobe.photoshop" => &[&T_vnd_adobe_photoshop_image],
-"application/vnd.rn-realmedia-vbr" => &[&T_vnd_rn_realmedia_application],
-"application/vnd.oma.bcast.provisioningtrigger" => &[&T_vnd_oma_bcast_provisioningtrigger_application],
-"application/vnd.crick.clicker.wordbank" => &[&T_vnd_crick_clicker_wordbank_application],
-"application/vnd.ms-publisher" => &[&T_x_mspublisher_application],
-"application/relax-ng-compact-syntax" => &[&T_relax_ng_compact_syntax_application],
-"image/x-raw-rawzor" => &[&T_x_raw_rawzor_image],
-"application/x-koan" => &[&T_vnd_koan_application],
-"application/vnd.nokia.n-gage.symbian.install" => &[&T_vnd_nokia_n_gage_symbian_install_application],
-"text/x-vbdotnet" => &[&T_x_vbdotnet_text],
-"video/dv" => &[&T_dv_video],
-"application/dns" => &[&T_dns_application],
-"application/vnd.nokia.pcd+xml" => &[&T_vnd_nokia_pcd_xml_application],
-"application/x-quattro-pro;version=1-4" => &[&T_x_quattro_pro_version_1_4_application],
-"application/vnd.powerbuilder75" => &[&T_vnd_powerbuilder75_application],
-"application/vnd.bmi" => &[&T_vnd_bmi_application],
-"application/x-tex-virtual-font" => &[&T_x_tex_virtual_font_application],
-"audio/amr" => &[&T_amr_audio],
-"application/x-vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
-"text/properties" => &[&T_x_java_properties_text],
-"application/x-futuresplash" => &[&T_x_futuresplash_application],
-"text/plain" => &[&T_plain_text],
-"text/asp" => &[&T_asp_text],
-"application/vnd.japannet-verification-wakeup" => &[&T_vnd_japannet_verification_wakeup_application],
-"image/vnd.sealedmedia.softseal.jpg" => &[&T_vnd_sealedmedia_softseal_jpg_image],
-"application/vnd.nokia.n-gage.ac+xml" => &[&T_vnd_nokia_n_gage_ac_xml_application],
-"application/x-sas-fdb" => &[&T_x_sas_fdb_application],
-"application/x-stuffitx" => &[&T_x_stuffitx_application],
-"application/x-font-libgrx" => &[&T_x_font_libgrx_application],
-"application/onenote;format=onetoc2" => &[&T_onenote_format_onetoc2_application],
-"application/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_application],
-"application/vnd.wqd" => &[&T_vnd_wqd_application],
-"application/x-tika-iworks-protected" => &[&T_x_tika_iworks_protected_application],
-"application/vnd.ms-wmdrm.meter-resp" => &[&T_vnd_ms_wmdrm_meter_resp_application],
-"text/x-java" => &[&T_x_java_source_text],
-"application/xhtml-voice+xml" => &[&T_xhtml_voice_xml_application],
-"application/vnd.uplanet.cacheop-wbxml" => &[&T_vnd_uplanet_cacheop_wbxml_application],
-"application/vnd.sun.xml.writer.global" => &[&T_vnd_sun_xml_writer_global_application],
-"application/x-ibooks+zip" => &[&T_x_ibooks_zip_application],
-"text/x-awk" => &[&T_x_awk_text],
-"application/vnd.intertrust.nncp" => &[&T_vnd_intertrust_nncp_application],
-"application/media_control+xml" => &[&T_media_control_xml_application],
-"text/x-sql" => &[&T_x_sql_text],
-"application/x-msmetafile" => &[&T_wmf_image],
-"application/vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
-"image/wmf" => &[&T_wmf_image],
-"message/global-delivery-status" => &[&T_global_delivery_status_message],
-"application/x-ustar" => &[&T_x_ustar_application],
-"application/xcap-error+xml" => &[&T_xcap_error_xml_application],
-"application/vnd.canon-lips" => &[&T_vnd_canon_lips_application],
-"application/vnd.blueice.multipass" => &[&T_vnd_blueice_multipass_application],
-"application/vnd.uplanet.list" => &[&T_vnd_uplanet_list_application],
-"multipart/signed" => &[&T_signed_multipart],
-"application/cea-2018+xml" => &[&T_cea_2018_xml_application],
-"audio/vnd.adobe.soundbooth" => &[&T_vnd_adobe_soundbooth_audio],
-"application/x-bcpio" => &[&T_x_bcpio_application],
-"text/x-makefile" => &[&T_x_makefile_text],
-"text/yaml" => &[&T_x_yaml_text],
-"application/x-mif" => &[&T_vnd_mif_application],
-"application/vnd.dreamfactory" => &[&T_vnd_dreamfactory_application],
-"application/x-xar" => &[&T_x_xar_application],
-"text/vtt" => &[&T_vtt_text],
-"image/x-pict" => &[&T_x_pict_image],
-"application/x-arj" => &[&T_x_arj_application],
-"application/x-itunes-ipa" => &[&T_x_itunes_ipa_application],
-"application/vnd.novadigm.edm" => &[&T_vnd_novadigm_edm_application],
-"application/vnd.ms-fontobject" => &[&T_vnd_ms_fontobject_application],
-"application/whoispp-response" => &[&T_whoispp_response_application],
-"application/vnd.frogans.ltf" => &[&T_vnd_frogans_ltf_application],
-"application/vnd.sqlite3" => &[&T_x_sqlite3_application],
-"application/vnd.epson.esf" => &[&T_vnd_epson_esf_application],
-"video/vnd.motorola.video" => &[&T_vnd_motorola_video_video],
-"application/vnd.nokia.radio-preset" => &[&T_vnd_nokia_radio_preset_application],
-"audio/smv0" => &[&T_smv0_audio],
-"application/xmpp+xml" => &[&T_xmpp_xml_application],
-"application/vnd.simtech-mindmapper" => &[&T_vnd_simtech_mindmapper_application],
-"application/index.cmd" => &[&T_index_cmd_application],
-"application/vnd.etsi.simservs+xml" => &[&T_vnd_etsi_simservs_xml_application],
-"text/vnd.esmertec.theme-descriptor" => &[&T_vnd_esmertec_theme_descriptor_text],
-"application/vnd.kenameaapp" => &[&T_vnd_kenameaapp_application],
-"application/x-mach-o-preload" => &[&T_x_mach_o_preload_application],
-"application/x-sas-itemstor" => &[&T_x_sas_itemstor_application],
-"application/x-atari-floppy-disk-image" => &[&T_x_atari_floppy_disk_image_application],
-"audio/vnd.dolby.mps" => &[&T_vnd_dolby_mps_audio],
-"application/index" => &[&T_index_application],
-"image/prs.pti" => &[&T_prs_pti_image],
-"application/davmount+xml" => &[&T_davmount_xml_application],
-"application/vnd.obn" => &[&T_vnd_obn_application],
-"application/vnd.hhe.lesson-player" => &[&T_vnd_hhe_lesson_player_application],
-"application/x-itunes-bplist" => &[&T_x_itunes_bplist_application],
-"audio/eac3" => &[&T_eac3_audio],
-"model/vnd.dwf;version=6" => &[&T_vnd_dwf_version_6_model],
-"video/x-ogm" => &[&T_x_ogm_video],
-"video/x-oggrgb" => &[&T_x_oggrgb_video],
-"text/x-expect" => &[&T_x_expect_text],
-"application/x-mysql-misam-data" => &[&T_x_mysql_misam_data_application],
-"audio/evrcwb" => &[&T_evrcwb_audio],
-"application/x-vnd.datapackage+gz" => &[&T_x_vnd_datapackage_gz_application],
-"application/vnd.neurolanguage.nlu" => &[&T_vnd_neurolanguage_nlu_application],
-"application/x-vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
-"application/vnd.oma.bcast.sgdd+xml" => &[&T_vnd_oma_bcast_sgdd_xml_application],
-"application/onix-message+xml" => &[&T_onix_message_xml_application],
-"application/x-shar" => &[&T_x_shar_application],
-"audio/vnd.nuera.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
-"application/vnd.uplanet.list-wbxml" => &[&T_vnd_uplanet_list_wbxml_application],
-"application/vnd.vd-study" => &[&T_vnd_vd_study_application],
-"video/theora" => &[&T_theora_video],
-"audio/t38" => &[&T_t38_audio],
-"audio/l16" => &[&T_l16_audio],
-"audio/mpa-robust" => &[&T_mpa_robust_audio],
-"video/x-ogg-rgb" => &[&T_x_oggrgb_video],
-"application/xcap-att+xml" => &[&T_xcap_att_xml_application],
-"video/vnd.ms-playready.media.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
-"application/x-font-speedo" => &[&T_x_font_speedo_application],
-"application/dita+xml;format=map" => &[&T_dita_xml_format_map_application],
-"audio/vorbis" => &[&T_vorbis_audio],
-"audio/vnd.cns.anp1" => &[&T_vnd_cns_anp1_audio],
-"image/x-raw-phaseone" => &[&T_x_raw_phaseone_image],
-"application/x-ms-shortcut" => &[&T_x_ms_shortcut_application],
-"application/ulpfec" => &[&T_ulpfec_application],
-"image/hevc" => &[&T_heic_image],
-"application/vnd.shana.informed.package" => &[&T_vnd_shana_informed_package_application],
-"application/vnd.kde.kchart" => &[&T_vnd_kde_kchart_application],
-"audio/pcma-wb" => &[&T_pcma_wb_audio],
-"image/x-raw-kodak" => &[&T_x_raw_kodak_image],
-"application/vnd.yamaha.openscoreformat" => &[&T_vnd_yamaha_openscoreformat_application],
-"application/vnd.dvb.esgcontainer" => &[&T_vnd_dvb_esgcontainer_application],
-"application/vnd.nokia.catalogs" => &[&T_vnd_nokia_catalogs_application],
-"application/set-registration-initiation" => &[&T_set_registration_initiation_application],
-"image/x-freehand" => &[&T_x_freehand_image],
-"image/x-portable-graymap" => &[&T_x_portable_graymap_image],
-"image/vnd.dgn;version=7" => &[&T_vnd_dgn_version_7_image],
-"application/vnd.nokia.conml+xml" => &[&T_vnd_nokia_conml_xml_application],
-"application/vnd.visio" => &[&T_vnd_visio_application],
-"application/vnd.ms-visio.drawing" => &[&T_vnd_ms_visio_drawing_application],
-"image/x-raw-imacon" => &[&T_x_raw_imacon_image],
-"application/x-gnumeric" => &[&T_x_gnumeric_application],
-"multipart/appledouble" => &[&T_appledouble_multipart],
-"application/x-bzip" => &[&T_x_bzip_application],
-"application/pkcs10" => &[&T_pkcs10_application],
-"application/vnd.aether.imp" => &[&T_vnd_aether_imp_application],
-"text/x-c++hdr" => &[&T_x_c__hdr_text],
-"application/vnd.data-vision.rdz" => &[&T_vnd_data_vision_rdz_application],
-"application/ocsp-response" => &[&T_ocsp_response_application],
-"application/x-wine-extension-inf" => &[&T_inf_application],
-"application/x-abiword" => &[&T_x_abiword_application],
-"audio/g728" => &[&T_g728_audio],
-"audio/ilbc" => &[&T_ilbc_audio],
-"text/csv" => &[&T_csv_text],
-"application/vnd.seemail" => &[&T_vnd_seemail_application],
-"video/mpeg4-generic" => &[&T_mpeg4_generic_video],
-"application/vnd.etsi.mcid+xml" => &[&T_vnd_etsi_mcid_xml_application],
-"application/vnd.oma-scws-config" => &[&T_vnd_oma_scws_config_application],
-"application/x-troff" => &[&T_troff_text],
-"application/vnd.motorola.iprm" => &[&T_vnd_motorola_iprm_application],
-"application/vnd.uplanet.listcmd" => &[&T_vnd_uplanet_listcmd_application],
-"application/vnd.oma.dcd" => &[&T_vnd_oma_dcd_application],
-"application/xcon-conference-info+xml" => &[&T_xcon_conference_info_xml_application],
-"application/set-registration" => &[&T_set_registration_application],
-"application/vnd.oma.dcdc" => &[&T_vnd_oma_dcdc_application],
-"audio/g723" => &[&T_g723_audio],
-"image/x-cmu-raster" => &[&T_x_cmu_raster_image],
-"application/vnd.xmpie.ppkg" => &[&T_vnd_xmpie_ppkg_application],
-"application/vnd.mobius.dis" => &[&T_vnd_mobius_dis_application],
-"application/vnd.sun.xml.writer.template" => &[&T_vnd_sun_xml_writer_template_application],
-"application/x-mach-o-universal" => &[&T_x_mach_o_universal_application],
-"image/x-raw-mamiya" => &[&T_x_raw_mamiya_image],
-"application/vnd.cinderella" => &[&T_vnd_cinderella_application],
-"application/vnd.llamagraphics.life-balance.exchange+xml" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
-"application/vnd.ms-visio.drawing.macroEnabled.12" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
-"application/vnd.3gpp2.bcmcsinfo+xml" => &[&T_vnd_3gpp2_bcmcsinfo_xml_application],
-"video/vnd.vivo" => &[&T_vnd_vivo_video],
-"application/vnd.fuzzysheet" => &[&T_vnd_fuzzysheet_application],
-"text/vnd.abc" => &[&T_vnd_abc_text],
-"image/vnd.net-fpx" => &[&T_vnd_net_fpx_image],
-"application/vnd.wap.wmlscriptc" => &[&T_vnd_wap_wmlscriptc_application],
-"audio/evrcb" => &[&T_evrcb_audio],
-"video/mj2" => &[&T_mj2_video],
-"video/vnd.iptvforum.ttsavc" => &[&T_vnd_iptvforum_ttsavc_video],
-"application/x-java-vm" => &[&T_java_vm_application],
-"application/vnd.openxmlformats-officedocument.presentationml.slideshow" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
-"application/vnd.digilite.prolights" => &[&T_vnd_digilite_prolights_application],
-"application/vnd.proteus.magazine" => &[&T_vnd_proteus_magazine_application],
-"audio/adpcm" => &[&T_adpcm_audio],
-"audio/x-caf" => &[&T_x_caf_audio],
-"application/vnd.sema" => &[&T_vnd_sema_application],
-"application/vnd.cups-raw" => &[&T_vnd_cups_raw_application],
-"application/vnd.ibm.afplinedata" => &[&T_vnd_ibm_afplinedata_application],
-"text/vnd.trolltech.linguist" => &[&T_vnd_trolltech_linguist_text],
-"font/otf" => &[&T_x_font_otf_application],
-"application/vnd.marlin.drm.license+xml" => &[&T_vnd_marlin_drm_license_xml_application],
-"model/vnd.moml+xml" => &[&T_vnd_moml_xml_model],
-"multipart/mixed" => &[&T_mixed_multipart],
-"application/x-dosexec" => &[&T_x_dosexec_application],
-"gzip/document" => &[&T_gzip_application],
-"video/vnd.iptvforum.2dparityfec-2005" => &[&T_vnd_iptvforum_2dparityfec_2005_video],
-"application/vnd.motorola.flexsuite.wem" => &[&T_vnd_motorola_flexsuite_wem_application],
-"application/vnd.apple.unknown.13" => &[&T_vnd_apple_unknown_13_application],
-"application/vnd.ffsns" => &[&T_vnd_ffsns_application],
-"text/tab-separated-values" => &[&T_tab_separated_values_text],
-"audio/pcma" => &[&T_pcma_audio],
-"application/vnd.gridmp" => &[&T_vnd_gridmp_application],
-"application/vnd.ms-playready.initiator+xml" => &[&T_vnd_ms_playready_initiator_xml_application],
-"application/vnd.stardivision.calc" => &[&T_vnd_stardivision_calc_application],
-"image/vnd.fst" => &[&T_vnd_fst_image],
-"application/warc" => &[&T_warc_application],
-"video/x-mng" => &[&T_x_mng_video],
-"application/lost+xml" => &[&T_lost_xml_application],
-"image/naplps" => &[&T_naplps_image],
-"application/vnd.piaccess.application-licence" => &[&T_vnd_piaccess_application_licence_application],
-"application/x-dbf" => &[&T_x_dbf_application],
-"image/emf" => &[&T_emf_image],
-"image/fits" => &[&T_fits_image],
-"application/vnd.nokia.pcd+wbxml" => &[&T_vnd_nokia_pcd_wbxml_application],
-"application/macwriteii" => &[&T_macwriteii_application],
-"application/vnd.hp-pcl" => &[&T_vnd_hp_pcl_application],
-"application/vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
-"audio/webm" => &[&T_webm_audio],
-"application/x-mmm-digisonde" => &[&T_x_mmm_digisonde_application],
-"video/quicktime" => &[&T_quicktime_video],
-"application/x-quattro-pro;version=6" => &[&T_x_quattro_pro_version_6_application],
-"video/x-flc" => &[&T_x_flc_video],
-"text/x-verilog" => &[&T_x_verilog_text],
-"audio/vorbis-config" => &[&T_vorbis_config_audio],
-"image/x-xwindowdump" => &[&T_x_xwindowdump_image],
-"application/vnd.symbian.install" => &[&T_vnd_symbian_install_application],
-"application/vnd.ms-cab-compressed" => &[&T_vnd_ms_cab_compressed_application],
-"application/vnd.japannet-registration-wakeup" => &[&T_vnd_japannet_registration_wakeup_application],
-"image/heif-sequence" => &[&T_heif_sequence_image],
-"application/vnd.immervision-ivu" => &[&T_vnd_immervision_ivu_application],
-"application/x-setupscript" => &[&T_inf_application],
-"audio/gsm" => &[&T_gsm_audio],
-"image/jxs" => &[&T_jxs_image],
-"application/vnd.ms-pki.seccat" => &[&T_vnd_ms_pki_seccat_application],
-"application/x-pkcs7-certreqresp" => &[&T_x_pkcs7_certreqresp_application],
 "application/patch-ops-error+xml" => &[&T_patch_ops_error_xml_application],
-"application/x-shockwave-flash" => &[&T_x_shockwave_flash_application],
-"application/x-isatab" => &[&T_x_isatab_application],
-"video/jpeg2000" => &[&T_jpeg2000_video],
-"application/sereal;version=3" => &[&T_sereal_version_3_application],
-"application/vnd.joost.joda-archive" => &[&T_vnd_joost_joda_archive_application],
-"application/cu-seeme" => &[&T_cu_seeme_application],
-"application/x-font-vfont" => &[&T_x_font_vfont_application],
-"application/x-xfig" => &[&T_x_xfig_application],
-"application/spirits-event+xml" => &[&T_spirits_event_xml_application],
-"application/vnd.oma.bcast.sgboot" => &[&T_vnd_oma_bcast_sgboot_application],
-"application/vnd.nokia.ncd" => &[&T_vnd_nokia_ncd_application],
-"application/vnd.jisp" => &[&T_vnd_jisp_application],
-"application/dialog-info+xml" => &[&T_dialog_info_xml_application],
-"model/vrml" => &[&T_vrml_model],
-"application/vnd.americandynamics.acc" => &[&T_vnd_americandynamics_acc_application],
-"application/vnd.wv.ssp+xml" => &[&T_vnd_wv_ssp_xml_application],
-"application/octet-stream" => &[&T_octet_stream_application],
-"application/vnd.ibm.modcap" => &[&T_vnd_ibm_modcap_application],
-"application/vnd.iptc.g2.packageitem+xml" => &[&T_vnd_iptc_g2_packageitem_xml_application],
-"application/x-parquet" => &[&T_x_parquet_application],
-"application/x-fossil-repository" => &[&T_x_fossil_repository_application],
-"audio/x-realaudio" => &[&T_x_pn_realaudio_audio],
-"application/vnd.japannet-setstore-wakeup" => &[&T_vnd_japannet_setstore_wakeup_application],
-"application/x-windows-installer" => &[&T_x_ms_installer_application],
-"application/vnd.mophun.certificate" => &[&T_vnd_mophun_certificate_application],
-"application/soap+fastinfoset" => &[&T_soap_fastinfoset_application],
-"application/vnd.ecowin.series" => &[&T_vnd_ecowin_series_application],
-"audio/midi" => &[&T_midi_audio],
-"application/xml" => &[&T_xml_application],
-"application/xcap-el+xml" => &[&T_xcap_el_xml_application],
-"video/celb" => &[&T_celb_video],
-"application/vnd.wordperfect;version=5.0" => &[&T_vnd_wordperfect_version_5_0_application],
-"application/vnd.oma.xcap-directory+xml" => &[&T_vnd_oma_xcap_directory_xml_application],
-"text/x-java-source" => &[&T_x_java_source_text],
-"application/vnd.flographit" => &[&T_vnd_flographit_application],
-"application/vnd.businessobjects" => &[&T_vnd_businessobjects_application],
-"application/vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
-"message/s-http" => &[&T_s_http_message],
-"text/x-yaml" => &[&T_x_yaml_text],
-"audio/dsr-es202050" => &[&T_dsr_es202050_audio],
-"multipart/voice-message" => &[&T_voice_message_multipart],
-"application/remote-printing" => &[&T_remote_printing_application],
-"application/vnd.eszigno3+xml" => &[&T_vnd_eszigno3_xml_application],
-"application/vnd.vidsoft.vidconference" => &[&T_vnd_vidsoft_vidconference_application],
-"application/vnd.android.package-archive" => &[&T_vnd_android_package_archive_application],
-"application/vnd.nervana" => &[&T_vnd_nervana_application],
-"application/x-mach-o-dylib" => &[&T_x_mach_o_dylib_application],
-"application/vnd.etsi.asic-e+zip" => &[&T_vnd_etsi_asic_e_zip_application],
-"application/x-matlab-data" => &[&T_x_matlab_data_application],
-"application/x-esri-layer" => &[&T_x_esri_layer_application],
-"text/sgml" => &[&T_sgml_text],
-"application/vnd.ncd.reference" => &[&T_vnd_ncd_reference_application],
-"video/nv" => &[&T_nv_video],
-"application/moss-signature" => &[&T_moss_signature_application],
+"application/x-memgraph" => &[&T_x_memgraph_application],
+"image/vnd.djvu" => &[&T_vnd_djvu_image],
+"application/mediaservercontrol+xml" => &[&T_mediaservercontrol_xml_application],
+"application/vnd.oma.bcast.notification+xml" => &[&T_vnd_oma_bcast_notification_xml_application],
+"application/xv+xml" => &[&T_xv_xml_application],
+"application/x-sas-data-index" => &[&T_x_sas_data_index_application],
+"audio/x-ogg-flac" => &[&T_x_oggflac_audio],
+"application/x-troff-me" => &[&T_troff_text],
+"application/vnd.lotus-approach" => &[&T_vnd_lotus_approach_application],
+"application/vnd.smaf" => &[&T_vnd_smaf_application],
+"application/vnd.apple.mpegurl" => &[&T_vnd_apple_mpegurl_application],
+"application/x-msdownload;format=pe-armLE" => &[&T_x_msdownload_format_pe_armLE_application],
+"application/vnd.dolby.mobile.2" => &[&T_vnd_dolby_mobile_2_application],
 "application/mathml+xml" => &[&T_mathml_xml_application],
-"font/collection" => &[&T_collection_font],
-"application/dita+xml;format=task" => &[&T_dita_xml_format_task_application],
-"application/vnd.osgi.bundle" => &[&T_vnd_osgi_bundle_application],
-"image/xcf" => &[&T_x_xcf_image],
-"audio/mp4" => &[&T_mp4_audio],
-"image/svg+xml" => &[&T_svg_xml_image],
-"text/x-log" => &[&T_x_log_text],
-"application/vnd.anser-web-certificate-issue-initiation" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
-"application/vnd.geogebra.file" => &[&T_vnd_geogebra_file_application],
-"application/vnd.yamaha.smaf-phrase" => &[&T_vnd_yamaha_smaf_phrase_application],
-"application/vnd.eudora.data" => &[&T_vnd_eudora_data_application],
-"image/x-portable-arbitrarymap" => &[&T_x_portable_arbitrarymap_image],
-"text/x-matlab" => &[&T_x_matlab_text],
-"application/x-stata-do" => &[&T_x_stata_do_application],
-"application/vnd.sun.xml.draw" => &[&T_vnd_sun_xml_draw_application],
-"application/dvcs" => &[&T_dvcs_application],
+"application/pgp" => &[&T_pgp_encrypted_application],
+"audio/vnd.celp" => &[&T_vnd_celp_audio],
+"image/vnd.fst" => &[&T_vnd_fst_image],
+"application/rdf+xml" => &[&T_rdf_xml_application],
+"application/autocad_dwg" => &[&T_vnd_dwg_image],
+"application/cbor" => &[&T_cbor_application],
+"application/vnd.obn" => &[&T_vnd_obn_application],
+"image/x-xcf" => &[&T_x_xcf_image],
+"application/x-jeol-jdf" => &[&T_x_jeol_jdf_application],
+"application/vnd.syncml.ds.notification" => &[&T_vnd_syncml_ds_notification_application],
+"image/x-bpg" => &[&T_x_bpg_image],
+"image/x-jp2-container" => &[&T_x_jp2_container_image],
+"application/matlab-mat" => &[&T_x_matlab_data_application],
+"application/x-kpresenter" => &[&T_vnd_kde_kpresenter_application],
+"application/x-futuresplash" => &[&T_x_futuresplash_application],
+"application/x-endnote-style" => &[&T_x_endnote_style_application],
+"application/vnd.ms-fontobject" => &[&T_vnd_ms_fontobject_application],
+"application/smil+xml" => &[&T_smil_xml_application],
+"application/vnd.iptc.g2.planningitem+xml" => &[&T_vnd_iptc_g2_planningitem_xml_application],
+"application/vnd.uplanet.bearer-choice" => &[&T_vnd_uplanet_bearer_choice_application],
+"application/x-sas-access" => &[&T_x_sas_access_application],
+"image/x-freehand" => &[&T_x_freehand_image],
+"application/vnd.iptc.g2.conceptitem+xml" => &[&T_vnd_iptc_g2_conceptitem_xml_application],
+"application/vnd.apple.unknown.13" => &[&T_vnd_apple_unknown_13_application],
+"application/vnd.stardivision.impress" => &[&T_vnd_stardivision_impress_application],
+"application/x-tika-msoffice-embedded" => &[&T_x_tika_msoffice_embedded_application],
+"application/x-gtar" => &[&T_x_gtar_application],
+"application/msexcel" => &[&T_vnd_ms_excel_application],
+"application/vnd.ms-wordml" => &[&T_vnd_ms_wordml_application],
+"application/vnd.dvb.notif-generic+xml" => &[&T_vnd_dvb_notif_generic_xml_application],
+"application/vnd.liberty-request+xml" => &[&T_vnd_liberty_request_xml_application],
+"application/prs.nprend" => &[&T_prs_nprend_application],
+"audio/qcelp" => &[&T_qcelp_audio],
+"application/vnd.ms-tnef" => &[&T_vnd_ms_tnef_application],
+"application/sereal;version=1" => &[&T_sereal_version_1_application],
+"audio/pcma-wb" => &[&T_pcma_wb_audio],
+"image/prs.btif" => &[&T_prs_btif_image],
+"audio/vnd.cns.inf1" => &[&T_vnd_cns_inf1_audio],
+"application/x-xml" => &[&T_xml_application],
+"application/x-font-libgrx" => &[&T_x_font_libgrx_application],
+"text/x-sass" => &[&T_x_sass_text],
+"application/vnd.ms-powerpoint.slideshow.macroenabled.12" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
+"application/vnd.spotfire.sfs" => &[&T_vnd_spotfire_sfs_application],
+"application/mp4" => &[&T_mp4_application],
+"text/x-objcsrc" => &[&T_x_objcsrc_text],
+"audio/x-realaudio" => &[&T_x_pn_realaudio_audio],
+"application/x-authorware-seg" => &[&T_x_authorware_seg_application],
+"application/pgp-keys" => &[&T_pgp_keys_application],
+"application/vnd.cinderella" => &[&T_vnd_cinderella_application],
+"image/jp2" => &[&T_jp2_image],
+"application/vnd.3gpp.pic-bw-var" => &[&T_vnd_3gpp_pic_bw_var_application],
+"application/cea-2018+xml" => &[&T_cea_2018_xml_application],
+"application/vnd.oma.bcast.smartcard-trigger+xml" => &[&T_vnd_oma_bcast_smartcard_trigger_xml_application],
+"application/x-kdelnk" => &[&T_x_kdelnk_application],
+"application/zlib" => &[&T_zlib_application],
+"audio/vmr-wb" => &[&T_vmr_wb_audio],
+"application/x-mysql-misam-index" => &[&T_x_mysql_misam_index_application],
+"audio/asc" => &[&T_asc_audio],
+"application/vnd.openxmlformats-officedocument.wordprocessingml.document" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
+"application/x-guitar-pro" => &[&T_x_guitar_pro_application],
+"application/msword2" => &[&T_msword2_application],
+"application/vnd.semd" => &[&T_vnd_semd_application],
+"application/x-lha" => &[&T_x_lha_application],
+"application/vnd.openxmlformats-officedocument.presentationml.slide" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
 "model/x.stl-ascii" => &[&T_x_stl_ascii_model],
-"application/x-sas-dmdb" => &[&T_x_sas_dmdb_application],
-"application/font-sfnt" => &[&T_x_font_ttf_application],
-"video/bmpeg" => &[&T_bmpeg_video],
-"application/vnd.motorola.flexsuite.gotap" => &[&T_vnd_motorola_flexsuite_gotap_application],
-"application/vnd.xmpie.xlim" => &[&T_vnd_xmpie_xlim_application],
-"application/vnd.novadigm.ext" => &[&T_vnd_novadigm_ext_application],
-"audio/vnd.digital-winds" => &[&T_vnd_digital_winds_audio],
-"application/vnd.yamaha.hv-script" => &[&T_vnd_yamaha_hv_script_application],
-"application/x-font-bdf" => &[&T_x_font_bdf_application],
-"application/x-vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
-"application/whoispp-query" => &[&T_whoispp_query_application],
-"application/dita+xml;format=concept" => &[&T_dita_xml_format_concept_application],
-"application/vnd.mobius.msl" => &[&T_vnd_mobius_msl_application],
+"application/news-transmission" => &[&T_news_transmission_application],
+"application/owl+xml" => &[&T_owl_xml_application],
+"application/vnd.data-vision.rdz" => &[&T_vnd_data_vision_rdz_application],
+"application/wsdl+xml" => &[&T_wsdl_xml_application],
+"application/vnd.uplanet.list" => &[&T_vnd_uplanet_list_application],
+"application/x-lz4" => &[&T_x_lz4_application],
+"video/3g2" => &[&T_3gpp2_video],
+"image/x-raw-casio" => &[&T_x_raw_casio_image],
+"application/x-pkcs7-certificates" => &[&T_x_pkcs7_certificates_application],
+"image/cgm" => &[&T_cgm_image],
+"application/vnd.sun.xml.calc.template" => &[&T_vnd_sun_xml_calc_template_application],
+"image/x-canon-cr2" => &[&T_x_canon_cr2_image],
+"application/vnd.ms-xpsdocument" => &[&T_vnd_ms_xpsdocument_application],
+"audio/evrcwb1" => &[&T_evrcwb1_audio],
+"application/vnd.groove-help" => &[&T_vnd_groove_help_application],
+"multipart/related" => &[&T_related_multipart],
+"application/ms-tnef" => &[&T_vnd_ms_tnef_application],
+"text/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_text],
+"application/x-hdf" => &[&T_x_hdf_application],
+"video/mpeg" => &[&T_mpeg_video],
+"application/x-csh" => &[&T_x_csh_application],
+"application/vnd.ms-publisher" => &[&T_x_mspublisher_application],
+"application/x-msdownload;format=pe" => &[&T_x_msdownload_format_pe_application],
+"text/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
+"application/kpml-response+xml" => &[&T_kpml_response_xml_application],
+"application/coreldraw" => &[&T_coreldraw_application],
+"audio/ape" => &[&T_ape_audio],
+"text/x-sed" => &[&T_x_sed_text],
+"text/vnd.wap.wml" => &[&T_vnd_wap_wml_text],
+"audio/vnd.sealedmedia.softseal.mpeg" => &[&T_vnd_sealedmedia_softseal_mpeg_audio],
+"application/vnd.etsi.aoc+xml" => &[&T_vnd_etsi_aoc_xml_application],
+"application/vnd.sbm.mid2" => &[&T_vnd_sbm_mid2_application],
+"application/x-endnote-refer" => &[&T_x_endnote_refer_application],
+"application/rss+xml" => &[&T_rss_xml_application],
+"image/x-tga" => &[&T_x_tga_image],
+"application/vnd.airzip.filesecure.azs" => &[&T_vnd_airzip_filesecure_azs_application],
+"application/vemmi" => &[&T_vemmi_application],
+"application/x-berkeley-db;format=hash;version=3" => &[&T_x_berkeley_db_format_hash_version_3_application],
+"application/vnd.iptc.g2.catalogitem+xml" => &[&T_vnd_iptc_g2_catalogitem_xml_application],
+"application/dif+xml" => &[&T_dif_xml_application],
+"application/vnd.hp-hpgl" => &[&T_vnd_hp_hpgl_application],
+"application/vnd.ms-powerpoint" => &[&T_vnd_ms_powerpoint_application],
+"application/x-xpinstall" => &[&T_x_xpinstall_application],
+"application/vnd.dvb.notif-container+xml" => &[&T_vnd_dvb_notif_container_xml_application],
+"application/vnd.antix.game-component" => &[&T_vnd_antix_game_component_application],
+"application/vnd.oma.bcast.sprov+xml" => &[&T_vnd_oma_bcast_sprov_xml_application],
+"application/x-nesrom" => &[&T_x_nesrom_application],
 "application/x-berkeley-db;format=hash;version=4" => &[&T_x_berkeley_db_format_hash_version_4_application],
-"audio/g7221" => &[&T_g7221_audio],
-"application/x-fossil-global-conf" => &[&T_x_fossil_global_conf_application],
-"chemical/x-cdx" => &[&T_x_cdx_chemical],
-"application/x-tika-java-web-archive" => &[&T_x_tika_java_web_archive_application],
-"image/vnd.sealed.png" => &[&T_vnd_sealed_png_image],
-"application/xspf+xml" => &[&T_xspf_xml_application],
-"audio/bv16" => &[&T_bv16_audio],
-"application/vnd.cendio.thinlinc.clientconf" => &[&T_vnd_cendio_thinlinc_clientconf_application],
-"application/ocsp-request" => &[&T_ocsp_request_application],
-"video/x-ms-wm" => &[&T_x_ms_wm_video],
-"application/x-yaml" => &[&T_x_yaml_text],
-"text/x-applescript" => &[&T_x_applescript_text],
-"application/x-coredump" => &[&T_x_coredump_application],
-"application/slate" => &[&T_slate_application],
+"text/x-coffeescript" => &[&T_x_coffeescript_text],
+"application/cdr" => &[&T_coreldraw_application],
+"image/x-psd" => &[&T_vnd_adobe_photoshop_image],
+"message/rfc2557" => &[&T_related_multipart],
+"text/x-eiffel" => &[&T_x_eiffel_text],
+"application/x-chrome-package" => &[&T_x_chrome_package_application],
+"application/vnd.sealed.3df" => &[&T_vnd_sealed_3df_application],
+"application/x-bibtex-text-file" => &[&T_x_bibtex_text_file_application],
+"application/vnd.pvi.ptid1" => &[&T_vnd_pvi_ptid1_application],
+"application/media_control+xml" => &[&T_media_control_xml_application],
+"application/x-shockwave-flash" => &[&T_x_shockwave_flash_application],
+"image/vnd.fpx" => &[&T_vnd_fpx_image],
+"application/vnd.nokia.n-gage.symbian.install" => &[&T_vnd_nokia_n_gage_symbian_install_application],
+"application/set-payment-initiation" => &[&T_set_payment_initiation_application],
+"application/vnd.cirpack.isdn-ext" => &[&T_vnd_cirpack_isdn_ext_application],
+"application/vnd.dvb.ipdcroaming" => &[&T_vnd_dvb_ipdcroaming_application],
+"application/sparql-results+xml" => &[&T_sparql_results_xml_application],
+"application/vnd.fujitsu.oasysprs" => &[&T_vnd_fujitsu_oasysprs_application],
+"application/oxps" => &[&T_vnd_ms_xpsdocument_application],
+"application/x-mach-o-dylinker" => &[&T_x_mach_o_dylinker_application],
+"image/cdr" => &[&T_coreldraw_application],
+"application/x-sas-data-v6" => &[&T_x_sas_data_v6_application],
+"image/nitf" => &[&T_nitf_image],
+"application/vnd.commerce-battelle" => &[&T_vnd_commerce_battelle_application],
+"application/vnd.3gpp.pic-bw-large" => &[&T_vnd_3gpp_pic_bw_large_application],
+"application/vnd.yamaha.openscoreformat.osfpvg+xml" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
+"application/vnd.jam" => &[&T_vnd_jam_application],
+"application/x-stata-dta" => &[&T_x_stata_dta_application],
+"application/vnd.etsi.iptvcommand+xml" => &[&T_vnd_etsi_iptvcommand_xml_application],
+"application/x-bzip2" => &[&T_x_bzip2_application],
+"audio/x-flac" => &[&T_x_flac_audio],
+"image/x-raw-phaseone" => &[&T_x_raw_phaseone_image],
+"audio/x-pn-realaudio" => &[&T_x_pn_realaudio_audio],
+"application/vnd.simtech-mindmapper" => &[&T_vnd_simtech_mindmapper_application],
+"application/vnd.kde.kchart" => &[&T_vnd_kde_kchart_application],
+"application/vnd.criticaltools.wbs+xml" => &[&T_vnd_criticaltools_wbs_xml_application],
+"application/x-mach-o-dylib-stub" => &[&T_x_mach_o_dylib_stub_application],
+"application/pidf-diff+xml" => &[&T_pidf_diff_xml_application],
+"audio/telephone-event" => &[&T_telephone_event_audio],
+"text/x-basic" => &[&T_x_basic_text],
+"application/vnd.ms-visio.drawing" => &[&T_vnd_ms_visio_drawing_application],
+"application/x-dtbncx+xml" => &[&T_x_dtbncx_xml_application],
+"text/x-yacc" => &[&T_x_yacc_text],
+"audio/pcma" => &[&T_pcma_audio],
+"audio/evrc0" => &[&T_evrc0_audio],
+"application/x-coreldraw" => &[&T_coreldraw_application],
+"application/vnd.eudora.data" => &[&T_vnd_eudora_data_application],
+"text/x-jsp" => &[&T_x_jsp_text],
+"application/x-berkeley-db;format=log" => &[&T_x_berkeley_db_format_log_application],
+"application/java-vm" => &[&T_java_vm_application],
+"image/vnd.net-fpx" => &[&T_vnd_net_fpx_image],
+"audio/mobile-xmf" => &[&T_mobile_xmf_audio],
+"application/davmount+xml" => &[&T_davmount_xml_application],
+"application/applefile" => &[&T_applefile_application],
+"text/x-emacs-lisp" => &[&T_x_emacs_lisp_text],
+"application/vnd.oma.bcast.provisioningtrigger" => &[&T_vnd_oma_bcast_provisioningtrigger_application],
+"application/vnd.wordperfect" => &[&T_vnd_wordperfect_application],
+"text/x-c" => &[&T_x_c_text],
+"application/lzip" => &[&T_lzip_application],
+"application/vnd.osgi.dp" => &[&T_vnd_osgi_dp_application],
+"x-conference/x-cooltalk" => &[&T_x_cooltalk_x_conference],
+"text/x-asciidoc" => &[&T_x_asciidoc_text],
+"application/vnd.adobe.xfdf" => &[&T_vnd_adobe_xfdf_application],
+"application/vnd.fuzzysheet" => &[&T_vnd_fuzzysheet_application],
+"application/vnd.ms-pki.seccat" => &[&T_vnd_ms_pki_seccat_application],
+"application/vnd.ms-visio.stencil.macroEnabled.12" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
+"application/x-geopackage" => &[&T_x_geopackage_application],
+"application/vnd.accpac.simply.imp" => &[&T_vnd_accpac_simply_imp_application],
+"text/vnd.sun.j2me.app-descriptor" => &[&T_vnd_sun_j2me_app_descriptor_text],
+"application/vnd.oma.bcast.simple-symbol-container" => &[&T_vnd_oma_bcast_simple_symbol_container_application],
+"application/x-sas-program-data" => &[&T_x_sas_program_data_application],
+"application/vnd.multiad.creator" => &[&T_vnd_multiad_creator_application],
+"application/vnd.ms-excel.sheet.4" => &[&T_vnd_ms_excel_sheet_4_application],
+"application/onix-message+xml" => &[&T_onix_message_xml_application],
+"application/epub+zip" => &[&T_epub_zip_application],
+"application/vnd.ibm.afplinedata" => &[&T_vnd_ibm_afplinedata_application],
+"image/jxs" => &[&T_jxs_image],
+"application/x-java-keystore" => &[&T_x_java_keystore_application],
+"application/vnd.wt.stf" => &[&T_vnd_wt_stf_application],
+"application/x-lzma" => &[&T_x_lzma_application],
+"application/vnd.tmobile-livetv" => &[&T_vnd_tmobile_livetv_application],
+"text/vnd.iptc.nitf" => &[&T_vnd_iptc_nitf_text],
+"application/vnd.shana.informed.formdata" => &[&T_vnd_shana_informed_formdata_application],
+"application/vnd.wap.slc" => &[&T_vnd_wap_slc_application],
+"application/x-uc2-compressed" => &[&T_x_uc2_compressed_application],
+"text/rtx" => &[&T_rtx_text],
+"application/vnd.oma.group-usage-list+xml" => &[&T_vnd_oma_group_usage_list_xml_application],
+"application/vnd.ms-package.3dmanufacturing-3dmodel+xml" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
+"image/vnd.adobe.premiere" => &[&T_vnd_adobe_premiere_image],
+"image/vnd.microsoft.icon" => &[&T_vnd_microsoft_icon_image],
+"video/vnd.sealed.mpeg1" => &[&T_vnd_sealed_mpeg1_video],
+"application/font-woff" => &[&T_woff_font],
+"application/x-xar" => &[&T_x_xar_application],
+"image/x-portable-pixmap" => &[&T_x_portable_pixmap_image],
+"application/x-vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
+"application/x-mach-o-universal" => &[&T_x_mach_o_universal_application],
+"application/x-texinfo" => &[&T_x_texinfo_application],
+"application/illustrator" => &[&T_illustrator_application],
+"application/x-internet-archive" => &[&T_x_internet_archive_application],
+"application/vnd.vcx" => &[&T_vnd_vcx_application],
 "application/x-cpio" => &[&T_x_cpio_application],
+"application/vnd.claymore" => &[&T_vnd_claymore_application],
+"text/x-csharp" => &[&T_x_csharp_text],
+"application/x-zim" => &[&T_x_zim_application],
+"application/vnd.novadigm.ext" => &[&T_vnd_novadigm_ext_application],
+"text/vnd.wap.si" => &[&T_vnd_wap_si_text],
+"application/vnd.motorola.flexsuite" => &[&T_vnd_motorola_flexsuite_application],
+"text/vnd.ms-mediapackage" => &[&T_vnd_ms_mediapackage_text],
+"text/x-tex" => &[&T_x_tex_application],
+"application/vnd.canon-cpdl" => &[&T_vnd_canon_cpdl_application],
+"audio/x-mpegurl" => &[&T_x_mpegurl_audio],
+"application/vnd.tcpdump.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
+"application/vnd.powerbuilder75" => &[&T_vnd_powerbuilder75_application],
+"application/prs.cww" => &[&T_prs_cww_application],
+"application/vnd.oma-scws-http-response" => &[&T_vnd_oma_scws_http_response_application],
+"audio/mp4" => &[&T_mp4_audio],
+"application/vnd.oma.dd2+xml" => &[&T_vnd_oma_dd2_xml_application],
+"image/x-raw-hasselblad" => &[&T_x_raw_hasselblad_image],
+"application/hwp+zip" => &[&T_hwp_zip_application],
+"application/x-vmdk" => &[&T_x_vmdk_application],
+"application/vnd.omads-file+xml" => &[&T_vnd_omads_file_xml_application],
+"application/sereal;version=2" => &[&T_sereal_version_2_application],
+"application/x-chess-pgn" => &[&T_x_chess_pgn_application],
+"application/vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
+"text/x-scala" => &[&T_x_scala_text],
+"audio/x-dec-adpcm" => &[&T_x_dec_adpcm_audio],
+"model/vnd.dwf;version=5" => &[&T_vnd_dwf_version_5_model],
+"application/x-esri-layer" => &[&T_x_esri_layer_application],
+"video/daala" => &[&T_daala_video],
+"application/x-itunes-ipa" => &[&T_x_itunes_ipa_application],
+"application/x-sas-view" => &[&T_x_sas_view_application],
+"audio/g726-32" => &[&T_g726_32_audio],
+"application/vnd.dna" => &[&T_vnd_dna_application],
+"application/vnd.powerbuilder7" => &[&T_vnd_powerbuilder7_application],
 "image/x-portable-anymap" => &[&T_x_portable_anymap_image],
-"application/vnd.geogebra.tool" => &[&T_vnd_geogebra_tool_application],
-"application/vnd.ms-powerpoint.addin.macroenabled.12" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
-"application/x-apple-diskimage" => &[&T_x_apple_diskimage_application],
-"text/x-java-properties" => &[&T_x_java_properties_text],
-"application/x-ms-reader" => &[&T_x_ms_reader_application],
-"application/vnd.wrq-hp3000-labelled" => &[&T_vnd_wrq_hp3000_labelled_application],
-"application/vnd.nintendo.snes.rom" => &[&T_x_nesrom_application],
-"application/gzipped" => &[&T_gzip_application],
+"application/x-wine-extension-inf" => &[&T_inf_application],
+"audio/vnd.dolby.mps" => &[&T_vnd_dolby_mps_audio],
+"message/imdn+xml" => &[&T_imdn_xml_message],
+"application/vnd.oasis.opendocument.presentation-template" => &[&T_vnd_oasis_opendocument_presentation_template_application],
+"audio/vnd.adobe.soundbooth" => &[&T_vnd_adobe_soundbooth_audio],
+"application/vnd.recordare.musicxml+xml" => &[&T_vnd_recordare_musicxml_xml_application],
+"model/vnd.vtu" => &[&T_vnd_vtu_model],
+"application/vnd.xmpie.ppkg" => &[&T_vnd_xmpie_ppkg_application],
+"application/vnd.ecowin.seriesupdate" => &[&T_vnd_ecowin_seriesupdate_application],
+"application/slate" => &[&T_slate_application],
+"application/vnd.oma.drm.risd+xml" => &[&T_vnd_oma_drm_risd_xml_application],
+"application/soap+xml" => &[&T_soap_xml_application],
+"application/vnd.oma.bcast.sgdd+xml" => &[&T_vnd_oma_bcast_sgdd_xml_application],
+"video/x-ms-wvx" => &[&T_x_ms_wvx_video],
+"application/x-wais-source" => &[&T_x_wais_source_application],
+"application/vnd.sealed.tiff" => &[&T_vnd_sealed_tiff_application],
+"application/vnd.ericsson.quickcall" => &[&T_vnd_ericsson_quickcall_application],
+"audio/tone" => &[&T_tone_audio],
+"audio/g7221" => &[&T_g7221_audio],
+"audio/g726-40" => &[&T_g726_40_audio],
+"audio/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_audio],
+"application/x-vnd.datapackage+gz" => &[&T_x_vnd_datapackage_gz_application],
+"text/x-haxe" => &[&T_x_haxe_text],
+"application/vnd.dvb.esgcontainer" => &[&T_vnd_dvb_esgcontainer_application],
+"video/vnd.sealed.swf" => &[&T_vnd_sealed_swf_video],
+"application/x-ebu-stl" => &[&T_x_ebu_stl_application],
+"application/vnd.semf" => &[&T_vnd_semf_application],
+"audio/vnd.nuera.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
+"image/bmp" => &[&T_bmp_image],
+"application/x-dtbresource+xml" => &[&T_x_dtbresource_xml_application],
+"application/vnd.enliven" => &[&T_vnd_enliven_application],
+"application/vnd.trueapp" => &[&T_vnd_trueapp_application],
+"text/x-sql" => &[&T_x_sql_text],
+"application/x-berkeley-db;format=hash;version=5" => &[&T_x_berkeley_db_format_hash_version_5_application],
+"application/vnd.wordperfect;version=5.0" => &[&T_vnd_wordperfect_version_5_0_application],
+"text/x-coldfusion" => &[&T_x_coldfusion_text],
+"application/vnd.crick.clicker.palette" => &[&T_vnd_crick_clicker_palette_application],
+"audio/example" => &[&T_example_audio],
+"image/vnd.sealedmedia.softseal.gif" => &[&T_vnd_sealedmedia_softseal_gif_image],
+"application/x-font-snf" => &[&T_x_font_snf_application],
+"application/vnd.yamaha.openscoreformat" => &[&T_vnd_yamaha_openscoreformat_application],
+"image/x-gimp-gbr" => &[&T_x_gimp_gbr_image],
+"application/vnd.software602.filler.form-xml-zip" => &[&T_vnd_software602_filler_form_xml_zip_application],
+"image/gif" => &[&T_gif_image],
+"application/vnd.webturbo" => &[&T_vnd_webturbo_application],
+"application/x-autocad" => &[&T_vnd_dwg_image],
+"text/vnd.si.uricatalogue" => &[&T_vnd_si_uricatalogue_text],
+"application/vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
+"image/x-raw-epson" => &[&T_x_raw_epson_image],
+"application/x-ms-wmz" => &[&T_x_ms_wmz_application],
+"application/zip" => &[&T_zip_application],
+"application/vnd.openxmlformats-officedocument.presentationml.slideshow" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
+"text/x-vbscript" => &[&T_x_vbscript_text],
+"application/vnd.amiga.ami" => &[&T_vnd_amiga_ami_application],
+"application/x-vnd.oasis.opendocument.text" => &[&T_vnd_oasis_opendocument_text_application],
+"audio/bv16" => &[&T_bv16_audio],
+"application/x-tika-ooxml-protected" => &[&T_x_tika_ooxml_protected_application],
+"audio/vnd.nokia.mobile-xmf" => &[&T_vnd_nokia_mobile_xmf_audio],
+"text/rss" => &[&T_rss_xml_application],
+"audio/dvi4" => &[&T_dvi4_audio],
+"image/x-raw-logitech" => &[&T_x_raw_logitech_image],
+"audio/vnd.dts.hd" => &[&T_vnd_dts_hd_audio],
+"application/vnd.java.hprof.text" => &[&T_vnd_java_hprof_text_application],
+"application/x-roxio-toast" => &[&T_x_roxio_toast_application],
+"image/vnd.dwg" => &[&T_vnd_dwg_image],
+"application/x-acad" => &[&T_vnd_dwg_image],
+"application/vnd.vividence.scriptfile" => &[&T_vnd_vividence_scriptfile_application],
+"multipart/appledouble" => &[&T_appledouble_multipart],
+"image/webp" => &[&T_webp_image],
+"application/moss-signature" => &[&T_moss_signature_application],
+"application/pkix-crl" => &[&T_pkix_crl_application],
+"application/vnd.bluetooth.ep.oob" => &[&T_vnd_bluetooth_ep_oob_application],
+"application/vnd.noblenet-web" => &[&T_vnd_noblenet_web_application],
+"application/vnd.wordperfect;version=5.1" => &[&T_vnd_wordperfect_version_5_1_application],
+"application/vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
+"audio/dls" => &[&T_dls_audio],
+"application/vnd.etsi.simservs+xml" => &[&T_vnd_etsi_simservs_xml_application],
+"text/x-log" => &[&T_x_log_text],
+"video/avi" => &[&T_x_msvideo_video],
+"application/x-koan" => &[&T_vnd_koan_application],
+"application/vnd.lotus-screencam" => &[&T_vnd_lotus_screencam_application],
+"application/mbms-msk+xml" => &[&T_mbms_msk_xml_application],
+"application/vnd.marlin.drm.conftoken+xml" => &[&T_vnd_marlin_drm_conftoken_xml_application],
+"image/x-cdr" => &[&T_coreldraw_application],
+"application/ecmascript" => &[&T_ecmascript_application],
+"application/vnd.epson.quickanime" => &[&T_vnd_epson_quickanime_application],
+"application/vnd.rn-realmedia-vbr" => &[&T_vnd_rn_realmedia_application],
+"application/font-woff2" => &[&T_woff2_font],
+"application/vnd.solent.sdkm+xml" => &[&T_vnd_solent_sdkm_xml_application],
+"application/vnd.ecowin.fileupdate" => &[&T_vnd_ecowin_fileupdate_application],
+"application/vnd.wv.csp+xml" => &[&T_vnd_wv_csp_xml_application],
+"model/vnd.moml+xml" => &[&T_vnd_moml_xml_model],
+"text/ecmascript" => &[&T_ecmascript_text],
+"application/vnd.dreamfactory" => &[&T_vnd_dreamfactory_application],
+"audio/prs.sid" => &[&T_prs_sid_audio],
+"application/x-berkeley-db;format=btree;version=2" => &[&T_x_berkeley_db_format_btree_version_2_application],
+"text/properties" => &[&T_x_java_properties_text],
+"application/epp+xml" => &[&T_epp_xml_application],
+"audio/x-pn-realaudio-plugin" => &[&T_x_pn_realaudio_plugin_audio],
+"application/vnd.httphone" => &[&T_vnd_httphone_application],
+"text/x-haml" => &[&T_x_haml_text],
+"chemical/x-csml" => &[&T_x_csml_chemical],
+"application/vnd.ibm.electronic-media" => &[&T_vnd_ibm_electronic_media_application],
+"audio/basic" => &[&T_basic_audio],
+"application/x-sas-mddb" => &[&T_x_sas_mddb_application],
+"application/x-x509-ca-cert" => &[&T_x_x509_cert_application],
+"application/vnd.stardivision.math" => &[&T_vnd_stardivision_math_application],
+"application/vnd.wap.wmlc" => &[&T_vnd_wap_wmlc_application],
+"audio/x-matroska" => &[&T_x_matroska_audio],
+"application/x-appleworks" => &[&T_x_appleworks_application],
+"application/x-atari-floppy-disk-image" => &[&T_x_atari_floppy_disk_image_application],
+"application/x-asprs" => &[&T_x_asprs_application],
+"application/vnd.fujitsu.oasysgp" => &[&T_vnd_fujitsu_oasysgp_application],
+"application/pgp-signature" => &[&T_pgp_signature_application],
+"application/x-msschedule" => &[&T_x_msschedule_application],
+"application/illustrator+ps" => &[&T_illustrator_ps_application],
+"application/vnd.swiftview-ics" => &[&T_vnd_swiftview_ics_application],
+"application/vnd.xmi+xml" => &[&T_vnd_xmi_xml_application],
+"application/msword" => &[&T_msword_application],
+"application/vnd.motorola.flexsuite.adsi" => &[&T_vnd_motorola_flexsuite_adsi_application],
+"text/x-expect" => &[&T_x_expect_text],
+"application/sereal;version=3" => &[&T_sereal_version_3_application],
+"text/plain" => &[&T_plain_text],
+"text/iso19139+xml" => &[&T_iso19139_xml_text],
+"text/x-robots" => &[&T_x_robots_text],
+"application/vnd.accpac.simply.aso" => &[&T_vnd_accpac_simply_aso_application],
+"application/vnd.ms-asf" => &[&T_vnd_ms_asf_application],
+"application/vnd.apple.pages" => &[&T_vnd_apple_pages_application],
+"application/yaml" => &[&T_x_yaml_text],
+"application/vnd.medcalcdata" => &[&T_vnd_medcalcdata_application],
+"audio/x-oggflac" => &[&T_x_oggflac_audio],
+"application/x-sas-xport" => &[&T_x_sas_xport_application],
+"application/vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
+"application/x-fossil-global-conf" => &[&T_x_fossil_global_conf_application],
+"application/vnd.informedcontrol.rms+xml" => &[&T_vnd_informedcontrol_rms_xml_application],
+"text/x-ada" => &[&T_x_ada_text],
+"application/x-troff-man" => &[&T_troff_text],
+"application/x-xz" => &[&T_x_xz_application],
+"audio/mp4a-latm" => &[&T_mp4a_latm_audio],
+"application/mpeg4-generic" => &[&T_mpeg4_generic_application],
+"application/vnd.ecowin.series" => &[&T_vnd_ecowin_series_application],
+"application/vnd.japannet-jpnstore-wakeup" => &[&T_vnd_japannet_jpnstore_wakeup_application],
+"application/vnd.rapid" => &[&T_vnd_rapid_application],
+"audio/mpa" => &[&T_mpa_audio],
+"application/vnd.geogebra.file" => &[&T_vnd_geogebra_file_application],
+"application/vnd.informix-visionary" => &[&T_vnd_informix_visionary_application],
+"application/vnd.dvb.iptv.alfec-enhancement" => &[&T_vnd_dvb_iptv_alfec_enhancement_application],
+"audio/aiff" => &[&T_x_aiff_audio],
+"application/vnd.iptc.g2.knowledgeitem+xml" => &[&T_vnd_iptc_g2_knowledgeitem_xml_application],
+"text/x-common-lisp" => &[&T_x_common_lisp_text],
+"application/xquery" => &[&T_xquery_application],
+"text/javascript" => &[&T_javascript_text],
+"image/vnd.dgn;ver=8" => &[&T_vnd_dgn_version_8_image],
+"application/spirits-event+xml" => &[&T_spirits_event_xml_application],
+"image/vnd.dxf" => &[&T_vnd_dxf_image],
+"application/cals-1840" => &[&T_cals_1840_application],
+"application/vnd.apple.numbers" => &[&T_vnd_apple_numbers_application],
+"image/icns" => &[&T_icns_image],
+"audio/vdvi" => &[&T_vdvi_audio],
+"application/sdp" => &[&T_sdp_application],
+"audio/x-aiff" => &[&T_x_aiff_audio],
+"application/x-vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
+"video/dv" => &[&T_dv_video],
+"application/vnd.xmpie.dpkg" => &[&T_vnd_xmpie_dpkg_application],
+"application/x-x509-user-cert" => &[&T_x_x509_cert_application],
+"image/x-niff" => &[&T_x_niff_image],
+"application/vnd.dvb.ipdcdftnotifaccess" => &[&T_vnd_dvb_ipdcdftnotifaccess_application],
+"video/vnd.cctv" => &[&T_vnd_cctv_video],
+"application/x-coredump" => &[&T_x_coredump_application],
+"application/x-mysql-db" => &[&T_x_mysql_db_application],
+"application/vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
+"application/vnd.canon-lips" => &[&T_vnd_canon_lips_application],
+"text/vnd.curl.dcurl" => &[&T_vnd_curl_dcurl_text],
+"application/dita+xml;format=topic" => &[&T_dita_xml_format_topic_application],
+"application/activemessage" => &[&T_activemessage_application],
+"application/vnd.ms-outlook" => &[&T_vnd_ms_outlook_application],
+"application/x-arj-compressed" => &[&T_x_arj_application],
+"application/x-erdas-hfa" => &[&T_x_erdas_hfa_application],
+"application/x-lharc" => &[&T_x_lharc_application],
+"application/xml" => &[&T_xml_application],
+"image/bpg" => &[&T_bpg_image],
+"model/vnd.gtw" => &[&T_vnd_gtw_model],
+"video/ogg" => &[&T_ogg_video],
+"application/x-x509-dsa-parameters" => &[&T_x_x509_dsa_parameters_application],
+"application/vnd.koan" => &[&T_vnd_koan_application],
+"audio/mpa-robust" => &[&T_mpa_robust_audio],
+"text/x-cgi" => &[&T_x_cgi_text],
+"audio/wave" => &[&T_vnd_wave_audio],
+"application/x-chrome-extension" => &[&T_x_chrome_extension_application],
+"application/x-foxmail" => &[&T_x_foxmail_application],
 "application/vnd.grafeq" => &[&T_vnd_grafeq_application],
+"text/x-verilog" => &[&T_x_verilog_text],
+"video/jpeg2000" => &[&T_jpeg2000_video],
+"application/vnd.japannet-directory-service" => &[&T_vnd_japannet_directory_service_application],
+"image/svg+xml" => &[&T_svg_xml_image],
+"text/vtt" => &[&T_vtt_text],
+"application/nasdata" => &[&T_nasdata_application],
+"text/x-clojure" => &[&T_x_clojure_text],
+"image/vnd.cns.inf2" => &[&T_vnd_cns_inf2_image],
+"application/vnd.japannet-payment-wakeup" => &[&T_vnd_japannet_payment_wakeup_application],
+"text/x-config" => &[&T_x_config_text],
+"text/richtext" => &[&T_richtext_text],
+"application/vnd.dvb.notif-ia-msglist+xml" => &[&T_vnd_dvb_notif_ia_msglist_xml_application],
+"audio/g722" => &[&T_g722_audio],
+"audio/mpeg4-generic" => &[&T_mpeg4_generic_audio],
+"audio/ulpfec" => &[&T_ulpfec_audio],
+"application/cpl+xml" => &[&T_cpl_xml_application],
+"application/atomsvc+xml" => &[&T_atomsvc_xml_application],
+"application/dita+xml;format=concept" => &[&T_dita_xml_format_concept_application],
+"audio/adpcm" => &[&T_adpcm_audio],
+"application/mbms-associated-procedure-description+xml" => &[&T_mbms_associated_procedure_description_xml_application],
+"application/vnd.uplanet.bearer-choice-wbxml" => &[&T_vnd_uplanet_bearer_choice_wbxml_application],
+"audio/x-ogg-pcm" => &[&T_x_oggpcm_audio],
+"application/vnd.powerbuilder6" => &[&T_vnd_powerbuilder6_application],
+"image/png" => &[&T_png_image],
+"model/mesh" => &[&T_mesh_model],
+"font/ttf" => &[&T_x_font_ttf_application],
+"application/edi-x12" => &[&T_edi_x12_application],
+"text/x-c++hdr" => &[&T_x_c__hdr_text],
+"application/dec-dx" => &[&T_dec_dx_application],
 "application/vnd.fdsn.seed" => &[&T_vnd_fdsn_seed_application],
-"application/cstadata+xml" => &[&T_cstadata_xml_application],
-"application/atom+xml" => &[&T_atom_xml_application],
+"application/x-pkcs7-certreqresp" => &[&T_x_pkcs7_certreqresp_application],
+"application/vnd.java.hprof " => &[&T_vnd_java_hprof__application],
+"application/x-berkeley-db;format=hash" => &[&T_x_berkeley_db_format_hash_application],
+"application/ttml+xml" => &[&T_ttml_xml_application],
+"application/x-isatab" => &[&T_x_isatab_application],
+"image/x-dwg" => &[&T_vnd_dwg_image],
+"application/x-lzip" => &[&T_x_lzip_application,&T_lzip_application],
+"application/vnd.oma-scws-config" => &[&T_vnd_oma_scws_config_application],
+"image/x-raw-canon" => &[&T_x_raw_canon_image],
+"audio/x-caf" => &[&T_x_caf_audio],
+"application/vnd.ms-word" => &[&T_msword_application],
+"application/vnd.etsi.iptvdiscovery+xml" => &[&T_vnd_etsi_iptvdiscovery_xml_application],
+"application/x-rar-compressed" => &[&T_x_rar_compressed_application],
+"application/vnd.iptc.g2.packageitem+xml" => &[&T_vnd_iptc_g2_packageitem_xml_application],
+"image/heic-sequence" => &[&T_heic_sequence_image],
+"application/vnd.etsi.asic-s+zip" => &[&T_vnd_etsi_asic_s_zip_application],
+"application/xcon-conference-info-diff+xml" => &[&T_xcon_conference_info_diff_xml_application],
+"image/x-icon" => &[&T_vnd_microsoft_icon_image],
+"application/vnd.ezpix-package" => &[&T_vnd_ezpix_package_application],
+"application/vnd.muvee.style" => &[&T_vnd_muvee_style_application],
+"application/vnd.uplanet.cacheop-wbxml" => &[&T_vnd_uplanet_cacheop_wbxml_application],
+"application/x-msdownload;format=pe-itanium" => &[&T_x_msdownload_format_pe_itanium_application],
+"application/x-shar" => &[&T_x_shar_application],
+"audio/vnd.digital-winds" => &[&T_vnd_digital_winds_audio],
+"application/vnd.dolby.mobile.1" => &[&T_vnd_dolby_mobile_1_application],
+"text/prs.fallenstein.rst" => &[&T_prs_fallenstein_rst_text],
+"audio/l16" => &[&T_l16_audio],
+"image/vnd.adobe.photoshop" => &[&T_vnd_adobe_photoshop_image],
+"text/x-idl" => &[&T_x_idl_text],
+"application/x-msmetafile" => &[&T_wmf_image],
+"video/h263" => &[&T_h263_video],
+"application/oebps-package+xml" => &[&T_oebps_package_xml_application],
+"application/vnd.oma.poc.final-report+xml" => &[&T_vnd_oma_poc_final_report_xml_application],
+"application/vnd.kde.kspread" => &[&T_vnd_kde_kspread_application],
+"application/mspowerpoint" => &[&T_vnd_ms_powerpoint_application],
+"application/vnd.dvb.notif-ia-registration-response+xml" => &[&T_vnd_dvb_notif_ia_registration_response_xml_application],
+"application/vnd.ibm.modcap" => &[&T_vnd_ibm_modcap_application],
+"application/timestamp-query" => &[&T_timestamp_query_application],
+"application/x-x509-cert;format=der" => &[&T_x_x509_cert_format_der_application],
+"application/vnd.cosmocaller" => &[&T_vnd_cosmocaller_application],
+"audio/gsm-efr" => &[&T_gsm_efr_audio],
+"application/x-font-framemaker" => &[&T_x_font_framemaker_application],
+"application/x-sc" => &[&T_x_sc_application],
+"application/x-sv4cpio" => &[&T_x_sv4cpio_application],
 "audio/mpeg" => &[&T_mpeg_audio],
+"application/x-vnd.oasis.opendocument.spreadsheet-template" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
+"application/vnd.ms-works" => &[&T_vnd_ms_works_application],
+"application/x-bentley-localization" => &[&T_x_bentley_localization_application],
+"audio/x-ms-wax" => &[&T_x_ms_wax_audio],
+"application/x-mach-o-dsym" => &[&T_x_mach_o_dsym_application],
+"application/vnd.mseq" => &[&T_vnd_mseq_application],
+"application/vnd.ms-visio.stencil" => &[&T_vnd_ms_visio_stencil_application],
+"text/example" => &[&T_example_text],
+"application/dvcs" => &[&T_dvcs_application],
+"application/dita+xml;format=map" => &[&T_dita_xml_format_map_application],
+"application/vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"message/global-delivery-status" => &[&T_global_delivery_status_message],
+"application/vnd.ms-word2006ml" => &[&T_vnd_ms_word2006ml_application],
+"application/vnd.rn-realmedia" => &[&T_vnd_rn_realmedia_application],
+"application/x-adobe-indesign-interchange" => &[&T_x_adobe_indesign_interchange_application],
+"application/lost+xml" => &[&T_lost_xml_application],
+"video/vnd.hns.video" => &[&T_vnd_hns_video_video],
+"application/x-x509-cert" => &[&T_x_x509_cert_application],
+"multipart/mixed" => &[&T_mixed_multipart],
+"application/x-idl-save-file" => &[&T_x_idl_save_file_application],
+"application/vnd.kde.kpresenter" => &[&T_vnd_kde_kpresenter_application],
+"application/x-dosexec" => &[&T_x_dosexec_application],
+"application/vnd.cendio.thinlinc.clientconf" => &[&T_vnd_cendio_thinlinc_clientconf_application],
+"application/x-elf" => &[&T_x_elf_application],
+"text/x-modula" => &[&T_x_modula_text],
+"application/x-ms-xbap" => &[&T_x_ms_xbap_application],
+"application/ocsp-response" => &[&T_ocsp_response_application],
+"application/x-abiword" => &[&T_x_abiword_application],
+"application/vnd.uplanet.listcmd-wbxml" => &[&T_vnd_uplanet_listcmd_wbxml_application],
+"application/x-stata-dta;version=8" => &[&T_x_stata_dta_version_8_application],
+"application/x-gunzip" => &[&T_gzip_application],
+"application/parityfec" => &[&T_parityfec_application],
+"application/x-mach-o" => &[&T_x_mach_o_application],
+"application/resource-lists+xml" => &[&T_resource_lists_xml_application],
+"audio/g726-24" => &[&T_g726_24_audio],
+"audio/bv32" => &[&T_bv32_audio],
+"application/vnd.sealedmedia.softseal.pdf" => &[&T_vnd_sealedmedia_softseal_pdf_application],
+"audio/gsm" => &[&T_gsm_audio],
+"application/x-x509-ec-parameters" => &[&T_x_x509_ec_parameters_application],
+"application/x-tika-java-enterprise-archive" => &[&T_x_tika_java_enterprise_archive_application],
+"application/vnd.ms-excel.sheet.2" => &[&T_vnd_ms_excel_sheet_2_application],
+"message/cpim" => &[&T_cpim_message],
+"image/x-wmf" => &[&T_wmf_image],
+"application/x-msdownload" => &[&T_x_msdownload_application],
+"application/x-x509-cert;format=pem" => &[&T_x_x509_cert_format_pem_application],
+"audio/amr-wb" => &[&T_amr_wb_audio],
+"application/x-tika-msoffice-embedded;format=comp_obj" => &[&T_x_tika_msoffice_embedded_format_comp_obj_application],
+"chemical/x-cdx" => &[&T_x_cdx_chemical],
+"application/x-cdlink" => &[&T_x_cdlink_application],
+"application/vnd.omads-email+xml" => &[&T_vnd_omads_email_xml_application],
+"application/pls+xml" => &[&T_pls_xml_application],
+"application/x-msbinder" => &[&T_x_msbinder_application],
+"application/vnd.dolby.mlp" => &[&T_vnd_dolby_mlp_application],
+"application/vnd.nokia.iptv.config+xml" => &[&T_vnd_nokia_iptv_config_xml_application],
+"video/webm" => &[&T_webm_video],
+"application/vnd.seemail" => &[&T_vnd_seemail_application],
+"application/warc+gz" => &[&T_warc_gz_application],
+"audio/vnd.wave" => &[&T_vnd_wave_audio],
+"application/sgml" => &[&T_sgml_application],
+"application/vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
+"application/vnd.stardivision.draw" => &[&T_vnd_stardivision_draw_application],
+"text/vnd.in3d.spot" => &[&T_vnd_in3d_spot_text],
+"application/vnd.lotus-organizer" => &[&T_vnd_lotus_organizer_application],
+"application/vnd.pwg-multiplexed" => &[&T_vnd_pwg_multiplexed_application],
+"application/vnd.marlin.drm.license+xml" => &[&T_vnd_marlin_drm_license_xml_application],
+"video/ulpfec" => &[&T_ulpfec_video],
+"video/vnd.nokia.videovoip" => &[&T_vnd_nokia_videovoip_video],
+"image/x-dpx" => &[&T_x_dpx_image],
+"multipart/alternative" => &[&T_alternative_multipart],
+"application/vnd.piaccess.application-licence" => &[&T_vnd_piaccess_application_licence_application],
+"text/ulpfec" => &[&T_ulpfec_text],
+"application/fastinfoset" => &[&T_fastinfoset_application],
+"image/heif-sequence" => &[&T_heif_sequence_image],
+"application/kate" => &[&T_kate_application],
+"video/3gpp2" => &[&T_3gpp2_video],
+"video/x-msvideo" => &[&T_x_msvideo_video],
+"text/vnd.dmclientscript" => &[&T_vnd_dmclientscript_text],
+"application/vnd.ecdis-update" => &[&T_vnd_ecdis_update_application],
+"application/vnd.sss-cod" => &[&T_vnd_sss_cod_application],
+"image/x-icns" => &[&T_icns_image],
+"application/vnd.fdf" => &[&T_vnd_fdf_application],
+"application/octet-stream" => &[&T_octet_stream_application],
+"application/vnd.gridmp" => &[&T_vnd_gridmp_application],
+"image/x-dcx" => &[&T_vnd_zbrush_dcx_image],
+"application/acad" => &[&T_vnd_dwg_image],
+"application/vnd.3gpp.pic-bw-small" => &[&T_vnd_3gpp_pic_bw_small_application],
+"image/x-pict" => &[&T_x_pict_image],
+"application/x-xmind" => &[&T_x_xmind_application],
+"application/x-123" => &[&T_vnd_lotus_1_2_3_application],
+"application/poc-settings+xml" => &[&T_poc_settings_xml_application],
+"application/vnd.marlin.drm.mdcf" => &[&T_vnd_marlin_drm_mdcf_application],
+"application/vnd.msa-disk-image" => &[&T_vnd_msa_disk_image_application],
+"application/x-quattro-pro;version=6" => &[&T_x_quattro_pro_version_6_application],
+"application/vnd.f-secure.mobile" => &[&T_vnd_f_secure_mobile_application],
+"application/vnd.hp-pclxl" => &[&T_vnd_hp_pclxl_application],
+"audio/dat12" => &[&T_dat12_audio],
+"font/woff" => &[&T_woff_font],
+"audio/sp-midi" => &[&T_sp_midi_audio],
+"application/atomicmail" => &[&T_atomicmail_application],
+"application/vnd.fdsn.mseed" => &[&T_vnd_fdsn_mseed_application],
+"application/vnd.wordperfect;version=6.x" => &[&T_vnd_wordperfect_version_6_x_application],
+"application/bat" => &[&T_x_bat_application],
+"application/vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
+"video/theora" => &[&T_theora_video],
+"application/onenote;format=onetoc2" => &[&T_onenote_format_onetoc2_application],
+"application/vnd.nokia.pcd+wbxml" => &[&T_vnd_nokia_pcd_wbxml_application],
+"application/x-gnumeric" => &[&T_x_gnumeric_application],
+"application/onix-message-short+xml" => &[&T_onix_message_short_xml_application],
+"application/vnd.syncml.dm+xml" => &[&T_vnd_syncml_dm_xml_application],
+"audio/evrc1" => &[&T_evrc1_audio],
+"application/xop+xml" => &[&T_xop_xml_application],
+"application/vnd.stardivision.writer-global" => &[&T_vnd_stardivision_writer_global_application],
+"audio/ilbc" => &[&T_ilbc_audio],
+"application/vnd.etsi.asic-e+zip" => &[&T_vnd_etsi_asic_e_zip_application],
+"application/x-apple-diskimage" => &[&T_x_apple_diskimage_application],
+"application/vnd.blueice.multipass" => &[&T_vnd_blueice_multipass_application],
+"application/vnd.ms-wmdrm.lic-resp" => &[&T_vnd_ms_wmdrm_lic_resp_application],
+"video/vnd.ms-playready.media.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
+"application/vnd.minisoft-hp3000-save" => &[&T_vnd_minisoft_hp3000_save_application],
+"application/x-tika-msoffice" => &[&T_x_tika_msoffice_application],
+"application/vnd.adobe.aftereffects.project" => &[&T_vnd_adobe_aftereffects_project_application],
+"application/vnd.ecowin.filerequest" => &[&T_vnd_ecowin_filerequest_application],
+"application/srgs+xml" => &[&T_srgs_xml_application],
+"application/vnd.isac.fcs" => &[&T_vnd_isac_fcs_application],
+"application/cstadata+xml" => &[&T_cstadata_xml_application],
+"application/onenote" => &[&T_onenote_application],
+"application/x-debian-package" => &[&T_x_debian_package_application],
+"text/x-dtd" => &[&T_xml_dtd_application],
+"video/mp2t" => &[&T_mp2t_video],
+"text/x-vcalendar" => &[&T_x_vcalendar_text],
+"application/ibe-pkg-reply+xml" => &[&T_ibe_pkg_reply_xml_application],
+"application/tve-trigger" => &[&T_tve_trigger_application],
+"audio/evrcb1" => &[&T_evrcb1_audio],
+"application/vnd.wfa.wsc" => &[&T_vnd_wfa_wsc_application],
+"image/vnd.fujixerox.edmics-mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
+"application/vnd.hydrostatix.sof-data" => &[&T_vnd_hydrostatix_sof_data_application],
+"application/vnd.preminet" => &[&T_vnd_preminet_application],
+"video/vnd.dlna.mpeg-tts" => &[&T_vnd_dlna_mpeg_tts_video],
+"video/vnd.dvb.file" => &[&T_vnd_dvb_file_video],
+"application/vnd.kde.kivio" => &[&T_vnd_kde_kivio_application],
+"audio/midi" => &[&T_midi_audio],
+"application/vnd.uplanet.channel-wbxml" => &[&T_vnd_uplanet_channel_wbxml_application],
+"application/vnd.sun.xml.calc" => &[&T_vnd_sun_xml_calc_application],
+"video/vc1" => &[&T_vc1_video],
+"multipart/digest" => &[&T_digest_multipart],
+"application/x-quattro-pro;version=1-4" => &[&T_x_quattro_pro_version_1_4_application],
+"application/vnd.pg.osasli" => &[&T_vnd_pg_osasli_application],
+"application/vnd.nokia.landmark+wbxml" => &[&T_vnd_nokia_landmark_wbxml_application],
+"application/vnd.oma.bcast.drm-trigger+xml" => &[&T_vnd_oma_bcast_drm_trigger_xml_application],
+"application/x-dwg" => &[&T_vnd_dwg_image],
+"application/x-javascript" => &[&T_javascript_text],
+"image/vnd.xiff" => &[&T_vnd_xiff_image],
+"application/vnd.ms-excel.workspace.4" => &[&T_vnd_ms_excel_workspace_4_application],
+"application/kpml-request+xml" => &[&T_kpml_request_xml_application],
+"application/vnd.macports.portpkg" => &[&T_vnd_macports_portpkg_application],
+"application/vnd.immervision-ivu" => &[&T_vnd_immervision_ivu_application],
+"application/vnd.openofficeorg.extension" => &[&T_vnd_openofficeorg_extension_application],
+"audio/dsr-es202212" => &[&T_dsr_es202212_audio],
+"model/gltf-binary" => &[&T_gltf_binary_model],
+"application/dita+xml;format=val" => &[&T_dita_xml_format_val_application],
+"application/x-filemaker" => &[&T_x_filemaker_application],
+"image/x-ms-bmp" => &[&T_bmp_image],
+"font/woff2" => &[&T_woff2_font],
+"text/uri-list" => &[&T_uri_list_text],
+"application/sgml-open-catalog" => &[&T_sgml_open_catalog_application],
+"text/calendar" => &[&T_calendar_text],
+"application/x-bat" => &[&T_x_bat_application],
+"text/x-php" => &[&T_x_php_text],
+"video/vnd.vivo" => &[&T_vnd_vivo_video],
+"application/vnd.oasis.opendocument.tika.flat.document" => &[&T_vnd_oasis_opendocument_tika_flat_document_application],
+"application/vnd.groove-identity-message" => &[&T_vnd_groove_identity_message_application],
+"image/vnd.wap.wbmp" => &[&T_vnd_wap_wbmp_image],
+"application/rls-services+xml" => &[&T_rls_services_xml_application],
+"audio/evrcwb0" => &[&T_evrcwb0_audio],
+"application/vnd.intu.qfx" => &[&T_vnd_intu_qfx_application],
+"application/x-texnicard" => &[&T_x_texnicard_application],
+"application/vnd.wrq-hp3000-labelled" => &[&T_vnd_wrq_hp3000_labelled_application],
+"application/x-vnd.oasis.opendocument.graphics" => &[&T_vnd_oasis_opendocument_graphics_application],
+"image/x-raw-mamiya" => &[&T_x_raw_mamiya_image],
+"application/cu-seeme" => &[&T_cu_seeme_application],
+"application/mbms-register+xml" => &[&T_mbms_register_xml_application],
+"application/x-rar" => &[&T_x_rar_compressed_application],
+"text/x-tika-text-based-message" => &[&T_x_tika_text_based_message_text],
+"application/vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
+"image/x-raw-sigma" => &[&T_x_raw_sigma_image],
+"video/x-mng" => &[&T_x_mng_video],
+"application/vnd.crick.clicker.keyboard" => &[&T_vnd_crick_clicker_keyboard_application],
+"image/x-raw-adobe" => &[&T_x_raw_adobe_image],
+"application/x-archive" => &[&T_x_archive_application],
+"image/aces" => &[&T_aces_image],
+"image/vnd.sealedmedia.softseal.jpg" => &[&T_vnd_sealedmedia_softseal_jpg_image],
+"application/x-mach-o-kext-bundle" => &[&T_x_mach_o_kext_bundle_application],
+"text/x-haskell" => &[&T_x_haskell_text],
+"application/x-frame" => &[&T_vnd_mif_application],
+"application/pkix-cert" => &[&T_pkix_cert_application],
+"application/rsd+xml" => &[&T_rsd_xml_application],
+"application/vnd.mfmp" => &[&T_vnd_mfmp_application],
+"application/x-vnd.datapackage+zip" => &[&T_x_vnd_datapackage_zip_application],
+"application/x-stata-dta;version=12" => &[&T_x_stata_dta_version_12_application],
+"application/vnd.visionary" => &[&T_vnd_visionary_application],
+"application/x-grib" => &[&T_x_grib_application],
+"image/x-raw-panasonic" => &[&T_x_raw_panasonic_image],
+"application/vnd.lotus-wordpro" => &[&T_vnd_lotus_wordpro_application],
+"application/vnd.oma.bcast.sgdu" => &[&T_vnd_oma_bcast_sgdu_application],
+"image/x-pc-paintbrush" => &[&T_vnd_zbrush_pcx_image],
+"application/vnd.oma.bcast.sgboot" => &[&T_vnd_oma_bcast_sgboot_application],
+"image/x-os2-graphics; charset=binary" => &[&T_x_os2_graphics__charset_binary_image],
+"application/smil" => &[&T_smil_xml_application],
+"application/relax-ng-compact-syntax" => &[&T_relax_ng_compact_syntax_application],
+"application/pdf" => &[&T_pdf_application],
+"image/jxl" => &[&T_jxl_image],
+"message/s-http" => &[&T_s_http_message],
+"application/x-font-speedo" => &[&T_x_font_speedo_application],
+"application/x-tika-unix-dump" => &[&T_x_tika_unix_dump_application],
+"application/edifact" => &[&T_edifact_application],
+"application/x-snappy-framed" => &[&T_x_snappy_framed_application],
+"video/bt656" => &[&T_bt656_video],
+"model/vnd.gdl" => &[&T_vnd_gdl_model],
+"text/directory" => &[&T_directory_text],
+"model/iges" => &[&T_iges_model],
+"text/enriched" => &[&T_enriched_text],
+"application/timestamped-data" => &[&T_timestamped_data_application],
+"application/vnd.motorola.flexsuite.ttc" => &[&T_vnd_motorola_flexsuite_ttc_application],
+"video/vnd.mpegurl" => &[&T_vnd_mpegurl_video],
+"application/vnd.mediastation.cdkey" => &[&T_vnd_mediastation_cdkey_application],
+"video/x-ogg-rgb" => &[&T_x_oggrgb_video],
+"audio/vnd.3gpp.iufp" => &[&T_vnd_3gpp_iufp_audio],
+"application/mac-binhex" => &[&T_mac_binhex40_application],
+"application/vnd.cups-raster" => &[&T_vnd_cups_raster_application],
+"application/x-ustar" => &[&T_x_ustar_application],
+"video/x-ogguvs" => &[&T_x_ogguvs_video],
+"application/mbox" => &[&T_mbox_application],
+"application/x-stata-do" => &[&T_x_stata_do_application],
+"text/xsl" => &[&T_xslfo_xml_application,&T_xslt_xml_application],
+"application/x-ms-asx" => &[&T_x_ms_asx_application],
+"application/vnd.sealed.csf" => &[&T_vnd_sealed_csf_application],
+"application/x-tmx" => &[&T_x_tmx_application],
+"application/vnd.uplanet.signal" => &[&T_vnd_uplanet_signal_application],
+"application/x-tex-tfm" => &[&T_x_tex_tfm_application],
+"text/x-ruby" => &[&T_x_ruby_text],
+"image/x-targa" => &[&T_x_tga_image],
+"application/vnd.dvb.notif-aggregate-root+xml" => &[&T_vnd_dvb_notif_aggregate_root_xml_application],
+"text/prs.lines.tag" => &[&T_prs_lines_tag_text],
+"application/vnd.oma.dcd" => &[&T_vnd_oma_dcd_application],
+"application/samlassertion+xml" => &[&T_samlassertion_xml_application],
+"video/vnd.iptvforum.ttsmpeg2" => &[&T_vnd_iptvforum_ttsmpeg2_video],
+"application/emma+xml" => &[&T_emma_xml_application],
+"application/pgp-encrypted" => &[&T_pgp_encrypted_application],
+"application/index.vnd" => &[&T_index_vnd_application],
+"video/mp4" => &[&T_mp4_video],
+"video/x-jng" => &[&T_x_jng_video],
+"video/bmpeg" => &[&T_bmpeg_video],
+"application/vnd.ms-pki.stl" => &[&T_vnd_ms_pki_stl_application],
+"application/vnd.noblenet-directory" => &[&T_vnd_noblenet_directory_application],
+"application/vnd.shx" => &[&T_vnd_shx_application],
+"audio/x-oggpcm" => &[&T_x_oggpcm_audio],
+"application/x-silverlight-app" => &[&T_x_silverlight_app_application],
+"application/x-mach-o-bundle" => &[&T_x_mach_o_bundle_application],
+"drawing/x-dwf" => &[&T_vnd_dwf_model],
+"application/vnd.sealed.doc" => &[&T_vnd_sealed_doc_application],
+"audio/clearmode" => &[&T_clearmode_audio],
+"image/x-portable-bitmap" => &[&T_x_portable_bitmap_image],
+"image/jpx" => &[&T_jpx_image],
+"application/x-parquet" => &[&T_x_parquet_application],
+"application/vnd.google-earth.kml+xml" => &[&T_vnd_google_earth_kml_xml_application],
+"application/vnd.adobe.xdp+xml" => &[&T_vnd_adobe_xdp_xml_application],
+"application/bizagi-modeler" => &[&T_bizagi_modeler_application],
+"model/vnd.gs-gdl" => &[&T_vnd_gs_gdl_model],
+"application/x-wacz" => &[&T_x_wacz_application],
+"application/font-sfnt" => &[&T_x_font_ttf_application],
+"application/x-dex" => &[&T_x_dex_application],
+"application/vnd.nokia.catalogs" => &[&T_vnd_nokia_catalogs_application],
+"application/vnd.3m.post-it-notes" => &[&T_vnd_3m_post_it_notes_application],
+"application/x-stata-dta;version=10" => &[&T_x_stata_dta_version_10_application],
+"application/vnd.sealed.net" => &[&T_vnd_sealed_net_application],
+"video/x-oggrgb" => &[&T_x_oggrgb_video],
+"image/vnd.radiance" => &[&T_vnd_radiance_image],
+"text/x-aspectj" => &[&T_x_aspectj_text],
+"application/x-sas-transport" => &[&T_x_sas_transport_application],
+"application/msonenote" => &[&T_onenote_application],
+"application/shf+xml" => &[&T_shf_xml_application],
+"application/vnd.dvb.ipdcesgaccess" => &[&T_vnd_dvb_ipdcesgaccess_application],
+"application/vnd.ms-playready.initiator+xml" => &[&T_vnd_ms_playready_initiator_xml_application],
+"application/vnd.nokia.isds-radio-presets" => &[&T_vnd_nokia_isds_radio_presets_application],
+"application/x-hwp-v5" => &[&T_x_hwp_v5_application],
+"video/nv" => &[&T_nv_video],
+"audio/g729d" => &[&T_g729d_audio],
+"text/x-python" => &[&T_x_python_text],
+"application/vnd.kinar" => &[&T_vnd_kinar_application],
+"video/x-dirac" => &[&T_x_dirac_video],
+"audio/rtx" => &[&T_rtx_audio],
+"text/xml" => &[&T_xml_application],
+"model/vnd.dwf;version=6" => &[&T_vnd_dwf_version_6_model],
+"image/vnd.zbrush.pcx" => &[&T_vnd_zbrush_pcx_image],
+"application/x-activemime" => &[&T_x_activemime_application],
+"application/vnd.iptc.g2.newsmessage+xml" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
+"application/ccxml+xml" => &[&T_ccxml_xml_application],
+"application/vnd.ms-cab-compressed" => &[&T_vnd_ms_cab_compressed_application],
+"application/vnd.sealed.mht" => &[&T_vnd_sealed_mht_application],
+"video/h263-2000" => &[&T_h263_2000_video],
+"application/vnd.ncd.control" => &[&T_vnd_ncd_control_application],
+"application/x-quattro-pro" => &[&T_x_quattro_pro_application],
+"application/vnd.anser-web-certificate-issue-initiation" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
+"application/xhtml-voice+xml" => &[&T_xhtml_voice_xml_application],
+"image/heic" => &[&T_heic_image],
+"video/x-f4v" => &[&T_x_f4v_video],
+"application/x-ms-emz" => &[&T_x_emf_compressed_image],
+"application/vnd.nokia.conml+wbxml" => &[&T_vnd_nokia_conml_wbxml_application],
+"application/vnd.etsi.iptvsad-cod+xml" => &[&T_vnd_etsi_iptvsad_cod_xml_application],
+"multipart/form-data" => &[&T_form_data_multipart],
+"application/iotp" => &[&T_iotp_application],
+"video/mpeg4-generic" => &[&T_mpeg4_generic_video],
+"message/delivery-status" => &[&T_delivery_status_message],
+"application/vnd.ms-wpl" => &[&T_vnd_ms_wpl_application],
+"application/vnd.stardivision.calc" => &[&T_vnd_stardivision_calc_application],
+"audio/x-adpcm" => &[&T_x_adpcm_audio],
+"image/x-raw-rawzor" => &[&T_x_raw_rawzor_image],
+"application/xcon-conference-info+xml" => &[&T_xcon_conference_info_xml_application],
+"application/x-tika-old-excel" => &[&T_x_tika_old_excel_application],
+"application/vnd.tcpdump.pcap" => &[&T_vnd_tcpdump_pcap_application],
+"application/simplesymbolcontainer" => &[&T_simplesymbolcontainer_application],
+"application/srgs" => &[&T_srgs_application],
+"application/x-tika-iworks-protected" => &[&T_x_tika_iworks_protected_application],
+"application/vnd.sema" => &[&T_vnd_sema_application],
+"application/vnd.mitsubishi.misty-guard.trustweb" => &[&T_vnd_mitsubishi_misty_guard_trustweb_application],
+"text/vnd.trolltech.linguist" => &[&T_vnd_trolltech_linguist_text],
+"application/vnd.nokia.n-gage.data" => &[&T_vnd_nokia_n_gage_data_application],
+"image/x-jp2-codestream" => &[&T_x_jp2_codestream_image],
+"application/x-touhou" => &[&T_x_touhou_application],
+"image/x-rgb" => &[&T_x_rgb_image],
+"image/vnd.dgn;version=7" => &[&T_vnd_dgn_version_7_image],
+"text/css" => &[&T_css_text],
+"application/vnd.ms-wmdrm.meter-chlg-req" => &[&T_vnd_ms_wmdrm_meter_chlg_req_application],
+"video/3gp" => &[&T_3gpp_video],
+"audio/l8" => &[&T_l8_audio],
+"application/x-zoo" => &[&T_x_zoo_application],
+"text/vnd.net2phone.commcenter.command" => &[&T_vnd_net2phone_commcenter_command_text],
+"image/vnd.fujixerox.edmics-rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
+"application/x-unix-archive" => &[&T_x_archive_application],
+"application/x-webarchive" => &[&T_x_webarchive_application],
+"application/x-berkeley-db;format=hash;version=2" => &[&T_x_berkeley_db_format_hash_version_2_application],
+"application/samlmetadata+xml" => &[&T_samlmetadata_xml_application],
+"image/x-raw-minolta" => &[&T_x_raw_minolta_image],
+"application/hyperstudio" => &[&T_hyperstudio_application],
+"application/vnd.kde.kword" => &[&T_vnd_kde_kword_application],
+"application/vnd.ctct.ws+xml" => &[&T_vnd_ctct_ws_xml_application],
+"application/x-mobipocket-ebook" => &[&T_x_mobipocket_ebook_application],
+"audio/vnd.ms-playready.media.pya" => &[&T_vnd_ms_playready_media_pya_audio],
+"application/x-tika-visio-ooxml" => &[&T_x_tika_visio_ooxml_application],
+"application/vnd.arastra.swi" => &[&T_vnd_arastra_swi_application],
+"video/x-matroska" => &[&T_x_matroska_video],
+"application/vnd.epson.esf" => &[&T_vnd_epson_esf_application],
+"application/vnd.acucorp" => &[&T_vnd_acucorp_application],
+"application/whoispp-response" => &[&T_whoispp_response_application],
+"image/x-jb2" => &[&T_x_jbig2_image],
+"application/x-font-linux-psf" => &[&T_x_font_linux_psf_application],
+"text/troff" => &[&T_troff_text],
+"application/vnd.eszigno3+xml" => &[&T_vnd_eszigno3_xml_application],
+"application/dns" => &[&T_dns_application],
+"application/mbms-user-service-description+xml" => &[&T_mbms_user_service_description_xml_application],
+"application/x-ms-nls" => &[&T_x_ms_nls_application],
+"application/xenc+xml" => &[&T_xenc_xml_application],
+"application/x-dbf" => &[&T_x_dbf_application],
+"application/javascript" => &[&T_javascript_text],
+"application/vnd.mobius.dis" => &[&T_vnd_mobius_dis_application],
+"application/sparql-query" => &[&T_sparql_query_application],
+"image/tiff-fx" => &[&T_tiff_fx_image],
+"video/raw" => &[&T_raw_video],
+"application/x-tika-staroffice" => &[&T_x_tika_staroffice_application],
+"application/x-pds" => &[&T_x_pds_application],
+"audio/vnd.4sb" => &[&T_vnd_4sb_audio],
+"video/x-ogm" => &[&T_x_ogm_video],
+"application/news-checkgroups" => &[&T_news_checkgroups_application],
+"message/news" => &[&T_news_message],
+"application/vnd.japannet-registration" => &[&T_vnd_japannet_registration_application],
+"audio/cn" => &[&T_cn_audio],
+"application/vnd.osa.netdeploy" => &[&T_vnd_osa_netdeploy_application],
+"application/simple-filter+xml" => &[&T_simple_filter_xml_application],
+"application/dash+xml" => &[&T_dash_xml_application],
+"application/x-installshield" => &[&T_x_installshield_application],
+"text/vnd.curl.mcurl" => &[&T_vnd_curl_mcurl_text],
+"application/vnd.denovo.fcselayout-link" => &[&T_vnd_denovo_fcselayout_link_application],
+"audio/vnd.rhetorex.32kadpcm" => &[&T_vnd_rhetorex_32kadpcm_audio],
+"application/vnd.ms-excel.template.macroenabled.12" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
+"application/vnd.powerbuilder7-s" => &[&T_vnd_powerbuilder7_s_application],
+"application/vnd.shana.informed.interchange" => &[&T_vnd_shana_informed_interchange_application],
+"application/vnd.syncml.dm+wbxml" => &[&T_vnd_syncml_dm_wbxml_application],
+"audio/g7291" => &[&T_g7291_audio],
+"application/vnd.avistar+xml" => &[&T_vnd_avistar_xml_application],
+"video/msvideo" => &[&T_x_msvideo_video],
+"application/vnd.intertrust.digibox" => &[&T_vnd_intertrust_digibox_application],
+"application/vnd.epson.msf" => &[&T_vnd_epson_msf_application],
+"application/vnd.mfer" => &[&T_vnd_mfer_application],
+"application/x-java-jnlp-file" => &[&T_x_java_jnlp_file_application],
+"text/x-java" => &[&T_x_java_source_text],
+"model/x3d+xml" => &[&T_x3d_xml_model],
+"text/x-scheme" => &[&T_x_scheme_text],
+"application/vnd.motorola.iprm" => &[&T_vnd_motorola_iprm_application],
+"application/vnd.etsi.iptvsad-bc+xml" => &[&T_vnd_etsi_iptvsad_bc_xml_application],
+"application/wita" => &[&T_wita_application],
+"application/vnd.umajin" => &[&T_vnd_umajin_application],
+"text/x-vbasic" => &[&T_x_vbasic_text],
+"application/vnd.hp-hps" => &[&T_vnd_hp_hps_application],
+"application/vnd.nokia.n-gage.ac+xml" => &[&T_vnd_nokia_n_gage_ac_xml_application],
+"application/vnd.oma.dcdc" => &[&T_vnd_oma_dcdc_application],
+"image/x-3ds" => &[&T_x_3ds_image],
+"application/vnd.groove-vcard" => &[&T_vnd_groove_vcard_application],
+"message/vnd.si.simp" => &[&T_vnd_si_simp_message],
+"audio/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_audio],
+"application/vnd.ms-artgalry" => &[&T_vnd_ms_artgalry_application],
+"text/vnd.latex-z" => &[&T_vnd_latex_z_text],
+"text/vnd.iptc.newsml" => &[&T_vnd_iptc_newsml_text],
+"text/x-diff" => &[&T_x_diff_text],
+"application/x-berkeley-db;format=queue" => &[&T_x_berkeley_db_format_queue_application],
+"image/g3fax" => &[&T_g3fax_image],
+"application/onenote; format=package" => &[&T_onenote__format_package_application],
+"application/vnd.airzip.filesecure.azf" => &[&T_vnd_airzip_filesecure_azf_application],
+"application/vnd.ruckus.download" => &[&T_vnd_ruckus_download_application],
+"application/http" => &[&T_http_application],
+"application/vnd.mobius.mqy" => &[&T_vnd_mobius_mqy_application],
+"audio/mpegurl" => &[&T_x_mpegurl_audio],
+"image/x-xpixmap" => &[&T_x_xpixmap_image],
+"image/vnd.zbrush.dcx" => &[&T_vnd_zbrush_dcx_image],
+"application/dita+xml" => &[&T_dita_xml_application],
+"video/x-ms-wm" => &[&T_x_ms_wm_video],
+"application/vnd.powerbuilder75-s" => &[&T_vnd_powerbuilder75_s_application],
+"application/x-bcpio" => &[&T_x_bcpio_application],
+"application/x-emf" => &[&T_emf_image],
+"application/vnd.xmpie.xlim" => &[&T_vnd_xmpie_xlim_application],
+"application/vnd.intu.qbo" => &[&T_vnd_intu_qbo_application],
+"application/vnd.sbm.cid" => &[&T_vnd_sbm_cid_application],
+"application/vnd.msign" => &[&T_vnd_msign_application],
+"application/vnd.sealed.ppt" => &[&T_vnd_sealed_ppt_application],
+"application/vnd.crick.clicker" => &[&T_vnd_crick_clicker_application],
+"application/vnd.ufdl" => &[&T_vnd_ufdl_application],
+"audio/lpc" => &[&T_lpc_audio],
+"application/vnd.uiq.theme" => &[&T_vnd_uiq_theme_application],
+"application/x-chat" => &[&T_x_chat_application],
+"application/sbml+xml" => &[&T_sbml_xml_application],
+"application/vnd.hbci" => &[&T_vnd_hbci_application],
+"application/x-mysql-misam-compressed-index" => &[&T_x_mysql_misam_compressed_index_application],
+"application/vnd.ms-visio.template.macroEnabled.12" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
+"application/vnd.ms-spreadsheetml" => &[&T_vnd_ms_spreadsheetml_application],
+"audio/vnd.lucent.voice" => &[&T_vnd_lucent_voice_audio],
+"image/x-raw-pentax" => &[&T_x_raw_pentax_image],
+"application/x-vnd.oasis.opendocument.graphics-template" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"image/x-emf-compressed" => &[&T_x_emf_compressed_image],
+"application/pkix-pkipath" => &[&T_pkix_pkipath_application],
+"model/example" => &[&T_example_model],
+"application/vnd.clonk.c4group" => &[&T_vnd_clonk_c4group_application],
+"application/vnd.wap.wbxml" => &[&T_vnd_wap_wbxml_application],
+"application/x-ibooks+zip" => &[&T_x_ibooks_zip_application],
+"application/vnd.poc.group-advertisement+xml" => &[&T_vnd_poc_group_advertisement_xml_application],
+"application/vnd.pocketlearn" => &[&T_vnd_pocketlearn_application],
+"application/vnd.framemaker" => &[&T_vnd_framemaker_application],
+"application/x-mysql-misam-data" => &[&T_x_mysql_misam_data_application],
+"image/vnd.dgn" => &[&T_vnd_dgn_image],
+"application/whoispp-query" => &[&T_whoispp_query_application],
+"text/parityfec" => &[&T_parityfec_text],
+"application/vnd.visio" => &[&T_vnd_visio_application],
+"application/vnd.novadigm.edx" => &[&T_vnd_novadigm_edx_application],
+"application/vnd.yamaha.smaf-audio" => &[&T_vnd_yamaha_smaf_audio_application],
+"application/beep+xml" => &[&T_beep_xml_application],
+"application/vnd.ipunplugged.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
+"application/x-hwp" => &[&T_x_hwp_application],
+"video/example" => &[&T_example_video],
+"message/global-headers" => &[&T_global_headers_message],
+"application/vnd.3gpp2.bcmcsinfo+xml" => &[&T_vnd_3gpp2_bcmcsinfo_xml_application],
+"application/vnd.lotus-freelance" => &[&T_vnd_lotus_freelance_application],
+"application/vnd.etsi.iptvsad-npvr+xml" => &[&T_vnd_etsi_iptvsad_npvr_xml_application],
+"application/x-vnd.oasis.opendocument.formula-template" => &[&T_vnd_oasis_opendocument_formula_template_application],
+"application/commonground" => &[&T_commonground_application],
+"application/vnd.dpgraph" => &[&T_vnd_dpgraph_application],
+"application/x-pdf" => &[&T_pdf_application],
+"application/news-groupinfo" => &[&T_news_groupinfo_application],
+"application/vnd.cups-pdf" => &[&T_vnd_cups_pdf_application],
+"application/vnd.oasis.opendocument.database" => &[&T_vnd_oasis_opendocument_base_application],
+"application/x-monotone-source-repo" => &[&T_x_monotone_source_repo_application],
+"application/x-sas" => &[&T_x_sas_application],
+"application/vnd.nervana" => &[&T_vnd_nervana_application],
+"video/mp4v-es" => &[&T_mp4v_es_video],
+"application/dwg" => &[&T_vnd_dwg_image],
+"application/x-isatab-assay" => &[&T_x_isatab_assay_application],
+"text/x-forth" => &[&T_x_forth_text],
+"application/x-sas-audit" => &[&T_x_sas_audit_application],
+"application/xcap-ns+xml" => &[&T_xcap_ns_xml_application],
+"message/disposition-notification" => &[&T_disposition_notification_message],
+"message/example" => &[&T_example_message],
+"text/red" => &[&T_red_text],
+"application/x-spectrum-tzx" => &[&T_x_spectrum_tzx_application],
+"application/onenote;format=one" => &[&T_onenote_format_one_application],
+"text/vnd.yaml" => &[&T_x_yaml_text],
+"video/rtp-enc-aescm128" => &[&T_rtp_enc_aescm128_video],
+"video/x-fli" => &[&T_x_fli_video],
+"audio/amr-wb+" => &[&T_amr_wb__audio],
+"application/x-font-otf" => &[&T_x_font_otf_application],
+"application/rtf" => &[&T_rtf_application],
+"image/hevc" => &[&T_heic_image],
+"application/pkixcmp" => &[&T_pkixcmp_application],
+"application/x-pkcs12" => &[&T_x_pkcs12_application],
+"application/vnd.bmi" => &[&T_vnd_bmi_application],
+"application/x-rar-compressed;version=5" => &[&T_x_rar_compressed_version_5_application],
+"text/x-yaml" => &[&T_x_yaml_text],
+"application/set-payment" => &[&T_set_payment_application],
+"application/vnd.frogans.fnc" => &[&T_vnd_frogans_fnc_application],
+"application/x-bplist" => &[&T_x_bplist_application],
+"application/vnd.japannet-verification" => &[&T_vnd_japannet_verification_application],
+"application/inf" => &[&T_inf_application],
+"application/scvp-vp-response" => &[&T_scvp_vp_response_application],
+"application/vnd.dir-bi.plate-dl-nosuffix" => &[&T_vnd_dir_bi_plate_dl_nosuffix_application],
+"application/vnd.ms-word.document.macroenabled.12" => &[&T_vnd_ms_word_document_macroenabled_12_application],
+"application/x-ms-compress-szdd" => &[&T_x_ms_compress_szdd_application],
+"application/envi.hdr" => &[&T_envi_hdr_application],
+"audio/parityfec" => &[&T_parityfec_audio],
+"application/x-java-jnilib" => &[&T_x_java_jnilib_application],
+"application/set-registration" => &[&T_set_registration_application],
+"application/vnd.crick.clicker.wordbank" => &[&T_vnd_crick_clicker_wordbank_application],
+"application/vnd.kde.kontour" => &[&T_vnd_kde_kontour_application],
+"application/applixware" => &[&T_applixware_application],
+"application/vnd.apple.iwork" => &[&T_vnd_apple_iwork_application],
+"application/vnd.openxmlformats-officedocument.presentationml.presentation" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
+"application/vnd.osgi.bundle" => &[&T_vnd_osgi_bundle_application],
+"application/x-arj" => &[&T_x_arj_application],
+"application/java-archive" => &[&T_java_archive_application],
+"application/x-mach-o-core" => &[&T_x_mach_o_core_application],
+"image/vnd.ms-modi" => &[&T_vnd_ms_modi_image],
+"application/gpx+xml" => &[&T_gpx_xml_application],
+"application/vnd.yamaha.hv-script" => &[&T_vnd_yamaha_hv_script_application],
+"application/x-ace-compressed" => &[&T_x_ace_compressed_application],
+"audio/ac3" => &[&T_ac3_audio],
+"gzip/document" => &[&T_gzip_application],
+"application/vnd.ms-opentype" => &[&T_x_font_otf_application],
+"image/prs.pti" => &[&T_prs_pti_image],
+"application/vnd.mobius.mbk" => &[&T_vnd_mobius_mbk_application],
+"image/jxr" => &[&T_jxr_image],
+"application/cellml+xml" => &[&T_cellml_xml_application],
+"model/vnd.dwfx+xps" => &[&T_vnd_dwfx_xps_model],
+"application/vnd.mif" => &[&T_vnd_mif_application],
+"application/vnd.mobius.plc" => &[&T_vnd_mobius_plc_application],
+"application/vnd.ms-outlook-pst" => &[&T_vnd_ms_outlook_pst_application],
+"application/zstd" => &[&T_zstd_application],
+"application/x-tika-ooxml" => &[&T_x_tika_ooxml_application],
+"text/vnd.curl.scurl" => &[&T_vnd_curl_scurl_text],
+"application/x-font-printer-metric" => &[&T_x_font_printer_metric_application],
+"audio/vnd.cmles.radio-events" => &[&T_vnd_cmles_radio_events_audio],
+"image/wmf" => &[&T_wmf_image],
+"application/vnd.uoml+xml" => &[&T_vnd_uoml_xml_application],
+"text/x-java-source" => &[&T_x_java_source_text],
+"application/vnd.syncml+xml" => &[&T_vnd_syncml_xml_application],
+"application/vnd.ms-excel.sheet.macroenabled.12" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
+"audio/x-psf" => &[&T_x_psf_audio],
+"application/scvp-vp-request" => &[&T_scvp_vp_request_application],
+"multipart/example" => &[&T_example_multipart],
+"application/photoshop" => &[&T_vnd_adobe_photoshop_image],
+"image/tiff" => &[&T_tiff_image],
+"application/dialog-info+xml" => &[&T_dialog_info_xml_application],
+"application/vnd.groove-tool-message" => &[&T_vnd_groove_tool_message_application],
+"application/vnd.unity" => &[&T_vnd_unity_application],
+"application/vnd.frogans.ltf" => &[&T_vnd_frogans_ltf_application],
+"model/e57" => &[&T_e57_model],
+"application/vnd.scribus" => &[&T_vnd_scribus_application],
+"image/vnd.dxf;format=ascii" => &[&T_vnd_dxf_format_ascii_image],
+"message/http" => &[&T_http_message],
+"audio/x-mp4a" => &[&T_mp4_audio],
+"application/vnd.immervision-ivp" => &[&T_vnd_immervision_ivp_application],
+"application/vnd.3gpp.sms" => &[&T_vnd_3gpp_sms_application],
+"application/vnd.ms-excel.sheet.binary.macroenabled.12" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
+"application/x-msmediaview" => &[&T_x_msmediaview_application],
+"video/3gpp-tt" => &[&T_3gpp_tt_video],
+"application/x-ole-storage" => &[&T_x_ole_storage_application],
+"image/x-cmx" => &[&T_x_cmx_image],
+"application/fits" => &[&T_fits_application],
+"application/x-esri-spatially-enabled-db" => &[&T_x_esri_spatially_enabled_db_application],
+"application/h224" => &[&T_h224_application],
+"application/vnd.yamaha.hv-voice" => &[&T_vnd_yamaha_hv_voice_application],
+"application/vnd.uplanet.listcmd" => &[&T_vnd_uplanet_listcmd_application],
+"application/x400-bp" => &[&T_x400_bp_application],
+"application/vnd.uplanet.alert" => &[&T_vnd_uplanet_alert_application],
+"application/vnd.palm" => &[&T_vnd_palm_application],
+"application/vnd.kde.kformula" => &[&T_vnd_kde_kformula_application],
+"application/vnd.lotus-1-2-3;version=97+9.x" => &[&T_vnd_lotus_1_2_3_version_97_9_x_application],
+"application/edi-consent" => &[&T_edi_consent_application],
+"audio/wav" => &[&T_vnd_wave_audio],
+"application/vnd.lotus-notes" => &[&T_vnd_lotus_notes_application],
+"video/x-theora" => &[&T_theora_video],
+"application/x-mbtiles" => &[&T_x_mbtiles_application],
+"application/vnd.meridian-slingshot" => &[&T_vnd_meridian_slingshot_application],
+"model/vnd.dwf;version=2" => &[&T_vnd_dwf_version_2_model],
+"application/x-vnd.oasis.opendocument.presentation" => &[&T_vnd_oasis_opendocument_presentation_application],
+"audio/vnd.vmx.cvsd" => &[&T_vnd_vmx_cvsd_audio],
+"application/x-plist" => &[&T_x_plist_application],
+"application/vnd.sealed.xls" => &[&T_vnd_sealed_xls_application],
+"application/vnd.zzazz.deck+xml" => &[&T_vnd_zzazz_deck_xml_application],
+"application/vnd.ms-excel.sheet.3" => &[&T_vnd_ms_excel_sheet_3_application],
+"font/sfnt" => &[&T_x_font_ttf_application],
+"application/vnd.oma.bcast.associated-procedure-parameter+xml" => &[&T_vnd_oma_bcast_associated_procedure_parameter_xml_application],
+"video/vnd.iptvforum.2dparityfec-1010" => &[&T_vnd_iptvforum_2dparityfec_1010_video],
+"text/html" => &[&T_html_text],
+"application/isup" => &[&T_isup_application],
+"image/ief" => &[&T_ief_image],
+"audio/vnd.nuera.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
+"application/manifest+json" => &[&T_manifest_json_application],
+"application/x-cdf" => &[&T_x_cdf_application],
+"text/vnd.wap.wmlscript" => &[&T_vnd_wap_wmlscript_text],
+"application/x-vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
+"application/vnd.etsi.mcid+xml" => &[&T_vnd_etsi_mcid_xml_application],
+"text/x-actionscript" => &[&T_x_actionscript_text],
+"image/x-canon-cr3" => &[&T_x_canon_cr3_image],
+"application/x-font-type1" => &[&T_x_font_type1_application],
+"application/x-sas-itemstor" => &[&T_x_sas_itemstor_application],
+"application/x-zip-compressed" => &[&T_zip_application],
+"application/macwriteii" => &[&T_macwriteii_application],
+"application/x-jigdo" => &[&T_x_jigdo_application],
+"application/x-executable" => &[&T_x_executable_application],
+"application/vnd.adobe.aftereffects.template" => &[&T_vnd_adobe_aftereffects_template_application],
+"application/vnd.kodak-descriptor" => &[&T_vnd_kodak_descriptor_application],
+"application/x-java-pack200" => &[&T_x_java_pack200_application],
+"image/vnd.sealed.png" => &[&T_vnd_sealed_png_image],
+"model/vnd.gs.gdl" => &[&T_vnd_gs_gdl_model],
+"application/x-brotli" => &[&T_x_brotli_application],
+"audio/vnd.dlna.adts" => &[&T_vnd_dlna_adts_audio],
+"image/x-xbitmap" => &[&T_x_xbitmap_image],
+"application/x-troff-ms" => &[&T_troff_text],
+"text/x-lex" => &[&T_x_lex_text],
+"application/vnd.contact.cmsg" => &[&T_vnd_contact_cmsg_application],
+"application/vnd.igloader" => &[&T_vnd_igloader_application],
+"application/vnd.ms-wmdrm.lic-chlg-req" => &[&T_vnd_ms_wmdrm_lic_chlg_req_application],
+"text/vnd.esmertec.theme-descriptor" => &[&T_vnd_esmertec_theme_descriptor_text],
+"application/vnd.3gpp2.sms" => &[&T_vnd_3gpp2_sms_application],
+"application/vnd.ffsns" => &[&T_vnd_ffsns_application],
+"application/vnd.recordare.musicxml" => &[&T_vnd_recordare_musicxml_application],
+"audio/vnd.everad.plj" => &[&T_vnd_everad_plj_audio],
+"application/vnd.stardivision.writer" => &[&T_vnd_stardivision_writer_application],
+"application/x-rpm" => &[&T_x_rpm_application],
+"application/vnd.uplanet.cacheop" => &[&T_vnd_uplanet_cacheop_application],
+"application/vnd.groove-account" => &[&T_vnd_groove_account_application],
+"application/vnd.chemdraw+xml" => &[&T_vnd_chemdraw_xml_application],
+"application/vnd.oasis.opendocument.flat.spreadsheet" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
+"image/vnd.dxf;format=binary" => &[&T_vnd_dxf_format_binary_image],
+"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
+"application/wasm" => &[&T_wasm_application],
+"application/x-sas-utility" => &[&T_x_sas_utility_application],
+"application/x-dvi" => &[&T_x_dvi_application],
+"application/vnd.ms-powerpoint.addin.macroenabled.12" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
+"text/vnd.fmi.flexstor" => &[&T_vnd_fmi_flexstor_text],
+"application/x-windows-installer" => &[&T_x_ms_installer_application],
+"audio/vnd.dolby.heaac.2" => &[&T_vnd_dolby_heaac_2_audio],
+"application/vnd.geometry-explorer" => &[&T_vnd_geometry_explorer_application],
+"application/vnd.llamagraphics.life-balance.exchange+xml" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
+"application/x-sh" => &[&T_x_sh_application],
+"application/vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
+"application/xcap-el+xml" => &[&T_xcap_el_xml_application],
+"image/xcf" => &[&T_x_xcf_image],
+"application/mbms-deregister+xml" => &[&T_mbms_deregister_xml_application],
+"application/x-vnd.oasis.opendocument.text-master" => &[&T_vnd_oasis_opendocument_text_master_application],
+"application/vnd.ms-excel.addin.macroenabled.12" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
+"text/vnd.graphviz" => &[&T_vnd_graphviz_text],
+"application/vnd.powerbuilder6-s" => &[&T_vnd_powerbuilder6_s_application],
+"application/vnd.hhe.lesson-player" => &[&T_vnd_hhe_lesson_player_application],
+"application/vnd.lotus-1-2-3" => &[&T_vnd_lotus_1_2_3_application],
+"application/vnd.groove-injector" => &[&T_vnd_groove_injector_application],
+"application/prs.plucker" => &[&T_prs_plucker_application],
+"text/x-perl" => &[&T_x_perl_text],
+"video/3gpp" => &[&T_3gpp_video],
+"application/vnd.ibm.secure-container" => &[&T_vnd_ibm_secure_container_application],
+"application/vnd.motorola.flexsuite.kmr" => &[&T_vnd_motorola_flexsuite_kmr_application],
+"application/pkcs7-signature" => &[&T_pkcs7_signature_application],
+"application/vnd.sun.xml.draw.template" => &[&T_vnd_sun_xml_draw_template_application],
+"application/x-tika-msoffice-embedded;format=ole10_native" => &[&T_x_tika_msoffice_embedded_format_ole10_native_application],
+"text/vnd.in3d.3dml" => &[&T_vnd_in3d_3dml_text],
+"application/x-vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
+"audio/webm" => &[&T_webm_audio],
+"image/x-raw-imacon" => &[&T_x_raw_imacon_image],
+"application/vnd.mindjet.mindmanager" => &[&T_vnd_mindjet_mindmanager_application],
+"text/x-rexx" => &[&T_x_rexx_text],
+"application/mikey" => &[&T_mikey_application],
+"application/vnd.fut-misnet" => &[&T_vnd_fut_misnet_application],
+"text/x-ocaml" => &[&T_x_ocaml_text],
+"application/reginfo+xml" => &[&T_reginfo_xml_application],
+"application/x-msi" => &[&T_x_ms_installer_application],
+"application/vnd.dxr" => &[&T_vnd_dxr_application],
+"application/vnd.epson.salt" => &[&T_vnd_epson_salt_application],
+"application/vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
+"application/vnd.ms-visio" => &[&T_vnd_visio_application],
+"text/sgml" => &[&T_sgml_text],
+"audio/smv-qcp" => &[&T_smv_qcp_audio],
+"application/vnd.oma.bcast.stkm" => &[&T_vnd_oma_bcast_stkm_application],
+"application/x-font-vfont" => &[&T_x_font_vfont_application],
+"application/vnd.kidspiration" => &[&T_vnd_kidspiration_application],
+"application/vnd.mophun.application" => &[&T_vnd_mophun_application_application],
+"application/x-mif" => &[&T_vnd_mif_application],
+"application/vnd.spotfire.dxp" => &[&T_vnd_spotfire_dxp_application],
+"video/vnd.objectvideo" => &[&T_vnd_objectvideo_video],
+"audio/dsr-es202211" => &[&T_dsr_es202211_audio],
+"application/x-httpd-jsp" => &[&T_x_jsp_text],
+"video/vnd.iptvforum.2dparityfec-2005" => &[&T_vnd_iptvforum_2dparityfec_2005_video],
+"video/quicktime" => &[&T_quicktime_video],
+"application/vnd.ms-powerpoint.slide.macroenabled.12" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
+"application/vnd.cab-jscript" => &[&T_vnd_cab_jscript_application],
+"image/x-portable-graymap" => &[&T_x_portable_graymap_image],
+"audio/l24" => &[&T_l24_audio],
+"message/tracking-status" => &[&T_tracking_status_message],
+"application/vnd.smart.teacher" => &[&T_vnd_smart_teacher_application],
+"message/global" => &[&T_global_message],
+"application/vnd.oasis.opendocument.text-web" => &[&T_vnd_oasis_opendocument_text_web_application],
+"application/x-fossil-checkout" => &[&T_x_fossil_checkout_application],
+"application/set-registration-initiation" => &[&T_set_registration_initiation_application],
+"audio/aac" => &[&T_x_aac_audio],
+"application/vnd.mcd" => &[&T_vnd_mcd_application],
+"audio/x-mpeg" => &[&T_mpeg_audio],
+"text/dns" => &[&T_dns_text],
+"application/x-iso9660-image" => &[&T_x_iso9660_image_application],
+"application/vnd.software602.filler.form+xml" => &[&T_vnd_software602_filler_form_xml_application],
+"application/vnd.yamaha.smaf-phrase" => &[&T_vnd_yamaha_smaf_phrase_application],
+"video/h264" => &[&T_h264_video],
+"application/x-stata-dta;version=13" => &[&T_x_stata_dta_version_13_application],
+"application/vnd.geogebra.tool" => &[&T_vnd_geogebra_tool_application],
+"application/conference-info+xml" => &[&T_conference_info_xml_application],
+"audio/eac3" => &[&T_eac3_audio],
+"application/vnd.etsi.cug+xml" => &[&T_vnd_etsi_cug_xml_application],
+"audio/vnd.nortel.vbk" => &[&T_vnd_nortel_vbk_audio],
+"text/vnd.motorola.reflex" => &[&T_vnd_motorola_reflex_text],
+"application/vnd.neurolanguage.nlu" => &[&T_vnd_neurolanguage_nlu_application],
+"text/x-csrc" => &[&T_x_c_text],
+"application/vnd.music-niff" => &[&T_vnd_music_niff_application],
+"application/vnd.ms-powerpoint.presentation.macroenabled.12" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
+"application/x-quattro-pro;version=1+5" => &[&T_x_quattro_pro_version_1_5_application],
+"audio/x-ms-wma" => &[&T_x_ms_wma_audio],
+"video/mp1s" => &[&T_mp1s_video],
+"application/vnd.crick.clicker.template" => &[&T_vnd_crick_clicker_template_application],
+"application/resource-lists-diff+xml" => &[&T_resource_lists_diff_xml_application],
+"application/x-vhd" => &[&T_x_vhd_application],
+"audio/t38" => &[&T_t38_audio],
+"audio/x-aac" => &[&T_x_aac_audio],
+"application/vnd.proteus.magazine" => &[&T_vnd_proteus_magazine_application],
+"application/vnd.omaloc-supl-init" => &[&T_vnd_omaloc_supl_init_application],
+"application/xcap-att+xml" => &[&T_xcap_att_xml_application],
+"application/xml-dtd" => &[&T_xml_dtd_application],
+"application/x-mysql-table-definition" => &[&T_x_mysql_table_definition_application],
+"application/x-dvd-ifo" => &[&T_x_dvd_ifo_application],
+"application/x-gzip" => &[&T_gzip_application],
+"application/x-mach-o-dylib" => &[&T_x_mach_o_dylib_application],
+"image/vnd.mozilla.apng" => &[&T_vnd_mozilla_apng_image],
+"application/gzip-compressed" => &[&T_gzip_application],
+"application/vnd.ms-ims" => &[&T_vnd_ms_ims_application],
+"application/x-fictionbook+xml" => &[&T_x_fictionbook_xml_application],
+"audio/amr-nb" => &[&T_amr_audio],
+"application/x-msdownload;format=pe64" => &[&T_x_msdownload_format_pe64_application],
+"audio/l20" => &[&T_l20_audio],
+"application/x-font-pcf" => &[&T_x_font_pcf_application],
+"application/cybercash" => &[&T_cybercash_application],
+"application/x-berkeley-db" => &[&T_x_berkeley_db_application],
+"application/x-ms-application" => &[&T_x_ms_application_application],
+"application/vnd.sss-dtf" => &[&T_vnd_sss_dtf_application],
+"application/x-kspread" => &[&T_vnd_kde_kspread_application],
+"video/jpm" => &[&T_jpm_image],
+"application/vnd.anser-web-funds-transfer-initiation" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
+"application/x-sv4crc" => &[&T_x_sv4crc_application],
+"application/sieve" => &[&T_sieve_application],
+"audio/vorbis-config" => &[&T_vorbis_config_audio],
+"application/vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
+"application/x-amf" => &[&T_x_amf_application],
+"application/x-sas-data" => &[&T_x_sas_data_application],
+"application/x-gnucash" => &[&T_x_gnucash_application],
+"application/vnd.uplanet.channel" => &[&T_vnd_uplanet_channel_application],
+"application/scvp-cv-request" => &[&T_scvp_cv_request_application],
+"application/vnd.hp-hpid" => &[&T_vnd_hp_hpid_application],
+"application/vnd.truedoc" => &[&T_vnd_truedoc_application],
+"application/mbms-envelope+xml" => &[&T_mbms_envelope_xml_application],
+"application/dicom" => &[&T_dicom_application],
+"application/vnd.fujixerox.hbpl" => &[&T_vnd_fujixerox_hbpl_application],
+"application/vnd.sss-ntf" => &[&T_vnd_sss_ntf_application],
+"application/x-font-dos" => &[&T_x_font_dos_application],
+"application/qsig" => &[&T_qsig_application],
+"application/vnd.ezpix-album" => &[&T_vnd_ezpix_album_application],
+"application/vnd.multiad.creator.cif" => &[&T_vnd_multiad_creator_cif_application],
+"audio/32kadpcm" => &[&T_32kadpcm_audio],
+"model/vnd.flatland.3dml" => &[&T_vnd_flatland_3dml_model],
+"application/ssml+xml" => &[&T_ssml_xml_application],
+"application/x-vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
+"application/vnd.yellowriver-custom-menu" => &[&T_vnd_yellowriver_custom_menu_application],
+"application/vnd.etsi.sci+xml" => &[&T_vnd_etsi_sci_xml_application],
+"image/jpm" => &[&T_jpm_image],
+"application/x-corelpresentations" => &[&T_x_corelpresentations_application],
+"application/vnd.handheld-entertainment+xml" => &[&T_vnd_handheld_entertainment_xml_application],
+"application/vnd.mobius.msl" => &[&T_vnd_mobius_msl_application],
+"video/mpv" => &[&T_mpv_video],
+"application/xspf+xml" => &[&T_xspf_xml_application],
+"application/vnd.acucobol" => &[&T_vnd_acucobol_application],
+"text/x-erlang" => &[&T_x_erlang_text],
+"application/vnd.joost.joda-archive" => &[&T_vnd_joost_joda_archive_application],
+"text/x-rst" => &[&T_x_rst_text],
+"application/dita+xml;format=task" => &[&T_dita_xml_format_task_application],
+"audio/x-m4a" => &[&T_mp4_audio],
+"application/vnd.otps.ct-kip+xml" => &[&T_vnd_otps_ct_kip_xml_application],
+"application/vnd.motorola.flexsuite.fis" => &[&T_vnd_motorola_flexsuite_fis_application],
+"application/x-yaml" => &[&T_x_yaml_text],
+"audio/vnd.cisco.nse" => &[&T_vnd_cisco_nse_audio],
+"application/vnd.oasis.opendocument.flat.presentation" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
+"application/vnd.intertrust.nncp" => &[&T_vnd_intertrust_nncp_application],
+"application/vnd.oasis.opendocument.flat.text" => &[&T_vnd_oasis_opendocument_flat_text_application],
+"text/vnd.wap.sl" => &[&T_vnd_wap_sl_text],
+"video/rtx" => &[&T_rtx_video],
+"application/vnd.aether.imp" => &[&T_vnd_aether_imp_application],
+"application/vnd.oma.bcast.ltkm" => &[&T_vnd_oma_bcast_ltkm_application],
+"application/x-bzip" => &[&T_x_bzip_application],
+"application/x-x509-key;format=pem" => &[&T_x_x509_key_format_pem_application],
+"application/soap+fastinfoset" => &[&T_soap_fastinfoset_application],
+"application/mac-binhex40" => &[&T_mac_binhex40_application],
+"application/vnd.mozilla.xul+xml" => &[&T_vnd_mozilla_xul_xml_application],
+"application/vnd.picsel" => &[&T_vnd_picsel_application],
+"application/vnd.nokia.ncd" => &[&T_vnd_nokia_ncd_application],
+"text/x-uuencode" => &[&T_x_uuencode_text],
+"text/x-vcard" => &[&T_x_vcard_text],
+"application/vnd.paos.xml" => &[&T_vnd_paos_xml_application],
+"application/nss" => &[&T_nss_application],
+"application/vnd.curl.pcurl" => &[&T_vnd_curl_pcurl_application],
+"application/x-bittorrent" => &[&T_x_bittorrent_application],
+"image/x-raw-olympus" => &[&T_x_raw_olympus_image],
+"application/x-berkeley-db;format=btree;version=3" => &[&T_x_berkeley_db_format_btree_version_3_application],
+"application/vnd.oma.poc.groups+xml" => &[&T_vnd_oma_poc_groups_xml_application],
+"application/x-latex" => &[&T_x_latex_application],
+"application/x-msdownload;format=pe-arm7" => &[&T_x_msdownload_format_pe_arm7_application],
+"application/index.cmd" => &[&T_index_cmd_application],
+"chemical/x-cml" => &[&T_x_cml_chemical],
+"application/vnd.hcl-bireports" => &[&T_vnd_hcl_bireports_application],
+"chemical/x-pdb" => &[&T_x_pdb_chemical],
+"video/x-sgi-movie" => &[&T_x_sgi_movie_video],
+"application/x-troff" => &[&T_troff_text],
+"application/gml+xml" => &[&T_gml_xml_application],
+"application/ulpfec" => &[&T_ulpfec_application],
+"application/vnd.quark.quarkxpress" => &[&T_vnd_quark_quarkxpress_application],
+"application/x-gzip-compressed" => &[&T_gzip_application],
+"application/vnd.3gpp.bsf+xml" => &[&T_vnd_3gpp_bsf_xml_application],
+"application/mathematica" => &[&T_mathematica_application],
+"application/x-vnd.oasis.opendocument.chart-template" => &[&T_vnd_oasis_opendocument_chart_template_application],
+"application/vnd.nokia.landmarkcollection+xml" => &[&T_vnd_nokia_landmarkcollection_xml_application],
+"application/vnd.omads-folder+xml" => &[&T_vnd_omads_folder_xml_application],
+"video/iso.segment" => &[&T_iso_segment_video],
+"video/jpeg" => &[&T_jpeg_video],
+"application/vnd.genomatix.tuxedo" => &[&T_vnd_genomatix_tuxedo_application],
+"application/x-geopackage; version=1.1Or1.0" => &[&T_x_geopackage__version_1_1Or1_0_application],
+"application/pidf+xml" => &[&T_pidf_xml_application],
+"message/global-disposition-notification" => &[&T_global_disposition_notification_message],
+"application/scvp-cv-response" => &[&T_scvp_cv_response_application],
+"application/x-itunes-bplist" => &[&T_x_itunes_bplist_application],
+"audio/ogg" => &[&T_ogg_audio],
+"model/vnd.collada+xml" => &[&T_vnd_collada_xml_model],
+"application/x-yml" => &[&T_x_yaml_text],
+"application/vnd.mophun.certificate" => &[&T_vnd_mophun_certificate_application],
+"application/x-berkeley-db;format=btree" => &[&T_x_berkeley_db_format_btree_application],
+"application/x-sfdu" => &[&T_x_sfdu_application],
+"text/vnd.fly" => &[&T_vnd_fly_text],
+"application/vnd.openxmlformats-officedocument.spreadsheetml.template" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
+"application/x-xliff+xml" => &[&T_x_xliff_xml_application],
+"application/x-java" => &[&T_java_vm_application],
+"application/vnd.oma.xcap-directory+xml" => &[&T_vnd_oma_xcap_directory_xml_application],
+"application/vnd.oma-scws-http-request" => &[&T_vnd_oma_scws_http_request_application],
+"application/x-sas-dmdb" => &[&T_x_sas_dmdb_application],
+"application/vnd.openxmlformats-officedocument.presentationml.template" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
+"application/vnd.adobe.indesign-idml-package" => &[&T_vnd_adobe_indesign_idml_package_application],
+"application/x-msdownload;format=pe32" => &[&T_x_msdownload_format_pe32_application],
+"application/x-stata-dta;version=14" => &[&T_x_stata_dta_version_14_application],
+"application/xslt+xml" => &[&T_xslt_xml_application],
+"application/vnd.dvb.notif-init+xml" => &[&T_vnd_dvb_notif_init_xml_application],
+"application/vnd.japannet-registration-wakeup" => &[&T_vnd_japannet_registration_wakeup_application],
+"audio/vnd.dolby.heaac.1" => &[&T_vnd_dolby_heaac_1_audio],
+"application/msword5" => &[&T_msword5_application],
+"application/vnd.vsf" => &[&T_vnd_vsf_application],
+"multipart/signed" => &[&T_signed_multipart],
+"application/atomcat+xml" => &[&T_atomcat_xml_application],
+"application/vnd.oma.bcast.imd+xml" => &[&T_vnd_oma_bcast_imd_xml_application],
+"text/x-rsrc" => &[&T_x_rsrc_text],
+"audio/dsr-es202050" => &[&T_dsr_es202050_audio],
+"application/vnd.pwg-xhtml-print+xml" => &[&T_vnd_pwg_xhtml_print_xml_application],
+"application/mosskey-data" => &[&T_mosskey_data_application],
+"text/x-texinfo" => &[&T_x_texinfo_application],
+"application/x-sharedlib" => &[&T_x_sharedlib_application],
+"application/x-font-sunos-news" => &[&T_x_font_sunos_news_application],
+"video/x-ogg-uvs" => &[&T_x_ogguvs_video],
+"audio/speex" => &[&T_speex_audio],
+"application/vnd.fujixerox.docuworks" => &[&T_vnd_fujixerox_docuworks_application],
+"application/vnd.nokia.landmark+xml" => &[&T_vnd_nokia_landmark_xml_application],
+"application/vnd.vidsoft.vidconference" => &[&T_vnd_vidsoft_vidconference_application],
+"application/vnd.sun.xml.writer.global" => &[&T_vnd_sun_xml_writer_global_application],
+"text/x-prolog" => &[&T_x_prolog_text],
+"application/vnd.lotus-1-2-3;version=4" => &[&T_vnd_lotus_1_2_3_version_4_application],
+"application/x-tcl" => &[&T_x_tcl_text],
+"application/vnd.ms-word.template.macroenabled.12" => &[&T_vnd_ms_word_template_macroenabled_12_application],
+"audio/vnd.dolby.pl2" => &[&T_vnd_dolby_pl2_audio],
+"application/vnd.fujitsu.oasys3" => &[&T_vnd_fujitsu_oasys3_application],
+"video/smpte292m" => &[&T_smpte292m_video],
+"application/x-ogg" => &[&T_ogg_application,&T_vorbis_audio],
+"application/x-spss-sav" => &[&T_x_spss_sav_application],
+"audio/evrcb" => &[&T_evrcb_audio],
+"application/vnd.fujixerox.ddd" => &[&T_vnd_fujixerox_ddd_application],
+"audio/g723" => &[&T_g723_audio],
+"application/vnd.shp" => &[&T_vnd_shp_application],
+"application/vnd.lotus-1-2-3;version=1" => &[&T_vnd_lotus_1_2_3_version_1_application],
+"application/vnd.garmin.tcx+xml" => &[&T_vnd_garmin_tcx_xml_application],
+"application/vnd.businessobjects" => &[&T_vnd_businessobjects_application],
+"audio/vnd.nuera.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
+"image/x-bmp" => &[&T_bmp_image],
+"video/celb" => &[&T_celb_video],
+"model/vrml" => &[&T_vrml_model],
+"application/vnd.curl.car" => &[&T_vnd_curl_car_application],
+"chemical/x-cmdf" => &[&T_x_cmdf_chemical],
+"application/binhex" => &[&T_mac_binhex40_application],
+"text/x-assembly" => &[&T_x_assembly_text],
+"application/vnd.marlin.drm.actiontoken+xml" => &[&T_vnd_marlin_drm_actiontoken_xml_application],
+"application/vnd.ms-htmlhelp" => &[&T_vnd_ms_htmlhelp_application],
+"text/x-ml" => &[&T_x_ml_text],
+"text/x-pascal" => &[&T_x_pascal_text],
+"application/vnd.wap.wmlscriptc" => &[&T_vnd_wap_wmlscriptc_application],
+"application/pkcs10" => &[&T_pkcs10_application],
+"application/vnd.flographit" => &[&T_vnd_flographit_application],
+"application/vnd.dvb.notif-ia-registration-request+xml" => &[&T_vnd_dvb_notif_ia_registration_request_xml_application],
+"application/vnd.nokia.radio-preset" => &[&T_vnd_nokia_radio_preset_application],
+"application/vnd.micrografx.flo" => &[&T_vnd_micrografx_flo_application],
+"application/x-rar-compressed;version=4" => &[&T_x_rar_compressed_version_4_application],
+"application/font-tdpfr" => &[&T_font_tdpfr_application],
+"application/vnd.s3sms" => &[&T_vnd_s3sms_application],
+"audio/vnd.dolby.pl2x" => &[&T_vnd_dolby_pl2x_audio],
+"application/vnd.ms-visio.drawing.macroEnabled.12" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
+"image/avif" => &[&T_avif_image],
+"audio/x-dec-basic" => &[&T_x_dec_basic_audio],
+"application/rlmi+xml" => &[&T_rlmi_xml_application],
+"application/pics-rules" => &[&T_pics_rules_application],
+"application/vnd.cups-raw" => &[&T_vnd_cups_raw_application],
+"application/sldworks" => &[&T_sldworks_application],
+"application/x-project" => &[&T_x_project_application],
+"application/vnd.oma.poc.detailed-progress-report+xml" => &[&T_vnd_oma_poc_detailed_progress_report_xml_application],
+"application/vnd.ibm.minipay" => &[&T_vnd_ibm_minipay_application],
+"audio/x-sap" => &[&T_x_sap_audio],
+"application/vnd.fujitsu.oasys2" => &[&T_vnd_fujitsu_oasys2_application],
+"model/vnd.parasolid.transmit.binary" => &[&T_vnd_parasolid_transmit_binary_model],
+"audio/t140c" => &[&T_t140c_audio],
+"application/xslfo+xml" => &[&T_xslfo_xml_application],
+"image/vnd.fastbidsheet" => &[&T_vnd_fastbidsheet_image],
+"application/mpeg4-iod" => &[&T_mpeg4_iod_application],
+"application/vnd.oasis.opendocument.base" => &[&T_vnd_oasis_opendocument_base_application],
+"audio/g728" => &[&T_g728_audio],
+"audio/pcmu-wb" => &[&T_pcmu_wb_audio],
+"application/eshop" => &[&T_eshop_application],
+"application/mbms-register-response+xml" => &[&T_mbms_register_response_xml_application],
+"application/x-vnd.oasis.opendocument.image-template" => &[&T_vnd_oasis_opendocument_image_template_application],
+"application/vnd.xara" => &[&T_vnd_xara_application],
+"application/x-httpresponse" => &[&T_x_httpresponse_application],
+"text/rfc822-headers" => &[&T_rfc822_headers_text],
+"application/x-killustrator" => &[&T_x_killustrator_application],
+"application/ocsp-request" => &[&T_ocsp_request_application],
+"application/x-vnd.oasis.opendocument.text-template" => &[&T_vnd_oasis_opendocument_text_template_application],
+"application/vnd.wordperfect;version=4.2" => &[&T_vnd_wordperfect_version_4_2_application],
+"application/x-mach-o-executable" => &[&T_x_mach_o_executable_application],
+"application/xmpp+xml" => &[&T_xmpp_xml_application],
+"application/vnd.xmpie.plan" => &[&T_vnd_xmpie_plan_application],
+"text/x-stsrc" => &[&T_x_stsrc_text],
+"message/partial" => &[&T_partial_message],
+"audio/vnd.cns.anp1" => &[&T_vnd_cns_anp1_audio],
+"application/vnd.novadigm.edm" => &[&T_vnd_novadigm_edm_application],
+"application/marc" => &[&T_marc_application],
+"application/vnd.vd-study" => &[&T_vnd_vd_study_application],
+"application/vnd.autopackage" => &[&T_vnd_autopackage_application],
+"application/vividence.scriptfile" => &[&T_vividence_scriptfile_application],
+"application/x-msterminal" => &[&T_x_msterminal_application],
+"image/x-jbig2" => &[&T_x_jbig2_image],
+"application/vnd.wolfram.wl" => &[&T_vnd_wolfram_wl_application],
+"application/x-x509-key;format=der" => &[&T_x_x509_key_format_der_application],
+"image/x-raw-leaf" => &[&T_x_raw_leaf_image],
+"text/aspdotnet" => &[&T_aspdotnet_text],
+"application/x-xfig" => &[&T_x_xfig_application],
+"application/x-compress" => &[&T_x_compress_application],
+"application/vnd.fujixerox.docuworks.binder" => &[&T_vnd_fujixerox_docuworks_binder_application],
+"multipart/byteranges" => &[&T_byteranges_multipart],
+"video/x-flv" => &[&T_x_flv_video],
+"application/vnd.mobius.txf" => &[&T_vnd_mobius_txf_application],
+"application/vnd.fints" => &[&T_vnd_fints_application],
+"application/x-font-adobe-metric" => &[&T_x_font_adobe_metric_application],
+"video/parityfec" => &[&T_parityfec_video],
+"application/x-vnd.sun.xml.writer" => &[&T_vnd_sun_xml_writer_application],
+"application/vnd.ctc-posml" => &[&T_vnd_ctc_posml_application],
+"application/vnd.irepository.package+xml" => &[&T_vnd_irepository_package_xml_application],
+"audio/musepack" => &[&T_musepack_audio],
+"application/vnd.wqd" => &[&T_vnd_wqd_application],
+"audio/red" => &[&T_red_audio],
+"text/t140" => &[&T_t140_text],
+"video/vnd.iptvforum.1dparityfec-2005" => &[&T_vnd_iptvforum_1dparityfec_2005_video],
+"application/vnd.emclient.accessrequest+xml" => &[&T_vnd_emclient_accessrequest_xml_application],
+"text/x-d" => &[&T_x_d_text],
+"application/x-vnd.oasis.opendocument.image" => &[&T_vnd_oasis_opendocument_image_application],
+"application/mxf" => &[&T_mxf_application],
+"audio/evrc-qcp" => &[&T_evrc_qcp_audio],
+"application/xcap-error+xml" => &[&T_xcap_error_xml_application],
+"application/vnd.wmc" => &[&T_vnd_wmc_application],
+"application/vnd.wmf.bootstrap" => &[&T_vnd_wmf_bootstrap_application],
+"application/vnd.adobe.air-application-installer-package+zip" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
+"application/vnd.fujitsu.oasys" => &[&T_vnd_fujitsu_oasys_application],
+"application/vnd.oasis.opendocument.chart" => &[&T_vnd_oasis_opendocument_chart_application],
+"audio/g729" => &[&T_g729_audio],
+"image/x-portable-arbitrarymap" => &[&T_x_portable_arbitrarymap_image],
+"image/example" => &[&T_example_image],
+"text/x-setext" => &[&T_x_setext_text],
+"application/vnd.ncd.reference" => &[&T_vnd_ncd_reference_application],
+"application/cnrp+xml" => &[&T_cnrp_xml_application],
+"application/x-msaccess" => &[&T_x_msaccess_application],
+"application/x-ms-installer" => &[&T_x_ms_installer_application],
+"application/vnd.rim.cod" => &[&T_vnd_rim_cod_application],
+"application/vnd.uplanet.alert-wbxml" => &[&T_vnd_uplanet_alert_wbxml_application],
+"application/x-fossil-repository" => &[&T_x_fossil_repository_application],
+"audio/rtp-midi" => &[&T_rtp_midi_audio],
+"image/t38" => &[&T_t38_image],
+"text/x-lua" => &[&T_x_lua_text],
+"application/vnd.triscape.mxs" => &[&T_vnd_triscape_mxs_application],
+"text/vnd.iptc.anpa" => &[&T_vnd_iptc_anpa_text],
+"application/gzip" => &[&T_gzip_application],
+"application/json" => &[&T_json_application],
+"application/vnd.shana.informed.package" => &[&T_vnd_shana_informed_package_application],
+"application/x-ms-shortcut" => &[&T_x_ms_shortcut_application],
+"audio/vnd.dolby.pl2z" => &[&T_vnd_dolby_pl2z_audio],
+"video/vnd.iptvforum.ttsavc" => &[&T_vnd_iptvforum_ttsavc_video],
+"application/x-xliff+zip" => &[&T_x_xliff_zip_application],
+"text/x-awk" => &[&T_x_awk_text],
+"font/otf" => &[&T_x_font_otf_application],
+"application/x-director" => &[&T_x_director_application],
+"application/vnd.trid.tpt" => &[&T_vnd_trid_tpt_application],
+"application/x-object" => &[&T_x_object_application],
+"audio/vnd.octel.sbc" => &[&T_vnd_octel_sbc_audio],
+"message/sipfrag" => &[&T_sipfrag_message],
+"application/vnd.svd" => &[&T_vnd_svd_application],
+"application/vnd.sun.xml.draw" => &[&T_vnd_sun_xml_draw_application],
+"application/vnd.kahootz" => &[&T_vnd_kahootz_application],
+"text/x-scss" => &[&T_x_scss_text],
+"application/x-tika-java-web-archive" => &[&T_x_tika_java_web_archive_application],
+"application/vnd.jcp.javame.midlet-rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
+"application/x-x509-key" => &[&T_x_x509_key_application],
+"image/x-raw-sony" => &[&T_x_raw_sony_image],
+"multipart/voice-message" => &[&T_voice_message_multipart],
+"application/vnd.chipnuts.karaoke-mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
+"application/x-mmm-digisonde" => &[&T_x_mmm_digisonde_application],
+"video/x-oggyuv" => &[&T_x_oggyuv_video],
+"application/x-elc" => &[&T_x_elc_application],
+"application/x-stuffit" => &[&T_x_stuffit_application],
+"video/vnd.motorola.video" => &[&T_vnd_motorola_video_video],
+"application/x-staroffice-template" => &[&T_x_staroffice_template_application],
+"application/rtx" => &[&T_rtx_application],
+"application/vnd.ms-excel" => &[&T_vnd_ms_excel_application],
+"text/x-yml" => &[&T_x_yaml_text],
+"image/vnd.mix" => &[&T_vnd_mix_image],
+"application/warc" => &[&T_warc_application],
+"chemical/x-cif" => &[&T_x_cif_chemical],
+"audio/vnd.hns.audio" => &[&T_vnd_hns_audio_audio],
+"application/vnd.iptc.g2.newsitem+xml" => &[&T_vnd_iptc_g2_newsitem_xml_application],
+"application/x-fat-diskimage" => &[&T_x_fat_diskimage_application],
+"video/vnd.nokia.interleaved-multimedia" => &[&T_vnd_nokia_interleaved_multimedia_video],
+"application/x-deflate" => &[&T_zlib_application],
+"application/x-speex" => &[&T_speex_audio],
+"video/h261" => &[&T_h261_video],
+"application/pkcs7-mime" => &[&T_pkcs7_mime_application],
+"application/vnd.etsi.iptvueprofile+xml" => &[&T_vnd_etsi_iptvueprofile_xml_application],
+"application/vnd.yamaha.hv-dic" => &[&T_vnd_yamaha_hv_dic_application],
+"application/riscos" => &[&T_riscos_application],
+"application/vnd.previewsystems.box" => &[&T_vnd_previewsystems_box_application],
+"application/vnd.cups-ppd" => &[&T_vnd_cups_ppd_application],
+"application/vnd.amazon.ebook" => &[&T_vnd_amazon_ebook_application],
+"application/vnd.route66.link66+xml" => &[&T_vnd_route66_link66_xml_application],
+"audio/vorbis" => &[&T_vorbis_audio],
+"image/x-cmu-raster" => &[&T_x_cmu_raster_image],
+"image/x-gimp-pat" => &[&T_x_gimp_pat_image],
+"application/x-7z-compressed" => &[&T_x_7z_compressed_application],
+"application/vnd.motorola.flexsuite.wem" => &[&T_vnd_motorola_flexsuite_wem_application],
+"application/x-sas-catalog" => &[&T_x_sas_catalog_application],
+"application/x-quattro-pro;version=5" => &[&T_x_quattro_pro_version_5_application],
+"text/asp" => &[&T_asp_text],
+"message/x-emlx" => &[&T_x_emlx_message],
+"application/vnd.cybank" => &[&T_vnd_cybank_application],
+"application/x-tar" => &[&T_x_tar_application],
+"application/vnd.etsi.iptvprofile+xml" => &[&T_vnd_etsi_iptvprofile_xml_application],
+"application/vnd.openofficeorg.autotext" => &[&T_vnd_openofficeorg_autotext_application],
+"application/vnd.zul" => &[&T_vnd_zul_application],
+"application/vnd.lotus-1-2-3;version=3" => &[&T_vnd_lotus_1_2_3_version_3_application],
+"application/vnd.sealedmedia.softseal.html" => &[&T_vnd_sealedmedia_softseal_html_application],
+"application/xhtml+xml" => &[&T_xhtml_xml_application],
+"application/prs.alvestrand.titrax-sheet" => &[&T_prs_alvestrand_titrax_sheet_application],
+"application/vnd.digilite.prolights" => &[&T_vnd_digilite_prolights_application],
+"application/x-Gnumeric-spreadsheet" => &[&T_x_gnumeric_application],
+"text/x-properties" => &[&T_x_java_properties_text],
+"application/postscript" => &[&T_postscript_application],
+"application/vnd.ms-project" => &[&T_vnd_ms_project_application],
+"application/wspolicy+xml" => &[&T_wspolicy_xml_application],
+"text/yaml" => &[&T_x_yaml_text],
+"application/sereal" => &[&T_sereal_application],
+"application/vnd.sun.xml.writer.template" => &[&T_vnd_sun_xml_writer_template_application],
+"text/x-c++src" => &[&T_x_c__src_text],
+"video/mj2" => &[&T_mj2_video],
+"application/x-mspublisher" => &[&T_x_mspublisher_application],
+"multipart/header-set" => &[&T_header_set_multipart],
+"application/moss-keys" => &[&T_moss_keys_application],
+"application/mac-compactpro" => &[&T_mac_compactpro_application],
+"application/iges" => &[&T_iges_application],
+"application/vnd.syncml.dm.notification" => &[&T_vnd_syncml_dm_notification_application],
+"audio/pcmu" => &[&T_pcmu_audio],
+"video/vnd.iptvforum.1dparityfec-1010" => &[&T_vnd_iptvforum_1dparityfec_1010_video],
+"video/x-flc" => &[&T_x_flc_video],
+"application/vnd.fsc.weblaunch" => &[&T_vnd_fsc_weblaunch_application],
+"application/x-adobe-indesign" => &[&T_x_adobe_indesign_application],
+"application/x-mimearchive" => &[&T_related_multipart],
+"application/vnd.micrografx.igx" => &[&T_vnd_micrografx_igx_application],
+"video/x-ogg-yuv" => &[&T_x_oggyuv_video],
+"application/x-authorware-map" => &[&T_x_authorware_map_application],
+"text/rtf" => &[&T_rtf_application],
+"audio/x-unknown" => &[&T_x_unknown_audio],
+"application/x-kword" => &[&T_vnd_kde_kword_application],
+"image/x-pcx" => &[&T_vnd_zbrush_pcx_image],
+"application/x-ms-wmd" => &[&T_x_ms_wmd_application],
+"application/vnd.motorola.flexsuite.gotap" => &[&T_vnd_motorola_flexsuite_gotap_application],
+"image/x-raw-fuji" => &[&T_x_raw_fuji_image],
+"multipart/encrypted" => &[&T_encrypted_multipart],
+"application/vnd.is-xpr" => &[&T_vnd_is_xpr_application],
+"image/x-raw-nikon" => &[&T_x_raw_nikon_image],
+"application/vnd.font-fontforge-sfd" => &[&T_vnd_font_fontforge_sfd_application],
+"application/quicktime" => &[&T_quicktime_application],
+"application/x-tex" => &[&T_x_tex_application],
+"application/x-java-vm" => &[&T_java_vm_application],
+"application/vnd.ecowin.chart" => &[&T_vnd_ecowin_chart_application],
+"application/vnd.sqlite3" => &[&T_x_sqlite3_application],
+"application/vnd.netfpx" => &[&T_vnd_netfpx_application],
+"image/vnd.dxb" => &[&T_vnd_dxb_image],
+"message/external-body" => &[&T_external_body_message],
+"text/x-cobol" => &[&T_x_cobol_text],
+"application/auth-policy+xml" => &[&T_auth_policy_xml_application],
+"application/csta+xml" => &[&T_csta_xml_application],
+"application/timestamp-reply" => &[&T_timestamp_reply_application],
+"application/vnd.fujixerox.art4" => &[&T_vnd_fujixerox_art4_application],
+"application/vnd.hp-pcl" => &[&T_vnd_hp_pcl_application],
+"application/x-setupscript" => &[&T_inf_application],
+"application/x-axcrypt" => &[&T_x_axcrypt_application],
+"application/vnd.renlearn.rlprint" => &[&T_vnd_renlearn_rlprint_application],
+"application/vnd.xmpie.cpkg" => &[&T_vnd_xmpie_cpkg_application],
+"application/x-berkeley-db;format=btree;version=4" => &[&T_x_berkeley_db_format_btree_version_4_application],
+"application/vnd.wv.ssp+xml" => &[&T_vnd_wv_ssp_xml_application],
+"text/x-makefile" => &[&T_x_makefile_text],
+"application/vnd.sun.wadl+xml" => &[&T_vnd_sun_wadl_xml_application],
+"application/fastsoap" => &[&T_fastsoap_application],
+"application/vnd.sealed.eml" => &[&T_vnd_sealed_eml_application],
+"text/x-asm" => &[&T_x_assembly_text],
+"image/x-raw-red" => &[&T_x_raw_red_image],
+"application/vnd.ms-powerpoint.template.macroenabled.12" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
+"application/mpeg4-iod-xmt" => &[&T_mpeg4_iod_xmt_application],
+"model/vnd.parasolid.transmit.text" => &[&T_vnd_parasolid_transmit_text_model],
+"application/x-font-ghostscript" => &[&T_x_font_ghostscript_application],
+"application/im-iscomposing+xml" => &[&T_im_iscomposing_xml_application],
+"application/x-netcdf" => &[&T_x_netcdf_application],
+"application/dca-rft" => &[&T_dca_rft_application],
+"application/gzipped" => &[&T_gzip_application],
+"text/x-chdr" => &[&T_x_chdr_text],
+"image/ntf" => &[&T_nitf_image],
+"application/vnd.nokia.conml+xml" => &[&T_vnd_nokia_conml_xml_application],
+"application/vnd.apple.installer+xml" => &[&T_vnd_apple_installer_xml_application],
+"application/mbms-protection-description+xml" => &[&T_mbms_protection_description_xml_application],
+"application/xcap-caps+xml" => &[&T_xcap_caps_xml_application],
+"audio/evrc" => &[&T_evrc_audio],
+"image/x-xwindowdump" => &[&T_x_xwindowdump_image],
+"application/vnd.xfdl" => &[&T_vnd_xfdl_application],
+"text/x-applescript" => &[&T_x_applescript_text],
+"application/vnd.oasis.opendocument.spreadsheet" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
+"text/x-tcl" => &[&T_x_tcl_text],
+"application/wordperfect5.1" => &[&T_wordperfect5_1_application],
+"application/vnd.epson.ssf" => &[&T_vnd_epson_ssf_application],
+"application/vnd.3gpp2.tcap" => &[&T_vnd_3gpp2_tcap_application],
+"video/x-ms-wmx" => &[&T_x_ms_wmx_video],
+"drawing/dwg" => &[&T_vnd_dwg_image],
+"model/vnd.mts" => &[&T_vnd_mts_model],
+"application/java-serialized-object" => &[&T_java_serialized_object_application],
+"multipart/parallel" => &[&T_parallel_multipart],
+"audio/opus" => &[&T_opus_audio],
+"application/vnd.musician" => &[&T_vnd_musician_application],
+"application/x-ms-reader" => &[&T_x_ms_reader_application],
+"application/vnd.audiograph" => &[&T_vnd_audiograph_application],
+"video/vnd.sealed.mpeg4" => &[&T_vnd_sealed_mpeg4_video],
+"application/x-sibelius" => &[&T_x_sibelius_application],
+"image/x-emf" => &[&T_emf_image],
+"application/x-stuffitx" => &[&T_x_stuffitx_application],
+"model/vnd.dwf" => &[&T_vnd_dwf_model],
+"text/vnd.curl" => &[&T_vnd_curl_text],
+"application/vnd.dynageo" => &[&T_vnd_dynageo_application],
+"application/vnd.apple.keynote" => &[&T_vnd_apple_keynote_application],
+"application/example" => &[&T_example_application],
+"text/x-less" => &[&T_x_less_text],
+"video/x-daala" => &[&T_daala_video],
+"application/vnd.japannet-setstore-wakeup" => &[&T_vnd_japannet_setstore_wakeup_application],
+"application/remote-printing" => &[&T_remote_printing_application],
+"text/x-vhdl" => &[&T_x_vhdl_text],
+"application/vnd.nokia.radio-presets" => &[&T_vnd_nokia_radio_presets_application],
+"application/vnd.gmx" => &[&T_vnd_gmx_application],
+"audio/evrcwb" => &[&T_evrcwb_audio],
+"video/x-ms-wmv" => &[&T_x_ms_wmv_video],
+"application/vnd.ibm.rights-management" => &[&T_vnd_ibm_rights_management_application],
+"application/vnd.sun.xml.impress" => &[&T_vnd_sun_xml_impress_application],
+"image/jpeg" => &[&T_jpeg_image],
+"application/vnd.fujixerox.art-ex" => &[&T_vnd_fujixerox_art_ex_application],
+"application/x-font-ttf" => &[&T_x_font_ttf_application],
+"image/vnd.svf" => &[&T_vnd_svf_image],
+"text/x-vbdotnet" => &[&T_x_vbdotnet_text],
+"application/mbms-msk-response+xml" => &[&T_mbms_msk_response_xml_application],
+"audio/3gpp" => &[&T_3gpp_video],
+"application/ogg" => &[&T_ogg_application],
+"application/index.response" => &[&T_index_response_application],
+"audio/x-wav" => &[&T_vnd_wave_audio],
+"application/vnd.shana.informed.formtemplate" => &[&T_vnd_shana_informed_formtemplate_application],
+"application/vnd.publishare-delta-tree" => &[&T_vnd_publishare_delta_tree_application],
+"audio/g726-16" => &[&T_g726_16_audio],
+"text/x-java-properties" => &[&T_x_java_properties_text],
+"video/mp2p" => &[&T_mp2p_video],
+"application/vnd.openxmlformats-officedocument.wordprocessingml.template" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
+"text/x-web-markdown" => &[&T_x_web_markdown_text],
+"application/x-prt" => &[&T_x_prt_application],
+"application/x-mswrite" => &[&T_x_mswrite_application],
+"application/x-sqlite3" => &[&T_x_sqlite3_application],
+"application/ibe-pp-data" => &[&T_ibe_pp_data_application],
+"application/vnd.oma.poc.optimized-progress-report+xml" => &[&T_vnd_oma_poc_optimized_progress_report_xml_application],
+"application/vnd.dvb.iptv.alfec-base" => &[&T_vnd_dvb_iptv_alfec_base_application],
+"application/x-font-bdf" => &[&T_x_font_bdf_application],
+"application/atom+xml" => &[&T_atom_xml_application],
+"application/vnd.ecowin.seriesrequest" => &[&T_vnd_ecowin_seriesrequest_application],
+"application/vnd.intercon.formnet" => &[&T_vnd_intercon_formnet_application],
+"application/vnd.lotus-1-2-3;version=2" => &[&T_vnd_lotus_1_2_3_version_2_application],
+"application/x-mscardfile" => &[&T_x_mscardfile_application],
+"application/x-bentley-besqlite" => &[&T_x_bentley_besqlite_application],
+"application/x-tex-virtual-font" => &[&T_x_tex_virtual_font_application],
+"video/x-ms-asf" => &[&T_x_ms_asf_video],
+"application/ibe-key-request+xml" => &[&T_ibe_key_request_xml_application],
+"application/vnd.nokia.pcd+xml" => &[&T_vnd_nokia_pcd_xml_application],
+"image/vnd.globalgraphics.pgb" => &[&T_vnd_globalgraphics_pgb_image],
+"video/x-m4v" => &[&T_x_m4v_video],
+"application/x-cdr" => &[&T_coreldraw_application],
+"audio/dsr-es201108" => &[&T_dsr_es201108_audio],
+"chemical/x-xyz" => &[&T_x_xyz_chemical],
+"application/vnd.symbian.install" => &[&T_vnd_symbian_install_application],
+"application/vnd.android.package-archive" => &[&T_vnd_android_package_archive_application],
+"audio/g719" => &[&T_g719_audio],
+"audio/amr" => &[&T_amr_audio],
+"application/x-matroska" => &[&T_x_matroska_application],
+"application/batch-smtp" => &[&T_batch_smtp_application],
+"application/vnd.ms-visio.template" => &[&T_vnd_ms_visio_template_application],
+"application/voicexml+xml" => &[&T_voicexml_xml_application],
+"application/index.obj" => &[&T_index_obj_application],
+"application/x-dbm" => &[&T_x_berkeley_db_application],
+"text/x-groovy" => &[&T_x_groovy_text],
+"application/x-vnd.datapackage+json" => &[&T_x_vnd_datapackage_json_application],
+"image/naplps" => &[&T_naplps_image],
+"audio/g729e" => &[&T_g729e_audio],
+"image/heif" => &[&T_heif_image],
+"application/vnd.sun.xml.math" => &[&T_vnd_sun_xml_math_application],
+"video/vnd.sealedmedia.softseal.mov" => &[&T_vnd_sealedmedia_softseal_mov_video],
+"application/index" => &[&T_index_application],
+"application/tzif" => &[&T_tzif_application],
+"application/vnd.google-earth.kmz" => &[&T_vnd_google_earth_kmz_application],
+"application/vnd.pg.format" => &[&T_vnd_pg_format_application],
+"application/x-mach-o-preload" => &[&T_x_mach_o_preload_application],
+"application/ipp" => &[&T_ipp_application],
+"application/vnd.olpc-sugar" => &[&T_vnd_olpc_sugar_application],
+"application/winhlp" => &[&T_winhlp_application],
+"text/x-matlab" => &[&T_x_matlab_text],
+"message/rfc822" => &[&T_rfc822_message],
+"application/vnd.noblenet-sealer" => &[&T_vnd_noblenet_sealer_application],
+"application/vnd.mobius.daf" => &[&T_vnd_mobius_daf_application],
+"text/tab-separated-values" => &[&T_tab_separated_values_text],
+"application/x-matlab-data" => &[&T_x_matlab_data_application],
+"text/x-go" => &[&T_x_go_text],
+"application/oda" => &[&T_oda_application],
+"application/x-mach-o-fvmlib" => &[&T_x_mach_o_fvmlib_application],
+"application/x-authorware-bin" => &[&T_x_authorware_bin_application],
+"application/vnd.iccprofile" => &[&T_vnd_iccprofile_application],
+"image/vnd.dgn;version=8" => &[&T_vnd_dgn_version_8_image],
+"image/emf" => &[&T_emf_image],
+"application/andrew-inset" => &[&T_andrew_inset_application],
+"application/vnd.jisp" => &[&T_vnd_jisp_application],
+"application/vnd.ms-wmdrm.meter-resp" => &[&T_vnd_ms_wmdrm_meter_resp_application],
+"application/vnd.japannet-verification-wakeup" => &[&T_vnd_japannet_verification_wakeup_application],
+"application/x-isatab-investigation" => &[&T_x_isatab_investigation_application],
+"application/x-sas-putility" => &[&T_x_sas_putility_application],
+"image/x-raw-kodak" => &[&T_x_raw_kodak_image],
+"application/vnd.nintendo.snes.rom" => &[&T_x_nesrom_application],
+"application/mosskey-request" => &[&T_mosskey_request_application],
+"application/vnd.hp-jlyt" => &[&T_vnd_hp_jlyt_application],
+"application/mbms-reception-report+xml" => &[&T_mbms_reception_report_xml_application],
+"audio/x-mod" => &[&T_x_mod_audio],
+"text/vnd.abc" => &[&T_vnd_abc_text],
+"text/x-fortran" => &[&T_x_fortran_text],
+"video/h263-1998" => &[&T_h263_1998_video],
+"application/vnd.groove-tool-template" => &[&T_vnd_groove_tool_template_application],
+"application/vnd.hzn-3d-crossword" => &[&T_vnd_hzn_3d_crossword_application],
+"application/vnd.ms-lrm" => &[&T_vnd_ms_lrm_application],
+"application/vnd.sun.xml.impress.template" => &[&T_vnd_sun_xml_impress_template_application],
+"text/csv" => &[&T_csv_text],
+"video/vnd.fvt" => &[&T_vnd_fvt_video],
+"video/pointer" => &[&T_pointer_video],
+"audio/vnd.dts" => &[&T_vnd_dts_audio],
+"application/vnd.kde.karbon" => &[&T_vnd_kde_karbon_application],
+"model/x.stl-binary" => &[&T_x_stl_binary_model],
+"video/vnd.motorola.videop" => &[&T_vnd_motorola_videop_video],
+"application/xml-external-parsed-entity" => &[&T_xml_external_parsed_entity_application],
+"application/x-openscad" => &[&T_x_openscad_application],
+"audio/smv" => &[&T_smv_audio],
+"application/x-kchart" => &[&T_vnd_kde_kchart_application],
+"application/vnd.oma.poc.invocation-descriptor+xml" => &[&T_vnd_oma_poc_invocation_descriptor_xml_application],
+"application/vnd.xfdl.webform" => &[&T_vnd_xfdl_webform_application],
+"application/x-doom" => &[&T_x_doom_application],
+"application/x-subrip" => &[&T_x_subrip_application],
+"application/x-msmoney" => &[&T_x_msmoney_application],
+"application/vnd.commonspace" => &[&T_vnd_commonspace_application],
+"application/x-sas-backup" => &[&T_x_sas_backup_application],
+"application/watcherinfo+xml" => &[&T_watcherinfo_xml_application],
+"application/vnd.apache.parquet" => &[&T_x_parquet_application],
+"application/simple-message-summary" => &[&T_simple_message_summary_application],
+"application/vnd.ms-excel.workspace.3" => &[&T_vnd_ms_excel_workspace_3_application],
+"application/vnd.wap.sic" => &[&T_vnd_wap_sic_application],
+"text/x-ini" => &[&T_x_ini_text],
+"application/x-amiga-disk-format" => &[&T_x_amiga_disk_format_application],
+"application/vnd.uplanet.list-wbxml" => &[&T_vnd_uplanet_list_wbxml_application],
+"application/vnd.llamagraphics.life-balance.desktop" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
+"application/vnd.vectorworks" => &[&T_vnd_vectorworks_application],
+"application/vnd.wv.csp+wbxml" => &[&T_vnd_wv_csp_wbxml_application],
+"application/vnd.fluxtime.clip" => &[&T_vnd_fluxtime_clip_application],
+"application/x-msclip" => &[&T_x_msclip_application],
+"audio/vnd.audiokoz" => &[&T_vnd_audiokoz_audio],
+"image/fits" => &[&T_fits_image],
+"font/collection" => &[&T_collection_font],
+"application/x-sas-fdb" => &[&T_x_sas_fdb_application],
+"application/vnd.street-stream" => &[&T_vnd_street_stream_application],
+"audio/evrcb0" => &[&T_evrcb0_audio],
+"audio/vnd.qcelp" => &[&T_vnd_qcelp_audio],
+"audio/smv0" => &[&T_smv0_audio],
+"application/x-shapefile" => &[&T_x_shapefile_application],
+"audio/3gpp2" => &[&T_3gpp2_video],
+"application/vnd.oasis.opendocument.formula" => &[&T_vnd_oasis_opendocument_formula_application],
+"application/vnd.sus-calendar" => &[&T_vnd_sus_calendar_application],
+"message/sip" => &[&T_sip_message],
+"image/hevc-sequence" => &[&T_heic_sequence_image],
+"multipart/report" => &[&T_report_multipart],
+"application/vnd.kenameaapp" => &[&T_vnd_kenameaapp_application],
+"audio/flac" => &[&T_x_flac_audio],
+"application/vnd.tao.intent-module-archive" => &[&T_vnd_tao_intent_module_archive_application],
+"application/x-dtbook+xml" => &[&T_x_dtbook_xml_application],
+"application/x-mach-o-object" => &[&T_x_mach_o_object_application],
+"application/vnd.debian.binary-package" => &[&T_x_debian_package_application],
+"application/vnd.qualcomm.brew-app-res" => &[&T_vnd_qualcomm_brew_app_res_application],
+"application/vnd.americandynamics.acc" => &[&T_vnd_americandynamics_acc_application],
+"application/vnd.cups-postscript" => &[&T_vnd_cups_postscript_application],
 
 };
 
 pub static EXT_MAP: phf::Map<&'static str,  &[&'static dyn MimeTypeChecker]> = phf_map! {
-"*.oth" => &[&T_vnd_oasis_opendocument_text_web_application],
-"*.xo" => &[&T_vnd_olpc_sugar_application],
-"*.vsf" => &[&T_vnd_vsf_application],
-"*.c4p" => &[&T_vnd_clonk_c4group_application],
-"*.ptid" => &[&T_vnd_pvi_ptid1_application],
-"*.xlt" => &[&T_vnd_ms_excel_application],
-"*.amfm" => &[&T_x_font_adobe_metric_application],
-"*.xml" => &[&T_xml_application],
-"*.msh" => &[&T_mesh_model],
-"*.emz" => &[&T_x_emf_compressed_image],
-"*.xconf" => &[&T_x_config_text],
-"*.icm" => &[&T_vnd_iccprofile_application],
-"*.pcf" => &[&T_x_font_pcf_application],
-"*.dcl" => &[&T_plain_text],
-"*.fv" => &[&T_plain_text],
-"*.mat" => &[&T_x_matlab_data_application],
-"*.wvx" => &[&T_x_ms_wvx_video],
-"*.slt" => &[&T_vnd_epson_salt_application],
-"*.dwg" => &[&T_vnd_dwg_image],
-"*.jng" => &[&T_x_jng_video],
-"*.minipsf" => &[&T_x_psf_audio],
-"*.fh40" => &[&T_x_freehand_image],
-"*.aart" => &[&T_plain_text],
-"*.n-gage" => &[&T_vnd_nokia_n_gage_symbian_install_application],
-"s_*.txt" => &[&T_x_isatab_application],
-"*.hqx" => &[&T_mac_binhex40_application],
-"*.xhtml2" => &[&T_xhtml_xml_application],
-"*.mqy" => &[&T_vnd_mobius_mqy_application],
-"*.sas7bitm" => &[&T_x_sas_itemstor_application],
-"*.dif" => &[&T_dif_xml_application],
-"*.Cbl" => &[&T_x_cobol_text],
-"*.acu" => &[&T_vnd_acucobol_application],
-"*.stw" => &[&T_vnd_sun_xml_writer_template_application],
-"*.zir" => &[&T_vnd_zul_application],
-"*.u32" => &[&T_x_authorware_bin_application],
-"*.sqlite" => &[&T_x_sqlite3_application],
-"*.itp" => &[&T_vnd_shana_informed_formtemplate_application],
-"*.odc" => &[&T_vnd_oasis_opendocument_chart_application],
-"*.der" => &[&T_x_x509_cert_format_der_application],
-"*.xlam" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
-"*.jpe" => &[&T_jpeg_image],
-"*.m4" => &[&T_plain_text],
-"*.cfm" => &[&T_x_coldfusion_text],
-"*.oa2" => &[&T_vnd_fujitsu_oasys2_application],
-"*.etx" => &[&T_x_setext_text],
-"*.irp" => &[&T_vnd_irepository_package_xml_application],
-"*.hdr" => &[&T_vnd_radiance_image],
-"*.wq2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_5_application],
-"*.ogm" => &[&T_x_ogm_video],
-"*.dae" => &[&T_vnd_collada_xml_model],
-"*.haml" => &[&T_x_haml_text],
-"abs-menulinks" => &[&T_plain_text],
-"*.pot" => &[&T_vnd_ms_powerpoint_application],
-"*.wb2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_6_application],
-"*.h" => &[&T_x_chdr_text],
-"*.cdkey" => &[&T_vnd_mediastation_cdkey_application],
-"*.ifm" => &[&T_vnd_shana_informed_formdata_application],
-"*.raw" => &[&T_x_raw_panasonic_image],
-"*.cgi" => &[&T_x_cgi_text],
-"README" => &[&T_plain_text],
-"*.cob" => &[&T_x_cobol_text],
-"*.uue" => &[&T_x_uuencode_text],
-"*.mif" => &[&T_vnd_mif_application],
-"*.uoml" => &[&T_vnd_uoml_xml_application],
-"KEYS" => &[&T_plain_text],
-"*.sdkm" => &[&T_vnd_solent_sdkm_xml_application],
-"*.jxs" => &[&T_jxs_image],
-"*.gpx" => &[&T_gpx_xml_application],
-"*.wp6" => &[&T_vnd_wordperfect_application],
-"*.fdf" => &[&T_vnd_fdf_application],
-"*.setreg" => &[&T_set_registration_initiation_application],
-"*.cii" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
-"*.xdm" => &[&T_vnd_syncml_dm_xml_application],
-"*.xlw" => &[&T_vnd_ms_excel_application],
-"*.nns" => &[&T_vnd_noblenet_sealer_application],
-"*.aab" => &[&T_x_authorware_bin_application],
-"*.si7" => &[&T_x_sas_data_index_application],
-"*.msp" => &[&T_x_ms_installer_application],
-"*.mseed" => &[&T_vnd_fdsn_mseed_application],
-"*.x3f" => &[&T_x_raw_sigma_image],
-"*.tao" => &[&T_vnd_tao_intent_module_archive_application],
-"*.jpeg" => &[&T_jpeg_image],
-"*.mcurl" => &[&T_vnd_curl_mcurl_text],
-"*.g3" => &[&T_g3fax_image],
-"*.jpg" => &[&T_jpeg_image],
-"*.cap" => &[&T_vnd_tcpdump_pcap_application],
-"*.bpm" => &[&T_bizagi_modeler_application],
-"*.spq" => &[&T_scvp_vp_request_application],
-"*.std" => &[&T_vnd_sun_xml_draw_template_application],
-"*.3xd" => &[&T_x3d_xml_model],
-"*.hwpx" => &[&T_hwp_zip_application],
-"*.xlc" => &[&T_vnd_ms_excel_application],
-"*.dotx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
-"*.pm" => &[&T_x_perl_text],
-"*.acc" => &[&T_vnd_americandynamics_acc_application],
-"*.dcx" => &[&T_vnd_zbrush_dcx_image],
-"*.rmp" => &[&T_x_pn_realaudio_plugin_audio],
-"*.fg5" => &[&T_vnd_fujitsu_oasysgp_application],
-"*.tiff" => &[&T_tiff_image],
-"*.ami" => &[&T_vnd_amiga_ami_application],
-"*.h263" => &[&T_h263_video],
-"*.davmount" => &[&T_davmount_xml_application],
-"*.acutc" => &[&T_vnd_acucorp_application],
-"*.les" => &[&T_vnd_hhe_lesson_player_application],
-"*.ntf" => &[&T_nitf_image],
-"*.chrt" => &[&T_vnd_kde_kchart_application],
-"*.sema" => &[&T_vnd_sema_application],
-"*.mpy" => &[&T_vnd_ibm_minipay_application],
-"*.docx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
-"*.h++" => &[&T_x_c__hdr_text],
-"*.djv" => &[&T_vnd_djvu_image],
-"*.c4d" => &[&T_vnd_clonk_c4group_application],
-"*.odb" => &[&T_vnd_oasis_opendocument_base_application],
-"*.sas7bfdb" => &[&T_x_sas_fdb_application],
-"*.xcat" => &[&T_plain_text],
-"*.emf" => &[&T_emf_image],
-"*.vssx" => &[&T_vnd_ms_visio_stencil_application],
-"*.mscml" => &[&T_mediaservercontrol_xml_application],
-"*.pem" => &[&T_x_x509_cert_format_pem_application],
-"*.ppd" => &[&T_vnd_cups_ppd_application],
-"*.vrml" => &[&T_vrml_model],
-"*.cfml" => &[&T_x_coldfusion_text],
-"*.asf" => &[&T_x_ms_asf_video],
-"*.sass" => &[&T_x_sass_text],
-"*.dcm" => &[&T_dicom_application],
-"*.msg" => &[&T_vnd_ms_outlook_application],
-"*.fts" => &[&T_fits_application],
-"*.pkg" => &[&T_octet_stream_application],
-"*.xps" => &[&T_vnd_ms_xpsdocument_application],
-"*.apr" => &[&T_vnd_lotus_approach_application],
-"*.minipsf1" => &[&T_x_psf_audio],
-"*.rexx" => &[&T_x_rexx_text],
-"*.tgz" => &[&T_gzip_application],
-"*.vssm" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
-"*.webarchive" => &[&T_x_webarchive_application],
-"*.zst" => &[&T_zstd_application],
-"*.dex" => &[&T_x_dex_application],
-"*.ft9" => &[&T_x_freehand_image],
-"*.nnw" => &[&T_vnd_noblenet_web_application],
-"*.sldm" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
-"*.cr2" => &[&T_x_canon_cr2_image],
-"*.adoc" => &[&T_x_asciidoc_text],
-"*.ei6" => &[&T_vnd_pg_osasli_application],
-"*.saf" => &[&T_vnd_yamaha_smaf_audio_application],
-"*.dump" => &[&T_octet_stream_application],
-"INSTALL" => &[&T_plain_text],
-"*.wks" => &[&T_vnd_ms_works_application],
-"*.aet" => &[&T_vnd_adobe_aftereffects_template_application],
-"*.pdf" => &[&T_pdf_application],
-"*.wkq" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application,&T_x_quattro_pro_version_5_application],
-"*.flac" => &[&T_x_flac_audio],
-"*.bay" => &[&T_x_raw_casio_image],
-"*.wp5" => &[&T_vnd_wordperfect_application],
-"*.aif" => &[&T_x_aiff_audio],
-"*.applescript" => &[&T_x_applescript_text],
-"*.F" => &[&T_x_fortran_text],
-"*.mxu" => &[&T_vnd_mpegurl_video],
-"*.pam" => &[&T_x_portable_arbitrarymap_image],
-"*.mpn" => &[&T_vnd_mophun_application_application],
-"*.c" => &[&T_x_c_text],
-"*.wmz" => &[&T_x_ms_wmz_application],
-"*.ppsx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
-"*.css" => &[&T_css_text],
-"*.wmx" => &[&T_x_ms_wmx_video],
-"*.3ds" => &[&T_x_3ds_image],
-"*.aspx" => &[&T_aspdotnet_text],
-"*.pst" => &[&T_vnd_ms_outlook_pst_application],
-"*.fh12" => &[&T_x_freehand_image],
-"*.ifo" => &[&T_x_dvd_ifo_application],
-"*.ear" => &[&T_x_tika_java_enterprise_archive_application],
-"*.war" => &[&T_x_tika_java_web_archive_application],
-"*.oxps" => &[&T_vnd_ms_xpsdocument_application],
-"*.br" => &[&T_x_brotli_application],
-"*.sgl" => &[&T_vnd_stardivision_writer_global_application],
-"*.pfb" => &[&T_x_font_type1_application],
-"*.mpp" => &[&T_vnd_ms_project_application],
-"*.xlsb" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
-"*.m14" => &[&T_x_msmediaview_application],
-"*.mdb" => &[&T_x_msaccess_application],
-"*.dwfx" => &[&T_vnd_dwfx_xps_model],
-"*.gsf" => &[&T_x_font_ghostscript_application],
-"*.text" => &[&T_plain_text],
-"*.tld" => &[&T_plain_text],
-"*.oa3" => &[&T_vnd_fujitsu_oasys3_application],
-"*.schemas" => &[&T_plain_text],
-"*.scs" => &[&T_scvp_cv_response_application],
-"*.sdp" => &[&T_sdp_application],
-"*.a" => &[&T_x_archive_application],
-"*.stk" => &[&T_hyperstudio_application],
-"*.aas" => &[&T_x_authorware_seg_application],
-"*.dcr" => &[&T_x_director_application],
-"*.shp" => &[&T_x_shapefile_application,&T_vnd_shp_application],
-"*.wpd" => &[&T_vnd_wordperfect_application],
-"*.car" => &[&T_vnd_curl_car_application],
-"*.wax" => &[&T_x_ms_wax_audio],
-"*.tr" => &[&T_troff_text],
-"*.sd7" => &[&T_x_sas_data_application],
-"*.eol" => &[&T_vnd_digital_winds_audio],
-"*.COB" => &[&T_x_cobol_text],
-"*.scm" => &[&T_x_scheme_text],
-"*.sxg" => &[&T_vnd_sun_xml_writer_global_application],
-"*.Cob" => &[&T_x_cobol_text],
-"*.dsc" => &[&T_prs_lines_tag_text],
-"*.ser" => &[&T_java_serialized_object_application],
-"*.in" => &[&T_plain_text],
-"*.m4s" => &[&T_iso_segment_video],
-"*.hpgl" => &[&T_vnd_hp_hpgl_application],
-"*.tfm" => &[&T_x_tex_tfm_application],
-"*.xspf" => &[&T_xspf_xml_application],
-"*.lisp" => &[&T_x_common_lisp_text],
-"*.h264" => &[&T_h264_video],
-"*.rm" => &[&T_vnd_rn_realmedia_application],
-"*.flc" => &[&T_x_flc_video],
-"*.otg" => &[&T_vnd_oasis_opendocument_graphics_template_application],
-"*.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
-"*.diff" => &[&T_x_diff_text],
-"*.plb" => &[&T_vnd_3gpp_pic_bw_large_application],
-"*.umj" => &[&T_vnd_umajin_application],
-"*.emlx" => &[&T_x_emlx_message],
-"*.wrl" => &[&T_vrml_model],
-"*.dpg" => &[&T_vnd_dpgraph_application],
-"*.rpss" => &[&T_vnd_nokia_radio_presets_application],
-"*.iso" => &[&T_x_iso9660_image_application],
-"*.enw" => &[&T_x_endnote_refer_application],
-"*.ktz" => &[&T_vnd_kahootz_application],
-"*.ods" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
-"*.pkipath" => &[&T_pkix_pkipath_application],
-"*.pages" => &[&T_vnd_apple_pages_application],
-"*.msty" => &[&T_vnd_muvee_style_application],
-"*.bau" => &[&T_vnd_openofficeorg_autotext_application],
-"*.fn" => &[&T_plain_text],
-"*.mobi" => &[&T_x_mobipocket_ebook_application],
-"*.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
-"*.manifest" => &[&T_plain_text],
-"*.xegrm" => &[&T_plain_text],
-"*.z" => &[&T_x_compress_application],
-"*.pict" => &[&T_x_pict_image],
-"*.msl" => &[&T_vnd_mobius_msl_application],
-"*.afm" => &[&T_x_font_adobe_metric_application],
-"*.uri" => &[&T_uri_list_text],
-"*.CBL" => &[&T_x_cobol_text],
-"*.msf" => &[&T_vnd_epson_msf_application],
-"*.rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
-"*.mmmp" => &[&T_vnd_mindjet_mindmanager_application],
-"*.odg" => &[&T_vnd_oasis_opendocument_graphics_application],
-"*.sr2" => &[&T_x_raw_sony_image],
-"*.wml" => &[&T_vnd_wap_wml_text],
-"*.grb1" => &[&T_x_grib_application],
-"*.cla" => &[&T_vnd_claymore_application],
-"*.pcl" => &[&T_vnd_hp_pcl_application],
-"*.csml" => &[&T_x_csml_chemical],
-"*.onetoc2" => &[&T_onenote_format_onetoc2_application],
-"*.f4v" => &[&T_x_f4v_video],
-"*.jxl" => &[&T_jxl_image],
-"*.wma" => &[&T_x_ms_wma_audio],
-"*.shx" => &[&T_vnd_shx_application],
-"*.kfo" => &[&T_vnd_kde_kformula_application],
-"*.asics" => &[&T_vnd_etsi_asic_s_zip_application],
-"*.pcap" => &[&T_vnd_tcpdump_pcap_application],
-"*.ccxml" => &[&T_ccxml_xml_application],
-"*.abw" => &[&T_x_abiword_application],
-"*.x32" => &[&T_x_authorware_bin_application],
-"*.swa" => &[&T_x_director_application],
-"*.pptx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
-"*.ico" => &[&T_vnd_microsoft_icon_image],
-"*.ras" => &[&T_x_cmu_raster_image],
-"*.mts" => &[&T_vnd_mts_model],
-"*.list" => &[&T_plain_text],
-"*.gv" => &[&T_vnd_graphviz_text],
-"*.ggb" => &[&T_vnd_geogebra_file_application],
-"*.jfi" => &[&T_jpeg_image],
-"*.jnilib" => &[&T_x_java_jnilib_application],
-"*.accdb" => &[&T_x_msaccess_application],
-"Makefile" => &[&T_x_makefile_text],
-"*.cdy" => &[&T_vnd_cinderella_application],
-"*.zaz" => &[&T_vnd_zzazz_deck_xml_application],
-"*.vcx" => &[&T_vnd_vcx_application],
-"*.ss7" => &[&T_x_sas_program_data_application],
-"*.mmpt" => &[&T_vnd_mindjet_mindmanager_application],
-"*.txt" => &[&T_plain_text],
-"*.4th" => &[&T_x_forth_text],
-"*.jnlp" => &[&T_x_java_jnlp_file_application],
-"*.ace" => &[&T_x_ace_compressed_application],
-"*.yml" => &[&T_x_yaml_text],
-"*.mpe" => &[&T_mpeg_video],
-"*.fh7" => &[&T_x_freehand_image],
-"*.vss" => &[&T_vnd_visio_application],
-"*.vf" => &[&T_x_tex_virtual_font_application],
-"*.gnumeric" => &[&T_x_gnumeric_application],
-"*.prt" => &[&T_x_prt_application],
-"*.crt" => &[&T_x_x509_cert_application],
-"*.data" => &[&T_plain_text],
-"*.dita" => &[&T_dita_xml_format_topic_application],
-"*.fzs" => &[&T_vnd_fuzzysheet_application],
-"*.mmp" => &[&T_vnd_mindjet_mindmanager_application],
-"*.spl" => &[&T_x_futuresplash_application],
-"*.vxml" => &[&T_voicexml_xml_application],
-"*.m2v" => &[&T_mpeg_video],
-"*.qxb" => &[&T_vnd_quark_quarkxpress_application],
-"*.k25" => &[&T_x_raw_kodak_image],
-"*.sldprt" => &[&T_sldworks_application],
-"*.qpw" => &[&T_x_quattro_pro_application],
-"*.st" => &[&T_x_stsrc_text],
-"*.less" => &[&T_x_less_text],
-"*.musicxml" => &[&T_vnd_recordare_musicxml_xml_application],
-"*.jsp" => &[&T_x_jsp_text],
-"*.vcg" => &[&T_vnd_groove_vcard_application],
-"*.icb" => &[&T_x_tga_image],
-"*.fodt" => &[&T_vnd_oasis_opendocument_flat_text_application],
-"*.clkp" => &[&T_vnd_crick_clicker_palette_application],
-"*.wsdl" => &[&T_wsdl_xml_application],
-"*.dataless" => &[&T_vnd_fdsn_seed_application],
-"*.xpx" => &[&T_vnd_intercon_formnet_application],
-"*.box" => &[&T_vnd_previewsystems_box_application],
-"*.m4b" => &[&T_mp4_audio],
-"*.qcp" => &[&T_qcelp_audio],
-"*.vis" => &[&T_vnd_visionary_application],
-"*.cdf" => &[&T_x_netcdf_application],
-"*.nar" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
-"*.csp" => &[&T_vnd_commonspace_application],
-"*.key" => &[&T_vnd_apple_keynote_application],
-"*.mmat" => &[&T_vnd_mindjet_mindmanager_application],
-"*.mgz" => &[&T_vnd_proteus_magazine_application],
-"*.bmp" => &[&T_bmp_image],
-"*.wbmp" => &[&T_vnd_wap_wbmp_image],
-"*.asm" => &[&T_x_assembly_text],
-"*.mpg" => &[&T_mpeg_video],
-"*.mb" => &[&T_mathematica_application],
-"*.odf" => &[&T_vnd_oasis_opendocument_formula_application],
-"*.kil" => &[&T_x_killustrator_application],
-"*.properties" => &[&T_x_java_properties_text],
-"*.mov" => &[&T_quicktime_video],
-"*.xap" => &[&T_x_silverlight_app_application],
-"*.pod" => &[&T_plain_text],
-"*.clkw" => &[&T_vnd_crick_clicker_wordbank_application],
-"*.scss" => &[&T_x_scss_text],
-"*.cif" => &[&T_x_cif_chemical],
-"*.mpd" => &[&T_dash_xml_application],
-"*.jl" => &[&T_x_common_lisp_text],
-"*.twds" => &[&T_vnd_simtech_mindmapper_application],
-"*.sib" => &[&T_x_sibelius_application],
-"*.midi" => &[&T_midi_audio],
-"*.sxw" => &[&T_vnd_sun_xml_writer_application],
-"*.p7r" => &[&T_x_pkcs7_certreqresp_application],
-"*.sus" => &[&T_vnd_sus_calendar_application],
-"*.me" => &[&T_troff_text],
-"*.j2c" => &[&T_x_jp2_codestream_image],
-"*.seed" => &[&T_vnd_fdsn_seed_application],
-"*.edm" => &[&T_vnd_novadigm_edm_application],
-"*.js" => &[&T_javascript_text],
-"*.skd" => &[&T_vnd_koan_application],
-"*.doc" => &[&T_msword_application],
-"*.odft" => &[&T_vnd_oasis_opendocument_formula_template_application],
-"*.sv4crc" => &[&T_x_sv4crc_application],
-"*.dvb" => &[&T_vnd_dvb_file_video],
-"*.btif" => &[&T_prs_btif_image],
-"*.et3" => &[&T_vnd_eszigno3_xml_application],
-"*.dwf" => &[&T_vnd_dwf_model],
-"*.uu" => &[&T_x_uuencode_text],
-"*.r" => &[&T_x_rsrc_text],
-"*.rsd" => &[&T_rsd_xml_application],
-"*.mpkg" => &[&T_vnd_apple_installer_xml_application],
-"*.m3u" => &[&T_x_mpegurl_audio],
-"*.lwp" => &[&T_vnd_lotus_wordpro_application],
-"*.xsl" => &[&T_xml_application],
-"*.tcsh" => &[&T_x_csh_application],
-"*.xlz" => &[&T_x_xliff_zip_application],
-"*.sldx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
-"*.ape" => &[&T_ape_audio],
-"*.aep" => &[&T_vnd_adobe_aftereffects_project_application],
-"*.rpm" => &[&T_x_rpm_application],
-"*.lsp" => &[&T_x_common_lisp_text],
-"*.pl" => &[&T_x_perl_text],
-"*.emma" => &[&T_emma_xml_application],
-"*.fff" => &[&T_x_raw_imacon_image],
-"*.m4a" => &[&T_mp4_audio],
-"*.sas7bndx" => &[&T_x_sas_data_index_application],
-"*.sp7" => &[&T_x_sas_putility_application],
-"*.shw" => &[&T_x_corelpresentations_application],
-"*.adf" => &[&T_x_amiga_disk_format_application],
-"*.ppm" => &[&T_x_portable_pixmap_image],
-"*.bpk" => &[&T_octet_stream_application],
-"*.afp" => &[&T_vnd_ibm_modcap_application],
-"*.dts" => &[&T_vnd_dts_audio],
-"*.kdc" => &[&T_x_raw_kodak_image],
-"*.BAS" => &[&T_x_basic_text],
-"*.ttc" => &[&T_x_font_ttf_application,&T_collection_font],
-"*.cxt" => &[&T_x_director_application],
-"*.enr" => &[&T_x_endnote_refer_application],
-"*.joda" => &[&T_vnd_joost_joda_archive_application],
-"*.pfa" => &[&T_x_font_type1_application],
-"*.123" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_97_9_x_application],
-"*.mde" => &[&T_x_msaccess_application],
-"*.texi" => &[&T_x_texinfo_application],
-"*.jpgm" => &[&T_jpm_image],
-"*.zipx" => &[&T_zip_application],
-"*.fh9" => &[&T_x_freehand_image],
-"*.adp" => &[&T_adpcm_audio],
-"*.vb" => &[&T_x_vbdotnet_text],
-"*.sitx" => &[&T_x_stuffitx_application],
-"*.egrm" => &[&T_plain_text],
-"*.sa7" => &[&T_x_sas_access_application],
-"*.txd" => &[&T_vnd_genomatix_tuxedo_application],
-"*.ram" => &[&T_x_pn_realaudio_audio],
-"*.silo" => &[&T_mesh_model],
-"*.t" => &[&T_troff_text],
-"*.i3" => &[&T_x_modula_text],
-"*.jb2" => &[&T_x_jbig2_image],
-"*.ifb" => &[&T_calendar_text],
-"*.psf1" => &[&T_x_psf_audio],
-"*.3mf" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
-"*.oprc" => &[&T_vnd_palm_application],
-"*.atc" => &[&T_vnd_acucorp_application],
-"*.skm" => &[&T_vnd_koan_application],
-"*.ac" => &[&T_plain_text],
-"*.asnd" => &[&T_vnd_adobe_soundbooth_audio],
-"*.onepkg" => &[&T_onenote__format_package_application],
-"*.vstx" => &[&T_vnd_ms_visio_template_application],
-"*.hfa" => &[&T_x_erdas_hfa_application],
-"*.jfif" => &[&T_jpeg_image],
-"*.wav" => &[&T_vnd_wave_audio],
-"*.portpkg" => &[&T_vnd_macports_portpkg_application],
-"*.m2a" => &[&T_mpeg_audio],
-"*.knp" => &[&T_vnd_kinar_application],
-"*.MYI" => &[&T_x_mysql_misam_compressed_index_application],
-"*.pvb" => &[&T_vnd_3gpp_pic_bw_var_application],
-"*.wbs" => &[&T_vnd_criticaltools_wbs_xml_application],
-"*.jisp" => &[&T_vnd_jisp_application],
-"*.eml" => &[&T_rfc822_message],
-"*.mp4v" => &[&T_mp4_video],
-"*.qxl" => &[&T_vnd_quark_quarkxpress_application],
-"*.dp" => &[&T_vnd_osgi_dp_application],
-"*.xquery" => &[&T_xquery_application],
-"*.mxs" => &[&T_vnd_triscape_mxs_application],
-"*.oti" => &[&T_vnd_oasis_opendocument_image_template_application],
-"*.ft7" => &[&T_x_freehand_image],
-"*.cc" => &[&T_x_c__src_text],
-"*.r3d" => &[&T_x_raw_red_image],
-"*.php" => &[&T_x_php_text],
-"*.fst" => &[&T_vnd_fst_image],
-"*.srt" => &[&T_x_subrip_application],
-"*.awk" => &[&T_x_awk_text],
-"*.mid" => &[&T_midi_audio],
-"*.las" => &[&T_x_asprs_application],
-"*.pgm" => &[&T_x_portable_graymap_image],
-"*.mdtext" => &[&T_x_web_markdown_text],
-"*.jpm" => &[&T_jpm_image],
-"*.odi" => &[&T_vnd_oasis_opendocument_image_application],
-"*.lit" => &[&T_x_ms_reader_application],
-"*.kon" => &[&T_vnd_kde_kontour_application],
-"*.pic" => &[&T_x_pict_image],
-"*.ppa" => &[&T_vnd_ms_powerpoint_application],
-"*.sas7bcat" => &[&T_x_sas_catalog_application],
-"*.gqs" => &[&T_vnd_grafeq_application],
-"*.cs" => &[&T_x_csharp_text],
-"*.ocaml" => &[&T_x_ocaml_text],
-"*.rar" => &[&T_x_rar_compressed_application],
-"*.spf" => &[&T_vnd_yamaha_smaf_phrase_application],
-"*.potm" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
-"*.w3d" => &[&T_x_director_application],
-"*.fits" => &[&T_fits_application],
-"*.fgd" => &[&T_x_director_application],
-"*.cel" => &[&T_vnd_dgn_image],
-"*.ac3" => &[&T_ac3_audio],
-"*.prc" => &[&T_x_mobipocket_ebook_application],
-"*.HPP" => &[&T_x_c__hdr_text],
-"*.fti" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
-"*.jif" => &[&T_jpeg_image],
-"*.ms" => &[&T_troff_text],
-"*.coffee" => &[&T_x_coffeescript_text],
-"*.l" => &[&T_x_lex_text],
-"*.cpio" => &[&T_x_cpio_application],
-"*.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
-"*.v" => &[&T_x_verilog_text],
-"*.atomcat" => &[&T_atomcat_xml_application],
-"*.list3820" => &[&T_vnd_ibm_modcap_application],
-"*.accde" => &[&T_x_msaccess_application],
-"*.listafp" => &[&T_vnd_ibm_modcap_application],
-"*.fodp" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
-"*.aam" => &[&T_x_authorware_map_application],
-"*.vstm" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
-"*.minigsf" => &[&T_x_psf_audio],
-"*.wqd" => &[&T_vnd_wqd_application],
-"*.wpl" => &[&T_vnd_ms_wpl_application],
-"*.meta" => &[&T_plain_text],
-"*.chat" => &[&T_x_chat_application],
-"*.prf" => &[&T_pics_rules_application],
-"*.c4u" => &[&T_vnd_clonk_c4group_application],
-"*.mpm" => &[&T_vnd_blueice_multipass_application],
-"*.parquet" => &[&T_x_parquet_application],
-"*.src" => &[&T_x_wais_source_application],
-"*.xslfo" => &[&T_xslfo_xml_application],
-"*.sql" => &[&T_x_sql_text],
-"*.java" => &[&T_x_java_source_text],
-"*.warc" => &[&T_warc_application],
-"*.cat" => &[&T_vnd_ms_pki_seccat_application],
-"*.es3" => &[&T_vnd_eszigno3_xml_application],
-"*.c4f" => &[&T_vnd_clonk_c4group_application],
-"*.nitf" => &[&T_nitf_image],
-"*.sit" => &[&T_x_stuffit_application],
-"*.tsv" => &[&T_tab_separated_values_text],
-"*.udeb" => &[&T_x_debian_package_application],
-"*.mny" => &[&T_x_msmoney_application],
-"*.lrm" => &[&T_vnd_ms_lrm_application],
-"*.gtw" => &[&T_vnd_gtw_model],
-"*.voc" => &[&T_x_unknown_audio],
-"*.ditaval" => &[&T_dita_xml_format_val_application],
-"*.oxt" => &[&T_vnd_openofficeorg_extension_application],
-"*.jpgv" => &[&T_jpeg_video],
-"*.exr" => &[&T_aces_image],
-"*.ppsm" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
-"*.mesh" => &[&T_mesh_model],
-"*.kmz" => &[&T_vnd_google_earth_kmz_application],
-"*.cls" => &[&T_x_vbasic_text],
-"*.igl" => &[&T_vnd_igloader_application],
-"*.vor" => &[&T_x_staroffice_template_application],
-"*.psd" => &[&T_vnd_adobe_photoshop_image],
-"*.mdi" => &[&T_vnd_ms_modi_image],
-"*.dtshd" => &[&T_vnd_dts_hd_audio],
-"*.ddd" => &[&T_vnd_fujixerox_ddd_application],
-"*.crl" => &[&T_pkix_crl_application],
-"*.distz" => &[&T_octet_stream_application],
-"*.bdf" => &[&T_x_font_bdf_application],
-"*.ft12" => &[&T_x_freehand_image],
-"*.tga" => &[&T_x_tga_image],
-"*.H" => &[&T_x_c__hdr_text],
-"*.f90" => &[&T_x_fortran_text],
-"*.stf" => &[&T_vnd_wt_stf_application],
-"*.php4" => &[&T_x_php_text],
-"*.laz" => &[&T_x_asprs_application],
-"*.ft10" => &[&T_x_freehand_image],
-"*.ditamap" => &[&T_dita_xml_format_map_application],
-"*.pef" => &[&T_x_raw_pentax_image],
-"*.numbers" => &[&T_vnd_apple_numbers_application],
-"*.ttml" => &[&T_ttml_xml_application],
-"*.sfdu" => &[&T_x_sfdu_application],
-"*.csh" => &[&T_x_csh_application],
-"*.nes" => &[&T_x_nesrom_application],
-"*.bash" => &[&T_x_sh_application],
-"*.dxr" => &[&T_x_director_application],
-"*.mime" => &[&T_rfc822_message],
-"*.ptx" => &[&T_x_raw_pentax_image],
-"*.he5" => &[&T_x_hdf_application],
-"*.dcs" => &[&T_x_raw_kodak_image],
-"*.mmf" => &[&T_vnd_smaf_application],
-"*.log" => &[&T_x_log_text],
-"*.inx" => &[&T_x_adobe_indesign_interchange_application],
-"*.viv" => &[&T_vnd_vivo_video],
-"*.mc1" => &[&T_vnd_medcalcdata_application],
-"*.mjp2" => &[&T_mj2_video],
-"*.fli" => &[&T_x_fli_video],
-"*.dotm" => &[&T_vnd_ms_word_template_macroenabled_12_application],
-"*.res" => &[&T_x_dtbresource_xml_application],
-"*.pbm" => &[&T_x_portable_bitmap_image],
-"*.wspolicy" => &[&T_wspolicy_xml_application],
-"*.mos" => &[&T_x_raw_leaf_image],
-"*.7z" => &[&T_x_7z_compressed_application],
-"*.mka" => &[&T_x_matroska_audio],
-"*.m4u" => &[&T_vnd_mpegurl_video],
-"*.caf" => &[&T_x_caf_audio],
-"*.fh50" => &[&T_x_freehand_image],
-"*.atom" => &[&T_atom_xml_application],
-"*.bat" => &[&T_x_bat_application],
-"*.crd" => &[&T_x_mscardfile_application],
-"*.deb" => &[&T_x_debian_package_application],
-"*.rb" => &[&T_x_ruby_text],
-"*.n3" => &[&T_plain_text],
-"*.ecma" => &[&T_ecmascript_application],
-"*.mp3" => &[&T_mpeg_audio],
-"*.sxm" => &[&T_vnd_sun_xml_math_application],
-"*.nef" => &[&T_x_raw_nikon_image],
-"*.bmi" => &[&T_vnd_bmi_application],
-"*.f" => &[&T_x_fortran_text],
-"*.gmx" => &[&T_vnd_gmx_application],
-"*.stl" => &[&T_x_stl_binary_model],
-"*.ig" => &[&T_x_modula_text],
-"*.sdkd" => &[&T_vnd_solent_sdkm_xml_application],
-"*.xdw" => &[&T_vnd_fujixerox_docuworks_application],
-"*.vmdk" => &[&T_x_vmdk_application],
-"*.cfg" => &[&T_x_config_text],
-"*.scad" => &[&T_x_openscad_application],
-"*.azs" => &[&T_vnd_airzip_filesecure_azs_application],
-"*.qxt" => &[&T_vnd_quark_quarkxpress_application],
-"*.cmx" => &[&T_x_cmx_image],
-"*.dot" => &[&T_msword_application],
-"*.p10" => &[&T_pkcs10_application],
-"*.bibtex" => &[&T_x_bibtex_text_file_application],
-"*.tif" => &[&T_tiff_image],
-"*.conf" => &[&T_x_config_text],
-"*.al" => &[&T_x_perl_text],
-"*.potx" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
-"*.sas7bput" => &[&T_x_sas_putility_application],
-"*.raf" => &[&T_x_raw_fuji_image],
-"*.h261" => &[&T_h261_video],
-"*.tsd" => &[&T_timestamped_data_application],
-"*.pps" => &[&T_vnd_ms_powerpoint_application],
-"*.epsf" => &[&T_postscript_application],
-"*.grm" => &[&T_plain_text],
-"*.plf" => &[&T_vnd_pocketlearn_application],
-"*.vhd" => &[&T_x_vhdl_text],
-"*.g" => &[&T_plain_text],
-"*.ics" => &[&T_calendar_text],
-"*.flv" => &[&T_x_flv_video],
-"*.hh" => &[&T_x_c__hdr_text],
-"*.webp" => &[&T_webp_image],
-"*.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
-"*.fig" => &[&T_x_xfig_application],
-"*.jam" => &[&T_vnd_jam_application],
-"*.sfd-hdstx" => &[&T_vnd_hydrostatix_sof_data_application],
-"*.exe" => &[&T_x_dosexec_application],
-"*.png" => &[&T_png_image],
-"*.xhvml" => &[&T_xv_xml_application],
-"*.rwz" => &[&T_x_raw_rawzor_image],
-"*.cxx" => &[&T_x_c__src_text],
-"*.mxl" => &[&T_vnd_recordare_musicxml_application],
-"*.ppam" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
-"*.xlm" => &[&T_vnd_ms_excel_application],
-"*.gac" => &[&T_vnd_groove_account_application],
-"*.erl" => &[&T_x_erlang_text],
-"*.apk" => &[&T_vnd_android_package_archive_application],
-"*.m" => &[&T_x_objcsrc_text],
-"*.memgraph" => &[&T_x_memgraph_application],
-"*.gslib" => &[&T_x_psf_audio],
-"*.sv4cpio" => &[&T_x_sv4cpio_application],
-"*.c++" => &[&T_x_c__src_text],
-"GNUMakefile" => &[&T_x_makefile_text],
-"*.sml" => &[&T_smil_xml_application],
-"*.xwd" => &[&T_x_xwindowdump_image],
-"*.scurl" => &[&T_vnd_curl_scurl_text],
-"*.xq" => &[&T_xquery_application],
-"*.spot" => &[&T_vnd_in3d_spot_text],
-"*.sed" => &[&T_x_sed_text],
-"*.fcs" => &[&T_vnd_isac_fcs_application],
-"*.zoo" => &[&T_x_zoo_application],
-"*.clkx" => &[&T_vnd_crick_clicker_application],
-"*.jks" => &[&T_x_java_keystore_application],
-"*.lbe" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
-"*.mwf" => &[&T_vnd_mfer_application],
-"*.smil" => &[&T_smil_xml_application],
-"*.pdb" => &[&T_x_pdb_chemical],
-"*.pct" => &[&T_x_pict_image],
-"*.dbf" => &[&T_x_dbf_application],
-"*.movie" => &[&T_x_sgi_movie_video],
-"*.igx" => &[&T_vnd_micrografx_igx_application],
-"*.dta" => &[&T_x_stata_dta_application],
-"*.lyr" => &[&T_x_esri_layer_application],
-"*.sas7baud" => &[&T_x_sas_audit_application],
-"*.pgn" => &[&T_x_chess_pgn_application],
-"*.sv7" => &[&T_x_sas_view_application],
-"*.vsdm" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
-"*.cml" => &[&T_x_cml_chemical],
-"*.xul" => &[&T_vnd_mozilla_xul_xml_application],
-"*.ppj" => &[&T_vnd_adobe_premiere_image],
-"*.dng" => &[&T_x_raw_adobe_image],
-"*.rld" => &[&T_resource_lists_diff_xml_application],
-"*.xz" => &[&T_x_xz_application],
-"*.vox" => &[&T_x_authorware_bin_application],
-"*.odt" => &[&T_vnd_oasis_opendocument_text_application],
-"*.mp2a" => &[&T_mpeg_audio],
-"*.cdr" => &[&T_coreldraw_application],
-"*.ghf" => &[&T_vnd_groove_help_application],
-"*.sxd" => &[&T_vnd_sun_xml_draw_application],
-"*.dmp" => &[&T_vnd_tcpdump_pcap_application],
-"*.heic" => &[&T_heic_image],
-"*.kwt" => &[&T_vnd_kde_kword_application],
-"*.h5" => &[&T_x_hdf_application],
-"*.psb" => &[&T_vnd_3gpp_pic_bw_small_application],
-"*.mag" => &[&T_vnd_ecowin_chart_application],
-"*.ada" => &[&T_x_ada_text],
-"*.xweb" => &[&T_plain_text],
-"*.rss" => &[&T_rss_xml_application],
-"*.Cls" => &[&T_x_vbasic_text],
-"*.fbs" => &[&T_vnd_fastbidsheet_image],
-"*.pfx" => &[&T_x_pkcs12_application],
-"*.xltm" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
-"*.vsl" => &[&T_plain_text],
-"*.bup" => &[&T_x_dvd_ifo_application],
-"*.dsw" => &[&T_plain_text],
-"*.asc" => &[&T_pgp_signature_application],
-"*.mpc" => &[&T_vnd_mophun_certificate_application,&T_musepack_audio],
-"*.sh" => &[&T_x_sh_application],
-"*.ief" => &[&T_ief_image],
-"*.CLS" => &[&T_x_vbasic_text],
-"*.fvt" => &[&T_vnd_fvt_video],
-"*.bas" => &[&T_x_basic_text],
-"*.avi" => &[&T_x_msvideo_video],
-"*.el" => &[&T_x_emacs_lisp_text],
-"*.dms" => &[&T_octet_stream_application],
-"*.fb2" => &[&T_x_fictionbook_xml_application],
-"*.MF" => &[&T_plain_text],
-"*.dcurl" => &[&T_vnd_curl_dcurl_text],
-"*.nc" => &[&T_x_netcdf_application],
-"*.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
-"*.msa" => &[&T_vnd_msa_disk_image_application],
-"*.osfpvg" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
-"*.kar" => &[&T_midi_audio],
-"*.gim" => &[&T_vnd_groove_identity_message_application],
-"*.ads" => &[&T_x_ada_text],
-"*.C" => &[&T_x_c__src_text],
-"*.mfm" => &[&T_vnd_mfmp_application],
-"*.hs" => &[&T_x_haskell_text],
-"*.cil" => &[&T_vnd_ms_artgalry_application],
-"*.esf" => &[&T_vnd_epson_esf_application],
-"*.kia" => &[&T_vnd_kidspiration_application],
-"*.x3d" => &[&T_vnd_hzn_3d_crossword_application],
-"*.gtar" => &[&T_x_gtar_application],
-"*.webm" => &[&T_webm_video],
-"*.tbz" => &[&T_x_bzip_application],
-"*.amr" => &[&T_amr_audio],
-"*.skp" => &[&T_vnd_koan_application],
-"*.rgb" => &[&T_x_rgb_image],
-"*.classpath" => &[&T_plain_text],
-"*.mxf" => &[&T_mxf_application],
-"*.xll" => &[&T_vnd_ms_excel_application],
-"*.scd" => &[&T_x_msschedule_application],
-"*.tex" => &[&T_x_tex_application],
-"*.onetmp" => &[&T_onenote_application],
-"*.snf" => &[&T_x_font_snf_application],
-"*.mhtml" => &[&T_related_multipart],
-"*.fly" => &[&T_vnd_fly_text],
-"*.ini" => &[&T_x_ini_text],
-"*.3g2" => &[&T_3gpp2_video],
-"*.MYD" => &[&T_x_mysql_misam_data_application],
-"*.gp4" => &[&T_x_guitar_pro_application],
-"*.wk3" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_3_application],
-"*.sas7bacs" => &[&T_x_sas_access_application],
-"*.ps" => &[&T_postscript_application],
-"*.mht" => &[&T_related_multipart],
-"*.as" => &[&T_x_actionscript_text],
-"*.xsp" => &[&T_plain_text],
-"*.hp" => &[&T_x_c__hdr_text],
-"*.vsw" => &[&T_vnd_visio_application],
-"*.Frm" => &[&T_x_vbasic_text],
-"*.d" => &[&T_x_d_text],
-"*.hvp" => &[&T_vnd_yamaha_hv_voice_application],
-"*.hx" => &[&T_x_haxe_text],
-"*.gex" => &[&T_vnd_geometry_explorer_application],
-"*.tmo" => &[&T_vnd_tmobile_livetv_application],
-"*.restx" => &[&T_x_rst_text],
-"*.ext" => &[&T_vnd_novadigm_ext_application],
-"*.dtd" => &[&T_xml_dtd_application],
-"*.gif" => &[&T_gif_image],
-"*.drc" => &[&T_x_dirac_video],
-"*.adoc.txt" => &[&T_x_asciidoc_text],
-"*.efif" => &[&T_vnd_picsel_application],
-"*.jad" => &[&T_vnd_sun_j2me_app_descriptor_text],
-"*.dfac" => &[&T_vnd_dreamfactory_application],
-"*.clp" => &[&T_x_msclip_application],
-"*.p12" => &[&T_x_pkcs12_application],
-"*.wp" => &[&T_vnd_wordperfect_application],
-"*.kpr" => &[&T_vnd_kde_kpresenter_application],
-"*.mpg4" => &[&T_mp4_video],
-"*.ogx" => &[&T_ogg_application],
-"*.wbxml" => &[&T_vnd_wap_wbxml_application],
-"*.shar" => &[&T_x_shar_application],
-"*.cr3" => &[&T_x_canon_cr3_image],
-"*.qps" => &[&T_vnd_publishare_delta_tree_application],
-"*.sxc" => &[&T_vnd_sun_xml_calc_application],
-"*.cpt" => &[&T_mac_compactpro_application],
-"*.ims" => &[&T_vnd_ms_ims_application],
-"*.bdm" => &[&T_vnd_syncml_dm_wbxml_application],
-"*.iso19139" => &[&T_iso19139_xml_text],
-"*.gqf" => &[&T_vnd_grafeq_application],
-"*.elc" => &[&T_octet_stream_application,&T_x_elc_application],
-"*.ens" => &[&T_x_endnote_style_application],
-"*.uris" => &[&T_uri_list_text],
-"*.ice" => &[&T_x_cooltalk_x_conference],
-"*.glb" => &[&T_gltf_binary_model],
-"*.fh" => &[&T_x_freehand_image],
-"*.jar" => &[&T_java_archive_application],
-"*.arw" => &[&T_x_raw_sony_image],
-"*.igs" => &[&T_iges_model],
-"*.mxml" => &[&T_xv_xml_application],
-"*.xla" => &[&T_vnd_ms_excel_application],
-"*.s7m" => &[&T_x_sas_dmdb_application],
-"*.ftc" => &[&T_vnd_fluxtime_clip_application],
-"*.cmdf" => &[&T_x_cmdf_chemical],
-"*.ent" => &[&T_plain_text],
-"*.dgnlib" => &[&T_vnd_dgn_image],
-"*.php3" => &[&T_x_php_text],
-"*.md" => &[&T_x_web_markdown_text],
-"*.rtf" => &[&T_rtf_application],
-"*.sse" => &[&T_vnd_kodak_descriptor_application],
-"*.pwn" => &[&T_vnd_3m_post_it_notes_application],
-"*.sisx" => &[&T_vnd_symbian_install_application],
-"*.obd" => &[&T_x_msbinder_application],
-"*.msi" => &[&T_x_ms_installer_application],
-"*.erf" => &[&T_x_raw_epson_image],
-"*.fo" => &[&T_xslfo_xml_application],
-"*.vtt" => &[&T_vtt_text],
-"*.m1v" => &[&T_mpeg_video],
+"*.fp7" => &[&T_x_filemaker_application],
 "*.mmas" => &[&T_vnd_mindjet_mindmanager_application],
-"*.svd" => &[&T_vnd_svd_application],
-"*.roff" => &[&T_troff_text],
-"*.xmp" => &[&T_rdf_xml_application],
-"*.xsd" => &[&T_xml_application],
-"*.iif" => &[&T_vnd_shana_informed_interchange_application],
-"*.crw" => &[&T_x_raw_canon_image],
-"*.tpt" => &[&T_vnd_trid_tpt_application],
-"*.dna" => &[&T_vnd_dna_application],
-"*.3gp" => &[&T_3gpp_video],
-"*.xvm" => &[&T_xv_xml_application],
-"*.cct" => &[&T_x_director_application],
-"*.types" => &[&T_plain_text],
-"*.woff" => &[&T_woff_font],
-"*.odp" => &[&T_vnd_oasis_opendocument_presentation_application],
-"*.xtest" => &[&T_plain_text],
-"*.pfr" => &[&T_font_tdpfr_application],
-"*.brotli" => &[&T_x_brotli_application],
-"*.mg" => &[&T_x_modula_text],
-"*.vcf" => &[&T_x_vcard_text],
-"*.atx" => &[&T_vnd_antix_game_component_application],
-"*.epub" => &[&T_epub_zip_application],
-"i_*.txt" => &[&T_x_isatab_investigation_application],
-"*.sdd" => &[&T_vnd_stardivision_impress_application],
-"*.gph" => &[&T_vnd_flographit_application],
-"*.xlex" => &[&T_plain_text],
-"*.oda" => &[&T_oda_application],
-"*.cfc" => &[&T_x_coldfusion_text],
-"*.xenc" => &[&T_xenc_xml_application],
-"*.pls" => &[&T_pls_xml_application],
-"*.crx" => &[&T_x_chrome_package_application,&T_x_chrome_extension_application],
-"*.dxp" => &[&T_vnd_spotfire_dxp_application],
-"*.qfx" => &[&T_vnd_intu_qfx_application],
-"*.wk1" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
-"*.docm" => &[&T_vnd_ms_word_document_macroenabled_12_application],
-"*.xmind" => &[&T_x_xmind_application],
-"*.xmap" => &[&T_plain_text],
-"*.iiq" => &[&T_x_raw_phaseone_image],
-"*.pre" => &[&T_vnd_lotus_freelance_application],
-"*.dmg" => &[&T_x_apple_diskimage_application],
-"*.npx" => &[&T_vnd_net_fpx_image],
-"LICENSE" => &[&T_plain_text],
-"*.hpid" => &[&T_vnd_hp_hpid_application],
-"*.hpp" => &[&T_x_c__hdr_text],
-"*.mpga" => &[&T_mpeg_audio],
-"*.osf" => &[&T_vnd_yamaha_openscoreformat_application],
-"*.sas7bdmd" => &[&T_x_sas_dmdb_application],
-"*.ksp" => &[&T_vnd_kde_kspread_application],
-"*.vbs" => &[&T_x_vbscript_text],
-"*.mp4" => &[&T_mp4_video],
-"*.idml" => &[&T_vnd_adobe_indesign_idml_package_application],
-"*.xpm" => &[&T_x_xpixmap_image],
-"*.hprof.txt" => &[&T_vnd_java_hprof_text_application],
-"*.aw" => &[&T_applixware_application],
-"*.bcpio" => &[&T_x_bcpio_application],
-"*.oga" => &[&T_ogg_audio],
-"*.iges" => &[&T_iges_model],
-"*.am" => &[&T_plain_text],
-"*.ttf" => &[&T_x_font_ttf_application],
-"*.trm" => &[&T_x_msterminal_application],
-"*.pnm" => &[&T_x_portable_anymap_image],
-"*.project" => &[&T_plain_text],
-"*.vcs" => &[&T_x_vcalendar_text],
-"*.air" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
-"*.spp" => &[&T_scvp_vp_response_application],
-"*.ppt" => &[&T_vnd_ms_powerpoint_application],
-"*.thmx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
-"*.oas" => &[&T_vnd_fujitsu_oasys_application],
-"*.pcurl" => &[&T_vnd_curl_pcurl_application],
-"*.atomsvc" => &[&T_atomsvc_xml_application],
-"*.sas7butl" => &[&T_x_sas_utility_application],
-"*.cdxml" => &[&T_vnd_chemdraw_xml_application],
-"*.svg" => &[&T_svg_xml_image],
-"*.drf" => &[&T_x_raw_kodak_image],
-"*.cbl" => &[&T_x_cobol_text],
-"*.xcf" => &[&T_x_xcf_image],
-"*.mng" => &[&T_x_mng_video],
-"*.nsf" => &[&T_vnd_lotus_notes_application],
-"*.snd" => &[&T_basic_audio],
-"*.setpay" => &[&T_set_payment_initiation_application],
-"*.maker" => &[&T_vnd_framemaker_application],
-"*.S" => &[&T_x_assembly_text],
-"*.mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
-"*.com" => &[&T_x_msdownload_application],
-"*.aj" => &[&T_x_aspectj_text],
-"*.idl" => &[&T_x_idl_text],
-"*.gz" => &[&T_gzip_application],
-"*.pml" => &[&T_vnd_ctc_posml_application],
-"*.rq" => &[&T_sparql_query_application],
-"*.sfs" => &[&T_vnd_spotfire_sfs_application],
-"*.lz4" => &[&T_x_lz4_application],
-"*.ai" => &[&T_illustrator_application],
-"*.qwt" => &[&T_vnd_quark_quarkxpress_application],
-"*.fit" => &[&T_fits_application],
-"*.class" => &[&T_java_vm_application],
-"*.rdz" => &[&T_vnd_data_vision_rdz_application],
-"*.ustar" => &[&T_x_ustar_application],
-"*.sbml" => &[&T_sbml_xml_application],
-"*.pptm" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
-"*.m4v" => &[&T_x_m4v_video],
-"*.geo" => &[&T_vnd_dynageo_application],
-"*.clkt" => &[&T_vnd_crick_clicker_template_application],
-"*.w60" => &[&T_vnd_wordperfect_application],
-"*.nb" => &[&T_mathematica_application],
-"*.qxd" => &[&T_vnd_quark_quarkxpress_application],
-"*.ez3" => &[&T_vnd_ezpix_package_application],
-"*.teacher" => &[&T_vnd_smart_teacher_application],
-"*.toast" => &[&T_x_roxio_toast_application],
-"*.bin" => &[&T_octet_stream_application],
-"*.cmd" => &[&T_x_bat_application],
-"*.mrw" => &[&T_x_raw_minolta_image],
-"*.hxx" => &[&T_x_c__hdr_text],
-"*.wsdd" => &[&T_plain_text],
-"*.ots" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
-"*.sgml" => &[&T_sgml_text],
-"*.itk" => &[&T_x_tcl_text],
-"*.nnd" => &[&T_vnd_noblenet_directory_application],
-"*.hvs" => &[&T_vnd_yamaha_hv_script_application],
-"*.fh8" => &[&T_x_freehand_image],
-"*.tcl" => &[&T_x_tcl_text],
-"*.sgm" => &[&T_sgml_text],
-"*.cl" => &[&T_x_common_lisp_text],
-"*.ost" => &[&T_vnd_ms_outlook_pst_application],
-"*.p7m" => &[&T_pkcs7_mime_application],
-"*.ibooks" => &[&T_x_ibooks_zip_application],
-"*.xpw" => &[&T_vnd_intercon_formnet_application],
-"*.svgz" => &[&T_svg_xml_image],
-"*.qam" => &[&T_vnd_epson_quickanime_application],
-"*.link66" => &[&T_vnd_route66_link66_xml_application],
-"*.mrc" => &[&T_marc_application],
-"*.man" => &[&T_troff_text],
-"*.mmap" => &[&T_vnd_mindjet_mindmanager_application],
-"*.jdf" => &[&T_x_jeol_jdf_application],
-"*.mcd" => &[&T_vnd_mcd_application],
-"*.ssf" => &[&T_vnd_epson_ssf_application],
-"*.webmanifest" => &[&T_manifest_json_application],
-"*.icns" => &[&T_icns_image],
-"*.sd2" => &[&T_x_sas_data_v6_application],
-"*.lbd" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
-"*.tar" => &[&T_x_tar_application],
-"*.3fr" => &[&T_x_raw_hasselblad_image],
-"*.apt" => &[&T_plain_text],
-"*.bz" => &[&T_x_bzip_application],
-"*.ssml" => &[&T_ssml_xml_application],
-"*.str" => &[&T_vnd_pg_format_application],
-"*.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
-"*.otf" => &[&T_x_font_otf_application],
-"*.wb3" => &[&T_x_quattro_pro_application],
-"*.opus" => &[&T_opus_audio],
-"*.srx" => &[&T_sparql_results_xml_application],
-"*.xltx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
-"*.sas" => &[&T_x_sas_application],
-"*.xlog" => &[&T_plain_text],
-"*.fpx" => &[&T_vnd_fpx_image],
-"*.f77" => &[&T_x_fortran_text],
-"*.mus" => &[&T_vnd_musician_application],
-"*.ufd" => &[&T_vnd_ufdl_application],
-"*.py" => &[&T_x_python_text],
-"*.tbz2" => &[&T_x_bzip2_application],
-"*.wk4" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_4_application],
-"*.mdo" => &[&T_plain_text],
-"*.frame" => &[&T_vnd_framemaker_application],
-"*.skt" => &[&T_vnd_koan_application],
-"*.stx" => &[&T_x_sas_transport_application],
-"*.xif" => &[&T_vnd_xiff_image],
-"*.sas7bbak" => &[&T_x_sas_backup_application],
-"*.kml" => &[&T_vnd_google_earth_kml_xml_application],
-"*.ad.txt" => &[&T_x_asciidoc_text],
-"*.xdp" => &[&T_vnd_adobe_xdp_xml_application],
-"*.arj" => &[&T_x_arj_application],
-"*.unityweb" => &[&T_vnd_unity_application],
-"*.grxml" => &[&T_srgs_xml_application],
-"*.twd" => &[&T_vnd_simtech_mindmapper_application],
-"*.dbase3" => &[&T_x_dbf_application],
-"*.cpp" => &[&T_x_c__src_text],
-"*.rest" => &[&T_x_rst_text],
-"*.cer" => &[&T_pkix_cert_application],
-"*.gtm" => &[&T_vnd_groove_tool_message_application],
-"*.semd" => &[&T_vnd_semd_application],
-"*.dxf" => &[&T_vnd_dxf_image],
-"*.psflib" => &[&T_x_psf_audio],
-"*.cwiki" => &[&T_plain_text],
-"*.CPP" => &[&T_x_c__src_text],
-"*.ihtml" => &[&T_plain_text],
-"*.sas7bdat" => &[&T_x_sas_data_application],
-"*.FRM" => &[&T_x_vbasic_text],
-"*.pgp" => &[&T_pgp_encrypted_application],
-"*.smi" => &[&T_smil_xml_application],
-"*.kwd" => &[&T_vnd_kde_kword_application],
-"*.sav" => &[&T_x_spss_sav_application],
-"*.htc" => &[&T_plain_text],
-"*.org" => &[&T_vnd_lotus_organizer_application],
-"*.perl" => &[&T_x_perl_text],
-"*.semf" => &[&T_vnd_semf_application],
-".htaccess" => &[&T_plain_text],
-"*.pat" => &[&T_x_gimp_pat_image],
-"*.azw" => &[&T_vnd_amazon_ebook_application],
-"*.dxb" => &[&T_vnd_dxb_image],
-"*.scala" => &[&T_x_scala_text],
-"*.ml" => &[&T_x_ml_text],
-"*.pas" => &[&T_x_pascal_text],
-"*.cbor" => &[&T_cbor_application],
-"*.slddrw" => &[&T_sldworks_application],
-"*.tmx" => &[&T_x_tmx_application],
-"*.sz" => &[&T_x_snappy_framed_application],
-"*.zip" => &[&T_zip_application],
-"*.cgm" => &[&T_cgm_image],
-"*.nrw" => &[&T_x_raw_nikon_image],
-"*.owl" => &[&T_rdf_xml_application,&T_owl_xml_application],
-"*.aiff" => &[&T_x_aiff_audio],
-"*.wmv" => &[&T_x_ms_wmv_video],
-"*.cdbcmsg" => &[&T_vnd_contact_cmsg_application],
-"^rdf$" => &[&T_rdf_xml_application],
-"*.fhc" => &[&T_x_freehand_image],
-"*.icc" => &[&T_vnd_iccprofile_application],
-"*.tra" => &[&T_vnd_trueapp_application],
-"*.dvi" => &[&T_x_dvi_application],
-"*.xyz" => &[&T_x_xyz_chemical],
-"*.hbci" => &[&T_vnd_hbci_application],
-"*.p7c" => &[&T_pkcs7_mime_application],
-"*.wpt" => &[&T_vnd_wordperfect_application],
-"*.do" => &[&T_x_stata_do_application],
-"*.xwelcome" => &[&T_plain_text],
-"*.aaf" => &[&T_octet_stream_application],
-"^owl$" => &[&T_rdf_xml_application],
-"*.fnc" => &[&T_vnd_frogans_fnc_application],
-"*.qwd" => &[&T_vnd_quark_quarkxpress_application],
-"*.zirz" => &[&T_vnd_zul_application],
-"*.asice" => &[&T_vnd_etsi_asic_e_zip_application],
-"*.uc2" => &[&T_x_uc2_compressed_application],
-"*.p" => &[&T_x_pascal_text],
-"*.woff2" => &[&T_woff2_font],
-"*.flw" => &[&T_vnd_kde_kivio_application],
-"*.xliff" => &[&T_x_xliff_xml_application],
-"*.xsm" => &[&T_vnd_syncml_xml_application],
-"*.wq1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application],
-"*.mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
-"*.sda" => &[&T_vnd_stardivision_draw_application],
-"*.vda" => &[&T_x_tga_image],
-"*.m13" => &[&T_x_msmediaview_application],
-"*.indd" => &[&T_x_adobe_indesign_application],
-"*.sr7" => &[&T_x_sas_itemstor_application],
-"*.xer" => &[&T_patch_ops_error_xml_application],
-"*.c4g" => &[&T_vnd_clonk_c4group_application],
-"*.latex" => &[&T_x_latex_application],
-"*.pcx" => &[&T_vnd_zbrush_pcx_image],
-"*.irm" => &[&T_vnd_ibm_rights_management_application],
-"*.djvu" => &[&T_vnd_djvu_image],
-"*.pack" => &[&T_x_java_pack200_application],
-"*.wmf" => &[&T_wmf_image],
-"*.acfm" => &[&T_x_font_adobe_metric_application],
-"*.Bas" => &[&T_x_basic_text],
-"*.wmlc" => &[&T_vnd_wap_wmlc_application],
-"*.pfm" => &[&T_x_font_printer_metric_application],
-"*.gnucash" => &[&T_x_gnucash_application],
-"*.imp" => &[&T_vnd_accpac_simply_imp_application],
-"*.roles" => &[&T_plain_text],
-"*.gram" => &[&T_srgs_application],
-"*.azf" => &[&T_vnd_airzip_filesecure_azf_application],
-"*.htm" => &[&T_html_text],
-"*.xbd" => &[&T_vnd_fujixerox_docuworks_binder_application],
-"*.m3" => &[&T_x_modula_text],
-"*.rw2" => &[&T_x_raw_panasonic_image],
-"*.y" => &[&T_x_yacc_text],
-"*.ez" => &[&T_andrew_inset_application],
-"*.otp" => &[&T_vnd_oasis_opendocument_presentation_template_application],
 "*.xfdf" => &[&T_vnd_adobe_xfdf_application],
-"*.wb1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_5_application],
-"*.ogg" => &[&T_vorbis_audio],
-"*.hdf" => &[&T_x_hdf_application],
-"*.grv" => &[&T_vnd_groove_injector_application],
-"*.htke" => &[&T_vnd_kenameaapp_application],
-"*.shf" => &[&T_shf_xml_application],
-"*.daf" => &[&T_vnd_mobius_daf_application],
-"*.pya" => &[&T_vnd_ms_playready_media_pya_audio],
-"*.xslt" => &[&T_xslt_xml_application],
-"*.tcap" => &[&T_vnd_3gpp2_tcap_application],
-"*.lz" => &[&T_x_lzip_application,&T_lzip_application],
-"*.xroles" => &[&T_plain_text],
-"*.sas7bmdb" => &[&T_x_sas_mddb_application],
-"*.ez2" => &[&T_vnd_ezpix_album_application],
-"*.sap" => &[&T_x_sap_audio],
-"*.html" => &[&T_html_text],
-"*.handlers" => &[&T_plain_text],
-"*.stc" => &[&T_vnd_sun_xml_calc_template_application],
-"*.vm" => &[&T_plain_text],
-"*.lhs" => &[&T_x_haskell_text],
-"*.zmm" => &[&T_vnd_handheld_entertainment_xml_application],
-"*.smf" => &[&T_vnd_stardivision_math_application],
-"*.grb2" => &[&T_x_grib_application],
-"*.flo" => &[&T_vnd_micrografx_flo_application],
-"*.rng" => &[&T_plain_text],
-"*.rnc" => &[&T_relax_ng_compact_syntax_application],
-"*.cu" => &[&T_cu_seeme_application],
-"*.xld" => &[&T_vnd_ms_excel_application],
-"*.rif" => &[&T_reginfo_xml_application],
-"*.clkk" => &[&T_vnd_crick_clicker_keyboard_application],
-"NOTICE" => &[&T_plain_text],
-"*.deploy" => &[&T_octet_stream_application],
-"*.rtx" => &[&T_richtext_text],
-"*.cod" => &[&T_vnd_rim_cod_application],
-"*.urls" => &[&T_uri_list_text],
-"*.groovy" => &[&T_x_groovy_text],
-"*.vhdl" => &[&T_x_vhdl_text],
-"*.mqv" => &[&T_quicktime_video],
-"*.asx" => &[&T_x_ms_asx_application],
-"*.wm" => &[&T_x_ms_wm_video],
-"*.jxr" => &[&T_jxr_image],
-"*.ott" => &[&T_vnd_oasis_opendocument_text_template_application],
-"*.edx" => &[&T_vnd_novadigm_edx_application],
-"*.mp2" => &[&T_mpeg_audio],
-"*.gml" => &[&T_gml_xml_application],
-"*.srl" => &[&T_sereal_application],
-"*.dd2" => &[&T_vnd_oma_dd2_xml_application],
-"*.e57" => &[&T_e57_model],
-"*.wmls" => &[&T_vnd_wap_wmlscript_text],
-"*.jp2" => &[&T_jp2_image],
-"*.mli" => &[&T_x_ocaml_text],
-"*.xbap" => &[&T_x_ms_xbap_application],
-"*.ipa" => &[&T_x_itunes_ipa_application],
-"*.pbd" => &[&T_vnd_powerbuilder6_application],
-"*.lostxml" => &[&T_lost_xml_application],
-"*.jbig2" => &[&T_x_jbig2_image],
-"*.nroff" => &[&T_troff_text],
-"*.xlsx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
-"*.m3a" => &[&T_mpeg_audio],
-"*.cmp" => &[&T_vnd_yellowriver_custom_menu_application],
-"*.application" => &[&T_x_ms_application_application],
-"*.vcd" => &[&T_x_cdlink_application],
-"*.torrent" => &[&T_x_bittorrent_application],
-"*.hprof" => &[&T_vnd_java_hprof__application],
-"*.ivp" => &[&T_vnd_immervision_ivp_application],
-"*.nlu" => &[&T_vnd_neurolanguage_nlu_application],
-"*.srf" => &[&T_x_raw_sony_image],
-"*.s" => &[&T_x_assembly_text],
-"*.curl" => &[&T_vnd_curl_text],
-"*.lua" => &[&T_x_lua_text],
-"*.gbr" => &[&T_x_gimp_gbr_image],
-"*.wmd" => &[&T_x_ms_wmd_application],
-"*.sdw" => &[&T_vnd_stardivision_writer_application],
-"*.cab" => &[&T_vnd_ms_cab_compressed_application],
-"*.dll" => &[&T_x_msdownload_application],
-"*.pki" => &[&T_pkixcmp_application],
-"*.fh11" => &[&T_x_freehand_image],
-"*.pp" => &[&T_x_pascal_text],
-"*.mbox" => &[&T_mbox_application],
-"*.mathml" => &[&T_mathml_xml_application],
-"*.otc" => &[&T_vnd_oasis_opendocument_chart_template_application],
-"*.sas7bvew" => &[&T_x_sas_view_application],
-"*.xgrm" => &[&T_plain_text],
-"*.e" => &[&T_x_eiffel_text],
-"*.xlf" => &[&T_x_xliff_xml_application],
-"*.xls" => &[&T_vnd_ms_excel_application],
-"*.mp4s" => &[&T_mp4_application],
-"*.ncx" => &[&T_x_dtbncx_xml_application],
-"*.mvb" => &[&T_x_msmediaview_application],
-"*.sig" => &[&T_pgp_signature_application],
-"*.sm7" => &[&T_x_sas_mddb_application],
-"*.xht" => &[&T_xhtml_xml_application],
-"*.ra" => &[&T_x_pn_realaudio_audio],
-"*.rl" => &[&T_resource_lists_xml_application],
-"*.config" => &[&T_x_config_text],
-"*.dib" => &[&T_bmp_image],
-"*.qt" => &[&T_quicktime_video],
-"*.mkv" => &[&T_x_matroska_video],
+"*.vb" => &[&T_x_vbdotnet_text],
 "*.tcx" => &[&T_vnd_garmin_tcx_xml_application],
-"*.patch" => &[&T_x_diff_text],
-"*.chm" => &[&T_vnd_ms_htmlhelp_application],
-"*.xpr" => &[&T_vnd_is_xpr_application],
-"*.ft11" => &[&T_x_freehand_image],
-"*.json" => &[&T_json_application],
-"*.mp4a" => &[&T_mp4_audio],
-"*.tk" => &[&T_x_tcl_text],
-"*.for" => &[&T_x_fortran_text],
-"*.swi" => &[&T_vnd_arastra_swi_application],
-"*.p7b" => &[&T_x_pkcs7_certificates_application],
-"*.wp61" => &[&T_vnd_wordperfect_application],
-"*.PAS" => &[&T_x_pascal_text],
-"*.fods" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
-"*.texinfo" => &[&T_x_texinfo_application],
-"*.fm" => &[&T_vnd_framemaker_application],
-"*.sxi" => &[&T_vnd_sun_xml_impress_application],
-"*.wps" => &[&T_vnd_ms_works_application],
-"*.pclxl" => &[&T_vnd_hp_pclxl_application],
-"*.otm" => &[&T_vnd_oasis_opendocument_text_master_application],
-"*.xop" => &[&T_xop_xml_application],
-"*.p7s" => &[&T_pkcs7_signature_application],
-"*.cst" => &[&T_x_director_application],
-"*.markdown" => &[&T_x_web_markdown_text],
-"*.sas7bpgm" => &[&T_x_sas_program_data_application],
-"*.grb" => &[&T_x_grib_application],
-"*.cwk" => &[&T_x_appleworks_application],
-"*.cdx" => &[&T_x_cdx_chemical],
-"*.vsdx" => &[&T_vnd_ms_visio_drawing_application],
-"*.fh4" => &[&T_x_freehand_image],
-"*.pub" => &[&T_x_mspublisher_application],
-"*.sf7" => &[&T_x_sas_fdb_application],
-"*.ogv" => &[&T_ogg_video],
-"*.lnk" => &[&T_x_ms_shortcut_application],
-"*.pqa" => &[&T_vnd_palm_application],
-"*.ma" => &[&T_mathematica_application],
-"*.ivu" => &[&T_vnd_immervision_ivu_application],
-"*.plc" => &[&T_vnd_mobius_plc_application],
-"*.txf" => &[&T_vnd_mobius_txf_application],
-"*.mod" => &[&T_x_mod_audio],
-"*.xpt" => &[&T_x_sas_xport_application],
-"*.ipk" => &[&T_vnd_shana_informed_package_application],
-"*.mbk" => &[&T_vnd_mobius_mbk_application],
-"*.boz" => &[&T_x_bzip2_application],
-"*.rdf" => &[&T_rdf_xml_application],
-"*.wtb" => &[&T_vnd_webturbo_application],
-"*.mst" => &[&T_x_ms_installer_application],
-"abs-linkmap" => &[&T_plain_text],
-"*.pom" => &[&T_plain_text],
-"*.asp" => &[&T_asp_text],
-"*.anpa" => &[&T_vnd_iptc_anpa_text],
-"*.susp" => &[&T_vnd_sus_calendar_application],
-"tzfile" => &[&T_tzif_application],
-"*.ltf" => &[&T_vnd_frogans_ltf_application],
-"a_*.txt" => &[&T_x_isatab_assay_application],
-"*.bh2" => &[&T_vnd_fujitsu_oasysprs_application],
-"*.gre" => &[&T_vnd_geometry_explorer_application],
-"*.lzh" => &[&T_octet_stream_application],
-"*.kne" => &[&T_vnd_kinar_application],
-"*.ufdl" => &[&T_vnd_ufdl_application],
-"*.au" => &[&T_basic_audio],
-"*.cww" => &[&T_prs_cww_application],
-"*.pxn" => &[&T_x_raw_logitech_image],
-"*.hlp" => &[&T_winhlp_application],
-"*.orf" => &[&T_x_raw_olympus_image],
-"*.xsamples" => &[&T_plain_text],
-"*.rep" => &[&T_vnd_businessobjects_application],
-"*.mpx" => &[&T_x_project_application],
-"*.xar" => &[&T_vnd_xara_application,&T_x_xar_application],
-"*.xhtml" => &[&T_xhtml_xml_application],
-"*.fh10" => &[&T_x_freehand_image],
-"*.opf" => &[&T_oebps_package_xml_application],
-"*.hvd" => &[&T_vnd_yamaha_hv_dic_application],
-"*.sc7" => &[&T_x_sas_catalog_application],
-"*.dbase" => &[&T_x_dbf_application],
-"*.eot" => &[&T_vnd_ms_fontobject_application],
-"*.fsc" => &[&T_vnd_fsc_weblaunch_application],
-"*.xport" => &[&T_x_sas_xport_application],
-"*.go" => &[&T_x_go_text],
-"*.dis" => &[&T_vnd_mobius_dis_application],
-"*.tzx" => &[&T_x_spectrum_tzx_application],
-"*.bsh" => &[&T_plain_text],
-"*.qbo" => &[&T_vnd_intu_qbo_application],
-"*.sc" => &[&T_vnd_ibm_secure_container_application],
-"*-gz" => &[&T_gzip_application],
-"*.rmi" => &[&T_midi_audio],
-"*.mef" => &[&T_x_raw_mamiya_image],
-"*.dir" => &[&T_x_director_application],
-"*.jmx" => &[&T_plain_text],
-"*.mf" => &[&T_plain_text],
-"*.vtu" => &[&T_vnd_vtu_model],
-"*.amf" => &[&T_x_amf_application],
-"*.frm" => &[&T_x_vbasic_text],
-"*.mj2" => &[&T_mj2_video],
-"*.junit" => &[&T_plain_text],
-"*.jlt" => &[&T_vnd_hp_jlyt_application],
-"*.warc.gz" => &[&T_warc_gz_application],
-"*.xvml" => &[&T_xv_xml_application],
-"*.dpx" => &[&T_x_dpx_image],
-"*.xfdl" => &[&T_vnd_xfdl_application],
-"*.ar" => &[&T_x_archive_application],
-"*.lrf" => &[&T_octet_stream_application],
-"*.swf" => &[&T_x_shockwave_flash_application],
-"*.epsi" => &[&T_postscript_application],
-"*.spc" => &[&T_x_pkcs7_certificates_application],
-"*.sldasm" => &[&T_sldworks_application],
+"*.mathml" => &[&T_mathml_xml_application],
+"*.imp" => &[&T_vnd_accpac_simply_imp_application],
+"*.atomcat" => &[&T_atomcat_xml_application],
+"*.fzs" => &[&T_vnd_fuzzysheet_application],
+"*.pot" => &[&T_vnd_ms_powerpoint_application],
+"*.prc" => &[&T_x_mobipocket_ebook_application],
 "*.xpi" => &[&T_x_xpinstall_application],
-"*.hps" => &[&T_vnd_hp_hps_application],
+"*.mxf" => &[&T_mxf_application],
+"*.dataless" => &[&T_vnd_fdsn_seed_application],
+"*.pnm" => &[&T_x_portable_anymap_image],
+"*.xegrm" => &[&T_plain_text],
+"*.xroles" => &[&T_plain_text],
+"*.sdp" => &[&T_sdp_application],
+"*.sitx" => &[&T_x_stuffitx_application],
+"*.nsf" => &[&T_vnd_lotus_notes_application],
+"*.mpp" => &[&T_vnd_ms_project_application],
+"*.laz" => &[&T_x_asprs_application],
+"*.ft" => &[&T_plain_text],
+"*.mng" => &[&T_x_mng_video],
+"*.epsf" => &[&T_postscript_application],
+"*.ens" => &[&T_x_endnote_style_application],
+"*.csv" => &[&T_csv_text],
+"*.azw" => &[&T_vnd_amazon_ebook_application],
+"*.qpw" => &[&T_x_quattro_pro_application],
+"*.ss7" => &[&T_x_sas_program_data_application],
+"*.prt" => &[&T_x_prt_application],
+"*.ac3" => &[&T_ac3_audio],
+"*.h261" => &[&T_h261_video],
+"*.qam" => &[&T_vnd_epson_quickanime_application],
+"*.asm" => &[&T_x_assembly_text],
+"*.clkx" => &[&T_vnd_crick_clicker_application],
+"*.spot" => &[&T_vnd_in3d_spot_text],
+"*.pfm" => &[&T_x_font_printer_metric_application],
+"*.aifc" => &[&T_x_aiff_audio],
+"*.sldasm" => &[&T_sldworks_application],
+"*.j2c" => &[&T_x_jp2_codestream_image],
+"*.project" => &[&T_plain_text],
+"*.sas7bpgm" => &[&T_x_sas_program_data_application],
+"*.rgb" => &[&T_x_rgb_image],
+"*.snf" => &[&T_x_font_snf_application],
+"*.fh40" => &[&T_x_freehand_image],
+"*.bpk" => &[&T_octet_stream_application],
+"*.xul" => &[&T_vnd_mozilla_xul_xml_application],
+"*.sm7" => &[&T_x_sas_mddb_application],
+"*.mpga" => &[&T_mpeg_audio],
+"*.mov" => &[&T_quicktime_video],
+"*.sig" => &[&T_pgp_signature_application],
+"*.grxml" => &[&T_srgs_xml_application],
+"*.mxl" => &[&T_vnd_recordare_musicxml_application],
+"*.p7b" => &[&T_x_pkcs7_certificates_application],
+"*.doc" => &[&T_msword_application],
+"*.c++" => &[&T_x_c__src_text],
+"*.npx" => &[&T_vnd_net_fpx_image],
+"*.pkipath" => &[&T_pkix_pkipath_application],
+"*.ecma" => &[&T_ecmascript_application],
+"*.fods" => &[&T_vnd_oasis_opendocument_flat_spreadsheet_application],
+"*.oxt" => &[&T_vnd_openofficeorg_extension_application],
+"*.cii" => &[&T_vnd_anser_web_certificate_issue_initiation_application],
+"*.m3u8" => &[&T_vnd_apple_mpegurl_application],
+"*.l" => &[&T_x_lex_text],
+"*.xspf" => &[&T_xspf_xml_application],
+"*.xsl" => &[&T_xml_application],
+"*.minipsf1" => &[&T_x_psf_audio],
+"*.raf" => &[&T_x_raw_fuji_image],
+"*.xlf" => &[&T_x_xliff_xml_application],
+"*.data" => &[&T_plain_text],
+"*.otg" => &[&T_vnd_oasis_opendocument_graphics_template_application],
+"*.jfif" => &[&T_jpeg_image],
+"*.mat" => &[&T_x_matlab_data_application],
+"*.kpr" => &[&T_vnd_kde_kpresenter_application],
+"*.plb" => &[&T_vnd_3gpp_pic_bw_large_application],
+"*.kwd" => &[&T_vnd_kde_kword_application],
+"*.ami" => &[&T_vnd_amiga_ami_application],
+"*.iso19139" => &[&T_iso19139_xml_text],
+"*.wk3" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_3_application],
+"*.fodt" => &[&T_vnd_oasis_opendocument_flat_text_application],
+"*.pgn" => &[&T_x_chess_pgn_application],
+"*.wb2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_6_application],
+"*.msi" => &[&T_x_ms_installer_application],
+"*.dtshd" => &[&T_vnd_dts_hd_audio],
+"*.p7s" => &[&T_pkcs7_signature_application],
+"*.sus" => &[&T_vnd_sus_calendar_application],
+"*.jx" => &[&T_plain_text],
+"*.mka" => &[&T_x_matroska_audio],
+"*.tcap" => &[&T_vnd_3gpp2_tcap_application],
+"^owl$" => &[&T_rdf_xml_application],
+"*.mpeg" => &[&T_mpeg_video],
+"*.pwn" => &[&T_vnd_3m_post_it_notes_application],
+"*.stl" => &[&T_x_stl_binary_model],
+"*.diff" => &[&T_x_diff_text],
+"*.xslfo" => &[&T_xslfo_xml_application],
+"*.php4" => &[&T_x_php_text],
+"*.mdtext" => &[&T_x_web_markdown_text],
+"*.tga" => &[&T_x_tga_image],
+"*.schemas" => &[&T_plain_text],
+"*.odc" => &[&T_vnd_oasis_opendocument_chart_application],
+"*.itp" => &[&T_vnd_shana_informed_formtemplate_application],
+"*.mfm" => &[&T_vnd_mfmp_application],
+"*.vssm" => &[&T_vnd_ms_visio_stencil_macroEnabled_12_application],
+"*.dsw" => &[&T_plain_text],
+"*.ivu" => &[&T_vnd_immervision_ivu_application],
+"*.mp4a" => &[&T_mp4_audio],
+"*.vda" => &[&T_x_tga_image],
+"*.abw" => &[&T_x_abiword_application],
+"*.bz" => &[&T_x_bzip_application],
+"*.smf" => &[&T_vnd_stardivision_math_application],
+"*.ac" => &[&T_plain_text],
+"*.sr2" => &[&T_x_raw_sony_image],
+"*.mde" => &[&T_x_msaccess_application],
+"*.kar" => &[&T_midi_audio],
+"*.ptx" => &[&T_x_raw_pentax_image],
+"*.x3f" => &[&T_x_raw_sigma_image],
+"*.mpg" => &[&T_mpeg_video],
+"*.asf" => &[&T_x_ms_asf_video],
+"*.H" => &[&T_x_c__hdr_text],
+"*.types" => &[&T_plain_text],
+"*.cbor" => &[&T_cbor_application],
+"*.spq" => &[&T_scvp_vp_request_application],
+"*.fb2" => &[&T_x_fictionbook_xml_application],
+"*.ditamap" => &[&T_dita_xml_format_map_application],
+"*.pml" => &[&T_vnd_ctc_posml_application],
+"*.n-gage" => &[&T_vnd_nokia_n_gage_symbian_install_application],
+"*.prf" => &[&T_pics_rules_application],
+"*.wp6" => &[&T_vnd_wordperfect_application],
+"*.lha" => &[&T_octet_stream_application],
+"*.xbap" => &[&T_x_ms_xbap_application],
+"*.ncx" => &[&T_x_dtbncx_xml_application],
+"*.xq" => &[&T_xquery_application],
+"*.sfdu" => &[&T_x_sfdu_application],
+"*.sv4cpio" => &[&T_x_sv4cpio_application],
+"*.pdf" => &[&T_pdf_application],
+"*.pclxl" => &[&T_vnd_hp_pclxl_application],
+"*.et3" => &[&T_vnd_eszigno3_xml_application],
+"*.docm" => &[&T_vnd_ms_word_document_macroenabled_12_application],
+"*.cdx" => &[&T_x_cdx_chemical],
+"*.clkw" => &[&T_vnd_crick_clicker_wordbank_application],
+"*.mp3" => &[&T_mpeg_audio],
+"*.ft9" => &[&T_x_freehand_image],
+"*.xpm" => &[&T_x_xpixmap_image],
+"*.m2a" => &[&T_mpeg_audio],
+"*.vxml" => &[&T_voicexml_xml_application],
+"*.ief" => &[&T_ief_image],
+"*.ntf" => &[&T_nitf_image],
+"*.mime" => &[&T_rfc822_message],
+"*.mqv" => &[&T_quicktime_video],
+"*.lz4" => &[&T_x_lz4_application],
+"*.com" => &[&T_x_msdownload_application],
+"*.mkd" => &[&T_x_web_markdown_text],
+"*.mxml" => &[&T_xv_xml_application],
+"*.cl" => &[&T_x_common_lisp_text],
+"*.frame" => &[&T_vnd_framemaker_application],
+"*.odft" => &[&T_vnd_oasis_opendocument_formula_template_application],
+"*.php" => &[&T_x_php_text],
+"*.cat" => &[&T_vnd_ms_pki_seccat_application],
+"*.eol" => &[&T_vnd_digital_winds_audio],
+"*.MYD" => &[&T_x_mysql_misam_data_application],
+"*.erl" => &[&T_x_erlang_text],
+"*.efif" => &[&T_vnd_picsel_application],
+"*.w3d" => &[&T_x_director_application],
+"*.igx" => &[&T_vnd_micrografx_igx_application],
+"*.ez" => &[&T_andrew_inset_application],
+"*.vcf" => &[&T_x_vcard_text],
+"*.txd" => &[&T_vnd_genomatix_tuxedo_application],
+"*.avif" => &[&T_avif_image],
+"*.xml" => &[&T_xml_application],
+"*.ear" => &[&T_x_tika_java_enterprise_archive_application],
+"*.iso" => &[&T_x_iso9660_image_application],
+"*.ssml" => &[&T_ssml_xml_application],
+"*.sxd" => &[&T_vnd_sun_xml_draw_application],
+"*.fits" => &[&T_fits_application],
+"*.enw" => &[&T_x_endnote_refer_application],
+"*.txf" => &[&T_vnd_mobius_txf_application],
+"*.cfg" => &[&T_x_config_text],
+"*.ptid" => &[&T_vnd_pvi_ptid1_application],
+"*.opus" => &[&T_opus_audio],
+"*.sgml" => &[&T_sgml_text],
+"*.cpt" => &[&T_mac_compactpro_application],
+"*.umj" => &[&T_vnd_umajin_application],
+"*.jks" => &[&T_x_java_keystore_application],
+"*.eot" => &[&T_vnd_ms_fontobject_application],
+"*.shar" => &[&T_x_shar_application],
+"*.fh" => &[&T_x_freehand_image],
+"*.dwfx" => &[&T_vnd_dwfx_xps_model],
+"*.fsc" => &[&T_vnd_fsc_weblaunch_application],
+"*.sdkm" => &[&T_vnd_solent_sdkm_xml_application],
+"*.fv" => &[&T_plain_text],
+"*.3g2" => &[&T_3gpp2_video],
+"*.mmpt" => &[&T_vnd_mindjet_mindmanager_application],
+"*.cmdf" => &[&T_x_cmdf_chemical],
+"*.orf" => &[&T_x_raw_olympus_image],
+"*.urls" => &[&T_uri_list_text],
+"*.xz" => &[&T_x_xz_application],
+"*.fnc" => &[&T_vnd_frogans_fnc_application],
+"*.aab" => &[&T_x_authorware_bin_application],
+"*.aam" => &[&T_x_authorware_map_application],
+"*.dist" => &[&T_octet_stream_application],
+"*.xsd" => &[&T_xml_application],
+"*.indd" => &[&T_x_adobe_indesign_application],
+"*.snd" => &[&T_basic_audio],
+"*.wpd" => &[&T_vnd_wordperfect_application],
+"*.uue" => &[&T_x_uuencode_text],
+"*.gre" => &[&T_vnd_geometry_explorer_application],
+"*.gph" => &[&T_vnd_flographit_application],
+"*.qwd" => &[&T_vnd_quark_quarkxpress_application],
+"*.mbox" => &[&T_mbox_application],
+"*.cwk" => &[&T_x_appleworks_application],
+"*.exr" => &[&T_aces_image],
+"*.haml" => &[&T_x_haml_text],
+"*.fhc" => &[&T_x_freehand_image],
+"*.pro" => &[&T_x_prolog_text],
+"*.xps" => &[&T_vnd_ms_xpsdocument_application],
+"*.bash" => &[&T_x_sh_application],
+"*.xif" => &[&T_vnd_xiff_image],
+"*.box" => &[&T_vnd_previewsystems_box_application],
+"*.flx" => &[&T_vnd_fmi_flexstor_text],
+"*.mp4" => &[&T_mp4_video],
+"*.p12" => &[&T_x_pkcs12_application],
+"*.nef" => &[&T_x_raw_nikon_image],
+"*.tk" => &[&T_x_tcl_text],
+"*.sxg" => &[&T_vnd_sun_xml_writer_global_application],
+"NOTICE" => &[&T_plain_text],
+"*.cfml" => &[&T_x_coldfusion_text],
+"*.vis" => &[&T_vnd_visionary_application],
+"*.sh" => &[&T_x_sh_application],
+"*.hpgl" => &[&T_vnd_hp_hpgl_application],
+"*.voc" => &[&T_x_unknown_audio],
+"*.ace" => &[&T_x_ace_compressed_application],
+"*.silo" => &[&T_mesh_model],
+"*.aspx" => &[&T_aspdotnet_text],
+"*.wri" => &[&T_x_mswrite_application],
+"*.mj2" => &[&T_mj2_video],
+"*.stf" => &[&T_vnd_wt_stf_application],
+"*.ser" => &[&T_java_serialized_object_application],
+"*.c4p" => &[&T_vnd_clonk_c4group_application],
+"*.am" => &[&T_plain_text],
+"*.cgi" => &[&T_x_cgi_text],
+"*.dbase3" => &[&T_x_dbf_application],
+"*.thmx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
+"*.FRM" => &[&T_x_vbasic_text],
+"*.ei6" => &[&T_vnd_pg_osasli_application],
+"*.lhs" => &[&T_x_haskell_text],
+"*.fpx" => &[&T_vnd_fpx_image],
+"*.p" => &[&T_x_pascal_text],
+"*.c4d" => &[&T_vnd_clonk_c4group_application],
+"*.car" => &[&T_vnd_curl_car_application],
+"*.tra" => &[&T_vnd_trueapp_application],
+"*.rar" => &[&T_x_rar_compressed_application],
+"*.xht" => &[&T_xhtml_xml_application],
+"*.heic" => &[&T_heic_image],
+"*.htm" => &[&T_html_text],
+"*.def" => &[&T_plain_text],
+"*.cdkey" => &[&T_vnd_mediastation_cdkey_application],
+"*.uc2" => &[&T_x_uc2_compressed_application],
+"*.dcurl" => &[&T_vnd_curl_dcurl_text],
+"*.sas7bitm" => &[&T_x_sas_itemstor_application],
+"*.hh" => &[&T_x_c__hdr_text],
+"*.see" => &[&T_vnd_seemail_application],
+"*.xlex" => &[&T_plain_text],
+"*.texinfo" => &[&T_x_texinfo_application],
+"*.ims" => &[&T_vnd_ms_ims_application],
+"*.stc" => &[&T_vnd_sun_xml_calc_template_application],
+"*.ngdat" => &[&T_vnd_nokia_n_gage_data_application],
+"*.icm" => &[&T_vnd_iccprofile_application],
+"*.tif" => &[&T_tiff_image],
+"*.tao" => &[&T_vnd_tao_intent_module_archive_application],
+"*.pam" => &[&T_x_portable_arbitrarymap_image],
+"*.adb" => &[&T_x_ada_text],
+"*.perl" => &[&T_x_perl_text],
+"*.cls" => &[&T_x_vbasic_text],
+"*.wvx" => &[&T_x_ms_wvx_video],
+"*.onetoc" => &[&T_onenote_format_onetoc2_application],
+"*.f77" => &[&T_x_fortran_text],
+"*.wbs" => &[&T_vnd_criticaltools_wbs_xml_application],
+"*.mp4s" => &[&T_mp4_application],
+"*.twd" => &[&T_vnd_simtech_mindmapper_application],
+"*.gbr" => &[&T_x_gimp_gbr_image],
+"*.aaf" => &[&T_octet_stream_application],
+"*.tex" => &[&T_x_tex_application],
+"*.dbase" => &[&T_x_dbf_application],
+"*.ent" => &[&T_plain_text],
+"*.hbci" => &[&T_vnd_hbci_application],
+"*.otm" => &[&T_vnd_oasis_opendocument_text_master_application],
+"*.azs" => &[&T_vnd_airzip_filesecure_azs_application],
+"*.g3" => &[&T_g3fax_image],
+"*.gv" => &[&T_vnd_graphviz_text],
+"*.cpp" => &[&T_x_c__src_text],
+"*.bz2" => &[&T_x_bzip2_application],
+"*.bpg" => &[&T_x_bpg_image,&T_bpg_image],
+"*.pef" => &[&T_x_raw_pentax_image],
+"*.HPP" => &[&T_x_c__hdr_text],
+"*.scala" => &[&T_x_scala_text],
+"*.msp" => &[&T_x_ms_installer_application],
+"*.ez3" => &[&T_vnd_ezpix_package_application],
+"*.ig" => &[&T_x_modula_text],
+"*.parquet" => &[&T_x_parquet_application],
+"*.he5" => &[&T_x_hdf_application],
+"*.mvb" => &[&T_x_msmediaview_application],
+"*.cww" => &[&T_prs_cww_application],
+"*.xlz" => &[&T_x_xliff_zip_application],
+"*.bh2" => &[&T_vnd_fujitsu_oasysprs_application],
+"*.s7m" => &[&T_x_sas_dmdb_application],
+"*.x32" => &[&T_x_authorware_bin_application],
+"*.unityweb" => &[&T_vnd_unity_application],
+"*.gslib" => &[&T_x_psf_audio],
+"*.mlp" => &[&T_vnd_dolby_mlp_application],
+"*.setreg" => &[&T_set_registration_initiation_application],
+"*.dotm" => &[&T_vnd_ms_word_template_macroenabled_12_application],
+"*.mb" => &[&T_mathematica_application],
+"*.ufdl" => &[&T_vnd_ufdl_application],
+"*.xpr" => &[&T_vnd_is_xpr_application],
+"*.c4u" => &[&T_vnd_clonk_c4group_application],
+"*.br" => &[&T_x_brotli_application],
+"*.mid" => &[&T_midi_audio],
+"*.oth" => &[&T_vnd_oasis_opendocument_text_web_application],
+"*.war" => &[&T_x_tika_java_web_archive_application],
+"*.gqs" => &[&T_vnd_grafeq_application],
+"*.ots" => &[&T_vnd_oasis_opendocument_spreadsheet_template_application],
+"*.hfa" => &[&T_x_erdas_hfa_application],
+"*.wkq" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application,&T_x_quattro_pro_version_5_application],
+"*.susp" => &[&T_vnd_sus_calendar_application],
+"*.air" => &[&T_vnd_adobe_air_application_installer_package_zip_application],
+"*.wsdd" => &[&T_plain_text],
+"*.mqy" => &[&T_vnd_mobius_mqy_application],
+"*.xbd" => &[&T_vnd_fujixerox_docuworks_binder_application],
+"*.htke" => &[&T_vnd_kenameaapp_application],
+"*.cdxml" => &[&T_vnd_chemdraw_xml_application],
+"*.ibooks" => &[&T_x_ibooks_zip_application],
+"*.webp" => &[&T_webp_image],
+"*.3dml" => &[&T_vnd_in3d_3dml_text],
+"*.zmm" => &[&T_vnd_handheld_entertainment_xml_application],
 "*.lvp" => &[&T_vnd_lucent_voice_audio],
 "*.sis" => &[&T_vnd_symbian_install_application],
-"*.su7" => &[&T_x_sas_utility_application],
-"*.sdc" => &[&T_vnd_stardivision_calc_application],
-"*.tpl" => &[&T_vnd_groove_tool_template_application],
-"*.def" => &[&T_plain_text],
-"*.nml" => &[&T_vnd_enliven_application],
-"*.3dml" => &[&T_vnd_in3d_3dml_text],
-"*.fp7" => &[&T_x_filemaker_application],
-"*.fh5" => &[&T_x_freehand_image],
-"*.bpg" => &[&T_x_bpg_image,&T_bpg_image],
-"*.onetoc" => &[&T_onenote_format_onetoc2_application],
-"*.pro" => &[&T_x_prolog_text],
-"*.ad" => &[&T_x_asciidoc_text],
-"*.rs" => &[&T_rls_services_xml_application],
-"*.dgn" => &[&T_vnd_dgn_image],
+"*.ifb" => &[&T_calendar_text],
+"*.fm" => &[&T_vnd_framemaker_application],
+"*.ihtml" => &[&T_plain_text],
+"*.xgrm" => &[&T_plain_text],
+"*.gac" => &[&T_vnd_groove_account_application],
+"*.al" => &[&T_x_perl_text],
+"*.cab" => &[&T_vnd_ms_cab_compressed_application],
+"*.fff" => &[&T_x_raw_imacon_image],
+"*.arw" => &[&T_x_raw_sony_image],
+"*.hvs" => &[&T_vnd_yamaha_hv_script_application],
+"*.ras" => &[&T_x_cmu_raster_image],
+"*.xyz" => &[&T_x_xyz_chemical],
 "*.rnx" => &[&T_plain_text],
-"*.mpt" => &[&T_vnd_ms_project_application],
-"*.gpkg" => &[&T_x_geopackage_application,&T_x_geopackage__version_1_1Or1_0_application],
-"*.sti" => &[&T_vnd_sun_xml_impress_template_application],
-"*.spx" => &[&T_speex_audio],
-"*.mlp" => &[&T_vnd_dolby_mlp_application],
-"*.jx" => &[&T_plain_text],
-"*.mjs" => &[&T_javascript_text],
-"*.aifc" => &[&T_x_aiff_audio],
-"*.csv" => &[&T_csv_text],
-"*.kpt" => &[&T_vnd_kde_kpresenter_application],
-"*.bib" => &[&T_x_bibtex_text_file_application],
-"*.wcm" => &[&T_vnd_ms_works_application],
-"*.cmc" => &[&T_vnd_cosmocaller_application],
-"*.one" => &[&T_onenote_format_one_application],
-"*.eps" => &[&T_postscript_application],
-"*.ktr" => &[&T_vnd_kahootz_application],
-"*.dtb" => &[&T_x_dtbook_xml_application],
-"*.wmlsc" => &[&T_vnd_wap_wmlscriptc_application],
-"*.wl" => &[&T_vnd_wolfram_wl_application],
-"*.lha" => &[&T_octet_stream_application],
-"*.wri" => &[&T_x_mswrite_application],
-"*.st7" => &[&T_x_sas_audit_application],
-"*.avif" => &[&T_avif_image],
-"*.wk2" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
-"*.ft8" => &[&T_x_freehand_image],
-"*.yaml" => &[&T_x_yaml_text],
-"*.xlsm" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
-"*.wad" => &[&T_x_doom_application],
-"*.wasm" => &[&T_wasm_application],
-"*.dist" => &[&T_octet_stream_application],
-"*.fe_launch" => &[&T_vnd_denovo_fcselayout_link_application],
-"*.adb" => &[&T_x_ada_text],
-"*.rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
-"*.m3u8" => &[&T_vnd_apple_mpegurl_application],
-"*.gpg" => &[&T_pgp_encrypted_application],
-"*.vst" => &[&T_vnd_visio_application],
-"*.axx" => &[&T_x_axcrypt_application],
-"*.cnd" => &[&T_plain_text],
-"*.clj" => &[&T_x_clojure_text],
-"*.aso" => &[&T_vnd_accpac_simply_aso_application],
-"*.exp" => &[&T_x_expect_text],
-"*.pen" => &[&T_plain_text],
-"*.see" => &[&T_vnd_seemail_application],
-"*.wdb" => &[&T_vnd_ms_works_application],
-"*.bz2" => &[&T_x_bzip2_application],
-"*.dsp" => &[&T_plain_text],
-"*.xargs" => &[&T_plain_text],
-"*.rst" => &[&T_x_rst_text],
-"*.scq" => &[&T_scvp_cv_request_application],
-"*.psf" => &[&T_x_font_linux_psf_application],
-"*.so" => &[&T_octet_stream_application],
-"*.ngdat" => &[&T_vnd_nokia_n_gage_data_application],
-"*.ggt" => &[&T_vnd_geogebra_tool_application],
-"*.jpf" => &[&T_jpx_image],
-"*.utz" => &[&T_vnd_uiq_theme_application],
-"*.gdl" => &[&T_vnd_gdl_model],
-"*.flx" => &[&T_vnd_fmi_flexstor_text],
-"*.xbm" => &[&T_x_xbitmap_image],
-"*.mseq" => &[&T_vnd_mseq_application],
-"*.lzma" => &[&T_x_lzma_application],
-"*.dpr" => &[&T_x_pascal_text],
-"*.mkd" => &[&T_x_web_markdown_text],
-"*.arc" => &[&T_x_internet_archive_application],
-"*.mpeg" => &[&T_mpeg_video],
-"*.heif" => &[&T_heif_image],
-"*.asciidoc" => &[&T_x_asciidoc_text],
-"*.karbon" => &[&T_vnd_kde_karbon_application],
-"*.book" => &[&T_vnd_framemaker_application],
-"*.vsd" => &[&T_vnd_visio_application],
-"*.ft" => &[&T_plain_text],
-"*.rpst" => &[&T_vnd_nokia_radio_preset_application],
-"*.aac" => &[&T_x_aac_audio],
+"*.xvm" => &[&T_xv_xml_application],
+"*.png" => &[&T_png_image],
+"*.nc" => &[&T_x_netcdf_application],
+"*.vf" => &[&T_x_tex_virtual_font_application],
+"*.m4" => &[&T_plain_text],
+"*.sav" => &[&T_x_spss_sav_application],
+"*.wbxml" => &[&T_vnd_wap_wbxml_application],
+"*.ppa" => &[&T_vnd_ms_powerpoint_application],
+"*.der" => &[&T_x_x509_cert_format_der_application],
+"*.amfm" => &[&T_x_font_adobe_metric_application],
+"*.eml" => &[&T_rfc822_message],
+"*.ftc" => &[&T_vnd_fluxtime_clip_application],
+"*.plc" => &[&T_vnd_mobius_plc_application],
+"*.dex" => &[&T_x_dex_application],
+"*.mny" => &[&T_x_msmoney_application],
+"*.sd7" => &[&T_x_sas_data_application],
+"*.fh50" => &[&T_x_freehand_image],
+"*.wpl" => &[&T_vnd_ms_wpl_application],
 "*.ppz" => &[&T_vnd_ms_powerpoint_application],
+"*.rpm" => &[&T_x_rpm_application],
+"*.psd" => &[&T_vnd_adobe_photoshop_image],
+"*.pgm" => &[&T_x_portable_graymap_image],
+"*.roles" => &[&T_plain_text],
+"*.distz" => &[&T_octet_stream_application],
+"*.jxr" => &[&T_jxr_image],
+"*.psb" => &[&T_vnd_3gpp_pic_bw_small_application],
+"*.musicxml" => &[&T_vnd_recordare_musicxml_xml_application],
+"*.grb" => &[&T_x_grib_application],
+"*.java" => &[&T_x_java_source_text],
+"*.pages" => &[&T_vnd_apple_pages_application],
+"*.torrent" => &[&T_x_bittorrent_application],
+"*.json" => &[&T_json_application],
+"*.knp" => &[&T_vnd_kinar_application],
+"*.mif" => &[&T_vnd_mif_application],
+"*.fgd" => &[&T_x_director_application],
+"*.lz" => &[&T_x_lzip_application,&T_lzip_application],
+"*.fli" => &[&T_x_fli_video],
+"*.bat" => &[&T_x_bat_application],
+"*.grb1" => &[&T_x_grib_application],
+"*.xconf" => &[&T_x_config_text],
+"*.mjp2" => &[&T_mj2_video],
+"*.skm" => &[&T_vnd_koan_application],
+"*.wqd" => &[&T_vnd_wqd_application],
+"*.std" => &[&T_vnd_sun_xml_draw_template_application],
+"*.onetoc2" => &[&T_onenote_format_onetoc2_application],
+"*.dvi" => &[&T_x_dvi_application],
+"*.htc" => &[&T_plain_text],
+"*.texi" => &[&T_x_texinfo_application],
+"*.sgl" => &[&T_vnd_stardivision_writer_global_application],
+"*.lua" => &[&T_x_lua_text],
+"*.curl" => &[&T_vnd_curl_text],
+"*.scad" => &[&T_x_openscad_application],
+"*.sti" => &[&T_vnd_sun_xml_impress_template_application],
+"*.enr" => &[&T_x_endnote_refer_application],
+"*.mpn" => &[&T_vnd_mophun_application_application],
+"*.st7" => &[&T_x_sas_audit_application],
+"*.rw2" => &[&T_x_raw_panasonic_image],
+"*.msa" => &[&T_vnd_msa_disk_image_application],
+"*.sbml" => &[&T_sbml_xml_application],
+"*.dp" => &[&T_vnd_osgi_dp_application],
+"*.rest" => &[&T_x_rst_text],
+"*.vbs" => &[&T_x_vbscript_text],
+"*.dvb" => &[&T_vnd_dvb_file_video],
+"*.nrw" => &[&T_x_raw_nikon_image],
+"*.ad.txt" => &[&T_x_asciidoc_text],
+"*.C" => &[&T_x_c__src_text],
+"*.do" => &[&T_x_stata_do_application],
+"*.pcurl" => &[&T_vnd_curl_pcurl_application],
+"*.ocaml" => &[&T_x_ocaml_text],
+"*.tbz2" => &[&T_x_bzip2_application],
+"*.drc" => &[&T_x_dirac_video],
+"*.nns" => &[&T_vnd_noblenet_sealer_application],
+"*.odp" => &[&T_vnd_oasis_opendocument_presentation_application],
+"*.exp" => &[&T_x_expect_text],
+"*.vss" => &[&T_vnd_visio_application],
+"*.gpx" => &[&T_gpx_xml_application],
+"*.xhtml2" => &[&T_xhtml_xml_application],
+"*.r" => &[&T_x_rsrc_text],
+"*.mjs" => &[&T_javascript_text],
+"*.4th" => &[&T_x_forth_text],
+"*.dbf" => &[&T_x_dbf_application],
+"*.fh10" => &[&T_x_freehand_image],
+"*.a" => &[&T_x_archive_application],
+"*.xbm" => &[&T_x_xbitmap_image],
+"*.ez2" => &[&T_vnd_ezpix_album_application],
+"*.dcm" => &[&T_dicom_application],
+"*.emz" => &[&T_x_emf_compressed_image],
+"*.tmx" => &[&T_x_tmx_application],
+"*.CLS" => &[&T_x_vbasic_text],
+"*.plf" => &[&T_vnd_pocketlearn_application],
+"*.link66" => &[&T_vnd_route66_link66_xml_application],
+"*.webarchive" => &[&T_x_webarchive_application],
+"*.m4b" => &[&T_mp4_audio],
+"*.class" => &[&T_java_vm_application],
+"*.rtx" => &[&T_richtext_text],
+"*.tsd" => &[&T_timestamped_data_application],
+"*.ppam" => &[&T_vnd_ms_powerpoint_addin_macroenabled_12_application],
+"*.sv7" => &[&T_x_sas_view_application],
+"*.Cob" => &[&T_x_cobol_text],
+"*.list" => &[&T_plain_text],
+"*.asnd" => &[&T_vnd_adobe_soundbooth_audio],
+"*.sml" => &[&T_smil_xml_application],
+"*.xhvml" => &[&T_xv_xml_application],
+"*.m3" => &[&T_x_modula_text],
+"*.wl" => &[&T_vnd_wolfram_wl_application],
+"*.rtf" => &[&T_rtf_application],
+"*.minipsf" => &[&T_x_psf_audio],
+"*.pre" => &[&T_vnd_lotus_freelance_application],
+"*.nnd" => &[&T_vnd_noblenet_directory_application],
+"*.djv" => &[&T_vnd_djvu_image],
+"*.h++" => &[&T_x_c__hdr_text],
+"*.emma" => &[&T_emma_xml_application],
+"*.shf" => &[&T_shf_xml_application],
+"*.coffee" => &[&T_x_coffeescript_text],
+"*.psflib" => &[&T_x_psf_audio],
+"*.h264" => &[&T_h264_video],
+"*.rnc" => &[&T_relax_ng_compact_syntax_application],
+"*.dfac" => &[&T_vnd_dreamfactory_application],
+"*.skp" => &[&T_vnd_koan_application],
+"*.sfs" => &[&T_vnd_spotfire_sfs_application],
+"*.minigsf" => &[&T_x_psf_audio],
+"*.cnd" => &[&T_plain_text],
+"*.spc" => &[&T_x_pkcs7_certificates_application],
+"*.mmap" => &[&T_vnd_mindjet_mindmanager_application],
+"*.cpio" => &[&T_x_cpio_application],
+"*.xop" => &[&T_xop_xml_application],
+"*.mf" => &[&T_plain_text],
+"*.mg" => &[&T_x_modula_text],
+"*.stw" => &[&T_vnd_sun_xml_writer_template_application],
+"*.webmanifest" => &[&T_manifest_json_application],
+"*.xslt" => &[&T_xslt_xml_application],
+"*.potm" => &[&T_vnd_ms_powerpoint_template_macroenabled_12_application],
+"*.rlc" => &[&T_vnd_fujixerox_edmics_rlc_image],
+"*.jpgv" => &[&T_jpeg_video],
+"*.rq" => &[&T_sparql_query_application],
+"*.sas7bfdb" => &[&T_x_sas_fdb_application],
+"*.semd" => &[&T_vnd_semd_application],
+"*.nar" => &[&T_vnd_iptc_g2_newsmessage_xml_application],
+"*.kfo" => &[&T_vnd_kde_kformula_application],
+"*.spf" => &[&T_vnd_yamaha_smaf_phrase_application],
+"*.fh7" => &[&T_x_freehand_image],
+"*.lnk" => &[&T_x_ms_shortcut_application],
+"*.xlam" => &[&T_vnd_ms_excel_addin_macroenabled_12_application],
+"*.asc" => &[&T_pgp_signature_application],
+"*.aas" => &[&T_x_authorware_seg_application],
+"*.hwpx" => &[&T_hwp_zip_application],
+"*.tr" => &[&T_troff_text],
+"*.uu" => &[&T_x_uuencode_text],
+"*.fti" => &[&T_vnd_anser_web_funds_transfer_initiation_application],
+"*.esf" => &[&T_vnd_epson_esf_application],
+"*.lwp" => &[&T_vnd_lotus_wordpro_application],
+"*.ppd" => &[&T_vnd_cups_ppd_application],
+"*.sldx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slide_application],
+"*.gmx" => &[&T_vnd_gmx_application],
+"*.zipx" => &[&T_zip_application],
+"*.vcs" => &[&T_x_vcalendar_text],
+"*.fvt" => &[&T_vnd_fvt_video],
+"*.nroff" => &[&T_troff_text],
+"*.bmi" => &[&T_vnd_bmi_application],
+"*.sfd-hdstx" => &[&T_vnd_hydrostatix_sof_data_application],
+"*.uris" => &[&T_uri_list_text],
+"*.yml" => &[&T_x_yaml_text],
+"*.pptx" => &[&T_vnd_openxmlformats_officedocument_presentationml_presentation_application],
+"*.boz" => &[&T_x_bzip2_application],
+"*.onepkg" => &[&T_onenote__format_package_application],
+"*.dmg" => &[&T_x_apple_diskimage_application],
+"*.pem" => &[&T_x_x509_cert_format_pem_application],
+"*.ms" => &[&T_troff_text],
+"*.vtt" => &[&T_vtt_text],
+"*.setpay" => &[&T_set_payment_initiation_application],
+"*.jb2" => &[&T_x_jbig2_image],
+"*.adp" => &[&T_adpcm_audio],
+"*.sz" => &[&T_x_snappy_framed_application],
+"*.opf" => &[&T_oebps_package_xml_application],
+"*.tcsh" => &[&T_x_csh_application],
+"*.hdr" => &[&T_vnd_radiance_image],
+"*.cml" => &[&T_x_cml_chemical],
+"*.n3" => &[&T_plain_text],
+"*.rl" => &[&T_resource_lists_xml_application],
+"*.vox" => &[&T_x_authorware_bin_application],
+"*.msf" => &[&T_vnd_epson_msf_application],
+"*.wks" => &[&T_vnd_ms_works_application],
+"*.hlp" => &[&T_winhlp_application],
+"*.sas" => &[&T_x_sas_application],
+"*.mp2" => &[&T_mpeg_audio],
+"*.fh8" => &[&T_x_freehand_image],
+"*.vsl" => &[&T_plain_text],
+"*.book" => &[&T_vnd_framemaker_application],
+"*.vst" => &[&T_vnd_visio_application],
+"*.aep" => &[&T_vnd_adobe_aftereffects_project_application],
+"*.vsw" => &[&T_vnd_visio_application],
+"*.dsc" => &[&T_prs_lines_tag_text],
+"*.twds" => &[&T_vnd_simtech_mindmapper_application],
+"*.pls" => &[&T_pls_xml_application],
+"*.gnucash" => &[&T_x_gnucash_application],
+"*.kpt" => &[&T_vnd_kde_kpresenter_application],
+"*.kwt" => &[&T_vnd_kde_kword_application],
+"*.v" => &[&T_x_verilog_text],
+"*.qbo" => &[&T_vnd_intu_qbo_application],
+"^rdf$" => &[&T_rdf_xml_application],
+"*.c4g" => &[&T_vnd_clonk_c4group_application],
+"*.md" => &[&T_x_web_markdown_text],
+"*.sxc" => &[&T_vnd_sun_xml_calc_application],
+"*.cu" => &[&T_cu_seeme_application],
+"*.mobi" => &[&T_x_mobipocket_ebook_application],
+"*.bup" => &[&T_x_dvd_ifo_application],
+"*.kia" => &[&T_vnd_kidspiration_application],
+"*.xpt" => &[&T_x_sas_xport_application],
+"*.seed" => &[&T_vnd_fdsn_seed_application],
+"*.edx" => &[&T_vnd_novadigm_edx_application],
+"*.jif" => &[&T_jpeg_image],
+"*.pvb" => &[&T_vnd_3gpp_pic_bw_var_application],
+"*.vhdl" => &[&T_x_vhdl_text],
+"*.rss" => &[&T_rss_xml_application],
+"*.iif" => &[&T_vnd_shana_informed_interchange_application],
+"*.teacher" => &[&T_vnd_smart_teacher_application],
+"*.ads" => &[&T_x_ada_text],
+"*.azf" => &[&T_vnd_airzip_filesecure_azf_application],
+"*.s" => &[&T_x_assembly_text],
+"KEYS" => &[&T_plain_text],
+"*.saf" => &[&T_vnd_yamaha_smaf_audio_application],
+"*.ipk" => &[&T_vnd_shana_informed_package_application],
+"*.p7r" => &[&T_x_pkcs7_certreqresp_application],
+"*.dta" => &[&T_x_stata_dta_application],
+"*.ft12" => &[&T_x_freehand_image],
+"*.sd2" => &[&T_x_sas_data_v6_application],
+"*.cdy" => &[&T_vnd_cinderella_application],
+"*.dae" => &[&T_vnd_collada_xml_model],
+"*.tzx" => &[&T_x_spectrum_tzx_application],
+"*.ra" => &[&T_x_pn_realaudio_audio],
+"*.applescript" => &[&T_x_applescript_text],
+"*.fts" => &[&T_fits_application],
+"*.lrm" => &[&T_vnd_ms_lrm_application],
+"*.mxs" => &[&T_vnd_triscape_mxs_application],
+"*.ifo" => &[&T_x_dvd_ifo_application],
+"*.ma" => &[&T_mathematica_application],
+"*.gtar" => &[&T_x_gtar_application],
+"*.etx" => &[&T_x_setext_text],
+"*.mpm" => &[&T_vnd_blueice_multipass_application],
+"*.msg" => &[&T_vnd_ms_outlook_application],
+"*.wrl" => &[&T_vrml_model],
+"*.m4s" => &[&T_iso_segment_video],
+"*.crd" => &[&T_x_mscardfile_application],
+"*.xmap" => &[&T_plain_text],
+"*.ogm" => &[&T_x_ogm_video],
+"*.rpss" => &[&T_vnd_nokia_radio_presets_application],
+"*.atom" => &[&T_atom_xml_application],
+"*.sc7" => &[&T_x_sas_catalog_application],
+"*.sed" => &[&T_x_sed_text],
+"*.asice" => &[&T_vnd_etsi_asic_e_zip_application],
+"*.kil" => &[&T_x_killustrator_application],
+"*.fdf" => &[&T_vnd_fdf_application],
+"*.heif" => &[&T_heif_image],
+"*.awk" => &[&T_x_awk_text],
+"*.for" => &[&T_x_fortran_text],
+"*.adf" => &[&T_x_amiga_disk_format_application],
+"*.toast" => &[&T_x_roxio_toast_application],
+"*.lit" => &[&T_x_ms_reader_application],
+"*.xcf" => &[&T_x_xcf_image],
+"*.csp" => &[&T_vnd_commonspace_application],
+"*.xport" => &[&T_x_sas_xport_application],
+"*.atc" => &[&T_vnd_acucorp_application],
+"*.fbs" => &[&T_vnd_fastbidsheet_image],
+"*.fig" => &[&T_x_xfig_application],
+"*.xer" => &[&T_patch_ops_error_xml_application],
+"*.oda" => &[&T_oda_application],
+"*.dcl" => &[&T_plain_text],
+"*.cc" => &[&T_x_c__src_text],
+"*.flac" => &[&T_x_flac_audio],
+"*.bdf" => &[&T_x_font_bdf_application],
+"*.scm" => &[&T_x_scheme_text],
+"*.jlt" => &[&T_vnd_hp_jlyt_application],
+"README" => &[&T_plain_text],
+"*.shp" => &[&T_x_shapefile_application,&T_vnd_shp_application],
+"*.lzh" => &[&T_octet_stream_application],
+"*.dms" => &[&T_octet_stream_application],
+"*.odf" => &[&T_vnd_oasis_opendocument_formula_application],
+"*.jpm" => &[&T_jpm_image],
+"*.woff2" => &[&T_woff2_font],
+"*.ape" => &[&T_ape_audio],
+"*.r3d" => &[&T_x_raw_red_image],
+"*.ps" => &[&T_postscript_application],
+"*.gtm" => &[&T_vnd_groove_tool_message_application],
+"*.kon" => &[&T_vnd_kde_kontour_application],
+"*.mpx" => &[&T_x_project_application],
+"*.mpg4" => &[&T_mp4_video],
+"*.vtu" => &[&T_vnd_vtu_model],
+"*.cmx" => &[&T_x_cmx_image],
+"*.lyr" => &[&T_x_esri_layer_application],
+"*.dcr" => &[&T_x_director_application],
+"*.tbz" => &[&T_x_bzip_application],
+"*.movie" => &[&T_x_sgi_movie_video],
+"*.qxl" => &[&T_vnd_quark_quarkxpress_application],
+"*.srf" => &[&T_x_raw_sony_image],
+"*.deploy" => &[&T_octet_stream_application],
+"*.sse" => &[&T_vnd_kodak_descriptor_application],
+"*.psf" => &[&T_x_font_linux_psf_application],
+"*.wq2" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_5_application],
+"*.k25" => &[&T_x_raw_kodak_image],
+"*.bsh" => &[&T_plain_text],
+"*.pfb" => &[&T_x_font_type1_application],
+"*.sas7bdmd" => &[&T_x_sas_dmdb_application],
+"*.rmp" => &[&T_x_pn_realaudio_plugin_audio],
+"*.wml" => &[&T_vnd_wap_wml_text],
+"*.sas7bdat" => &[&T_x_sas_data_application],
+"*.arc" => &[&T_x_internet_archive_application],
+"*.semf" => &[&T_vnd_semf_application],
+"*.icb" => &[&T_x_tga_image],
+"*.aw" => &[&T_applixware_application],
+"*.pub" => &[&T_x_mspublisher_application],
+"*.3mf" => &[&T_vnd_ms_package_3dmanufacturing_3dmodel_xml_application],
+"*.wsdl" => &[&T_wsdl_xml_application],
+"*.ppj" => &[&T_vnd_adobe_premiere_image],
+"*.jnilib" => &[&T_x_java_jnilib_application],
+"*.cxt" => &[&T_x_director_application],
+"*.ivp" => &[&T_vnd_immervision_ivp_application],
+"*.csml" => &[&T_x_csml_chemical],
+"*.sas7butl" => &[&T_x_sas_utility_application],
+"*.mts" => &[&T_vnd_mts_model],
+"*.mus" => &[&T_vnd_musician_application],
+"*.wk2" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
+"*.m3a" => &[&T_mpeg_audio],
+"*.text" => &[&T_plain_text],
+"*.jdf" => &[&T_x_jeol_jdf_application],
+"*.ini" => &[&T_x_ini_text],
+"*.sass" => &[&T_x_sass_text],
+"LICENSE" => &[&T_plain_text],
+"*.msty" => &[&T_vnd_muvee_style_application],
+"*.clkt" => &[&T_vnd_crick_clicker_template_application],
+"*.3fr" => &[&T_x_raw_hasselblad_image],
+"*.sgm" => &[&T_sgml_text],
+"*.si7" => &[&T_x_sas_data_index_application],
+"*.MF" => &[&T_plain_text],
+"*.nnw" => &[&T_vnd_noblenet_web_application],
+"*.tar" => &[&T_x_tar_application],
+"*.ttml" => &[&T_ttml_xml_application],
+"a_*.txt" => &[&T_x_isatab_assay_application],
+"*.gim" => &[&T_vnd_groove_identity_message_application],
+"*.fodp" => &[&T_vnd_oasis_opendocument_flat_presentation_application],
+"*.ltf" => &[&T_vnd_frogans_ltf_application],
+"*.dd2" => &[&T_vnd_oma_dd2_xml_application],
+"*.u32" => &[&T_x_authorware_bin_application],
+"*.sas7bndx" => &[&T_x_sas_data_index_application],
+"*.grm" => &[&T_plain_text],
+"*.vm" => &[&T_plain_text],
+"*.wk4" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_4_application],
+"*.z" => &[&T_x_compress_application],
+"*.rb" => &[&T_x_ruby_text],
+"*.m4v" => &[&T_x_m4v_video],
+"*.wm" => &[&T_x_ms_wm_video],
+"*.srl" => &[&T_sereal_application],
+"*.vsf" => &[&T_vnd_vsf_application],
+"*.xfdl" => &[&T_vnd_xfdl_application],
+"*.dtd" => &[&T_xml_dtd_application],
+"*.wasm" => &[&T_wasm_application],
+"*.t" => &[&T_troff_text],
+"*.handlers" => &[&T_plain_text],
+"*.cod" => &[&T_vnd_rim_cod_application],
+"*.p7m" => &[&T_pkcs7_mime_application],
+"*.ssf" => &[&T_vnd_epson_ssf_application],
+"*.warc.gz" => &[&T_warc_gz_application],
+"*.pfr" => &[&T_font_tdpfr_application],
+"*.aet" => &[&T_vnd_adobe_aftereffects_template_application],
+"*.oga" => &[&T_ogg_audio],
+"*.ecelp9600" => &[&T_vnd_nuera_ecelp9600_audio],
+"*.bmp" => &[&T_bmp_image],
+"*.tmo" => &[&T_vnd_tmobile_livetv_application],
+"*.mef" => &[&T_x_raw_mamiya_image],
+"*.bin" => &[&T_octet_stream_application],
+"*.ram" => &[&T_x_pn_realaudio_audio],
+"*.Cbl" => &[&T_x_cobol_text],
+"*.go" => &[&T_x_go_text],
+"*.lsp" => &[&T_x_common_lisp_text],
+"*.st" => &[&T_x_stsrc_text],
+"*.mmf" => &[&T_vnd_smaf_application],
+"*.mxu" => &[&T_vnd_mpegurl_video],
+"*.f90" => &[&T_x_fortran_text],
+"*.dot" => &[&T_msword_application],
+"*.iiq" => &[&T_x_raw_phaseone_image],
+"*.pic" => &[&T_x_pict_image],
+"*.ppsm" => &[&T_vnd_ms_powerpoint_slideshow_macroenabled_12_application],
+"*.crx" => &[&T_x_chrome_package_application,&T_x_chrome_extension_application],
+"*.cxx" => &[&T_x_c__src_text],
+"*.hps" => &[&T_vnd_hp_hps_application],
+"*.rdf" => &[&T_rdf_xml_application],
+"*.csh" => &[&T_x_csh_application],
+"*.hprof" => &[&T_vnd_java_hprof__application],
+"*.bas" => &[&T_x_basic_text],
+"*.dis" => &[&T_vnd_mobius_dis_application],
+"*.xap" => &[&T_x_silverlight_app_application],
+"*.xlc" => &[&T_vnd_ms_excel_application],
+"*.nes" => &[&T_x_nesrom_application],
+"*.scurl" => &[&T_vnd_curl_scurl_text],
+"*.mdb" => &[&T_x_msaccess_application],
+"*.caf" => &[&T_x_caf_audio],
+"*.raw" => &[&T_x_raw_panasonic_image],
+"*.ktr" => &[&T_vnd_kahootz_application],
+"*.mdi" => &[&T_vnd_ms_modi_image],
+"*.fh11" => &[&T_x_freehand_image],
+"*.obd" => &[&T_x_msbinder_application],
+"*.jisp" => &[&T_vnd_jisp_application],
+"*.ggt" => &[&T_vnd_geogebra_tool_application],
+"*.udeb" => &[&T_x_debian_package_application],
+"*.spx" => &[&T_speex_audio],
+"*.fh9" => &[&T_x_freehand_image],
+"*.mmd" => &[&T_vnd_chipnuts_karaoke_mmd_application],
+"*.pom" => &[&T_plain_text],
+"*.sdw" => &[&T_vnd_stardivision_writer_application],
+"*.xcat" => &[&T_plain_text],
+"*.vor" => &[&T_x_staroffice_template_application],
+"*.sql" => &[&T_x_sql_text],
+"*.tcl" => &[&T_x_tcl_text],
+"*.yaml" => &[&T_x_yaml_text],
+"*.dna" => &[&T_vnd_dna_application],
+"*.bau" => &[&T_vnd_openofficeorg_autotext_application],
+"*.ksp" => &[&T_vnd_kde_kspread_application],
+"*.osfpvg" => &[&T_vnd_yamaha_openscoreformat_osfpvg_xml_application],
+"*.aso" => &[&T_vnd_accpac_simply_aso_application],
+"*.jbig2" => &[&T_x_jbig2_image],
+"*.3gp" => &[&T_3gpp_video],
+"*.xlt" => &[&T_vnd_ms_excel_application],
+"*.spl" => &[&T_x_futuresplash_application],
+"*.qfx" => &[&T_vnd_intu_qfx_application],
+"*.rep" => &[&T_vnd_businessobjects_application],
+"*.tpl" => &[&T_vnd_groove_tool_template_application],
+"*.skt" => &[&T_vnd_koan_application],
+"*.zip" => &[&T_zip_application],
+"*.dts" => &[&T_vnd_dts_audio],
+"*.xtest" => &[&T_plain_text],
+"*.flw" => &[&T_vnd_kde_kivio_application],
+"*.gpg" => &[&T_pgp_encrypted_application],
+"*.pcx" => &[&T_vnd_zbrush_pcx_image],
+"*.hs" => &[&T_x_haskell_text],
+"*.tsv" => &[&T_tab_separated_values_text],
+"*.f" => &[&T_x_fortran_text],
+"*.axx" => &[&T_x_axcrypt_application],
+"*.oprc" => &[&T_vnd_palm_application],
+"*.scs" => &[&T_scvp_cv_response_application],
+"*.mbk" => &[&T_vnd_mobius_mbk_application],
+"*.gnumeric" => &[&T_x_gnumeric_application],
+"*.sc" => &[&T_vnd_ibm_secure_container_application],
+"*.jl" => &[&T_x_common_lisp_text],
+"*.qcp" => &[&T_qcelp_audio],
+"*.pqa" => &[&T_vnd_palm_application],
+"*.xo" => &[&T_vnd_olpc_sugar_application],
+"*.dcx" => &[&T_vnd_zbrush_dcx_image],
+"*.xmind" => &[&T_x_xmind_application],
+"*.pps" => &[&T_vnd_ms_powerpoint_application],
+"*.zst" => &[&T_zstd_application],
+"*.slddrw" => &[&T_sldworks_application],
+"*.stk" => &[&T_hyperstudio_application],
+"*.igl" => &[&T_vnd_igloader_application],
+"*.wk1" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_2_application],
+"*.vcx" => &[&T_vnd_vcx_application],
+"*.m2v" => &[&T_mpeg_video],
+"*.pyv" => &[&T_vnd_ms_playready_media_pyv_video],
+"*.dtb" => &[&T_x_dtbook_xml_application],
+"*.rng" => &[&T_plain_text],
+"*.avi" => &[&T_x_msvideo_video],
+"*.odb" => &[&T_vnd_oasis_opendocument_base_application],
+"*.dita" => &[&T_dita_xml_format_topic_application],
+"*.cct" => &[&T_x_director_application],
+"*.clkk" => &[&T_vnd_crick_clicker_keyboard_application],
+"*.mpy" => &[&T_vnd_ibm_minipay_application],
+"*.ppt" => &[&T_vnd_ms_powerpoint_application],
+"*.egrm" => &[&T_plain_text],
+"*.inx" => &[&T_x_adobe_indesign_interchange_application],
+"Makefile" => &[&T_x_makefile_text],
+"*.apt" => &[&T_plain_text],
+"*.flv" => &[&T_x_flv_video],
+"*.wmd" => &[&T_x_ms_wmd_application],
+"*.mod" => &[&T_x_mod_audio],
+"*.cif" => &[&T_x_cif_chemical],
+"*.bdm" => &[&T_vnd_syncml_dm_wbxml_application],
+"*.rld" => &[&T_resource_lists_diff_xml_application],
+"*.xargs" => &[&T_plain_text],
+"*.zaz" => &[&T_vnd_zzazz_deck_xml_application],
+"*.pbm" => &[&T_x_portable_bitmap_image],
+"*.midi" => &[&T_midi_audio],
+"*.erf" => &[&T_x_raw_epson_image],
+"*.srt" => &[&T_x_subrip_application],
+"*.xweb" => &[&T_plain_text],
+"*.pcl" => &[&T_vnd_hp_pcl_application],
+"*.sdd" => &[&T_vnd_stardivision_impress_application],
+"*.warc" => &[&T_warc_application],
+"*.cs" => &[&T_x_csharp_text],
+"*.Frm" => &[&T_x_vbasic_text],
+"*.wmv" => &[&T_x_ms_wmv_video],
+"*.gpkg" => &[&T_x_geopackage_application,&T_x_geopackage__version_1_1Or1_0_application],
+"*.gz" => &[&T_gzip_application],
+"*.groovy" => &[&T_x_groovy_text],
+"*.application" => &[&T_x_ms_application_application],
+"*.bcpio" => &[&T_x_bcpio_application],
+"*.vmdk" => &[&T_x_vmdk_application],
+"*.swi" => &[&T_vnd_arastra_swi_application],
+"*.xenc" => &[&T_xenc_xml_application],
+"*.meta" => &[&T_plain_text],
+"*.clkp" => &[&T_vnd_crick_clicker_palette_application],
+"*.wcm" => &[&T_vnd_ms_works_application],
+"*.m13" => &[&T_x_msmediaview_application],
+"*.el" => &[&T_x_emacs_lisp_text],
+"*.h5" => &[&T_x_hdf_application],
+"*.oa2" => &[&T_vnd_fujitsu_oasys2_application],
+"*.dng" => &[&T_x_raw_adobe_image],
+"*.geo" => &[&T_vnd_dynageo_application],
+"*.lbd" => &[&T_vnd_llamagraphics_life_balance_desktop_application],
+"*.slt" => &[&T_vnd_epson_salt_application],
+"*.tgz" => &[&T_gzip_application],
+"*.sp7" => &[&T_x_sas_putility_application],
+"*.vhd" => &[&T_x_vhdl_text],
+"*.hpid" => &[&T_vnd_hp_hpid_application],
+"*.sf7" => &[&T_x_sas_fdb_application],
+"*.h263" => &[&T_h263_video],
+"*.apk" => &[&T_vnd_android_package_archive_application],
+"*.wdb" => &[&T_vnd_ms_works_application],
+"*.jpe" => &[&T_jpeg_image],
+"*.patch" => &[&T_x_diff_text],
+"*.wmx" => &[&T_x_ms_wmx_video],
+"*.mscml" => &[&T_mediaservercontrol_xml_application],
+"*.apr" => &[&T_vnd_lotus_approach_application],
+"*.man" => &[&T_troff_text],
+"*.atx" => &[&T_vnd_antix_game_component_application],
+"*.wp61" => &[&T_vnd_wordperfect_application],
+"*.mcurl" => &[&T_vnd_curl_mcurl_text],
+"*.cfm" => &[&T_x_coldfusion_text],
+"*.wax" => &[&T_x_ms_wax_audio],
+"*.restx" => &[&T_x_rst_text],
+"*.cdr" => &[&T_coreldraw_application],
+"*.jxs" => &[&T_jxs_image],
+"*.irp" => &[&T_vnd_irepository_package_xml_application],
+"*.deb" => &[&T_x_debian_package_application],
+"*-gz" => &[&T_gzip_application],
+"*.pya" => &[&T_vnd_ms_playready_media_pya_audio],
+"*.rdz" => &[&T_vnd_data_vision_rdz_application],
+"*.xll" => &[&T_vnd_ms_excel_application],
+"*.wp" => &[&T_vnd_wordperfect_application],
+"*.ttc" => &[&T_x_font_ttf_application,&T_collection_font],
+"*.acc" => &[&T_vnd_americandynamics_acc_application],
+"*.jpg" => &[&T_jpeg_image],
+"*.cdbcmsg" => &[&T_vnd_contact_cmsg_application],
+"*.res" => &[&T_x_dtbresource_xml_application],
+"*.nlu" => &[&T_vnd_neurolanguage_nlu_application],
+"*.pict" => &[&T_x_pict_image],
+"*.onetmp" => &[&T_onenote_application],
+"*.maker" => &[&T_vnd_framemaker_application],
+"*.less" => &[&T_x_less_text],
+"*.sap" => &[&T_x_sap_audio],
+"*.str" => &[&T_vnd_pg_format_application],
+"*.dxp" => &[&T_vnd_spotfire_dxp_application],
+"*.wmlsc" => &[&T_vnd_wap_wmlscriptc_application],
+"*.wmlc" => &[&T_vnd_wap_wmlc_application],
+"*.hqx" => &[&T_mac_binhex40_application],
+"*.mmp" => &[&T_vnd_mindjet_mindmanager_application],
+"*.oas" => &[&T_vnd_fujitsu_oasys_application],
+"*.wps" => &[&T_vnd_ms_works_application],
+"*.scd" => &[&T_x_msschedule_application],
+"*.rsd" => &[&T_rsd_xml_application],
+"*.dxr" => &[&T_x_director_application],
+"*.ico" => &[&T_vnd_microsoft_icon_image],
+"*.aj" => &[&T_x_aspectj_text],
+"*.mgz" => &[&T_vnd_proteus_magazine_application],
+"*.xmp" => &[&T_rdf_xml_application],
+"*.3ds" => &[&T_x_3ds_image],
+"*.xlsb" => &[&T_vnd_ms_excel_sheet_binary_macroenabled_12_application],
+"*.swf" => &[&T_x_shockwave_flash_application],
+"*.ai" => &[&T_illustrator_application],
+"*.wmls" => &[&T_vnd_wap_wmlscript_text],
+"*.f4v" => &[&T_x_f4v_video],
+"*.3xd" => &[&T_x3d_xml_model],
+"*.S" => &[&T_x_assembly_text],
+"*.crw" => &[&T_x_raw_canon_image],
+"*.xld" => &[&T_vnd_ms_excel_application],
+"*.docx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_document_application],
+"*.PAS" => &[&T_x_pascal_text],
+"*.mseed" => &[&T_vnd_fdsn_mseed_application],
+"*.btif" => &[&T_prs_btif_image],
+"*.x3d" => &[&T_vnd_hzn_3d_crossword_application],
+"*.aif" => &[&T_x_aiff_audio],
+"*.xls" => &[&T_vnd_ms_excel_application],
+"*.tfm" => &[&T_x_tex_tfm_application],
+"*.mhtml" => &[&T_related_multipart],
+"*.grv" => &[&T_vnd_groove_injector_application],
+"*.les" => &[&T_vnd_hhe_lesson_player_application],
+"*.afm" => &[&T_x_font_adobe_metric_application],
+"*.dsp" => &[&T_plain_text],
+"*.ogg" => &[&T_vorbis_audio],
+"*.srx" => &[&T_sparql_results_xml_application],
+"*.jfi" => &[&T_jpeg_image],
+"*.listafp" => &[&T_vnd_ibm_modcap_application],
+"*.iges" => &[&T_iges_model],
+"*.hvp" => &[&T_vnd_yamaha_hv_voice_application],
+"*.drf" => &[&T_x_raw_kodak_image],
+"*.cob" => &[&T_x_cobol_text],
+"*.markdown" => &[&T_x_web_markdown_text],
+"*.exe" => &[&T_x_dosexec_application],
+"*.ttf" => &[&T_x_font_ttf_application],
+"*.wpt" => &[&T_vnd_wordperfect_application],
+"*.pxn" => &[&T_x_raw_logitech_image],
+"*.manifest" => &[&T_plain_text],
+"*.dpg" => &[&T_vnd_dpgraph_application],
+"*.oa3" => &[&T_vnd_fujitsu_oasys3_application],
+"*.daf" => &[&T_vnd_mobius_daf_application],
+"*.bib" => &[&T_x_bibtex_text_file_application],
+"*.gsf" => &[&T_x_font_ghostscript_application],
+"*.epsi" => &[&T_postscript_application],
+"*.sas7baud" => &[&T_x_sas_audit_application],
+"*.fh5" => &[&T_x_freehand_image],
+"*.bay" => &[&T_x_raw_casio_image],
+"*.xsamples" => &[&T_plain_text],
+"*.pod" => &[&T_plain_text],
+"*.ods" => &[&T_vnd_oasis_opendocument_spreadsheet_application],
+"*.w60" => &[&T_vnd_wordperfect_application],
+"*.properties" => &[&T_x_java_properties_text],
+"*.ghf" => &[&T_vnd_groove_help_application],
+"*.wmz" => &[&T_x_ms_wmz_application],
+"*.aart" => &[&T_plain_text],
+"*.gram" => &[&T_srgs_application],
+"*.ccxml" => &[&T_ccxml_xml_application],
+"*.mmat" => &[&T_vnd_mindjet_mindmanager_application],
+"*.mpt" => &[&T_vnd_ms_project_application],
+"*.pcapng" => &[&T_vnd_tcpdump_pcapng_application],
+"*.trm" => &[&T_x_msterminal_application],
+"*.pst" => &[&T_vnd_ms_outlook_pst_application],
+"*.lisp" => &[&T_x_common_lisp_text],
+"*.amf" => &[&T_x_amf_application],
+"*.as" => &[&T_x_actionscript_text],
+"*.fit" => &[&T_fits_application],
+"*.sxi" => &[&T_vnd_sun_xml_impress_application],
+"*.jmx" => &[&T_plain_text],
+"*.webm" => &[&T_webm_video],
+"*.adoc.txt" => &[&T_x_asciidoc_text],
+"*.pat" => &[&T_x_gimp_pat_image],
+"*.pbd" => &[&T_vnd_powerbuilder6_application],
+"*.oxps" => &[&T_vnd_ms_xpsdocument_application],
+"*.afp" => &[&T_vnd_ibm_modcap_application],
+"*.xsm" => &[&T_vnd_syncml_xml_application],
+"*.chrt" => &[&T_vnd_kde_kchart_application],
+"*.sa7" => &[&T_x_sas_access_application],
+"*.qxb" => &[&T_vnd_quark_quarkxpress_application],
+"*.ada" => &[&T_x_ada_text],
+"*.ggb" => &[&T_vnd_geogebra_file_application],
+"*.wad" => &[&T_x_doom_application],
+"*.hpp" => &[&T_x_c__hdr_text],
+"*.jpgm" => &[&T_jpm_image],
+"*.jam" => &[&T_vnd_jam_application],
+"*.wmf" => &[&T_wmf_image],
+"*.one" => &[&T_onenote_format_one_application],
+"*.cmp" => &[&T_vnd_yellowriver_custom_menu_application],
+"*.elc" => &[&T_octet_stream_application,&T_x_elc_application],
+"*.vstm" => &[&T_vnd_ms_visio_template_macroEnabled_12_application],
+"*.fh12" => &[&T_x_freehand_image],
+"*.dxb" => &[&T_vnd_dxb_image],
+"*.pct" => &[&T_x_pict_image],
+"INSTALL" => &[&T_plain_text],
+"*.dpr" => &[&T_x_pascal_text],
+"*.rmi" => &[&T_midi_audio],
+"*.las" => &[&T_x_asprs_application],
+"*.wb1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_5_application],
+"*.dll" => &[&T_x_msdownload_application],
+"*.sib" => &[&T_x_sibelius_application],
+"*.swa" => &[&T_x_director_application],
+"*.xar" => &[&T_vnd_xara_application,&T_x_xar_application],
+"*.asp" => &[&T_asp_text],
+"*.in" => &[&T_plain_text],
+"*.mht" => &[&T_related_multipart],
+"*.aac" => &[&T_x_aac_audio],
+"*.js" => &[&T_javascript_text],
+"*.asciidoc" => &[&T_x_asciidoc_text],
+"*.rif" => &[&T_reginfo_xml_application],
+"*.pdb" => &[&T_x_pdb_chemical],
+"*.vcg" => &[&T_vnd_groove_vcard_application],
+"*.Bas" => &[&T_x_basic_text],
+"*.tld" => &[&T_plain_text],
+"*.MYI" => &[&T_x_mysql_misam_compressed_index_application],
+"*.ifm" => &[&T_vnd_shana_informed_formdata_application],
+"*.pp" => &[&T_x_pascal_text],
+"*.roff" => &[&T_troff_text],
+"*.gp4" => &[&T_x_guitar_pro_application],
+"*.xquery" => &[&T_xquery_application],
+"*.m3u" => &[&T_x_mpegurl_audio],
+"*.dgn" => &[&T_vnd_dgn_image],
+"*.kml" => &[&T_vnd_google_earth_kml_xml_application],
+"*.pptm" => &[&T_vnd_ms_powerpoint_presentation_macroenabled_12_application],
+"*.xhtml" => &[&T_xhtml_xml_application],
+"*.dwf" => &[&T_vnd_dwf_model],
+"*.xlw" => &[&T_vnd_ms_excel_application],
+"*.fg5" => &[&T_vnd_fujitsu_oasysgp_application],
+"*.ext" => &[&T_vnd_novadigm_ext_application],
+"*.wspolicy" => &[&T_wspolicy_xml_application],
+"*.cgm" => &[&T_cgm_image],
+"*.potx" => &[&T_vnd_openxmlformats_officedocument_presentationml_template_application],
+"*.osf" => &[&T_vnd_yamaha_openscoreformat_application],
+"*.key" => &[&T_vnd_apple_keynote_application],
+"*.dgnlib" => &[&T_vnd_dgn_image],
+"*.fst" => &[&T_vnd_fst_image],
+"*.fh4" => &[&T_x_freehand_image],
+"*.brotli" => &[&T_x_brotli_application],
+"*.ogx" => &[&T_ogg_application],
+"*.list3820" => &[&T_vnd_ibm_modcap_application],
+"*.ktz" => &[&T_vnd_kahootz_application],
+"*.sda" => &[&T_vnd_stardivision_draw_application],
+"*.stx" => &[&T_x_sas_transport_application],
+"*.ft7" => &[&T_x_freehand_image],
+"*.ics" => &[&T_calendar_text],
+"*.CBL" => &[&T_x_cobol_text],
+"*.otc" => &[&T_vnd_oasis_opendocument_chart_template_application],
+"*.mp2a" => &[&T_mpeg_audio],
+"*.rst" => &[&T_x_rst_text],
+"*.ecelp4800" => &[&T_vnd_nuera_ecelp4800_audio],
+"*.spp" => &[&T_scvp_vp_response_application],
+"*.asx" => &[&T_x_ms_asx_application],
+"*.hvd" => &[&T_vnd_yamaha_hv_dic_application],
+"*.sema" => &[&T_vnd_sema_application],
+"*.xpw" => &[&T_vnd_intercon_formnet_application],
+"*.sdc" => &[&T_vnd_stardivision_calc_application],
+"*.ar" => &[&T_x_archive_application],
+"*.jar" => &[&T_java_archive_application],
+"i_*.txt" => &[&T_x_isatab_investigation_application],
+"*.xdp" => &[&T_vnd_adobe_xdp_xml_application],
+"*.svd" => &[&T_vnd_svd_application],
+"*.src" => &[&T_x_wais_source_application],
+"*.ecelp7470" => &[&T_vnd_nuera_ecelp7470_audio],
+"*.wav" => &[&T_vnd_wave_audio],
+"*.jnlp" => &[&T_x_java_jnlp_file_application],
+"*.zir" => &[&T_vnd_zul_application],
+"*.svg" => &[&T_svg_xml_image],
+"*.wb3" => &[&T_x_quattro_pro_application],
+"*.mkv" => &[&T_x_matroska_video],
+"*.sxw" => &[&T_vnd_sun_xml_writer_application],
+"*.cap" => &[&T_vnd_tcpdump_pcap_application],
+"*.asics" => &[&T_vnd_etsi_asic_s_zip_application],
+"*.pfa" => &[&T_x_font_type1_application],
+"*.sr7" => &[&T_x_sas_itemstor_application],
+"*.mpe" => &[&T_mpeg_video],
+"*.scss" => &[&T_x_scss_text],
+"*.classpath" => &[&T_plain_text],
+"*.rm" => &[&T_vnd_rn_realmedia_application],
+"*.otf" => &[&T_x_font_otf_application],
+"*.dmp" => &[&T_vnd_tcpdump_pcap_application],
+"*.txt" => &[&T_plain_text],
+"*.fn" => &[&T_plain_text],
+"*.jpeg" => &[&T_jpeg_image],
+"*.edm" => &[&T_vnd_novadigm_edm_application],
+"*.rwz" => &[&T_x_raw_rawzor_image],
+"*.sas7bvew" => &[&T_x_sas_view_application],
+"*.mesh" => &[&T_mesh_model],
+"*.h" => &[&T_x_chdr_text],
+"tzfile" => &[&T_tzif_application],
+"*.mli" => &[&T_x_ocaml_text],
+"*.qxd" => &[&T_vnd_quark_quarkxpress_application],
+"*.atomsvc" => &[&T_atomsvc_xml_application],
+"*.odg" => &[&T_vnd_oasis_opendocument_graphics_application],
+"*.sv4crc" => &[&T_x_sv4crc_application],
+"*.shw" => &[&T_x_corelpresentations_application],
+"*.woff" => &[&T_woff_font],
+"*.zirz" => &[&T_vnd_zul_application],
+"*.lbe" => &[&T_vnd_llamagraphics_life_balance_exchange_xml_application],
+"*.fcs" => &[&T_vnd_isac_fcs_application],
+"*.chat" => &[&T_x_chat_application],
+"*.sxm" => &[&T_vnd_sun_xml_math_application],
+"*.mrw" => &[&T_x_raw_minolta_image],
+"*.psf1" => &[&T_x_psf_audio],
+"*.ddd" => &[&T_vnd_fujixerox_ddd_application],
+"*.mmmp" => &[&T_vnd_mindjet_mindmanager_application],
+"*.kne" => &[&T_vnd_kinar_application],
+"*.rpst" => &[&T_vnd_nokia_radio_preset_application],
+"*.mcd" => &[&T_vnd_mcd_application],
+"*.ft10" => &[&T_x_freehand_image],
+"*.pen" => &[&T_plain_text],
+"*.sldprt" => &[&T_sldworks_application],
+"*.hxx" => &[&T_x_c__hdr_text],
+"*.acu" => &[&T_vnd_acucobol_application],
+"*.jsp" => &[&T_x_jsp_text],
+"*.mseq" => &[&T_vnd_mseq_application],
+"*.epub" => &[&T_epub_zip_application],
+"*.memgraph" => &[&T_x_memgraph_application],
+"*.xlsm" => &[&T_vnd_ms_excel_sheet_macroenabled_12_application],
+"*.idml" => &[&T_vnd_adobe_indesign_idml_package_application],
+"*.acutc" => &[&T_vnd_acucorp_application],
+"*.owl" => &[&T_rdf_xml_application,&T_owl_xml_application],
+"*.mpkg" => &[&T_vnd_apple_installer_xml_application],
+"*.igs" => &[&T_iges_model],
+"*.cer" => &[&T_pkix_cert_application],
+"*.conf" => &[&T_x_config_text],
+"*.au" => &[&T_basic_audio],
+"*.bibtex" => &[&T_x_bibtex_text_file_application],
+"*.aiff" => &[&T_x_aiff_audio],
+"*.svgz" => &[&T_svg_xml_image],
+"*.Cls" => &[&T_x_vbasic_text],
+"*.php3" => &[&T_x_php_text],
+"*.mp4v" => &[&T_mp4_video],
+"*.glb" => &[&T_gltf_binary_model],
+"*.dif" => &[&T_dif_xml_application],
+"*.scq" => &[&T_scvp_cv_request_application],
+"*.tiff" => &[&T_tiff_image],
+"*.log" => &[&T_x_log_text],
+"*.y" => &[&T_x_yacc_text],
+"*.wp5" => &[&T_vnd_wordperfect_application],
+"*.rms" => &[&T_vnd_jcp_javame_midlet_rms_application],
+"*.ft8" => &[&T_x_freehand_image],
+"*.cbl" => &[&T_x_cobol_text],
+"*.gex" => &[&T_vnd_geometry_explorer_application],
+"abs-menulinks" => &[&T_plain_text],
+"*.cmd" => &[&T_x_bat_application],
+"*.icns" => &[&T_icns_image],
+"*.oti" => &[&T_vnd_oasis_opendocument_image_template_application],
+"*.latex" => &[&T_x_latex_application],
+"*.m1v" => &[&T_mpeg_video],
+"*.itk" => &[&T_x_tcl_text],
+"*.frm" => &[&T_x_vbasic_text],
+"*.davmount" => &[&T_davmount_xml_application],
+"*.jng" => &[&T_x_jng_video],
+"*.p10" => &[&T_pkcs10_application],
+"*.cil" => &[&T_vnd_ms_artgalry_application],
+"*.su7" => &[&T_x_sas_utility_application],
+"*.vstx" => &[&T_vnd_ms_visio_template_application],
+"abs-linkmap" => &[&T_plain_text],
+"*.BAS" => &[&T_x_basic_text],
+"*.pl" => &[&T_x_perl_text],
+"*.xvml" => &[&T_xv_xml_application],
+"*.org" => &[&T_vnd_lotus_organizer_application],
+"*.anpa" => &[&T_vnd_iptc_anpa_text],
+"*.sit" => &[&T_x_stuffit_application],
+"*.dwg" => &[&T_vnd_dwg_image],
+"*.uoml" => &[&T_vnd_uoml_xml_application],
+"*.cwiki" => &[&T_plain_text],
+"*.pgp" => &[&T_pgp_encrypted_application],
+"*.m4a" => &[&T_mp4_audio],
+"*.djvu" => &[&T_vnd_djvu_image],
+"*.7z" => &[&T_x_7z_compressed_application],
+"*.qxt" => &[&T_vnd_quark_quarkxpress_application],
+"*.joda" => &[&T_vnd_joost_joda_archive_application],
+"*.ustar" => &[&T_x_ustar_application],
+"*.hp" => &[&T_x_c__hdr_text],
+"*.zoo" => &[&T_x_zoo_application],
+"*.sqlite" => &[&T_x_sqlite3_application],
+"*.crt" => &[&T_x_x509_cert_application],
+"*.ice" => &[&T_x_cooltalk_x_conference],
+"*.xdw" => &[&T_vnd_fujixerox_docuworks_application],
+"*.irm" => &[&T_vnd_ibm_rights_management_application],
+"*.qt" => &[&T_quicktime_video],
+"*.clp" => &[&T_x_msclip_application],
+"*.xlsx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_sheet_application],
+"*.m" => &[&T_x_objcsrc_text],
+".htaccess" => &[&T_plain_text],
+"*.karbon" => &[&T_vnd_kde_karbon_application],
+"*.xpx" => &[&T_vnd_intercon_formnet_application],
+"*.emf" => &[&T_emf_image],
+"*.junit" => &[&T_plain_text],
+"*.xwelcome" => &[&T_plain_text],
+"*.jp2" => &[&T_jp2_image],
+"*.smi" => &[&T_smil_xml_application],
+"*.idl" => &[&T_x_idl_text],
+"*.ft11" => &[&T_x_freehand_image],
+"*.html" => &[&T_html_text],
+"*.ogv" => &[&T_ogg_video],
+"*.tpt" => &[&T_vnd_trid_tpt_application],
+"*.emlx" => &[&T_x_emlx_message],
+"*.e" => &[&T_x_eiffel_text],
+"*.numbers" => &[&T_vnd_apple_numbers_application],
+"*.chm" => &[&T_vnd_ms_htmlhelp_application],
+"*.qwt" => &[&T_vnd_quark_quarkxpress_application],
+"*.sdkd" => &[&T_vnd_solent_sdkm_xml_application],
+"*.vssx" => &[&T_vnd_ms_visio_stencil_application],
+"*.bpm" => &[&T_bizagi_modeler_application],
+"*.vcd" => &[&T_x_cdlink_application],
+"*.grb2" => &[&T_x_grib_application],
+"*.accde" => &[&T_x_msaccess_application],
+"*.dpx" => &[&T_x_dpx_image],
+"*.acfm" => &[&T_x_font_adobe_metric_application],
+"*.mmr" => &[&T_vnd_fujixerox_edmics_mmr_image],
+"*.pkg" => &[&T_octet_stream_application],
+"*.so" => &[&T_octet_stream_application],
+"*.cr3" => &[&T_x_canon_cr3_image],
+"*.pas" => &[&T_x_pascal_text],
+"*.utz" => &[&T_vnd_uiq_theme_application],
+"*.dump" => &[&T_octet_stream_application],
+"*.py" => &[&T_x_python_text],
+"*.flc" => &[&T_x_flc_video],
+"*.xliff" => &[&T_x_xliff_xml_application],
+"*.mpd" => &[&T_dash_xml_application],
+"*.123" => &[&T_vnd_lotus_1_2_3_application,&T_vnd_lotus_1_2_3_version_97_9_x_application],
+"*.ost" => &[&T_vnd_ms_outlook_pst_application],
+"*.wbmp" => &[&T_vnd_wap_wbmp_image],
+"*.mos" => &[&T_x_raw_leaf_image],
+"*.wma" => &[&T_x_ms_wma_audio],
+"*.msh" => &[&T_mesh_model],
+"GNUMakefile" => &[&T_x_makefile_text],
+"*.otp" => &[&T_vnd_oasis_opendocument_presentation_template_application],
+"*.odt" => &[&T_vnd_oasis_opendocument_text_application],
+"*.gqf" => &[&T_vnd_grafeq_application],
+"*.g" => &[&T_plain_text],
+"*.hprof.txt" => &[&T_vnd_java_hprof_text_application],
+"*.COB" => &[&T_x_cobol_text],
+"*.sisx" => &[&T_vnd_symbian_install_application],
+"*.adoc" => &[&T_x_asciidoc_text],
+"*.e57" => &[&T_e57_model],
+"*.pcap" => &[&T_vnd_tcpdump_pcap_application],
+"*.amr" => &[&T_amr_audio],
+"*.jad" => &[&T_vnd_sun_j2me_app_descriptor_text],
+"*.vrml" => &[&T_vrml_model],
+"*.cmc" => &[&T_vnd_cosmocaller_application],
+"*.fly" => &[&T_vnd_fly_text],
+"*.mwf" => &[&T_vnd_mfer_application],
+"*.lzma" => &[&T_x_lzma_application],
+"*.pack" => &[&T_x_java_pack200_application],
+"*.F" => &[&T_x_fortran_text],
+"*.gml" => &[&T_gml_xml_application],
+"*.nb" => &[&T_mathematica_application],
+"*.d" => &[&T_x_d_text],
+"*.config" => &[&T_x_config_text],
+"*.ppsx" => &[&T_vnd_openxmlformats_officedocument_presentationml_slideshow_application],
+"*.cdf" => &[&T_x_netcdf_application],
+"*.wtb" => &[&T_vnd_webturbo_application],
+"*.sas7bmdb" => &[&T_x_sas_mddb_application],
+"*.sas7bbak" => &[&T_x_sas_backup_application],
+"*.gtw" => &[&T_vnd_gtw_model],
+"*.pm" => &[&T_x_perl_text],
+"*.dotx" => &[&T_vnd_openxmlformats_officedocument_wordprocessingml_template_application],
+"*.pki" => &[&T_pkixcmp_application],
+"*.xwd" => &[&T_x_xwindowdump_image],
+"*.mc1" => &[&T_vnd_medcalcdata_application],
+"*.xsp" => &[&T_plain_text],
+"*.hx" => &[&T_x_haxe_text],
+"*.nitf" => &[&T_nitf_image],
+"*.ml" => &[&T_x_ml_text],
+"*.odi" => &[&T_vnd_oasis_opendocument_image_application],
+"*.cfc" => &[&T_x_coldfusion_text],
+"*.xlm" => &[&T_vnd_ms_excel_application],
+"*.uri" => &[&T_uri_list_text],
+"*.crl" => &[&T_pkix_crl_application],
+"*.gdl" => &[&T_vnd_gdl_model],
+"*.eps" => &[&T_postscript_application],
+"*.xltx" => &[&T_vnd_openxmlformats_officedocument_spreadsheetml_template_application],
+"*.vsd" => &[&T_vnd_visio_application],
+"*.i3" => &[&T_x_modula_text],
+"*.pcf" => &[&T_x_font_pcf_application],
+"*.sldm" => &[&T_vnd_ms_powerpoint_slide_macroenabled_12_application],
+"*.icc" => &[&T_vnd_iccprofile_application],
+"*.smil" => &[&T_smil_xml_application],
+"*.c" => &[&T_x_c_text],
+"*.ott" => &[&T_vnd_oasis_opendocument_text_template_application],
+"*.msl" => &[&T_vnd_mobius_msl_application],
+"*.xltm" => &[&T_vnd_ms_excel_template_macroenabled_12_application],
+"*.mag" => &[&T_vnd_ecowin_chart_application],
+"*.arj" => &[&T_x_arj_application],
+"*.shx" => &[&T_vnd_shx_application],
+"*.pfx" => &[&T_x_pkcs12_application],
+"*.c4f" => &[&T_vnd_clonk_c4group_application],
+"*.mrc" => &[&T_marc_application],
+"*.wq1" => &[&T_x_quattro_pro_application,&T_x_quattro_pro_version_1_4_application],
+"*.gif" => &[&T_gif_image],
+"*.me" => &[&T_troff_text],
+"*.cla" => &[&T_vnd_claymore_application],
+"*.accdb" => &[&T_x_msaccess_application],
+"*.flo" => &[&T_vnd_micrografx_flo_application],
+"*.rexx" => &[&T_x_rexx_text],
+"*.kdc" => &[&T_x_raw_kodak_image],
+"*.clj" => &[&T_x_clojure_text],
+"*.es3" => &[&T_vnd_eszigno3_xml_application],
+"*.jpf" => &[&T_jpx_image],
+"*.mst" => &[&T_x_ms_installer_application],
+"*.rcprofile" => &[&T_vnd_ipunplugged_rcprofile_application],
+"*.fe_launch" => &[&T_vnd_denovo_fcselayout_link_application],
+"*.m14" => &[&T_x_msmediaview_application],
+"*.vsdx" => &[&T_vnd_ms_visio_drawing_application],
+"*.fo" => &[&T_xslfo_xml_application],
+"*.kmz" => &[&T_vnd_google_earth_kmz_application],
+"*.skd" => &[&T_vnd_koan_application],
+"*.mpc" => &[&T_vnd_mophun_certificate_application,&T_musepack_audio],
+"*.CPP" => &[&T_x_c__src_text],
+"*.p7c" => &[&T_pkcs7_mime_application],
+"*.xdm" => &[&T_vnd_syncml_dm_xml_application],
+"*.sas7bput" => &[&T_x_sas_putility_application],
+"*.lostxml" => &[&T_lost_xml_application],
+"*.vsdm" => &[&T_vnd_ms_visio_drawing_macroEnabled_12_application],
+"*.hdf" => &[&T_x_hdf_application],
+"*.viv" => &[&T_vnd_vivo_video],
+"*.ppm" => &[&T_x_portable_pixmap_image],
+"*.ad" => &[&T_x_asciidoc_text],
+"*.cr2" => &[&T_x_canon_cr2_image],
+"*.jxl" => &[&T_jxl_image],
+"*.cst" => &[&T_x_director_application],
+"*.lrf" => &[&T_octet_stream_application],
+"*.dib" => &[&T_bmp_image],
+"*.ufd" => &[&T_vnd_ufdl_application],
+"*.cel" => &[&T_vnd_dgn_image],
+"*.nml" => &[&T_vnd_enliven_application],
+"*.dcs" => &[&T_x_raw_kodak_image],
+"*.sas7bcat" => &[&T_x_sas_catalog_application],
+"*.sas7bacs" => &[&T_x_sas_access_application],
+"*.dxf" => &[&T_vnd_dxf_image],
+"*.portpkg" => &[&T_vnd_macports_portpkg_application],
+"s_*.txt" => &[&T_x_isatab_application],
+"*.css" => &[&T_css_text],
+"*.mdo" => &[&T_plain_text],
+"*.xlog" => &[&T_plain_text],
+"*.m4u" => &[&T_vnd_mpegurl_video],
+"*.ipa" => &[&T_x_itunes_ipa_application],
+"*.dir" => &[&T_x_director_application],
+"*.qps" => &[&T_vnd_publishare_delta_tree_application],
+"*.rs" => &[&T_rls_services_xml_application],
+"*.xla" => &[&T_vnd_ms_excel_application],
+"*.ditaval" => &[&T_dita_xml_format_val_application],
 
 };

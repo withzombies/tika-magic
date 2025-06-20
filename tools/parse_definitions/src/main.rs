@@ -182,10 +182,6 @@ fn string_to_bytes(input: &str) -> Vec<u8> {
     result
 }
 
-/// Convert a match from the XML file into a rule that will be used
-/// to generate Rust code. Returns a `MatchRule` which is used when
-/// generating the Rust code and a `BTreeSet<String>` which is used
-/// to deduplicate and cache any possible regexes
 fn match_to_rule(mat: &Match, regex_patterns: &mut RuleRegexes) -> MatchRule {
     let rule = match &mat.match_type.as_str() {
         &"string" => match (&mat.offset, &mat.value, &mat.mask) {
