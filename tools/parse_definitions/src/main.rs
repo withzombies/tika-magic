@@ -1,6 +1,8 @@
 mod parse_xml;
+mod rule_regexes;
 
 use crate::parse_xml::{parse_mime_type_xml, Match, MimeType, Offset};
+use crate::rule_regexes::RuleRegexes;
 use crate::MatchRule::{And, RootXML};
 use num_traits::Num;
 use regex::bytes::Regex;
@@ -20,6 +22,7 @@ struct OutputMimeType {
     subclasses: Vec<String>,
     priority: u32,
     children: Vec<String>,
+    regex_patterns: RuleRegexes,
 }
 
 #[derive(TemplateSimple)]
@@ -179,7 +182,11 @@ fn string_to_bytes(input: &str) -> Vec<u8> {
     result
 }
 
-fn match_to_rule(mat: &Match) -> MatchRule {
+/// Convert a match from the XML file into a rule that will be used
+/// to generate Rust code. Returns a `MatchRule` which is used when
+/// generating the Rust code and a `BTreeSet<String>` which is used
+/// to deduplicate and cache any possible regexes
+fn match_to_rule(mat: &Match, regex_patterns: &mut RuleRegexes) -> MatchRule {
     let rule = match &mat.match_type.as_str() {
         &"string" => match (&mat.offset, &mat.value, &mat.mask) {
             (None, Some(value), None) => MatchRule::String(0, string_to_bytes(value)),
@@ -241,6 +248,7 @@ fn match_to_rule(mat: &Match) -> MatchRule {
                 match Regex::new(value) {
                     Ok(reg) => {
                         reg.is_match(&[0, 1, 2, 3, 4, 5, 6, 7]);
+                        regex_patterns.insert(value);
                     }
                     Err(e) => {
                         eprintln!("Error: Invalid regex pattern: {}", e);
@@ -252,7 +260,9 @@ fn match_to_rule(mat: &Match) -> MatchRule {
             }
             (Some(Offset::Range { start, end }), Some(value)) => {
                 match Regex::new(value) {
-                    Ok(_) => {}
+                    Ok(_) => {
+                        regex_patterns.insert(value);
+                    }
                     Err(e) => {
                         eprintln!("Error: Invalid regex pattern: {}", e);
                         return MatchRule::Empty;
@@ -323,8 +333,9 @@ fn match_to_rule(mat: &Match) -> MatchRule {
             .sub_matches
             .clone()
             .into_iter()
-            .map(|mat: parse_xml::Match| match_to_rule(&mat))
+            .map(|mat: parse_xml::Match| match_to_rule(&mat, regex_patterns))
             .collect();
+
         let mut rules = vec![rule];
 
         if sub_rules.len() == 1 {
@@ -359,41 +370,54 @@ fn xml_actions_to_rules(mime: &MimeType) -> Vec<MatchRule> {
         .collect()
 }
 
-fn actions_to_rules(mime: &MimeType) -> MatchRule {
+fn actions_to_rules(mime: &MimeType) -> (MatchRule, RuleRegexes) {
     // Any magics work
     let mut or_rules: Vec<MatchRule> = xml_actions_to_rules(mime);
+
+    // Deduplicated cache of all regex patterns that appear in this mimetype from
+    // the XML file. Used to create a regex compilation cache using `LazyLocks`
+    // in the template.
+    let mut regex_patterns: RuleRegexes = RuleRegexes::default();
 
     for magic in &mime.magics {
         if magic.matches.len() == 1 {
             let first = magic.matches.first().unwrap();
-            or_rules.push(match_to_rule(first));
-            continue;
+            let rule = match_to_rule(first, &mut regex_patterns);
+            or_rules.push(rule);
+        } else {
+            let rules: Vec<MatchRule> = magic
+                .matches
+                .iter()
+                .map(|mat: &parse_xml::Match| match_to_rule(mat, &mut regex_patterns))
+                .collect();
+            or_rules.extend(rules);
         }
-
-        let rules: Vec<MatchRule> = magic
-            .matches
-            .iter()
-            .map(|mat: &parse_xml::Match| match_to_rule(mat))
-            .collect();
-        or_rules.extend(rules);
     }
 
-    match or_rules.len().cmp(&1) {
+    let rule = match or_rules.len().cmp(&1) {
         Ordering::Less => MatchRule::Empty,
         Ordering::Equal => or_rules.pop().unwrap(),
         Ordering::Greater => MatchRule::Or(or_rules),
-    }
+    };
+
+    (rule, regex_patterns)
 }
 
-fn rules_to_string(match_rule: &MatchRule) -> String {
+fn rules_to_string(match_rule: &MatchRule, regex_patterns: &RuleRegexes) -> String {
     match match_rule {
         MatchRule::Or(rules) => {
-            let strings = rules.iter().map(rules_to_string).collect::<Vec<String>>();
+            let strings = rules
+                .iter()
+                .map(|match_rule| rules_to_string(match_rule, regex_patterns))
+                .collect::<Vec<String>>();
             let joined = strings.join(" || ");
             format!("({})", joined)
         }
         MatchRule::And(rules) => {
-            let strings = rules.iter().map(rules_to_string).collect::<Vec<String>>();
+            let strings = rules
+                .iter()
+                .map(|match_rule| rules_to_string(match_rule, regex_patterns))
+                .collect::<Vec<String>>();
             let joined = strings.join(" && ");
             format!("({})", joined)
         }
@@ -434,15 +458,19 @@ fn rules_to_string(match_rule: &MatchRule) -> String {
             )
         }
         MatchRule::Regex(offset, pattern) => {
-            format!(
-                "regex(bytes, {}, &Regex::new(\"{}\").unwrap())",
-                offset, pattern
-            )
+            let regex_index = regex_patterns
+                .get_index(pattern)
+                .expect("Regex pattern exists in rule");
+            format!("regex(bytes, {}, &REGEX_PATTERN_{})", offset, regex_index)
         }
         MatchRule::RegexRange(start, end, pattern) => {
+            let regex_index = regex_patterns
+                .get_index(pattern)
+                .expect("Regex pattern exists in rule");
+
             format!(
-                "regex_range(bytes, {}, {}, &Regex::new(\"{}\").unwrap())",
-                start, end, pattern
+                "regex_range(bytes, {}, {}, &REGEX_PATTERN_{})",
+                start, end, regex_index
             )
         }
         MatchRule::ValueU32(offset, value) => {
@@ -483,22 +511,27 @@ fn parse_definition_file(
 
     let output_mime_types = &mime_types
         .iter()
-        .map(|mime: &MimeType| OutputMimeType {
-            short_name: mime_to_short_name(&mime.mime_type),
-            mime_string: mime.mime_type.to_string(),
-            globs: mime
-                .globs
-                .iter()
-                .filter_map(|z| z.pattern.clone())
-                .collect(),
-            match_rules_string: rules_to_string(&actions_to_rules(mime)),
-            subclasses: mime
-                .sub_classes
-                .iter()
-                .filter_map(|e| e.class_type.clone())
-                .collect::<Vec<String>>(),
-            priority: max(mime.magics.iter().map(|m| m.priority).max().unwrap_or(0), 0),
-            children: vec![],
+        .map(|mime: &MimeType| {
+            let (rules, regex_patterns) = actions_to_rules(mime);
+
+            OutputMimeType {
+                short_name: mime_to_short_name(&mime.mime_type),
+                mime_string: mime.mime_type.to_string(),
+                globs: mime
+                    .globs
+                    .iter()
+                    .filter_map(|z| z.pattern.clone())
+                    .collect(),
+                match_rules_string: rules_to_string(&rules, &regex_patterns),
+                subclasses: mime
+                    .sub_classes
+                    .iter()
+                    .filter_map(|e| e.class_type.clone())
+                    .collect::<Vec<String>>(),
+                priority: max(mime.magics.iter().map(|m| m.priority).max().unwrap_or(0), 0),
+                children: vec![],
+                regex_patterns,
+            }
         })
         .collect::<Vec<OutputMimeType>>();
 
@@ -647,7 +680,7 @@ mod tests {
 
         let mime: MimeType = from_str(def).unwrap();
 
-        let rule = actions_to_rules(&mime);
+        let (rule, regex_patterns) = actions_to_rules(&mime);
         dbg!(&rule);
 
         assert!(matches!(rule, MatchRule::Or(_)));
@@ -671,7 +704,7 @@ mod tests {
             MatchRule::String(0, [0x50, 0x4B, 0x07, 0x08].to_vec())
         );
 
-        let string_rules = rules_to_string(&rule);
+        let string_rules = rules_to_string(&rule, &regex_patterns);
         assert_eq!(
             string_rules,
             "(offset(bytes, 0, &[80, 75, 3, 4]) || offset(bytes, 0, &[80, 75, 5, 6]) || offset(bytes, 0, &[80, 75, 7, 8]))"
@@ -697,7 +730,7 @@ mod tests {
 
         let mime: MimeType = from_str(def).unwrap();
 
-        let rule = actions_to_rules(&mime);
+        let (rule, regex_patterns) = actions_to_rules(&mime);
         dbg!(&rule);
 
         assert!(matches!(rule, MatchRule::And(_)));
@@ -726,7 +759,7 @@ mod tests {
             MatchRule::String(8, [174, 177, 83, 120, 208, 41, 150, 212].to_vec())
         );
 
-        let string_rules = rules_to_string(&rule);
+        let string_rules = rules_to_string(&rule, &regex_patterns);
         assert_eq!(
             string_rules,
             "(offset(bytes, 0, &[228, 82, 92, 123]) && offset(bytes, 4, &[140, 216]) && offset(bytes, 6, &[167, 77]) && (offset(bytes, 8, &[174, 177, 83, 120, 208, 41, 150, 211]) || offset(bytes, 8, &[174, 177, 83, 120, 208, 41, 150, 212])))"
@@ -749,10 +782,10 @@ mod tests {
 
         let mime: MimeType = from_str(def).unwrap();
 
-        let rule = actions_to_rules(&mime);
+        let (rule, regex_patterns) = actions_to_rules(&mime);
         dbg!(&rule);
 
-        let string_rules = rules_to_string(&rule);
+        let string_rules = rules_to_string(&rule, &regex_patterns);
         assert_eq!(
             string_rules,
             "(T_zip_application{}.check(bytes) && T_zip2_application{}.check(bytes) && offset(bytes, 0, &[80, 75, 3, 4]) && offset(bytes, 30, &[109, 105, 109, 101, 116, 121, 112, 101, 97, 112, 112, 108, 105, 99, 97, 116, 105, 111, 110, 47, 118, 110, 100, 46, 101, 116, 115, 105, 46, 97, 115, 105, 99, 45, 101, 43, 122, 105, 112]))"
@@ -792,10 +825,10 @@ mod tests {
 
         let mime: MimeType = from_str(def).unwrap();
 
-        let rule = actions_to_rules(&mime);
+        let (rule, regex_patterns) = actions_to_rules(&mime);
         dbg!(&rule);
 
-        let string_rules = rules_to_string(&rule);
+        let string_rules = rules_to_string(&rule, &regex_patterns);
         assert_eq!(
             string_rules,
             "(offset(bytes, 0, &[60, 63, 120, 109, 108]) || offset(bytes, 0, &[60, 63, 88, 77, 76]) || offset(bytes, 0, &[239, 187, 191, 60, 63, 120, 109, 108]) || offset(bytes, 0, &[255, 254, 60, 0, 63, 0, 120, 0, 109, 0, 108, 0]) || offset(bytes, 0, &[254, 255, 0, 60, 0, 63, 0, 120, 0, 109, 0, 108]) || offset(bytes, 0, &[60, 33, 45, 45]))"
@@ -813,10 +846,10 @@ mod tests {
 
         let mime: MimeType = from_str(def).unwrap();
 
-        let rule = actions_to_rules(&mime);
+        let (rule, regex_patterns) = actions_to_rules(&mime);
         dbg!(&rule);
 
-        let string_rules = rules_to_string(&rule);
+        let string_rules = rules_to_string(&rule, &regex_patterns);
         assert_eq!(
             string_rules,
             r#"(rootxml(bytes, "html", "http://www.w3.org/1999/xhtml") || rootxml_local(bytes, "html") || rootxml_namespace(bytes, "http://www.w3.org/1991/xhtml"))"#
