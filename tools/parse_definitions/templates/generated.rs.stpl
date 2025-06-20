@@ -24,17 +24,15 @@ impl MimeTypeChecker for <%- t.short_name %> {
           %>]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        <% for (pattern, i) in t.regex_patterns.cloned_iter() { %>
-        static REGEX_PATTERN_<%- i %>: LazyLock<Regex> = LazyLock::new(|| Regex::new("<%- pattern %>").unwrap());
+        <% for (i, pattern) in t.regex_patterns.cloned_iter() { %>static REGEX_PATTERN_<%- i %> = LazyLock::new(|| Regex::new("<%- pattern %>").unwrap());
         <% } %>
-
         <%- t.match_rules_string %>
     }
     fn get_children(&self) -> &[&'static dyn MimeTypeChecker] {
         &[<%- t.children.join(",") %>]
     }
     fn is_virtual(&self) -> bool {
-    <%- !t.children.is_empty() && !t.match_rules_string.is_empty() %>
+        <%- !t.children.is_empty() && !t.match_rules_string.is_empty() %>
     }
 }
 <% } %>

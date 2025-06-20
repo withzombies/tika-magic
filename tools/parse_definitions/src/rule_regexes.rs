@@ -1,29 +1,23 @@
-use std::collections::HashMap;
-
 #[derive(Default, Clone)]
 /// A deduplicated cache of all the regexes found in a rule.
 /// This is used to create the per-rule `LazyLock` which
 /// caches the compilation of the regex string
 ///
 /// Not the most efficient implementation but doesn't require any dependencies
-pub struct RuleRegexes {
-    i: usize,
-    map: HashMap<String, usize>,
-}
+pub struct RuleRegexes(Vec<String>);
 
 impl RuleRegexes {
     pub fn insert(&mut self, value: &str) {
-        if !self.map.contains_key(value) {
-            self.map.insert(value.to_owned(), self.i);
-            self.i += 1;
+        if !self.0.iter().any(|v| v == value) {
+            self.0.push(value.to_owned());
         }
     }
 
     pub fn get_index(&self, value: &str) -> Option<usize> {
-        self.map.get(value).copied()
+        self.0.iter().position(|v| v == value)
     }
 
-    pub fn cloned_iter(&self) -> impl Iterator<Item = (String, usize)> + '_ {
-        self.map.iter().map(|(k, v)| (k.clone(), *v))
+    pub fn cloned_iter(&self) -> impl Iterator<Item = (usize, String)> + '_ {
+        self.0.iter().cloned().enumerate()
     }
 }
