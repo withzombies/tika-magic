@@ -102,28 +102,25 @@ The MIME type detection rules are derived from the [Apache Tika](http://tika.apa
 
 `tika-magic` is slower in the general case than `tree_magic_mini`, as `tree_magic_mini` is specifically optimized for 
 quick parsing. Both projects are optimized for a few code paths and have fairly identical results in those paths.
-
-Anything not `application/zip`, `image/gif`, `image/png`, or `application/pdf` will be faster in `tree_magic_mini`.
-
 ```
-test tika-magic::from_u8::application_zip           ... bench:       1,918 ns/iter (+/- 85)
-test tika-magic::from_u8::image_gif                 ... bench:          20 ns/iter (+/- 1)
-test tika-magic::from_u8::image_png                 ... bench:          11 ns/iter (+/- 10)
-test tika-magic::from_u8::text_plain                ... bench:   5,933,460 ns/iter (+/- 269,395)
-test tika-magic::match_u8::application_zip          ... bench:          14 ns/iter (+/- 2)
-test tika-magic::match_u8::image_gif                ... bench:          14 ns/iter (+/- 1)
+test tika-magic::from_u8::application_zip           ... bench:       1,303 ns/iter (+/- 37)
+test tika-magic::from_u8::image_gif                 ... bench:          17 ns/iter (+/- 1)
+test tika-magic::from_u8::image_png                 ... bench:           9 ns/iter (+/- 3)
+test tika-magic::from_u8::text_plain                ... bench:      34,573 ns/iter (+/- 1,665)
+test tika-magic::match_u8::application_zip          ... bench:         549 ns/iter (+/- 56)
+test tika-magic::match_u8::image_gif                ... bench:          14 ns/iter (+/- 0)
 test tika-magic::match_u8::image_png                ... bench:          14 ns/iter (+/- 0)
-test tika-magic::match_u8::text_plain               ... bench:          15 ns/iter (+/- 0)
+test tika-magic::match_u8::text_plain               ... bench:          28 ns/iter (+/- 2)
 
 
-test tree_magic_mini::from_u8::application_zip      ... bench:       5,364 ns/iter (+/- 524)
-test tree_magic_mini::from_u8::image_gif            ... bench:       1,567 ns/iter (+/- 90)
-test tree_magic_mini::from_u8::image_png            ... bench:       1,848 ns/iter (+/- 73)
-test tree_magic_mini::from_u8::text_plain           ... bench:      27,507 ns/iter (+/- 2,296)
-test tree_magic_mini::match_u8::application_zip     ... bench:          37 ns/iter (+/- 2)
-test tree_magic_mini::match_u8::image_gif           ... bench:          28 ns/iter (+/- 1)
-test tree_magic_mini::match_u8::image_png           ... bench:          27 ns/iter (+/- 1)
-test tree_magic_mini::match_u8::text_plain          ... bench:          16 ns/iter (+/- 1)
+test tree_magic_mini::from_u8::application_zip      ... bench:       5,090 ns/iter (+/- 525)
+test tree_magic_mini::from_u8::image_gif            ... bench:       1,545 ns/iter (+/- 113)
+test tree_magic_mini::from_u8::image_png            ... bench:       1,797 ns/iter (+/- 148)
+test tree_magic_mini::from_u8::text_plain           ... bench:      25,872 ns/iter (+/- 824)
+test tree_magic_mini::match_u8::application_zip     ... bench:          36 ns/iter (+/- 2)
+test tree_magic_mini::match_u8::image_gif           ... bench:          26 ns/iter (+/- 1)
+test tree_magic_mini::match_u8::image_png           ... bench:          26 ns/iter (+/- 1)
+test tree_magic_mini::match_u8::text_plain          ... bench:          16 ns/iter (+/- 3)
 ```
 
 If you can afford to use the system magic database or to distribute GPL software, `tree_magic_mini` is significantly 

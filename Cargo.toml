@@ -1,6 +1,6 @@
 [package]
 name = "tika-magic"
-version = "0.2.5"
+version = "0.2.6"
 edition = "2021"
 authors = [
     "Ryan Stortz <ryan@withzombies.com>",
@@ -12,7 +12,7 @@ license = "Apache-2.0"
 readme = "README.md"
 categories = ["parser-implementations", "filesystem"]
 keywords = ["mime", "filesystem", "media-types"]
-exclude = ["tests/*", "benches/*"]
+exclude = ["tests/*", "benches/*", "tools/*"]
 rust-version = "1.73.0"
 
 [dependencies]
@@ -31,12 +31,14 @@ open_zips = ["dep:zip"]
 open_ole = ["dep:ole"]
 
 [package.metadata]
-exclude = ["tools/*", "file/*", "benches/*"]
+exclude = ["tools/*", "benches/*"]
 
 [[bench]]
 name = "from_u8"
 harness = false
+path = "benches/from_u8.rs"
 
 [[bench]]
 name = "match_u8"
 harness = false
+path = "benches/match_u8.rs"
