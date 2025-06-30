@@ -29,13 +29,13 @@ fn main() {
 
     // Validate that the file exists
     if !path.exists() {
-        eprintln!("Error: File '{}' does not exist", file_path);
+        eprintln!("Error: File '{file_path}' does not exist");
         process::exit(1);
     }
 
     // Check if it's a regular file
     if !path.is_file() {
-        eprintln!("Error: '{}' is not a regular file", file_path);
+        eprintln!("Error: '{file_path}' is not a regular file");
         process::exit(1);
     }
 
@@ -45,18 +45,18 @@ fn main() {
         match tika_magic::from_filepath_exhaustive(path) {
             Some(mime_types) => {
                 if mime_types.is_empty() {
-                    println!("{}: Could not determine file type", file_path);
+                    println!("{file_path}: Could not determine file type");
                 } else {
                     println!("{}: {}", file_path, mime_types.join(", "));
                 }
             }
-            None => println!("{}: Could not determine file type", file_path),
+            None => println!("{file_path}: Could not determine file type"),
         }
     } else {
         // Get the single best matching MIME type
         match tika_magic::from_filepath(path) {
-            Some(mime_type) => println!("{}: {}", file_path, mime_type),
-            None => println!("{}: Could not determine file type", file_path),
+            Some(mime_type) => println!("{file_path}: {mime_type}"),
+            None => println!("{file_path}: Could not determine file type"),
         }
     }
 }

@@ -2,8 +2,9 @@
 #![allow(non_camel_case_types)]
 #![allow(unused)]
 #![allow(clippy::eq_op)]
+#![allow(clippy::overly_complex_bool_expr)]
 
-use std::sync::LazyLock;
+use once_cell::sync::Lazy;
 
 use crate::magic::*;
 use regex::bytes::Regex;
@@ -18,13 +19,13 @@ impl MimeTypeChecker for <%- t.short_name %> {
     }
     fn get_ext(&self) -> &[&'static str] {
         &[<%- t.globs.iter()
-               .map(|e| format!("\"{}\"", e))
+               .map(|e| format!("\"{e}\""))
                .collect::<Vec<_>>()
                .join(",")
           %>]
     }
     fn check(&self, bytes: &[u8]) -> bool {
-        <% for (i, pattern) in t.regex_patterns.cloned_iter() { %>static REGEX_PATTERN_<%- i %>: LazyLock<Regex> = LazyLock::new(|| Regex::new("<%- pattern %>").unwrap());
+        <% for (i, pattern) in t.regex_patterns.cloned_iter() { %>static REGEX_PATTERN_<%- i %>: Lazy<Regex> = Lazy::new(|| Regex::new("<%- pattern %>").unwrap());
         <% } %>
         <%- t.match_rules_string %>
     }

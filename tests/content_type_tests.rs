@@ -13,9 +13,9 @@ mod tests {
         if len >= 4 {
             let top = components[len - 3].as_os_str().to_string_lossy();
             let sub = components[len - 2].as_os_str().to_string_lossy();
-            format!("{}/{}", top, sub)
+            format!("{top}/{sub}")
         } else {
-            panic!("Unexpected path structure: {:?}", path);
+            panic!("Unexpected path structure: {path:?}");
         }
     }
 

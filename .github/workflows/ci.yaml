@@ -6,14 +6,14 @@ on:
   pull_request:
 
 jobs:
-  build-and-test:
-    name: Build & Test (${{ matrix.os }}, ${{ matrix.rust }})
+  test-lib:
+    name: Test Library (${{ matrix.os }}, ${{ matrix.rust }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        rust: [stable, nightly]
+        rust: [stable, 1.73.0, nightly]
 
     steps:
       - name: Checkout code
@@ -23,10 +23,81 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
 
-      - name: Build
-        run: cargo build --verbose
+      - name: Check lib package
+        run: cargo check --tests
 
-      - name: Test
-        run: cargo test --verbose
+      - name: Run clippy on lib
+        run: cargo clippy --all-targets --all-features -- -D warnings
 
+      - name: Check formatting on lib  
+        run: cargo fmt --check
+
+      - name: Test lib package
+        run: cargo test
+
+      - name: Test lib package with features
+        run: cargo test --features "open_zips,open_ole"
+
+  test-file:
+    name: Test CLI Tool (${{ matrix.os }}, ${{ matrix.rust }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        rust: [stable, 1.88.0]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust (${{ matrix.rust }})
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
+
+      - name: Check file binary
+        run: cd tools/file && cargo check
+
+      - name: Run clippy on file
+        run: cd tools/file && cargo clippy --all-targets -- -D warnings
+
+      - name: Check formatting on file
+        run: cd tools/file && cargo fmt --check
+
+      - name: Test file binary
+        run: cd tools/file && cargo test
+
+  test-tools:
+    name: Test Tools (${{ matrix.os }}, ${{ matrix.rust }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        rust: [stable, 1.88.0]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust (${{ matrix.rust }})
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
+
+      - name: Check parse_definitions binary
+        run: cd tools/parse_definitions && cargo check
+
+      - name: Run clippy on tools
+        run: cd tools/parse_definitions && cargo clippy --all-targets -- -D warnings
+
+      - name: Check formatting on tools
+        run: cd tools/parse_definitions && cargo fmt --check
+
+      - name: Test parse_definitions binary
+        run: cd tools/parse_definitions && cargo test
