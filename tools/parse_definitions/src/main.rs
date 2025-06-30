@@ -427,22 +427,16 @@ fn rules_to_string(match_rule: &MatchRule, regex_patterns: &RuleRegexes) -> Stri
             format!("offset_case_insensitive(bytes, {offset}, &{bytes:?})")
         }
         MatchRule::StringRangeCaseInsensitive(start, end, bytes) => {
-            format!(
-                "offset_range_case_insensitive(bytes, {start}, {end}, &{bytes:?})"
-            )
+            format!("offset_range_case_insensitive(bytes, {start}, {end}, &{bytes:?})")
         }
         MatchRule::StringMask(offset, bytes, mask) => {
             format!("offset_mask(bytes, {offset}, &{bytes:?}, &{mask:?})")
         }
         MatchRule::StringMaskRange(start, end, bytes, mask) => {
-            format!(
-                "offset_mask_range(bytes, {start}, {end}, &{bytes:?}, &{mask:?})"
-            )
+            format!("offset_mask_range(bytes, {start}, {end}, &{bytes:?}, &{mask:?})")
         }
         MatchRule::StringMaskCaseInsensitive(offset, bytes, mask) => {
-            format!(
-                "offset_mask_case_insensitive(bytes, {offset}, &{bytes:?}, &{mask:?})"
-            )
+            format!("offset_mask_case_insensitive(bytes, {offset}, &{bytes:?}, &{mask:?})")
         }
         MatchRule::StringMaskRangeCaseInsensitive(start, end, bytes, mask) => {
             format!(
@@ -460,9 +454,7 @@ fn rules_to_string(match_rule: &MatchRule, regex_patterns: &RuleRegexes) -> Stri
                 .get_index(pattern)
                 .expect("Regex pattern exists in rule");
 
-            format!(
-                "regex_range(bytes, {start}, {end}, &REGEX_PATTERN_{regex_index})"
-            )
+            format!("regex_range(bytes, {start}, {end}, &REGEX_PATTERN_{regex_index})")
         }
         MatchRule::ValueU32(offset, value) => {
             format!("offset(bytes, {offset}, &{value:?})")
