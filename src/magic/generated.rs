@@ -2,6 +2,7 @@
 #![allow(non_camel_case_types)]
 #![allow(unused)]
 #![allow(clippy::eq_op)]
+#![allow(clippy::overly_complex_bool_expr)]
 
 use once_cell::sync::Lazy;
 

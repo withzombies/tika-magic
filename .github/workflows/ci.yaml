@@ -25,19 +25,19 @@ jobs:
           toolchain: ${{ matrix.rust }}
 
       - name: Check lib package
-        run: cd lib && cargo check --tests
+        run: cargo check --tests
 
       - name: Run clippy on lib
-        run: cd lib && cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Check formatting on lib  
-        run: cd lib && cargo fmt --check
+        run: cargo fmt --check
 
       - name: Test lib package
-        run: cd lib && cargo test
+        run: cargo test
 
       - name: Test lib package with features
-        run: cd lib && cargo test --features "open_zips,open_ole"
+        run: cargo test --features "open_zips,open_ole"
 
   test-file:
     name: Test CLI Tool (${{ matrix.os }}, ${{ matrix.rust }})
@@ -58,16 +58,16 @@ jobs:
           toolchain: ${{ matrix.rust }}
 
       - name: Check file binary
-        run: cd file && cargo check
+        run: cd tools/file && cargo check
 
       - name: Run clippy on file
-        run: cd file && cargo clippy --all-targets -- -D warnings
+        run: cd tools/file && cargo clippy --all-targets -- -D warnings
 
       - name: Check formatting on file
-        run: cd file && cargo fmt --check
+        run: cd tools/file && cargo fmt --check
 
       - name: Test file binary
-        run: cd file && cargo test
+        run: cd tools/file && cargo test
 
   test-tools:
     name: Test Tools (${{ matrix.os }}, ${{ matrix.rust }})
