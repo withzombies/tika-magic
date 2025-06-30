@@ -1,4 +1,4 @@
-lib/tests/inputs/** linguist-vendored
-lib/benches/application/** linguist-vendored
-lib/benches/image/** linguist-vendored
-lib/benches/text/** linguist-vendored
+tests/inputs/** linguist-vendored
+benches/application/** linguist-vendored
+benches/image/** linguist-vendored
+benches/text/** linguist-vendored
