@@ -371,7 +371,7 @@ fn actions_to_rules(mime: &MimeType) -> (MatchRule, RuleRegexes) {
     let mut or_rules: Vec<MatchRule> = xml_actions_to_rules(mime);
 
     // Deduplicated cache of all regex patterns that appear in this mimetype from
-    // the XML file. Used to create a regex compilation cache using `LazyLocks`
+    // the XML file. Used to create a regex compilation cache using `once_cell::sync::Lazy`
     // in the template.
     let mut regex_patterns: RuleRegexes = RuleRegexes::default();
 
@@ -581,7 +581,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if error_out {
-        return Err(Box::new(std::io::Error::other(
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
             "We can't handle multiple definitions for the same mime type",
         )));
     }

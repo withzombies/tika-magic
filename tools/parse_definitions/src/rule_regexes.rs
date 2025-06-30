@@ -1,6 +1,6 @@
 #[derive(Default, Clone)]
 /// A deduplicated cache of all the regexes found in a rule.
-/// This is used to create the per-rule `LazyLock` which
+/// This is used to create the per-rule `once_cell::sync::Lazy` which
 /// caches the compilation of the regex string
 ///
 /// Not the most efficient implementation but doesn't require any dependencies

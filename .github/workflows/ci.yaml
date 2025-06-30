@@ -13,7 +13,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        rust: [stable, nightly]
+        rust:
+          - VERSION: stable
+            FLAGS: ""
+          - VERSION: 1.56.0
+            FLAGS: ""
+          - VERSION: nightly
+            FLAGS: ""
+          - VERSION: nightly
+            FLAGS: "-Z direct-minimal-versions"
 
     steps:
       - name: Checkout code
@@ -22,11 +30,8 @@ jobs:
       - name: Set up Rust (${{ matrix.rust }})
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: ${{ matrix.rust.VERSION }}
 
-      - name: Build
-        run: cargo build --verbose
+      - run: cargo check --workspace --tests ${{ matrix.rust.FLAGS }}
 
-      - name: Test
-        run: cargo test --verbose
-
+      - run: cargo test --workspace ${{ matrix.rust.FLAGS }}
