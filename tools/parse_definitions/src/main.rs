@@ -42,7 +42,7 @@ fn mime_to_short_name(mime_type: &str) -> String {
         .collect::<Vec<String>>()
         .join("_");
 
-    format!("T_{}", short_name)
+    format!("T_{short_name}")
 }
 
 fn print_help() {
@@ -110,7 +110,7 @@ fn string_to_bytes(input: &str) -> Vec<u8> {
 
         // Ensure length is even; prepend a `0` if necessary
         let adjusted_hex = if hex.len() % 2 != 0 {
-            format!("0{}", hex)
+            format!("0{hex}")
         } else {
             hex.to_string()
         };
@@ -165,7 +165,7 @@ fn string_to_bytes(input: &str) -> Vec<u8> {
                                 '\'' => b'\'',
                                 '\"' => b'\"',
                                 ' ' => 0x20,
-                                _ => panic!("Unknown escape sequence: \\{}", next),
+                                _ => panic!("Unknown escape sequence: \\{next}"),
                             });
                             chars.next(); // Consume the escaped character
                         }
@@ -240,14 +240,14 @@ fn match_to_rule(mat: &Match, regex_patterns: &mut RuleRegexes) -> MatchRule {
         &"regex" => match (&mat.offset, &mat.value) {
             (Some(Offset::Start(start)), Some(value)) => {
                 // Test the regex pattern, we don't support some features
-                println!("Testing regex pattern: {}", value);
+                println!("Testing regex pattern: {value}");
                 match Regex::new(value) {
                     Ok(reg) => {
                         reg.is_match(&[0, 1, 2, 3, 4, 5, 6, 7]);
                         regex_patterns.insert(value);
                     }
                     Err(e) => {
-                        eprintln!("Error: Invalid regex pattern: {}", e);
+                        eprintln!("Error: Invalid regex pattern: {e}");
                         return MatchRule::Empty;
                     }
                 }
@@ -260,7 +260,7 @@ fn match_to_rule(mat: &Match, regex_patterns: &mut RuleRegexes) -> MatchRule {
                         regex_patterns.insert(value);
                     }
                     Err(e) => {
-                        eprintln!("Error: Invalid regex pattern: {}", e);
+                        eprintln!("Error: Invalid regex pattern: {e}");
                         return MatchRule::Empty;
                     }
                 }
@@ -407,7 +407,7 @@ fn rules_to_string(match_rule: &MatchRule, regex_patterns: &RuleRegexes) -> Stri
                 .map(|match_rule| rules_to_string(match_rule, regex_patterns))
                 .collect::<Vec<String>>();
             let joined = strings.join(" || ");
-            format!("({})", joined)
+            format!("({joined})")
         }
         MatchRule::And(rules) => {
             let strings = rules
@@ -415,49 +415,45 @@ fn rules_to_string(match_rule: &MatchRule, regex_patterns: &RuleRegexes) -> Stri
                 .map(|match_rule| rules_to_string(match_rule, regex_patterns))
                 .collect::<Vec<String>>();
             let joined = strings.join(" && ");
-            format!("({})", joined)
+            format!("({joined})")
         }
         MatchRule::String(offset, bytes) => {
-            format!("offset(bytes, {}, &{:?})", offset, bytes)
+            format!("offset(bytes, {offset}, &{bytes:?})")
         }
         MatchRule::StringRange(start, end, bytes) => {
-            format!("offset_range(bytes, {}, {}, &{:?})", start, end, bytes)
+            format!("offset_range(bytes, {start}, {end}, &{bytes:?})")
         }
         MatchRule::StringCaseInsensitive(offset, bytes) => {
-            format!("offset_case_insensitive(bytes, {}, &{:?})", offset, bytes)
+            format!("offset_case_insensitive(bytes, {offset}, &{bytes:?})")
         }
         MatchRule::StringRangeCaseInsensitive(start, end, bytes) => {
             format!(
-                "offset_range_case_insensitive(bytes, {}, {}, &{:?})",
-                start, end, bytes
+                "offset_range_case_insensitive(bytes, {start}, {end}, &{bytes:?})"
             )
         }
         MatchRule::StringMask(offset, bytes, mask) => {
-            format!("offset_mask(bytes, {}, &{:?}, &{:?})", offset, bytes, mask)
+            format!("offset_mask(bytes, {offset}, &{bytes:?}, &{mask:?})")
         }
         MatchRule::StringMaskRange(start, end, bytes, mask) => {
             format!(
-                "offset_mask_range(bytes, {}, {}, &{:?}, &{:?})",
-                start, end, bytes, mask
+                "offset_mask_range(bytes, {start}, {end}, &{bytes:?}, &{mask:?})"
             )
         }
         MatchRule::StringMaskCaseInsensitive(offset, bytes, mask) => {
             format!(
-                "offset_mask_case_insensitive(bytes, {}, &{:?}, &{:?})",
-                offset, bytes, mask
+                "offset_mask_case_insensitive(bytes, {offset}, &{bytes:?}, &{mask:?})"
             )
         }
         MatchRule::StringMaskRangeCaseInsensitive(start, end, bytes, mask) => {
             format!(
-                "offset_mask_range_case_insensitive(bytes, {}, {}, &{:?}, &{:?})",
-                start, end, bytes, mask
+                "offset_mask_range_case_insensitive(bytes, {start}, {end}, &{bytes:?}, &{mask:?})"
             )
         }
         MatchRule::Regex(offset, pattern) => {
             let regex_index = regex_patterns
                 .get_index(pattern)
                 .expect("Regex pattern exists in rule");
-            format!("regex(bytes, {}, &REGEX_PATTERN_{})", offset, regex_index)
+            format!("regex(bytes, {offset}, &REGEX_PATTERN_{regex_index})")
         }
         MatchRule::RegexRange(start, end, pattern) => {
             let regex_index = regex_patterns
@@ -465,34 +461,33 @@ fn rules_to_string(match_rule: &MatchRule, regex_patterns: &RuleRegexes) -> Stri
                 .expect("Regex pattern exists in rule");
 
             format!(
-                "regex_range(bytes, {}, {}, &REGEX_PATTERN_{})",
-                start, end, regex_index
+                "regex_range(bytes, {start}, {end}, &REGEX_PATTERN_{regex_index})"
             )
         }
         MatchRule::ValueU32(offset, value) => {
-            format!("offset(bytes, {}, &{:?})", offset, value)
+            format!("offset(bytes, {offset}, &{value:?})")
         }
         MatchRule::ValueU16(offset, value) => {
-            format!("offset(bytes, {}, &{:?})", offset, value)
+            format!("offset(bytes, {offset}, &{value:?})")
         }
         MatchRule::Empty => "false".to_string(),
         MatchRule::UnicodeLE(offset, bytes) => {
-            format!("unicode_le(bytes, {}, &{:?})", offset, bytes)
+            format!("unicode_le(bytes, {offset}, &{bytes:?})")
         }
         MatchRule::UnicodeLERange(start, end, bytes) => {
-            format!("unicode_le_range(bytes, {}, {}, &{:?})", start, end, bytes)
+            format!("unicode_le_range(bytes, {start}, {end}, &{bytes:?})")
         }
         MatchRule::RootXML(Some(local), Some(namespace)) => {
-            format!("rootxml(bytes, \"{}\", \"{}\")", local, namespace)
+            format!("rootxml(bytes, \"{local}\", \"{namespace}\")")
         }
         MatchRule::RootXML(Some(local), None) => {
-            format!("rootxml_local(bytes, \"{}\")", local)
+            format!("rootxml_local(bytes, \"{local}\")")
         }
         MatchRule::RootXML(None, Some(namespace)) => {
-            format!("rootxml_namespace(bytes, \"{}\")", namespace)
+            format!("rootxml_namespace(bytes, \"{namespace}\")")
         }
         _ => {
-            panic!("Unsupported rule {:?}", match_rule);
+            panic!("Unsupported rule {match_rule:?}");
         }
     }
 }
@@ -560,7 +555,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let xml_paths = &args[1..];
     for xml_path in xml_paths {
-        println!("Processing file: {}", xml_path);
+        println!("Processing file: {xml_path}");
         let (omt, at) = parse_definition_file(xml_path)?;
         output_mime_types.extend(omt);
         alias_types.extend(at);
@@ -581,8 +576,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if error_out {
-        return Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
+        return Err(Box::new(std::io::Error::other(
             "We can't handle multiple definitions for the same mime type",
         )));
     }
@@ -635,7 +629,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         type_map
             .entry(alias.clone())
             .or_default()
-            .push(format!("&{}", short_name));
+            .push(format!("&{short_name}"));
     }
 
     let ctx = OutputTemplate {

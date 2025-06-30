@@ -261,12 +261,12 @@ pub(crate) fn rootxml(bytes: &[u8], local_name: &str, namespace_uri: &str) -> bo
 }
 
 pub(crate) fn rootxml_local(bytes: &[u8], local_name: &str) -> bool {
-    let local_name_tag = format!("<{} ", local_name);
+    let local_name_tag = format!("<{local_name} ");
     let local_name_bytes = local_name_tag.as_bytes();
-    let local_name_with_namespace = format!("{}:{} ", local_name, local_name);
+    let local_name_with_namespace = format!("{local_name}:{local_name} ");
     let local_name_with_namespace_bytes = local_name_with_namespace.as_bytes();
 
-    let localname_followed_by_namspace = format!(":{} xmlns", local_name);
+    let localname_followed_by_namspace = format!(":{local_name} xmlns");
     let localname_followed_by_namspace_bytes = localname_followed_by_namspace.as_bytes();
 
     file_is_text(bytes)

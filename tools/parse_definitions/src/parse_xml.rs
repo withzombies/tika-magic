@@ -174,15 +174,15 @@ impl FromStr for Offset {
         if let Some((start, end)) = input.split_once(':') {
             let start: u32 = start
                 .parse()
-                .map_err(|_| format!("Invalid start value: {}", start))?;
+                .map_err(|_| format!("Invalid start value: {start}"))?;
             let end: u32 = end
                 .parse()
-                .map_err(|_| format!("Invalid end value: {}", end))?;
+                .map_err(|_| format!("Invalid end value: {end}"))?;
             Ok(Offset::Range { start, end })
         } else {
             let start: u32 = input
                 .parse()
-                .map_err(|_| format!("Invalid single offset: {}", input))?;
+                .map_err(|_| format!("Invalid single offset: {input}"))?;
             Ok(Offset::Start(start))
         }
     }
