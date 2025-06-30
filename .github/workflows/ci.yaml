@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Build & Test (${{ matrix.os }}, ${{ matrix.rust }})
+    name: Build & Test (${{ matrix.os }}, ${{ matrix.rust.VERSION }}), ${{ matrix.rust.FLAGS }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Rust (${{ matrix.rust }})
+      - name: Set up Rust (${{ matrix.rust.VERSION }})
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust.VERSION }}
