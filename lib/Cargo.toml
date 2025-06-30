@@ -9,11 +9,11 @@ description = "Determines the MIME type of a file using the Apache Tika mime dat
 repository = "https://github.com/withzombies/tika-magic/"
 documentation = "https://docs.rs/tika-magic/"
 license = "Apache-2.0"
-readme = "../README.md"
+readme = "README.md"
 categories = ["parser-implementations", "filesystem"]
 keywords = ["mime", "filesystem", "media-types"]
 exclude = ["tests/*", "benches/*"]
-rust-version = "1.65.0"
+rust-version = "1.73.0"
 
 [dependencies]
 phf = { version = "^0.10.0", features = ["macros"] }

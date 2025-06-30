@@ -332,11 +332,7 @@ mod tests {
         assert_eq!(
             actual_mime,
             expected_mime,
-            "Test:{} failed Input: {:?}, Expected: {}, Got: {}",
-            name,
-            bytes,
-            expected_mime,
-            actual_mime // Added debug info on failure
+            "Test:{name} failed Input: {bytes:?}, Expected: {expected_mime}, Got: {actual_mime}" // Added debug info on failure
         );
     }
 }

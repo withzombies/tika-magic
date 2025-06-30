@@ -7,69 +7,94 @@ on:
 
 jobs:
   test-lib:
-    name: Test Library (${{ matrix.os }}, ${{ matrix.rust.VERSION }})
+    name: Test Library (${{ matrix.os }}, ${{ matrix.rust }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        rust:
-          - VERSION: stable
-            FLAGS: ""
-          - VERSION: 1.65.0
-            FLAGS: ""
-          - VERSION: nightly
-            FLAGS: ""
-          - VERSION: nightly
-            FLAGS: "-Z direct-minimal-versions"
+        rust: [stable, 1.73.0, nightly]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Rust (${{ matrix.rust.VERSION }})
+      - name: Set up Rust (${{ matrix.rust }})
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ matrix.rust.VERSION }}
+          toolchain: ${{ matrix.rust }}
 
       - name: Check lib package
-        run: cargo check -p tika-magic --tests ${{ matrix.rust.FLAGS }}
+        run: cd lib && cargo check --tests
+
+      - name: Run clippy on lib
+        run: cd lib && cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Check formatting on lib  
+        run: cd lib && cargo fmt --check
 
       - name: Test lib package
-        run: cargo test -p tika-magic ${{ matrix.rust.FLAGS }}
+        run: cd lib && cargo test
 
-  test-binaries:
-    name: Test Binaries (${{ matrix.os }}, ${{ matrix.rust.VERSION }})
+      - name: Test lib package with features
+        run: cd lib && cargo test --features "open_zips,open_ole"
+
+  test-file:
+    name: Test CLI Tool (${{ matrix.os }}, ${{ matrix.rust }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        rust:
-          - VERSION: stable
-            FLAGS: ""
-          - VERSION: 1.88.0
-            FLAGS: ""
-          - VERSION: nightly
-            FLAGS: ""
+        rust: [stable, 1.88.0, nightly]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Rust (${{ matrix.rust.VERSION }})
+      - name: Set up Rust (${{ matrix.rust }})
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ matrix.rust.VERSION }}
+          toolchain: ${{ matrix.rust }}
 
       - name: Check file binary
-        run: cargo check -p tika-magic-file ${{ matrix.rust.FLAGS }}
+        run: cd file && cargo check
 
-      - name: Check parse_definitions binary
-        run: cargo check -p parse_definitions ${{ matrix.rust.FLAGS }}
+      - name: Run clippy on file
+        run: cd file && cargo clippy --all-targets -- -D warnings
+
+      - name: Check formatting on file
+        run: cd file && cargo fmt --check
 
       - name: Test file binary
-        run: cargo test -p tika-magic-file ${{ matrix.rust.FLAGS }}
+        run: cd file && cargo test
+
+  test-tools:
+    name: Test Tools (${{ matrix.os }}, ${{ matrix.rust }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        rust: [stable, 1.88.0, nightly]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust (${{ matrix.rust }})
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Check parse_definitions binary
+        run: cd tools/parse_definitions && cargo check
+
+      - name: Run clippy on tools
+        run: cd tools/parse_definitions && cargo clippy --all-targets -- -D warnings
+
+      - name: Check formatting on tools
+        run: cd tools/parse_definitions && cargo fmt --check
 
       - name: Test parse_definitions binary
-        run: cargo test -p parse_definitions ${{ matrix.rust.FLAGS }}
+        run: cd tools/parse_definitions && cargo test

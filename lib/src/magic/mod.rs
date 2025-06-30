@@ -8,9 +8,9 @@ mod generated;
 mod ole;
 mod zip;
 
+pub use self::ole::OleSpecialHandler;
+pub use self::zip::ZipSpecialHandler;
 pub use generated::{EXT_MAP, MIME_MAP, MIME_TYPES};
-pub use ole::OleSpecialHandler;
-pub use zip::ZipSpecialHandler;
 
 use generated::*;
 

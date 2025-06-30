@@ -1,3 +1,0 @@
-[workspace]
-members = ["lib", "file", "tools/parse_definitions"]
-resolver = "2"
