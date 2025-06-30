@@ -48,7 +48,7 @@ jobs:
         rust:
           - VERSION: stable
             FLAGS: ""
-          - VERSION: 1.80.0
+          - VERSION: 1.88.0
             FLAGS: ""
           - VERSION: nightly
             FLAGS: ""
