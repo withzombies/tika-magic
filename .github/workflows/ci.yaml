@@ -23,6 +23,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
 
       - name: Check lib package
         run: cargo check --tests
@@ -56,6 +57,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
 
       - name: Check file binary
         run: cd tools/file && cargo check
@@ -86,6 +88,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
 
       - name: Check parse_definitions binary
         run: cd tools/parse_definitions && cargo check
