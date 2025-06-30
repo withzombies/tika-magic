@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  build-and-test:
-    name: Build & Test (${{ matrix.os }}, ${{ matrix.rust.VERSION }}), ${{ matrix.rust.FLAGS }}
+  test-lib:
+    name: Test Library (${{ matrix.os }}, ${{ matrix.rust.VERSION }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -32,6 +32,44 @@ jobs:
         with:
           toolchain: ${{ matrix.rust.VERSION }}
 
-      - run: cargo check --workspace --tests ${{ matrix.rust.FLAGS }}
+      - name: Check lib package
+        run: cargo check -p tika-magic --tests ${{ matrix.rust.FLAGS }}
 
-      - run: cargo test --workspace ${{ matrix.rust.FLAGS }}
+      - name: Test lib package
+        run: cargo test -p tika-magic ${{ matrix.rust.FLAGS }}
+
+  test-binaries:
+    name: Test Binaries (${{ matrix.os }}, ${{ matrix.rust.VERSION }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        rust:
+          - VERSION: stable
+            FLAGS: ""
+          - VERSION: 1.80.0
+            FLAGS: ""
+          - VERSION: nightly
+            FLAGS: ""
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust (${{ matrix.rust.VERSION }})
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust.VERSION }}
+
+      - name: Check file binary
+        run: cargo check -p tika-magic-file ${{ matrix.rust.FLAGS }}
+
+      - name: Check parse_definitions binary
+        run: cargo check -p parse_definitions ${{ matrix.rust.FLAGS }}
+
+      - name: Test file binary
+        run: cargo test -p tika-magic-file ${{ matrix.rust.FLAGS }}
+
+      - name: Test parse_definitions binary
+        run: cargo test -p parse_definitions ${{ matrix.rust.FLAGS }}

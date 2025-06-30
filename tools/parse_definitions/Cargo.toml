@@ -2,6 +2,7 @@
 name = "parse_definitions"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.80.0"
 
 [dependencies]
 hex = "0.4.3"
