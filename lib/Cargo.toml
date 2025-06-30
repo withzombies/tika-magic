@@ -13,7 +13,7 @@ readme = "../README.md"
 categories = ["parser-implementations", "filesystem"]
 keywords = ["mime", "filesystem", "media-types"]
 exclude = ["tests/*", "benches/*"]
-rust-version = "1.56.0"
+rust-version = "1.60.0"
 
 [dependencies]
 phf = { version = "^0.10.0", features = ["macros"] }
