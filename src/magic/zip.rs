@@ -118,8 +118,16 @@ mod zip_impl {
             Some(first.get_mime())
         }
 
-        pub(crate) fn check(&self, bytes: &[u8]) -> Option<&'static str> {
+        pub(crate) fn check<R>(&self, reader: &mut R) -> Option<&'static str>
+        where
+            R: Read + Seek,
+        {
             // Make sure it's a zip file
+
+            let mut bytes = [0; 2];
+            reader.read_exact(&mut bytes).ok()?;
+            reader.rewind().ok()?;
+
             let magic = bytes.get(0..2)?;
 
             if magic != b"PK" {
@@ -127,7 +135,7 @@ mod zip_impl {
             }
 
             // Try to open the zip and read its mimetype file
-            let Ok(mut zip) = zip::ZipArchive::new(Cursor::new(bytes)) else {
+            let Ok(mut zip) = zip::ZipArchive::new(reader) else {
                 return None;
             };
 
