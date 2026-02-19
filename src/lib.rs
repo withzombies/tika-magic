@@ -12,7 +12,7 @@ mod magic;
 
 use crate::magic::{MIME_MAP, MIME_TYPES, PRIORITY_MIME_TYPES};
 use std::fs::File;
-use std::io::Read;
+use std::io::{Cursor, Read, Seek};
 use std::path::Path;
 
 pub type Mime = &'static str;
@@ -33,7 +33,7 @@ pub type Mime = &'static str;
 /// assert_eq!(result, true);
 /// ```
 pub fn match_u8(mimetype: &str, bytes: &[u8]) -> bool {
-    if handle_special_files(bytes).is_some() {
+    if handle_special_files(&mut Cursor::new(bytes)).is_some() {
         return true;
     }
 
@@ -69,33 +69,89 @@ fn check_recursive(checker: &'static dyn magic::MimeTypeChecker, bytes: &[u8]) -
 }
 
 #[cfg(feature = "open_zips")]
-fn maybe_open_zip(bytes: &[u8]) -> Option<Mime> {
-    crate::magic::ZipSpecialHandler.check(bytes)
+fn maybe_open_zip<R>(reader: &mut R) -> Option<Mime>
+where
+    R: Read + Seek,
+{
+    crate::magic::ZipSpecialHandler.check(reader)
 }
 #[cfg(not(feature = "open_zips"))]
-fn maybe_open_zip(_bytes: &[u8]) -> Option<Mime> {
+fn maybe_open_zip<R>(_reader: &mut R) -> Option<Mime> {
     None
 }
 
 #[cfg(feature = "open_ole")]
-fn maybe_open_ole(bytes: &[u8]) -> Option<Mime> {
-    crate::magic::OleSpecialHandler.check(bytes)
+fn maybe_open_ole<R>(reader: &mut R) -> Option<Mime>
+where
+    R: Read + Seek,
+{
+    crate::magic::OleSpecialHandler.check(reader)
 }
 #[cfg(not(feature = "open_ole"))]
-fn maybe_open_ole(_bytes: &[u8]) -> Option<Mime> {
+fn maybe_open_ole<R>(_reader: &mut R) -> Option<Mime> {
     None
 }
 
-fn handle_special_files(bytes: &[u8]) -> Option<Mime> {
-    if let Some(mime) = maybe_open_zip(bytes) {
+fn handle_special_files<R>(reader: &mut R) -> Option<Mime>
+where
+    R: Read + Seek,
+{
+    if let Some(mime) = maybe_open_zip(reader) {
         return Some(mime);
     }
 
-    if let Some(mime) = maybe_open_ole(bytes) {
+    reader.rewind().ok()?;
+
+    if let Some(mime) = maybe_open_ole(reader) {
         return Some(mime);
     }
 
     None
+}
+
+/// Gets the MIME from a reader
+///
+/// Returns MIME as string.
+///
+/// # Examples
+/// ```rust
+/// // Load a docx file
+/// let input: &[u8] = include_bytes!("../tests/inputs/application/vnd.openxmlformats-officedocument.wordprocessingml.document/testWORD.docx");
+///
+/// // Find the MIME type of the docx
+/// let result = tika_magic::from_u8(input);
+/// assert_eq!(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+/// ```
+pub fn from_reader<R>(reader: &mut R) -> Option<Mime>
+where
+    R: Read + Seek,
+{
+    if let Some(mime) = handle_special_files(reader) {
+        return Some(mime);
+    }
+
+    reader.rewind().ok()?;
+
+    let mut buf = [0u8; 0x20000];
+    match reader.take(buf.len() as u64).read(&mut buf) {
+        Ok(0) => return None,
+        Err(_) => return None,
+        _ => (),
+    }
+
+    for m in PRIORITY_MIME_TYPES {
+        if let Some(mime) = check_recursive(*m, &buf) {
+            return Some(mime);
+        }
+    }
+
+    for m in MIME_TYPES {
+        if let Some(mime) = check_recursive(*m, &buf) {
+            return Some(mime);
+        }
+    }
+
+    Some("application/octet-stream")
 }
 
 /// Gets the MIME from a byte stream.
@@ -112,7 +168,7 @@ fn handle_special_files(bytes: &[u8]) -> Option<Mime> {
 /// assert_eq!(result, "image/gif");
 /// ```
 pub fn from_u8(bytes: &[u8]) -> Mime {
-    if let Some(mime) = handle_special_files(bytes) {
+    if let Some(mime) = handle_special_files(&mut Cursor::new(bytes)) {
         return mime;
     }
 
@@ -215,16 +271,9 @@ pub fn match_filepath(mimetype: &str, path: &Path) -> bool {
 /// let result = tika_magic::from_file(&file);
 /// assert_eq!(result, Some("image/gif"));
 /// ```
-pub fn from_file(file: &File) -> Option<Mime> {
-    let mut buf = [0u8; 0x20000];
-
-    match file.take(buf.len() as u64).read(&mut buf) {
-        Ok(0) => return None,
-        Err(_) => return None,
-        _ => (),
-    }
-
-    Some(from_u8(&buf))
+pub fn from_file(mut file: &File) -> Option<Mime> {
+    // let mut reader = BufReader::new(file);
+    from_reader(&mut file)
 }
 
 /// Gets all the MIME types that match a file.

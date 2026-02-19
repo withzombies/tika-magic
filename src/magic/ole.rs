@@ -3,16 +3,24 @@ pub struct OleSpecialHandler;
 mod ole_impl {
     use crate::magic::OleSpecialHandler;
     use ole::Reader;
-    use std::io::Read;
+    use std::io::{Read, Seek};
 
     impl OleSpecialHandler {
-        pub(crate) fn check(&self, bytes: &[u8]) -> Option<&'static str> {
-            let magic = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
+        pub(crate) fn check<R>(&self, reader: &mut R) -> Option<&'static str>
+        where
+            R: Read + Seek,
+        {
+            let magic: [u8; 8] = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
+            let mut bytes: [u8; 8] = [0; 8];
+
+            reader.read_exact(&mut bytes).ok()?;
+            reader.rewind().ok()?;
+
             if !bytes.starts_with(&magic) {
                 return None;
             }
 
-            let Ok(reader) = Reader::new(bytes) else {
+            let Ok(reader) = Reader::new(reader) else {
                 return None;
             };
 
